@@ -1,0 +1,508 @@
+{
+  "schemaVersion": {
+    "major": 1,
+    "minor": 2
+  },
+  "identifier": "tube-track-uk.beck.heathrow-golden-slice.v1",
+  "geometryStatus": "authored",
+  "source": {
+    "graphSchemaVersion": 1,
+    "graphGeneratedAt": "2026-08-18T09:26:41.336750+00:00",
+    "note": "Hand-authored Heathrow Piccadilly line trace aligned to the supplied TfL reference crop. Operational segments remain independent from the drawing control points."
+  },
+  "artworkSize": {
+    "width": 1284,
+    "height": 1418
+  },
+  "styles": {
+    "routeStrokeWidth": 28,
+    "affectedOuterStrokeWidth": 62,
+    "affectedKnockoutStrokeWidth": 46,
+    "affectedRouteStrokeWidth": 32,
+    "primaryLabelFontSize": 42,
+    "secondaryLabelFontSize": 36,
+    "labelPadding": 10
+  },
+  "debugReference": {
+    "resourceName": "heathrow-reference-debug",
+    "resourceExtension": "png",
+    "geometryOpacity": 0.4
+  },
+  "paths": [
+    {
+      "id": "beck.v1.path.piccadilly.hr5-hrc",
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 217,
+            "y": 1025
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 217,
+            "y": 900
+          }
+        },
+        {
+          "op": "cubic",
+          "control1": {
+            "x": 217,
+            "y": 866
+          },
+          "control2": {
+            "x": 228,
+            "y": 840
+          },
+          "to": {
+            "x": 247,
+            "y": 818
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 338,
+            "y": 727
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 610,
+            "y": 455
+          }
+        }
+      ]
+    },
+    {
+      "id": "beck.v1.path.piccadilly.hrc-hnx",
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 610,
+            "y": 455
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 740,
+            "y": 325
+          }
+        }
+      ]
+    },
+    {
+      "id": "beck.v1.path.piccadilly.hnx-hr4",
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 740,
+            "y": 325
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 710,
+            "y": 355
+          }
+        },
+        {
+          "op": "cubic",
+          "control1": {
+            "x": 701,
+            "y": 364
+          },
+          "control2": {
+            "x": 697,
+            "y": 381
+          },
+          "to": {
+            "x": 697,
+            "y": 405
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 697,
+            "y": 910
+          }
+        },
+        {
+          "op": "cubic",
+          "control1": {
+            "x": 697,
+            "y": 970
+          },
+          "control2": {
+            "x": 670,
+            "y": 1025
+          },
+          "to": {
+            "x": 610,
+            "y": 1025
+          }
+        }
+      ]
+    },
+    {
+      "id": "beck.v1.path.piccadilly.hr4-hrc",
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 610,
+            "y": 1025
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 450,
+            "y": 1025
+          }
+        },
+        {
+          "op": "cubic",
+          "control1": {
+            "x": 386,
+            "y": 1025
+          },
+          "control2": {
+            "x": 338,
+            "y": 977
+          },
+          "to": {
+            "x": 338,
+            "y": 913
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 338,
+            "y": 727
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 610,
+            "y": 455
+          }
+        }
+      ]
+    },
+    {
+      "id": "beck.v1.path.piccadilly.hnx-hwt",
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 740,
+            "y": 325
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 910,
+            "y": 155
+          }
+        }
+      ]
+    }
+  ],
+  "segments": [
+    {
+      "id": "piccadilly:940GZZLUHR5:940GZZLUHRC",
+      "lineID": "piccadilly",
+      "fromStationID": "940GZZLUHR5",
+      "toStationID": "940GZZLUHRC",
+      "pathID": "beck.v1.path.piccadilly.hr5-hrc",
+      "pathDirection": "forward",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "piccadilly:940GZZLUHNX:940GZZLUHRC",
+      "lineID": "piccadilly",
+      "fromStationID": "940GZZLUHRC",
+      "toStationID": "940GZZLUHNX",
+      "pathID": "beck.v1.path.piccadilly.hrc-hnx",
+      "pathDirection": "forward",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "piccadilly:940GZZLUHNX:940GZZLUHR4",
+      "lineID": "piccadilly",
+      "fromStationID": "940GZZLUHNX",
+      "toStationID": "940GZZLUHR4",
+      "pathID": "beck.v1.path.piccadilly.hnx-hr4",
+      "pathDirection": "forward",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "piccadilly:940GZZLUHR4:940GZZLUHRC",
+      "lineID": "piccadilly",
+      "fromStationID": "940GZZLUHR4",
+      "toStationID": "940GZZLUHRC",
+      "pathID": "beck.v1.path.piccadilly.hr4-hrc",
+      "pathDirection": "forward",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": "piccadilly:940GZZLUHNX:940GZZLUHWT",
+      "lineID": "piccadilly",
+      "fromStationID": "940GZZLUHNX",
+      "toStationID": "940GZZLUHWT",
+      "pathID": "beck.v1.path.piccadilly.hnx-hwt",
+      "pathDirection": "forward",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "stationMarkers": [
+    {
+      "stationID": "940GZZLUHR5",
+      "name": "Heathrow Terminal 5",
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "anchor": {
+        "x": 217,
+        "y": 1025
+      },
+      "hitRadius": 34,
+      "primitives": [
+        {
+          "kind": "circle",
+          "circle": {
+            "centre": {
+              "x": 217,
+              "y": 1025
+            },
+            "radius": 15,
+            "outlineWidth": 4
+          }
+        }
+      ]
+    },
+    {
+      "stationID": "940GZZLUHRC",
+      "name": "Heathrow Terminals 2 & 3",
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "anchor": {
+        "x": 610,
+        "y": 455
+      },
+      "hitRadius": 34,
+      "primitives": [
+        {
+          "kind": "circle",
+          "circle": {
+            "centre": {
+              "x": 610,
+              "y": 455
+            },
+            "radius": 15,
+            "outlineWidth": 4
+          }
+        }
+      ]
+    },
+    {
+      "stationID": "940GZZLUHNX",
+      "name": "Hatton Cross",
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "anchor": {
+        "x": 740,
+        "y": 325
+      },
+      "hitRadius": 34,
+      "primitives": [
+        {
+          "kind": "circle",
+          "circle": {
+            "centre": {
+              "x": 740,
+              "y": 325
+            },
+            "radius": 15,
+            "outlineWidth": 4
+          }
+        }
+      ]
+    },
+    {
+      "stationID": "940GZZLUHR4",
+      "name": "Heathrow Terminal 4",
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "anchor": {
+        "x": 610,
+        "y": 1025
+      },
+      "hitRadius": 34,
+      "primitives": [
+        {
+          "kind": "circle",
+          "circle": {
+            "centre": {
+              "x": 610,
+              "y": 1025
+            },
+            "radius": 15,
+            "outlineWidth": 4
+          }
+        }
+      ]
+    },
+    {
+      "stationID": "940GZZLUHWT",
+      "name": "Hounslow West",
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "anchor": {
+        "x": 910,
+        "y": 155
+      },
+      "hitRadius": 34,
+      "primitives": [
+        {
+          "kind": "circle",
+          "circle": {
+            "centre": {
+              "x": 910,
+              "y": 155
+            },
+            "radius": 15,
+            "outlineWidth": 4
+          }
+        }
+      ]
+    }
+  ],
+  "labels": [
+    {
+      "id": "beck.v1.label.940GZZLUHR5",
+      "stationID": "940GZZLUHR5",
+      "text": "Heathrow\nTerminal 5",
+      "position": {
+        "x": 217,
+        "y": 1110
+      },
+      "alignment": "centre",
+      "rotationDegrees": 0,
+      "priority": 10
+    },
+    {
+      "id": "beck.v1.label.940GZZLUHRC",
+      "stationID": "940GZZLUHRC",
+      "text": "Heathrow\nTerminals 2 & 3",
+      "position": {
+        "x": 555,
+        "y": 375
+      },
+      "alignment": "trailing",
+      "rotationDegrees": 0,
+      "priority": 10
+    },
+    {
+      "id": "beck.v1.label.940GZZLUHNX",
+      "stationID": "940GZZLUHNX",
+      "text": "Hatton Cross",
+      "position": {
+        "x": 770,
+        "y": 365
+      },
+      "alignment": "leading",
+      "rotationDegrees": 0,
+      "priority": 10
+    },
+    {
+      "id": "beck.v1.label.940GZZLUHR4",
+      "stationID": "940GZZLUHR4",
+      "text": "Heathrow\nTerminal 4",
+      "position": {
+        "x": 610,
+        "y": 1110
+      },
+      "alignment": "centre",
+      "rotationDegrees": 0,
+      "priority": 10
+    },
+    {
+      "id": "beck.v1.label.940GZZLUHWT",
+      "stationID": "940GZZLUHWT",
+      "text": "Hounslow West",
+      "position": {
+        "x": 945,
+        "y": 230
+      },
+      "alignment": "leading",
+      "rotationDegrees": 0,
+      "priority": 10
+    }
+  ],
+  "routes": [
+    {
+      "id": "piccadilly.heathrow-terminal-5-east.v1",
+      "lineID": "piccadilly",
+      "stationIDs": [
+        "940GZZLUHR5",
+        "940GZZLUHRC",
+        "940GZZLUHNX",
+        "940GZZLUHWT"
+      ],
+      "segmentIDs": [
+        "piccadilly:940GZZLUHR5:940GZZLUHRC",
+        "piccadilly:940GZZLUHNX:940GZZLUHRC",
+        "piccadilly:940GZZLUHNX:940GZZLUHWT"
+      ]
+    },
+    {
+      "id": "piccadilly.heathrow-terminal-4-loop-east.v1",
+      "lineID": "piccadilly",
+      "stationIDs": [
+        "940GZZLUHNX",
+        "940GZZLUHR4",
+        "940GZZLUHRC",
+        "940GZZLUHNX",
+        "940GZZLUHWT"
+      ],
+      "segmentIDs": [
+        "piccadilly:940GZZLUHNX:940GZZLUHR4",
+        "piccadilly:940GZZLUHR4:940GZZLUHRC",
+        "piccadilly:940GZZLUHNX:940GZZLUHRC",
+        "piccadilly:940GZZLUHNX:940GZZLUHWT"
+      ]
+    }
+  ]
+}

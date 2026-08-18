@@ -152,6 +152,28 @@ CENTRAL_SCHEMATIC_POINTS: dict[str, tuple[float, float]] = {
     "Shepherd's Bush Market": (130, 505),
     "Goldhawk Road": (130, 565),
     "Hammersmith (H&C Line)": (85, 610),
+    # Heathrow follows the diagram's compact terminal loop rather than placing
+    # three terminal names on a geographic east-west run.
+    "Heathrow Terminals 2 & 3": (-71, 469),
+    "Heathrow Terminal 5": (-119, 541),
+    "Heathrow Terminal 4": (-71, 541),
+}
+
+# A station can have separate route-aligned platforms. Keep the station's
+# canonical point for selection/focus, while authoring each coloured route to
+# its own platform point. The renderer draws the interchange connector bar.
+SCHEMATIC_ROUTE_POINT_OVERRIDES: dict[tuple[str, str], tuple[float, float]] = {
+    ("circle", "Paddington"): (350, 325),
+    ("district", "Paddington"): (350, 325),
+}
+SCHEMATIC_SEGMENT_PATH_OVERRIDES: dict[
+    tuple[str, str, str], tuple[tuple[float, float], ...]
+] = {
+    ("piccadilly", "Heathrow Terminal 5", "Heathrow Terminals 2 & 3"): (
+        (-119, 541),
+        (-119, 517),
+        (-71, 469),
+    ),
 }
 
 
@@ -313,6 +335,42 @@ def octilinear_path(start: tuple[float, float], end: tuple[float, float]) -> lis
     points.append({"x": round(elbow_x, 2), "y": round(elbow_y, 2)})
     points.append({"x": x2, "y": y2})
     return points
+
+
+def schematic_route_point(
+    line_id: str,
+    station_id: str,
+    stations: dict[str, dict[str, Any]],
+    station_points: dict[str, tuple[float, float]],
+) -> tuple[float, float]:
+    station_name = stations[station_id]["name"]
+    return SCHEMATIC_ROUTE_POINT_OVERRIDES.get(
+        (line_id, station_name),
+        station_points[station_id],
+    )
+
+
+def schematic_segment_path(
+    line_id: str,
+    from_id: str,
+    to_id: str,
+    stations: dict[str, dict[str, Any]],
+    station_points: dict[str, tuple[float, float]],
+) -> list[dict[str, float]]:
+    from_name = stations[from_id]["name"]
+    to_name = stations[to_id]["name"]
+    direct_key = (line_id, from_name, to_name)
+    reverse_key = (line_id, to_name, from_name)
+    if direct_key in SCHEMATIC_SEGMENT_PATH_OVERRIDES:
+        points = SCHEMATIC_SEGMENT_PATH_OVERRIDES[direct_key]
+        return [{"x": x, "y": y} for x, y in points]
+    if reverse_key in SCHEMATIC_SEGMENT_PATH_OVERRIDES:
+        points = reversed(SCHEMATIC_SEGMENT_PATH_OVERRIDES[reverse_key])
+        return [{"x": x, "y": y} for x, y in points]
+    return octilinear_path(
+        schematic_route_point(line_id, from_id, stations, station_points),
+        schematic_route_point(line_id, to_id, stations, station_points),
+    )
 
 
 def geographic_line_strings(payload: dict[str, Any]) -> list[list[tuple[float, float]]]:
@@ -494,7 +552,13 @@ def main() -> int:
                         "lineID": line_id,
                         "fromStationID": from_id,
                         "toStationID": to_id,
-                        "schematicPoints": octilinear_path(station_points[from_id], station_points[to_id]),
+                        "schematicPoints": schematic_segment_path(
+                            line_id,
+                            from_id,
+                            to_id,
+                            station_records,
+                            station_points,
+                        ),
                         "geographicPoints": geographic_points,
                     }
                 )

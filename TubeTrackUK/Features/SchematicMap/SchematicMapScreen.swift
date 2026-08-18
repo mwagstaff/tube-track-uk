@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SchematicMapScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(\.colorScheme) private var colorScheme
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
     @State private var resetToken = 0
     private let routesOnlyDebugEnabled = ProcessInfo.processInfo.arguments.contains("--schematic-routes-only")
@@ -36,13 +37,19 @@ struct SchematicMapScreen: View {
     }
 
     private var background: some View {
-        ZStack {
-            Color(.systemGroupedBackground)
-            LinearGradient(
-                colors: [.blue.opacity(0.07), .clear, .cyan.opacity(0.04)],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+        Group {
+            if colorScheme == .dark {
+                SchematicMapPalette.darkBackground
+            } else {
+                ZStack {
+                    Color(.systemGroupedBackground)
+                    LinearGradient(
+                        colors: [.blue.opacity(0.07), .clear, .cyan.opacity(0.04)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                }
+            }
         }
         .ignoresSafeArea()
     }

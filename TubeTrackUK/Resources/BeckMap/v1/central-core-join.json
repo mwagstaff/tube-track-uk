@@ -1,0 +1,3903 @@
+{
+  "artworkSize": {
+    "height": 2000.0,
+    "width": 2600.0
+  },
+  "debugReference": {
+    "geometryOpacity": 0.52,
+    "resourceExtension": "png",
+    "resourceName": "central-core-join-reference-debug"
+  },
+  "geometryStatus": "authored",
+  "identifier": "tube-track-uk.beck.central-core-join.v1",
+  "labels": [
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUSKS",
+      "position": {
+        "x": 600,
+        "y": 1192
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSKS",
+      "text": "South\nKensington"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUSSQ",
+      "position": {
+        "x": 719,
+        "y": 1192
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSSQ",
+      "text": "Sloane\nSquare"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUVIC",
+      "position": {
+        "x": 810,
+        "y": 1133
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUVIC",
+      "text": "Victoria"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUSJP",
+      "position": {
+        "x": 855,
+        "y": 1192
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSJP",
+      "text": "St James's\nPark"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUWSM",
+      "position": {
+        "x": 960,
+        "y": 1134
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWSM",
+      "text": "Westminster"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUEMB",
+      "position": {
+        "x": 1102,
+        "y": 1137
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUEMB",
+      "text": "Embankment"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUTMP",
+      "position": {
+        "x": 1160,
+        "y": 1190
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTMP",
+      "text": "Temple"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUBKF",
+      "position": {
+        "x": 1180,
+        "y": 1103
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBKF",
+      "text": "Blackfriars"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUMSH",
+      "position": {
+        "x": 1221,
+        "y": 1060
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUMSH",
+      "text": "Mansion\nHouse"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUCST",
+      "position": {
+        "x": 1300,
+        "y": 998
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCST",
+      "text": "Cannon\nStreet"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUGPK",
+      "position": {
+        "x": 840,
+        "y": 972
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUGPK",
+      "text": "Green Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUPCC",
+      "position": {
+        "x": 908,
+        "y": 1021
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUPCC",
+      "text": "Piccadilly\nCircus"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLULSQ",
+      "position": {
+        "x": 984,
+        "y": 962
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLULSQ",
+      "text": "Leicester\nSquare"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUCGN",
+      "position": {
+        "x": 1126,
+        "y": 995
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCGN",
+      "text": "Covent\nGarden"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUHBN",
+      "position": {
+        "x": 1102,
+        "y": 904
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHBN",
+      "text": "Holborn"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLURSQ",
+      "position": {
+        "x": 1165,
+        "y": 742
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLURSQ",
+      "text": "Russell\nSquare"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUKSX",
+      "position": {
+        "x": 1290,
+        "y": 596
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUKSX",
+      "text": "King's Cross\n& St Pancras"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUOXC",
+      "position": {
+        "x": 910,
+        "y": 900
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUOXC",
+      "text": "Oxford Circus"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUTCR",
+      "position": {
+        "x": 1077,
+        "y": 820
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTCR",
+      "text": "Tottenham\nCourt Road"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUWRR",
+      "position": {
+        "x": 1081,
+        "y": 742
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWRR",
+      "text": "Warren\nStreet"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUGDG",
+      "position": {
+        "x": 1003,
+        "y": 813
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUGDG",
+      "text": "Goodge\nStreet"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUEUS",
+      "position": {
+        "x": 1024,
+        "y": 608
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUEUS",
+      "text": "Euston"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUCHX",
+      "position": {
+        "x": 1078,
+        "y": 1055
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCHX",
+      "text": "Charing\nCross"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUWLO",
+      "position": {
+        "x": 958,
+        "y": 1274
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWLO",
+      "text": "Waterloo"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUSWK",
+      "position": {
+        "x": 1120,
+        "y": 1320
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSWK",
+      "text": "Southwark"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLULNB",
+      "position": {
+        "x": 1465,
+        "y": 1146
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLULNB",
+      "text": "London Bridge"
+    }
+  ],
+  "paths": [
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 898.625,
+            "y": 895.01
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 898.625,
+            "y": 907.078
+          }
+        },
+        {
+          "control1": {
+            "x": 898.625,
+            "y": 914.844
+          },
+          "control2": {
+            "x": 901.625,
+            "y": 922.61
+          },
+          "op": "cubic",
+          "to": {
+            "x": 906.828,
+            "y": 926.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 980.07,
+            "y": 1000.091
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 980.07,
+            "y": 1000.091
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1068.454,
+            "y": 1088.443
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1068.454,
+            "y": 1088.443
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1082.891,
+            "y": 1102.875
+          }
+        },
+        {
+          "control1": {
+            "x": 1088.109,
+            "y": 1107.125
+          },
+          "control2": {
+            "x": 1091.094,
+            "y": 1114.891
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1091.094,
+            "y": 1122.672
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1091.094,
+            "y": 1168.051
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1091.094,
+            "y": 1168.051
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1091.094,
+            "y": 1270.021
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 900.003,
+            "y": 892.344
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1067.074,
+            "y": 892.344
+          }
+        }
+      ],
+      "id": "beck.v1.path.central.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1067.074,
+            "y": 892.344
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1153.593,
+            "y": 892.344
+          }
+        },
+        {
+          "control1": {
+            "x": 1159.968,
+            "y": 892.344
+          },
+          "control2": {
+            "x": 1168.89,
+            "y": 896.031
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1173.406,
+            "y": 900.547
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1185.428,
+            "y": 912.579
+          }
+        }
+      ],
+      "id": "beck.v1.path.central.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 623.878,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 743.71,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 743.71,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 830.069,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 830.069,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 899.692,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 899.692,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 974.002,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 974.002,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1091.825,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1091.825,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1190.235,
+            "y": 1164.734
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1190.235,
+            "y": 1164.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1216.344,
+            "y": 1164.734
+          }
+        },
+        {
+          "control1": {
+            "x": 1221.703,
+            "y": 1164.734
+          },
+          "control2": {
+            "x": 1226.734,
+            "y": 1162.656
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1230.515,
+            "y": 1158.859
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1278.679,
+            "y": 1110.696
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1278.679,
+            "y": 1110.696
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1327.169,
+            "y": 1062.206
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1327.169,
+            "y": 1062.206
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1363.25,
+            "y": 1026.124
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.central-core-join.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 624.691,
+            "y": 1173.039
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 744.73,
+            "y": 1173.037
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 744.73,
+            "y": 1173.037
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 830.473,
+            "y": 1173.036
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 830.473,
+            "y": 1173.036
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 901.516,
+            "y": 1173.035
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 901.516,
+            "y": 1173.035
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 973.785,
+            "y": 1173.034
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 973.785,
+            "y": 1173.034
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1091.374,
+            "y": 1173.033
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1091.374,
+            "y": 1173.033
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1189.365,
+            "y": 1173.031
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1189.365,
+            "y": 1173.031
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1216.313,
+            "y": 1173.031
+          }
+        },
+        {
+          "control1": {
+            "x": 1224.141,
+            "y": 1173.031
+          },
+          "control2": {
+            "x": 1231.204,
+            "y": 1169.875
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1236.329,
+            "y": 1164.75
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1282.043,
+            "y": 1119.04
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1282.043,
+            "y": 1119.04
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1330.043,
+            "y": 1071.044
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1330.043,
+            "y": 1071.044
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1366.125,
+            "y": 1034.966
+          }
+        }
+      ],
+      "id": "beck.v1.path.district.central-core-join.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 829.982,
+            "y": 999.966
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 854.156,
+            "y": 1024.14
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 859.953,
+            "y": 1029.968
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 985.992,
+            "y": 1155.985
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 985.992,
+            "y": 1155.985
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1034.281,
+            "y": 1204.265
+          }
+        },
+        {
+          "control1": {
+            "x": 1038.5,
+            "y": 1207.953
+          },
+          "control2": {
+            "x": 1042.469,
+            "y": 1216.422
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1042.469,
+            "y": 1224.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1042.469,
+            "y": 1270.019
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1042.469,
+            "y": 1270.019
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1042.469,
+            "y": 1276.031
+          }
+        },
+        {
+          "control1": {
+            "x": 1042.469,
+            "y": 1291.343
+          },
+          "control2": {
+            "x": 1054.906,
+            "y": 1303.765
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1070.219,
+            "y": 1303.765
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1113.406,
+            "y": 1303.781
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1121.703,
+            "y": 1303.781
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1161.019,
+            "y": 1303.787
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1161.019,
+            "y": 1303.787
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1229.125,
+            "y": 1303.797
+          }
+        },
+        {
+          "control1": {
+            "x": 1234.687,
+            "y": 1304.093
+          },
+          "control2": {
+            "x": 1243.422,
+            "y": 1301.093
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1248.922,
+            "y": 1295.593
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1375.593,
+            "y": 1168.906
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1381.062,
+            "y": 1163.515
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1401.75,
+            "y": 1142.828
+          }
+        },
+        {
+          "control1": {
+            "x": 1406.25,
+            "y": 1138.312
+          },
+          "control2": {
+            "x": 1415.156,
+            "y": 1134.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1421.547,
+            "y": 1134.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1442.015,
+            "y": 1134.703
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1450.093,
+            "y": 1134.703
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1455.039,
+            "y": 1134.702
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1095.589,
+            "y": 620.009
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1095.578,
+            "y": 652.172
+          }
+        },
+        {
+          "control1": {
+            "x": 1095.578,
+            "y": 658.547
+          },
+          "control2": {
+            "x": 1091.891,
+            "y": 667.453
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1087.391,
+            "y": 671.969
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1074.781,
+            "y": 684.578
+          }
+        },
+        {
+          "control1": {
+            "x": 1070.266,
+            "y": 689.078
+          },
+          "control2": {
+            "x": 1066.578,
+            "y": 698.0
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1066.578,
+            "y": 704.375
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 723.621
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 723.621
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 820.651
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 820.651
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 895.228
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 895.228
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 998.674
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 998.674
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 1089.29
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 1089.29
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 1167.876
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.578,
+            "y": 1167.876
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.578,
+            "y": 1269.719
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.charing-cross.central-core-join.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1128.641,
+            "y": 618.325
+          }
+        },
+        {
+          "control1": {
+            "x": 1129.251,
+            "y": 622.588
+          },
+          "control2": {
+            "x": 1131.216,
+            "y": 626.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1134.312,
+            "y": 629.625
+          }
+        },
+        {
+          "control1": {
+            "x": 1138.094,
+            "y": 633.406
+          },
+          "control2": {
+            "x": 1143.125,
+            "y": 635.485
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1148.484,
+            "y": 635.485
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1183.406,
+            "y": 635.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1190.375,
+            "y": 635.469
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1204.516,
+            "y": 635.453
+          }
+        },
+        {
+          "control1": {
+            "x": 1212.328,
+            "y": 635.453
+          },
+          "control2": {
+            "x": 1219.422,
+            "y": 638.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1224.531,
+            "y": 643.75
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1237.402,
+            "y": 656.621
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.euston-kings-cross.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 830.087,
+            "y": 999.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 979.879,
+            "y": 999.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 979.879,
+            "y": 999.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1066.954,
+            "y": 999.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1066.954,
+            "y": 999.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1087.953,
+            "y": 999.203
+          }
+        },
+        {
+          "control1": {
+            "x": 1094.328,
+            "y": 999.203
+          },
+          "control2": {
+            "x": 1103.25,
+            "y": 995.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1107.75,
+            "y": 991.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1129.408,
+            "y": 969.342
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1129.408,
+            "y": 969.342
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1186.415,
+            "y": 912.335
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1186.415,
+            "y": 912.335
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1219.968,
+            "y": 878.781
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1224.109,
+            "y": 874.735
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1229.375,
+            "y": 869.469
+          }
+        },
+        {
+          "control1": {
+            "x": 1233.89,
+            "y": 864.953
+          },
+          "control2": {
+            "x": 1237.578,
+            "y": 856.047
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1237.578,
+            "y": 849.656
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1237.578,
+            "y": 790.027
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1237.578,
+            "y": 790.027
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1237.578,
+            "y": 741.828
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1237.593,
+            "y": 728.469
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1237.593,
+            "y": 656.006
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.central-core-join.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 829.219,
+            "y": 998.971
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 829.25,
+            "y": 973.406
+          }
+        },
+        {
+          "control1": {
+            "x": 829.25,
+            "y": 967.016
+          },
+          "control2": {
+            "x": 832.875,
+            "y": 958.172
+          },
+          "op": "cubic",
+          "to": {
+            "x": 837.391,
+            "y": 953.672
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 878.672,
+            "y": 912.375
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 883.531,
+            "y": 907.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 898.951,
+            "y": 892.095
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.central-core-join.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 898.951,
+            "y": 892.095
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1060.766,
+            "y": 730.266
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1065.359,
+            "y": 725.688
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1067.038,
+            "y": 724.009
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.central-core-join.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1067.038,
+            "y": 724.009
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1125.312,
+            "y": 665.719
+          }
+        },
+        {
+          "control1": {
+            "x": 1126.03,
+            "y": 665.001
+          },
+          "control2": {
+            "x": 1126.859,
+            "y": 664.304
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1127.772,
+            "y": 663.639
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.central-core-join.v1.2"
+    }
+  ],
+  "routes": [
+    {
+      "id": "bakerloo.central-core-join.v1",
+      "lineID": "bakerloo",
+      "segmentIDs": [
+        "bakerloo:940GZZLUOXC:940GZZLUPCC",
+        "bakerloo:940GZZLUCHX:940GZZLUPCC",
+        "bakerloo:940GZZLUCHX:940GZZLUEMB",
+        "bakerloo:940GZZLUEMB:940GZZLUWLO"
+      ],
+      "stationIDs": [
+        "940GZZLUOXC",
+        "940GZZLUPCC",
+        "940GZZLUCHX",
+        "940GZZLUEMB",
+        "940GZZLUWLO"
+      ]
+    },
+    {
+      "id": "central.central-core-join.v1",
+      "lineID": "central",
+      "segmentIDs": [
+        "central:940GZZLUOXC:940GZZLUTCR",
+        "central:940GZZLUHBN:940GZZLUTCR"
+      ],
+      "stationIDs": [
+        "940GZZLUOXC",
+        "940GZZLUTCR",
+        "940GZZLUHBN"
+      ]
+    },
+    {
+      "id": "circle.central-core-join.v1",
+      "lineID": "circle",
+      "segmentIDs": [
+        "circle:940GZZLUSKS:940GZZLUSSQ",
+        "circle:940GZZLUSSQ:940GZZLUVIC",
+        "circle:940GZZLUSJP:940GZZLUVIC",
+        "circle:940GZZLUSJP:940GZZLUWSM",
+        "circle:940GZZLUEMB:940GZZLUWSM",
+        "circle:940GZZLUEMB:940GZZLUTMP",
+        "circle:940GZZLUBKF:940GZZLUTMP",
+        "circle:940GZZLUBKF:940GZZLUMSH",
+        "circle:940GZZLUCST:940GZZLUMSH"
+      ],
+      "stationIDs": [
+        "940GZZLUSKS",
+        "940GZZLUSSQ",
+        "940GZZLUVIC",
+        "940GZZLUSJP",
+        "940GZZLUWSM",
+        "940GZZLUEMB",
+        "940GZZLUTMP",
+        "940GZZLUBKF",
+        "940GZZLUMSH",
+        "940GZZLUCST"
+      ]
+    },
+    {
+      "id": "district.central-core-join.v1",
+      "lineID": "district",
+      "segmentIDs": [
+        "district:940GZZLUSKS:940GZZLUSSQ",
+        "district:940GZZLUSSQ:940GZZLUVIC",
+        "district:940GZZLUSJP:940GZZLUVIC",
+        "district:940GZZLUSJP:940GZZLUWSM",
+        "district:940GZZLUEMB:940GZZLUWSM",
+        "district:940GZZLUEMB:940GZZLUTMP",
+        "district:940GZZLUBKF:940GZZLUTMP",
+        "district:940GZZLUBKF:940GZZLUMSH",
+        "district:940GZZLUCST:940GZZLUMSH"
+      ],
+      "stationIDs": [
+        "940GZZLUSKS",
+        "940GZZLUSSQ",
+        "940GZZLUVIC",
+        "940GZZLUSJP",
+        "940GZZLUWSM",
+        "940GZZLUEMB",
+        "940GZZLUTMP",
+        "940GZZLUBKF",
+        "940GZZLUMSH",
+        "940GZZLUCST"
+      ]
+    },
+    {
+      "id": "jubilee.central-core-join.v1",
+      "lineID": "jubilee",
+      "segmentIDs": [
+        "jubilee:940GZZLUGPK:940GZZLUWSM",
+        "jubilee:940GZZLUWLO:940GZZLUWSM",
+        "jubilee:940GZZLUSWK:940GZZLUWLO",
+        "jubilee:940GZZLULNB:940GZZLUSWK"
+      ],
+      "stationIDs": [
+        "940GZZLUGPK",
+        "940GZZLUWSM",
+        "940GZZLUWLO",
+        "940GZZLUSWK",
+        "940GZZLULNB"
+      ]
+    },
+    {
+      "id": "northern.charing-cross.central-core-join.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUEUS:940GZZLUWRR",
+        "northern:940GZZLUGDG:940GZZLUWRR",
+        "northern:940GZZLUGDG:940GZZLUTCR",
+        "northern:940GZZLULSQ:940GZZLUTCR",
+        "northern:940GZZLUCHX:940GZZLULSQ",
+        "northern:940GZZLUCHX:940GZZLUEMB",
+        "northern:940GZZLUEMB:940GZZLUWLO"
+      ],
+      "stationIDs": [
+        "940GZZLUEUS",
+        "940GZZLUWRR",
+        "940GZZLUGDG",
+        "940GZZLUTCR",
+        "940GZZLULSQ",
+        "940GZZLUCHX",
+        "940GZZLUEMB",
+        "940GZZLUWLO"
+      ]
+    },
+    {
+      "id": "northern.euston-kings-cross.central-core-join.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUEUS:940GZZLUKSX"
+      ],
+      "stationIDs": [
+        "940GZZLUEUS",
+        "940GZZLUKSX"
+      ]
+    },
+    {
+      "id": "piccadilly.central-core-join.v1",
+      "lineID": "piccadilly",
+      "segmentIDs": [
+        "piccadilly:940GZZLUGPK:940GZZLUPCC",
+        "piccadilly:940GZZLULSQ:940GZZLUPCC",
+        "piccadilly:940GZZLUCGN:940GZZLULSQ",
+        "piccadilly:940GZZLUCGN:940GZZLUHBN",
+        "piccadilly:940GZZLUHBN:940GZZLURSQ",
+        "piccadilly:940GZZLUKSX:940GZZLURSQ"
+      ],
+      "stationIDs": [
+        "940GZZLUGPK",
+        "940GZZLUPCC",
+        "940GZZLULSQ",
+        "940GZZLUCGN",
+        "940GZZLUHBN",
+        "940GZZLURSQ",
+        "940GZZLUKSX"
+      ]
+    },
+    {
+      "id": "victoria.central-core-join.v1",
+      "lineID": "victoria",
+      "segmentIDs": [
+        "victoria:940GZZLUGPK:940GZZLUOXC",
+        "victoria:940GZZLUOXC:940GZZLUWRR",
+        "victoria:940GZZLUEUS:940GZZLUWRR"
+      ],
+      "stationIDs": [
+        "940GZZLUGPK",
+        "940GZZLUOXC",
+        "940GZZLUWRR",
+        "940GZZLUEUS"
+      ]
+    }
+  ],
+  "schemaVersion": {
+    "major": 1,
+    "minor": 2
+  },
+  "segments": [
+    {
+      "fromPort": {
+        "x": 898.625,
+        "y": 895.01
+      },
+      "fromStationID": "940GZZLUOXC",
+      "id": "bakerloo:940GZZLUOXC:940GZZLUPCC",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-core-join.v1.0",
+      "toPort": {
+        "x": 980.07,
+        "y": 1000.091
+      },
+      "toStationID": "940GZZLUPCC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 980.07,
+        "y": 1000.091
+      },
+      "fromStationID": "940GZZLUPCC",
+      "id": "bakerloo:940GZZLUCHX:940GZZLUPCC",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-core-join.v1.1",
+      "toPort": {
+        "x": 1068.454,
+        "y": 1088.443
+      },
+      "toStationID": "940GZZLUCHX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1068.454,
+        "y": 1088.443
+      },
+      "fromStationID": "940GZZLUCHX",
+      "id": "bakerloo:940GZZLUCHX:940GZZLUEMB",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-core-join.v1.2",
+      "toPort": {
+        "x": 1091.094,
+        "y": 1168.051
+      },
+      "toStationID": "940GZZLUEMB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1091.094,
+        "y": 1168.051
+      },
+      "fromStationID": "940GZZLUEMB",
+      "id": "bakerloo:940GZZLUEMB:940GZZLUWLO",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-core-join.v1.3",
+      "toPort": {
+        "x": 1091.094,
+        "y": 1270.021
+      },
+      "toStationID": "940GZZLUWLO",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 900.003,
+        "y": 892.344
+      },
+      "fromStationID": "940GZZLUOXC",
+      "id": "central:940GZZLUOXC:940GZZLUTCR",
+      "lineID": "central",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.central.central-core-join.v1.0",
+      "toPort": {
+        "x": 1067.074,
+        "y": 892.344
+      },
+      "toStationID": "940GZZLUTCR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1067.074,
+        "y": 892.344
+      },
+      "fromStationID": "940GZZLUTCR",
+      "id": "central:940GZZLUHBN:940GZZLUTCR",
+      "lineID": "central",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.central.central-core-join.v1.1",
+      "toPort": {
+        "x": 1185.428,
+        "y": 912.579
+      },
+      "toStationID": "940GZZLUHBN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 623.878,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUSKS",
+      "id": "circle:940GZZLUSKS:940GZZLUSSQ",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.0",
+      "toPort": {
+        "x": 743.71,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUSSQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 743.71,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUSSQ",
+      "id": "circle:940GZZLUSSQ:940GZZLUVIC",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.1",
+      "toPort": {
+        "x": 830.069,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUVIC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 830.069,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUVIC",
+      "id": "circle:940GZZLUSJP:940GZZLUVIC",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.2",
+      "toPort": {
+        "x": 899.692,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUSJP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 899.692,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUSJP",
+      "id": "circle:940GZZLUSJP:940GZZLUWSM",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.3",
+      "toPort": {
+        "x": 974.002,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUWSM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 974.002,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUWSM",
+      "id": "circle:940GZZLUEMB:940GZZLUWSM",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.4",
+      "toPort": {
+        "x": 1091.825,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUEMB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1091.825,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUEMB",
+      "id": "circle:940GZZLUEMB:940GZZLUTMP",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.5",
+      "toPort": {
+        "x": 1190.235,
+        "y": 1164.734
+      },
+      "toStationID": "940GZZLUTMP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1190.235,
+        "y": 1164.734
+      },
+      "fromStationID": "940GZZLUTMP",
+      "id": "circle:940GZZLUBKF:940GZZLUTMP",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.6",
+      "toPort": {
+        "x": 1278.679,
+        "y": 1110.696
+      },
+      "toStationID": "940GZZLUBKF",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1278.679,
+        "y": 1110.696
+      },
+      "fromStationID": "940GZZLUBKF",
+      "id": "circle:940GZZLUBKF:940GZZLUMSH",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.7",
+      "toPort": {
+        "x": 1327.169,
+        "y": 1062.206
+      },
+      "toStationID": "940GZZLUMSH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1327.169,
+        "y": 1062.206
+      },
+      "fromStationID": "940GZZLUMSH",
+      "id": "circle:940GZZLUCST:940GZZLUMSH",
+      "lineID": "circle",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.circle.central-core-join.v1.8",
+      "toPort": {
+        "x": 1363.25,
+        "y": 1026.124
+      },
+      "toStationID": "940GZZLUCST",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 624.691,
+        "y": 1173.039
+      },
+      "fromStationID": "940GZZLUSKS",
+      "id": "district:940GZZLUSKS:940GZZLUSSQ",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.0",
+      "toPort": {
+        "x": 744.73,
+        "y": 1173.037
+      },
+      "toStationID": "940GZZLUSSQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 744.73,
+        "y": 1173.037
+      },
+      "fromStationID": "940GZZLUSSQ",
+      "id": "district:940GZZLUSSQ:940GZZLUVIC",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.1",
+      "toPort": {
+        "x": 830.473,
+        "y": 1173.036
+      },
+      "toStationID": "940GZZLUVIC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 830.473,
+        "y": 1173.036
+      },
+      "fromStationID": "940GZZLUVIC",
+      "id": "district:940GZZLUSJP:940GZZLUVIC",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.2",
+      "toPort": {
+        "x": 901.516,
+        "y": 1173.035
+      },
+      "toStationID": "940GZZLUSJP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 901.516,
+        "y": 1173.035
+      },
+      "fromStationID": "940GZZLUSJP",
+      "id": "district:940GZZLUSJP:940GZZLUWSM",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.3",
+      "toPort": {
+        "x": 973.785,
+        "y": 1173.034
+      },
+      "toStationID": "940GZZLUWSM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 973.785,
+        "y": 1173.034
+      },
+      "fromStationID": "940GZZLUWSM",
+      "id": "district:940GZZLUEMB:940GZZLUWSM",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.4",
+      "toPort": {
+        "x": 1091.374,
+        "y": 1173.033
+      },
+      "toStationID": "940GZZLUEMB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1091.374,
+        "y": 1173.033
+      },
+      "fromStationID": "940GZZLUEMB",
+      "id": "district:940GZZLUEMB:940GZZLUTMP",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.5",
+      "toPort": {
+        "x": 1189.365,
+        "y": 1173.031
+      },
+      "toStationID": "940GZZLUTMP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1189.365,
+        "y": 1173.031
+      },
+      "fromStationID": "940GZZLUTMP",
+      "id": "district:940GZZLUBKF:940GZZLUTMP",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.6",
+      "toPort": {
+        "x": 1282.043,
+        "y": 1119.04
+      },
+      "toStationID": "940GZZLUBKF",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1282.043,
+        "y": 1119.04
+      },
+      "fromStationID": "940GZZLUBKF",
+      "id": "district:940GZZLUBKF:940GZZLUMSH",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.7",
+      "toPort": {
+        "x": 1330.043,
+        "y": 1071.044
+      },
+      "toStationID": "940GZZLUMSH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1330.043,
+        "y": 1071.044
+      },
+      "fromStationID": "940GZZLUMSH",
+      "id": "district:940GZZLUCST:940GZZLUMSH",
+      "lineID": "district",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.district.central-core-join.v1.8",
+      "toPort": {
+        "x": 1366.125,
+        "y": 1034.966
+      },
+      "toStationID": "940GZZLUCST",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 829.982,
+        "y": 999.966
+      },
+      "fromStationID": "940GZZLUGPK",
+      "id": "jubilee:940GZZLUGPK:940GZZLUWSM",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-core-join.v1.0",
+      "toPort": {
+        "x": 985.992,
+        "y": 1155.985
+      },
+      "toStationID": "940GZZLUWSM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 985.992,
+        "y": 1155.985
+      },
+      "fromStationID": "940GZZLUWSM",
+      "id": "jubilee:940GZZLUWLO:940GZZLUWSM",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-core-join.v1.1",
+      "toPort": {
+        "x": 1042.469,
+        "y": 1270.019
+      },
+      "toStationID": "940GZZLUWLO",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1042.469,
+        "y": 1270.019
+      },
+      "fromStationID": "940GZZLUWLO",
+      "id": "jubilee:940GZZLUSWK:940GZZLUWLO",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-core-join.v1.2",
+      "toPort": {
+        "x": 1161.019,
+        "y": 1303.787
+      },
+      "toStationID": "940GZZLUSWK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1161.019,
+        "y": 1303.787
+      },
+      "fromStationID": "940GZZLUSWK",
+      "id": "jubilee:940GZZLULNB:940GZZLUSWK",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-core-join.v1.3",
+      "toPort": {
+        "x": 1455.039,
+        "y": 1134.702
+      },
+      "toStationID": "940GZZLULNB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1095.589,
+        "y": 620.009
+      },
+      "fromStationID": "940GZZLUEUS",
+      "id": "northern:940GZZLUEUS:940GZZLUWRR",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.0",
+      "toPort": {
+        "x": 1066.578,
+        "y": 723.621
+      },
+      "toStationID": "940GZZLUWRR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 723.621
+      },
+      "fromStationID": "940GZZLUWRR",
+      "id": "northern:940GZZLUGDG:940GZZLUWRR",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.1",
+      "toPort": {
+        "x": 1066.578,
+        "y": 820.651
+      },
+      "toStationID": "940GZZLUGDG",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 820.651
+      },
+      "fromStationID": "940GZZLUGDG",
+      "id": "northern:940GZZLUGDG:940GZZLUTCR",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.2",
+      "toPort": {
+        "x": 1066.578,
+        "y": 895.228
+      },
+      "toStationID": "940GZZLUTCR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 895.228
+      },
+      "fromStationID": "940GZZLUTCR",
+      "id": "northern:940GZZLULSQ:940GZZLUTCR",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.3",
+      "toPort": {
+        "x": 1066.578,
+        "y": 998.674
+      },
+      "toStationID": "940GZZLULSQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 998.674
+      },
+      "fromStationID": "940GZZLULSQ",
+      "id": "northern:940GZZLUCHX:940GZZLULSQ",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.4",
+      "toPort": {
+        "x": 1066.578,
+        "y": 1089.29
+      },
+      "toStationID": "940GZZLUCHX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 1089.29
+      },
+      "fromStationID": "940GZZLUCHX",
+      "id": "northern:940GZZLUCHX:940GZZLUEMB",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.5",
+      "toPort": {
+        "x": 1066.578,
+        "y": 1167.876
+      },
+      "toStationID": "940GZZLUEMB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.578,
+        "y": 1167.876
+      },
+      "fromStationID": "940GZZLUEMB",
+      "id": "northern:940GZZLUEMB:940GZZLUWLO",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.6",
+      "toPort": {
+        "x": 1066.578,
+        "y": 1269.719
+      },
+      "toStationID": "940GZZLUWLO",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1128.641,
+        "y": 618.325
+      },
+      "fromStationID": "940GZZLUEUS",
+      "id": "northern:940GZZLUEUS:940GZZLUKSX",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.euston-kings-cross.central-core-join.v1.0",
+      "toPort": {
+        "x": 1237.402,
+        "y": 656.621
+      },
+      "toStationID": "940GZZLUKSX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 830.087,
+        "y": 999.203
+      },
+      "fromStationID": "940GZZLUGPK",
+      "id": "piccadilly:940GZZLUGPK:940GZZLUPCC",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.0",
+      "toPort": {
+        "x": 979.879,
+        "y": 999.203
+      },
+      "toStationID": "940GZZLUPCC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 979.879,
+        "y": 999.203
+      },
+      "fromStationID": "940GZZLUPCC",
+      "id": "piccadilly:940GZZLULSQ:940GZZLUPCC",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.1",
+      "toPort": {
+        "x": 1066.954,
+        "y": 999.203
+      },
+      "toStationID": "940GZZLULSQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1066.954,
+        "y": 999.203
+      },
+      "fromStationID": "940GZZLULSQ",
+      "id": "piccadilly:940GZZLUCGN:940GZZLULSQ",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.2",
+      "toPort": {
+        "x": 1129.408,
+        "y": 969.342
+      },
+      "toStationID": "940GZZLUCGN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1129.408,
+        "y": 969.342
+      },
+      "fromStationID": "940GZZLUCGN",
+      "id": "piccadilly:940GZZLUCGN:940GZZLUHBN",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.3",
+      "toPort": {
+        "x": 1186.415,
+        "y": 912.335
+      },
+      "toStationID": "940GZZLUHBN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1186.415,
+        "y": 912.335
+      },
+      "fromStationID": "940GZZLUHBN",
+      "id": "piccadilly:940GZZLUHBN:940GZZLURSQ",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.4",
+      "toPort": {
+        "x": 1237.578,
+        "y": 790.027
+      },
+      "toStationID": "940GZZLURSQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1237.578,
+        "y": 790.027
+      },
+      "fromStationID": "940GZZLURSQ",
+      "id": "piccadilly:940GZZLUKSX:940GZZLURSQ",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.central-core-join.v1.5",
+      "toPort": {
+        "x": 1237.593,
+        "y": 656.006
+      },
+      "toStationID": "940GZZLUKSX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 829.219,
+        "y": 998.971
+      },
+      "fromStationID": "940GZZLUGPK",
+      "id": "victoria:940GZZLUGPK:940GZZLUOXC",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.central-core-join.v1.0",
+      "toPort": {
+        "x": 898.951,
+        "y": 892.095
+      },
+      "toStationID": "940GZZLUOXC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 898.951,
+        "y": 892.095
+      },
+      "fromStationID": "940GZZLUOXC",
+      "id": "victoria:940GZZLUOXC:940GZZLUWRR",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.central-core-join.v1.1",
+      "toPort": {
+        "x": 1067.038,
+        "y": 724.009
+      },
+      "toStationID": "940GZZLUWRR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1067.038,
+        "y": 724.009
+      },
+      "fromStationID": "940GZZLUWRR",
+      "id": "victoria:940GZZLUEUS:940GZZLUWRR",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.central-core-join.v1.2",
+      "toPort": {
+        "x": 1127.772,
+        "y": 663.639
+      },
+      "toStationID": "940GZZLUEUS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "source": {
+    "graphGeneratedAt": "2026-08-18T09:26:41.336750+00:00",
+    "graphSchemaVersion": 1,
+    "note": "Exact coloured master paths extracted offline from the April 2026 TfL vector map; station ports and labels manually identified in the fixed 2600\u00d72000 reference crop."
+  },
+  "stationMarkers": [
+    {
+      "anchor": {
+        "x": 624,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "South Kensington",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 623.878,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 624,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 624.691,
+              "y": 1173.039
+            },
+            "start": {
+              "x": 624,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 624,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUSKS"
+    },
+    {
+      "anchor": {
+        "x": 744,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Sloane Square",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 743.71,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 744,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 744.73,
+              "y": 1173.037
+            },
+            "start": {
+              "x": 744,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 744,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUSSQ"
+    },
+    {
+      "anchor": {
+        "x": 830,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Victoria",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 830.069,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 830,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 830.473,
+              "y": 1173.036
+            },
+            "start": {
+              "x": 830,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 830,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUVIC"
+    },
+    {
+      "anchor": {
+        "x": 900,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "St. James's Park",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 899.692,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 900,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 901.516,
+              "y": 1173.035
+            },
+            "start": {
+              "x": 900,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 900,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUSJP"
+    },
+    {
+      "anchor": {
+        "x": 974,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district",
+        "jubilee"
+      ],
+      "name": "Westminster",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 974.002,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 974,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 973.785,
+              "y": 1173.034
+            },
+            "start": {
+              "x": 974,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 985.992,
+              "y": 1155.985
+            },
+            "start": {
+              "x": 974,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 974,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 985.992,
+              "y": 1155.985
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUWSM"
+    },
+    {
+      "anchor": {
+        "x": 1091,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "circle",
+        "district",
+        "northern"
+      ],
+      "name": "Embankment",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1091.825,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 1091,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1091.374,
+              "y": 1173.033
+            },
+            "start": {
+              "x": 1091,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1066.578,
+              "y": 1167.876
+            },
+            "start": {
+              "x": 1091,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1091,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1066.578,
+              "y": 1167.876
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUEMB"
+    },
+    {
+      "anchor": {
+        "x": 1190,
+        "y": 1169
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Temple",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1190.235,
+              "y": 1164.734
+            },
+            "start": {
+              "x": 1190,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1189.365,
+              "y": 1173.031
+            },
+            "start": {
+              "x": 1190,
+              "y": 1169
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1190,
+              "y": 1169
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUTMP"
+    },
+    {
+      "anchor": {
+        "x": 1280,
+        "y": 1115
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Blackfriars",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1278.679,
+              "y": 1110.696
+            },
+            "start": {
+              "x": 1280,
+              "y": 1115
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1282.043,
+              "y": 1119.04
+            },
+            "start": {
+              "x": 1280,
+              "y": 1115
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1280,
+              "y": 1115
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUBKF"
+    },
+    {
+      "anchor": {
+        "x": 1329,
+        "y": 1067
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Mansion House",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1327.169,
+              "y": 1062.206
+            },
+            "start": {
+              "x": 1329,
+              "y": 1067
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1330.043,
+              "y": 1071.044
+            },
+            "start": {
+              "x": 1329,
+              "y": 1067
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1329,
+              "y": 1067
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUMSH"
+    },
+    {
+      "anchor": {
+        "x": 1365,
+        "y": 1031
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "circle",
+        "district"
+      ],
+      "name": "Cannon Street",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1363.25,
+              "y": 1026.124
+            },
+            "start": {
+              "x": 1365,
+              "y": 1031
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1366.125,
+              "y": 1034.966
+            },
+            "start": {
+              "x": 1365,
+              "y": 1031
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1365,
+              "y": 1031
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUCST"
+    },
+    {
+      "anchor": {
+        "x": 830,
+        "y": 999
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "jubilee",
+        "piccadilly",
+        "victoria"
+      ],
+      "name": "Green Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 830,
+              "y": 999
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUGPK"
+    },
+    {
+      "anchor": {
+        "x": 980,
+        "y": 999
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "piccadilly"
+      ],
+      "name": "Piccadilly Circus",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 980,
+              "y": 999
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUPCC"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 999
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "piccadilly"
+      ],
+      "name": "Leicester Square",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1067,
+              "y": 999
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLULSQ"
+    },
+    {
+      "anchor": {
+        "x": 1129,
+        "y": 969
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Covent Garden",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1133.95,
+              "y": 973.95
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1124.05,
+              "y": 964.05
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUCGN"
+    },
+    {
+      "anchor": {
+        "x": 1186,
+        "y": 912
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "central",
+        "piccadilly"
+      ],
+      "name": "Holborn",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1186,
+              "y": 912
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUHBN"
+    },
+    {
+      "anchor": {
+        "x": 1238,
+        "y": 790
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Russell Square",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1245.0,
+              "y": 790.0
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1231.0,
+              "y": 790.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLURSQ"
+    },
+    {
+      "anchor": {
+        "x": 1238,
+        "y": 656
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "piccadilly"
+      ],
+      "name": "King's Cross St. Pancras",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1238,
+              "y": 656
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUKSX"
+    },
+    {
+      "anchor": {
+        "x": 900,
+        "y": 894
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "central",
+        "victoria"
+      ],
+      "name": "Oxford Circus",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 900,
+              "y": 894
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUOXC"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 894
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "central",
+        "northern"
+      ],
+      "name": "Tottenham Court Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1067,
+              "y": 894
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUTCR"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 724
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "victoria"
+      ],
+      "name": "Warren Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1067,
+              "y": 724
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUWRR"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 821
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Goodge Street",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1060.0,
+              "y": 821.0
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 1074.0,
+              "y": 821.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUGDG"
+    },
+    {
+      "anchor": {
+        "x": 1096,
+        "y": 620
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "victoria"
+      ],
+      "name": "Euston",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1128.641,
+              "y": 618.325
+            },
+            "start": {
+              "x": 1096,
+              "y": 620
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1127.772,
+              "y": 663.639
+            },
+            "start": {
+              "x": 1096,
+              "y": 620
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1096,
+              "y": 620
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1128.641,
+              "y": 618.325
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1127.772,
+              "y": 663.639
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUEUS"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 1089
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "northern"
+      ],
+      "name": "Charing Cross",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1067,
+              "y": 1089
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUCHX"
+    },
+    {
+      "anchor": {
+        "x": 1067,
+        "y": 1270
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "jubilee",
+        "northern"
+      ],
+      "name": "Waterloo",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1091.094,
+              "y": 1270.021
+            },
+            "start": {
+              "x": 1067,
+              "y": 1270
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1042.469,
+              "y": 1270.019
+            },
+            "start": {
+              "x": 1067,
+              "y": 1270
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1067,
+              "y": 1270
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1091.094,
+              "y": 1270.021
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1042.469,
+              "y": 1270.019
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUWLO"
+    },
+    {
+      "anchor": {
+        "x": 1161,
+        "y": 1304
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "jubilee"
+      ],
+      "name": "Southwark",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1160.999,
+              "y": 1311.0
+            },
+            "lineID": "jubilee",
+            "start": {
+              "x": 1161.001,
+              "y": 1297.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUSWK"
+    },
+    {
+      "anchor": {
+        "x": 1455,
+        "y": 1135
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "jubilee"
+      ],
+      "name": "London Bridge",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1455,
+              "y": 1135
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLULNB"
+    }
+  ],
+  "styles": {
+    "affectedKnockoutStrokeWidth": 15,
+    "affectedOuterStrokeWidth": 19,
+    "affectedRouteStrokeWidth": 10,
+    "labelPadding": 2,
+    "primaryLabelFontSize": 18,
+    "routeStrokeWidth": 8.3,
+    "secondaryLabelFontSize": 16
+  }
+}

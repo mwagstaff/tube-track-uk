@@ -1,0 +1,584 @@
+{
+  "artworkSize": {
+    "height": 800,
+    "width": 500
+  },
+  "debugReference": {
+    "geometryOpacity": 0.52,
+    "resourceExtension": "png",
+    "resourceName": "central-completion-reference-debug"
+  },
+  "geometryStatus": "authored",
+  "identifier": "tube-track-uk.beck.central-completion.v1",
+  "labels": [
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUBST",
+      "position": {
+        "x": 201.979,
+        "y": 162.016
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBST",
+      "text": "Baker Street"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLURGP",
+      "position": {
+        "x": 257.661,
+        "y": 242.186
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLURGP",
+      "text": "Regent's Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUOXC",
+      "position": {
+        "x": 318.625,
+        "y": 362.004
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUOXC",
+      "text": "Oxford Circus"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUBND",
+      "position": {
+        "x": 164.0,
+        "y": 348.892
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBND",
+      "text": "Bond Street"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUGPK",
+      "position": {
+        "x": 211.982,
+        "y": 467.966
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUGPK",
+      "text": "Green Park"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUVIC",
+      "position": {
+        "x": 211.021,
+        "y": 622.991
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUVIC",
+      "text": "Victoria"
+    }
+  ],
+  "paths": [
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 181.979,
+            "y": 180.016
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 239.661,
+            "y": 238.186
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-completion.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 239.661,
+            "y": 238.186
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 290.422,
+            "y": 289.375
+          }
+        },
+        {
+          "control1": {
+            "x": 295.641,
+            "y": 293.641
+          },
+          "control2": {
+            "x": 298.625,
+            "y": 301.406
+          },
+          "op": "cubic",
+          "to": {
+            "x": 298.625,
+            "y": 309.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 298.625,
+            "y": 344.004
+          }
+        }
+      ],
+      "id": "beck.v1.path.bakerloo.central-completion.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 182.0,
+            "y": 135.928
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 182.0,
+            "y": 343.892
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-completion.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 182.0,
+            "y": 343.892
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 182.0,
+            "y": 390.39
+          }
+        },
+        {
+          "control1": {
+            "x": 182.0,
+            "y": 398.172
+          },
+          "control2": {
+            "x": 184.984,
+            "y": 405.922
+          },
+          "op": "cubic",
+          "to": {
+            "x": 190.203,
+            "y": 410.187
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 229.982,
+            "y": 449.966
+          }
+        }
+      ],
+      "id": "beck.v1.path.jubilee.central-completion.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 229.021,
+            "y": 617.991
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 229.156,
+            "y": 530.641
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 229.125,
+            "y": 527.328
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 229.218,
+            "y": 450.01
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.central-completion.v1.0"
+    }
+  ],
+  "routes": [
+    {
+      "id": "bakerloo.central-completion.v1",
+      "lineID": "bakerloo",
+      "segmentIDs": [
+        "bakerloo:940GZZLUBST:940GZZLURGP",
+        "bakerloo:940GZZLUOXC:940GZZLURGP"
+      ],
+      "stationIDs": [
+        "940GZZLUBST",
+        "940GZZLURGP",
+        "940GZZLUOXC"
+      ]
+    },
+    {
+      "id": "jubilee.central-completion.v1",
+      "lineID": "jubilee",
+      "segmentIDs": [
+        "jubilee:940GZZLUBND:940GZZLUBST",
+        "jubilee:940GZZLUBND:940GZZLUGPK"
+      ],
+      "stationIDs": [
+        "940GZZLUBST",
+        "940GZZLUBND",
+        "940GZZLUGPK"
+      ]
+    },
+    {
+      "id": "victoria.central-completion.v1",
+      "lineID": "victoria",
+      "segmentIDs": [
+        "victoria:940GZZLUGPK:940GZZLUVIC"
+      ],
+      "stationIDs": [
+        "940GZZLUVIC",
+        "940GZZLUGPK"
+      ]
+    }
+  ],
+  "schemaVersion": {
+    "major": 1,
+    "minor": 2
+  },
+  "segments": [
+    {
+      "fromPort": {
+        "x": 181.979,
+        "y": 180.016
+      },
+      "fromStationID": "940GZZLUBST",
+      "id": "bakerloo:940GZZLUBST:940GZZLURGP",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-completion.v1.0",
+      "toPort": {
+        "x": 239.661,
+        "y": 238.186
+      },
+      "toStationID": "940GZZLURGP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 239.661,
+        "y": 238.186
+      },
+      "fromStationID": "940GZZLURGP",
+      "id": "bakerloo:940GZZLUOXC:940GZZLURGP",
+      "lineID": "bakerloo",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.bakerloo.central-completion.v1.1",
+      "toPort": {
+        "x": 298.625,
+        "y": 344.004
+      },
+      "toStationID": "940GZZLUOXC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 182.0,
+        "y": 135.928
+      },
+      "fromStationID": "940GZZLUBST",
+      "id": "jubilee:940GZZLUBND:940GZZLUBST",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-completion.v1.0",
+      "toPort": {
+        "x": 182.0,
+        "y": 343.892
+      },
+      "toStationID": "940GZZLUBND",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 182.0,
+        "y": 343.892
+      },
+      "fromStationID": "940GZZLUBND",
+      "id": "jubilee:940GZZLUBND:940GZZLUGPK",
+      "lineID": "jubilee",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.jubilee.central-completion.v1.1",
+      "toPort": {
+        "x": 229.982,
+        "y": 449.966
+      },
+      "toStationID": "940GZZLUGPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 229.021,
+        "y": 617.991
+      },
+      "fromStationID": "940GZZLUVIC",
+      "id": "victoria:940GZZLUGPK:940GZZLUVIC",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.central-completion.v1.0",
+      "toPort": {
+        "x": 229.218,
+        "y": 450.01
+      },
+      "toStationID": "940GZZLUGPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "source": {
+    "graphGeneratedAt": "2026-08-18T09:26:41.336750+00:00",
+    "graphSchemaVersion": 1,
+    "note": "Exact master paths extracted offline from the April 2026 TfL vector map; final central joins manually ported in a fixed 500x800 crop."
+  },
+  "stationMarkers": [
+    {
+      "anchor": {
+        "x": 181.979,
+        "y": 180.016
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo",
+        "jubilee"
+      ],
+      "name": "Baker Street",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 182.0,
+              "y": 135.928
+            },
+            "start": {
+              "x": 181.979,
+              "y": 180.016
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 181.979,
+              "y": 180.016
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 182.0,
+              "y": 135.928
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUBST"
+    },
+    {
+      "anchor": {
+        "x": 239.661,
+        "y": 238.186
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo"
+      ],
+      "name": "Regent's Park",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 244.632,
+              "y": 233.257
+            },
+            "lineID": "bakerloo",
+            "start": {
+              "x": 234.691,
+              "y": 243.115
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLURGP"
+    },
+    {
+      "anchor": {
+        "x": 298.625,
+        "y": 344.004
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "bakerloo"
+      ],
+      "name": "Oxford Circus",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 298.625,
+              "y": 344.004
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUOXC"
+    },
+    {
+      "anchor": {
+        "x": 182.0,
+        "y": 343.892
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "jubilee"
+      ],
+      "name": "Bond Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 182.0,
+              "y": 343.892
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUBND"
+    },
+    {
+      "anchor": {
+        "x": 229.982,
+        "y": 449.966
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "jubilee",
+        "victoria"
+      ],
+      "name": "Green Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 229.982,
+              "y": 449.966
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUGPK"
+    },
+    {
+      "anchor": {
+        "x": 229.021,
+        "y": 617.991
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Victoria",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 229.021,
+              "y": 617.991
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUVIC"
+    }
+  ],
+  "styles": {
+    "affectedKnockoutStrokeWidth": 15,
+    "affectedOuterStrokeWidth": 19,
+    "affectedRouteStrokeWidth": 10,
+    "labelPadding": 2,
+    "primaryLabelFontSize": 18,
+    "routeStrokeWidth": 8.3,
+    "secondaryLabelFontSize": 16
+  }
+}

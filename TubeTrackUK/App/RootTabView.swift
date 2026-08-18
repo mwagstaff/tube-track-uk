@@ -18,6 +18,10 @@ struct RootTabView: View {
                         .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
                         .tag(AppTab.map)
 
+                    BeckMapScreen()
+                        .tabItem { Label(AppTab.beck.title, systemImage: AppTab.beck.symbol) }
+                        .tag(AppTab.beck)
+
                     RealWorldMapScreen()
                         .tabItem { Label(AppTab.realWorld.title, systemImage: AppTab.realWorld.symbol) }
                         .tag(AppTab.realWorld)

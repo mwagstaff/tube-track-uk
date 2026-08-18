@@ -1711,8 +1711,8 @@
       "name": "Heathrow Terminal 4",
       "latitude": 51.458524,
       "longitude": -0.445771,
-      "schematicX": -95.0,
-      "schematicY": 445.0,
+      "schematicX": -71.0,
+      "schematicY": 541.0,
       "lineIDs": [
         "piccadilly"
       ],
@@ -1727,8 +1727,8 @@
       "name": "Heathrow Terminal 5",
       "latitude": 51.470052,
       "longitude": -0.49056,
-      "schematicX": -95.0,
-      "schematicY": 445.0,
+      "schematicX": -119.0,
+      "schematicY": 541.0,
       "lineIDs": [
         "piccadilly"
       ],
@@ -1744,7 +1744,7 @@
       "latitude": 51.471235,
       "longitude": -0.452265,
       "schematicX": -71.0,
-      "schematicY": 445.0,
+      "schematicY": 469.0,
       "lineIDs": [
         "piccadilly"
       ],
@@ -11485,7 +11485,7 @@
         },
         {
           "x": 350,
-          "y": 245
+          "y": 325
         }
       ],
       "geographicPoints": [
@@ -11867,7 +11867,7 @@
       "schematicPoints": [
         {
           "x": 350,
-          "y": 245
+          "y": 325
         },
         {
           "x": 430,
@@ -15887,7 +15887,7 @@
         },
         {
           "x": 350,
-          "y": 245
+          "y": 325
         }
       ],
       "geographicPoints": [
@@ -17891,7 +17891,7 @@
       "schematicPoints": [
         {
           "x": 350,
-          "y": 245
+          "y": 325
         },
         {
           "x": 430,
@@ -39273,7 +39273,7 @@
       "schematicPoints": [
         {
           "x": -71.0,
-          "y": 445.0
+          "y": 469.0
         },
         {
           "x": -47.0,
@@ -39602,12 +39602,12 @@
       "toStationID": "940GZZLUHRC",
       "schematicPoints": [
         {
-          "x": -95.0,
-          "y": 445.0
+          "x": -71.0,
+          "y": 541.0
         },
         {
           "x": -71.0,
-          "y": 445.0
+          "y": 469.0
         }
       ],
       "geographicPoints": [
@@ -39716,12 +39716,16 @@
       "toStationID": "940GZZLUHRC",
       "schematicPoints": [
         {
-          "x": -95.0,
-          "y": 445.0
+          "x": -119.0,
+          "y": 541.0
+        },
+        {
+          "x": -119.0,
+          "y": 517.0
         },
         {
           "x": -71.0,
-          "y": 445.0
+          "y": 469.0
         }
       ],
       "geographicPoints": [

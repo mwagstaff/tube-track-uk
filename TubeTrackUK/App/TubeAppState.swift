@@ -3,6 +3,7 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
     case map
+    case beck
     case realWorld
     case works
     case about
@@ -12,6 +13,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .map: "Map"
+        case .beck: "Beck"
         case .realWorld: "Real World"
         case .works: "Works"
         case .about: "About"
@@ -21,6 +23,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .map: "map"
+        case .beck: "point.3.connected.trianglepath.dotted"
         case .realWorld: "globe.europe.africa"
         case .works: "wrench.and.screwdriver"
         case .about: "info.circle"
@@ -45,6 +48,8 @@ final class TubeAppState {
     var selectedDisruptionID: String?
     var focusedSegmentIDs: Set<String> = []
     var focusedStationIDs: Set<String> = []
+    var focusedLineIDs: Set<TubeLineID> = []
+    var focusedResolutionConfidence: ResolutionConfidence?
     var preferredColorScheme: ColorScheme?
 
     var graph: TubeGraph?
@@ -100,15 +105,19 @@ final class TubeAppState {
     }
 
     var activeAffectedSegmentIDs: Set<String> {
-        if !focusedSegmentIDs.isEmpty { return focusedSegmentIDs }
+        if hasFocusedMapSection { return focusedSegmentIDs }
         if let selectedDisruption { return selectedDisruption.affectedSegmentIDs }
         return Set(disruptions.flatMap(\.affectedSegmentIDs))
     }
 
     var activeAffectedStationIDs: Set<String> {
-        if !focusedStationIDs.isEmpty { return focusedStationIDs }
+        if hasFocusedMapSection { return focusedStationIDs }
         if let selectedDisruption { return selectedDisruption.affectedStationIDs }
         return Set(disruptions.flatMap(\.affectedStationIDs))
+    }
+
+    var hasFocusedMapSection: Bool {
+        !focusedLineIDs.isEmpty || !focusedSegmentIDs.isEmpty || !focusedStationIDs.isEmpty
     }
 
     var currentIssueCount: Int { disruptions.count }
@@ -251,6 +260,8 @@ final class TubeAppState {
         selectedStationID = nil
         focusedSegmentIDs = []
         focusedStationIDs = []
+        focusedLineIDs = []
+        focusedResolutionConfidence = nil
         disruptionDisplayMode = .issues
     }
 
@@ -260,6 +271,8 @@ final class TubeAppState {
         selectedLineID = work.lineIDs.first
         focusedSegmentIDs = work.affectedSegmentIDs
         focusedStationIDs = work.affectedStationIDs
+        focusedLineIDs = Set(work.lineIDs)
+        focusedResolutionConfidence = work.confidence
         disruptionDisplayMode = .issues
     }
 
@@ -269,6 +282,8 @@ final class TubeAppState {
         selectedDisruptionID = nil
         focusedSegmentIDs = []
         focusedStationIDs = []
+        focusedLineIDs = []
+        focusedResolutionConfidence = nil
     }
 
     func setActive(_ active: Bool) {

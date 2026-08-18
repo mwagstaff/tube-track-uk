@@ -54,13 +54,22 @@ struct WorkDetailView: View {
 
                     VStack(spacing: 10) {
                         Button {
+                            appState.focus(on: work, in: .beck)
+                            dismiss()
+                        } label: {
+                            Label("View on Beck map", systemImage: "point.3.connected.trianglepath.dotted")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+
+                        Button {
                             appState.focus(on: work, in: .map)
                             dismiss()
                         } label: {
                             Label("View on schematic map", systemImage: "map")
                                 .frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .buttonStyle(.bordered)
 
                         Button {
                             appState.focus(on: work, in: .realWorld)

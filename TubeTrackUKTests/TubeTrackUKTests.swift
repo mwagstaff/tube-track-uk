@@ -136,6 +136,99 @@ struct TubeTrackUKTests {
         } == true)
     }
 
+    @Test @MainActor func paddingtonRoutesUseSeparatePlatformAxesJoinedByTheRenderer() throws {
+        let graph = try TubeGraph.bundled()
+        let geometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: [:],
+            preferredCornerRadius: 28
+        )
+        let platformPoints = SchematicMapView.makeStationPlatformPoints(
+            graph: graph,
+            renderingGeometry: geometry
+        )["940GZZLUPAC"] ?? []
+
+        #expect(platformPoints.contains { abs($0.y - 245) < 0.01 })
+        #expect(platformPoints.contains { abs($0.y - 325) < 0.01 })
+
+        let subsurfaceSegments = graph.segments.filter {
+            ($0.lineID == .circle || $0.lineID == .district)
+                && ($0.fromStationID == "940GZZLUPAC" || $0.toStationID == "940GZZLUPAC")
+        }
+        #expect(subsurfaceSegments.count == 4)
+        #expect(subsurfaceSegments.allSatisfy { segment in
+            let endpoint = segment.fromStationID == "940GZZLUPAC"
+                ? segment.schematicPoints.first
+                : segment.schematicPoints.last
+            return abs((endpoint?.y ?? 0) - 325) < 0.01
+        })
+    }
+
+    @Test @MainActor func districtAndPiccadillyKeepSeparateWesternCorridors() throws {
+        let graph = try TubeGraph.bundled()
+        let geometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: [:],
+            laneTranslationOverrides: SchematicMapView.makeLaneTranslationOverrides(for: graph),
+            preferredCornerRadius: 28
+        )
+        let piccadillyID = "piccadilly:940GZZLUBSC:940GZZLUECT"
+        let districtID = "district:940GZZLUBSC:940GZZLUWKN"
+        let piccadillyBaronsCourt = try #require(
+            geometry.renderedStationPoints[piccadillyID]?["940GZZLUBSC"]
+        )
+        let districtBaronsCourt = try #require(
+            geometry.renderedStationPoints[districtID]?["940GZZLUBSC"]
+        )
+
+        #expect(abs(piccadillyBaronsCourt.y - 619) < 0.01)
+        #expect(abs(districtBaronsCourt.y - 631) < 0.01)
+        #expect(districtBaronsCourt.y - piccadillyBaronsCourt.y == 12)
+    }
+
+    @Test func heathrowTerminalsFormDistinctSchematicLoop() throws {
+        let graph = try TubeGraph.bundled()
+        let terminal4 = try #require(graph.stationsByID["940GZZLUHR4"])
+        let terminal5 = try #require(graph.stationsByID["940GZZLUHR5"])
+        let terminals23 = try #require(graph.stationsByID["940GZZLUHRC"])
+        #expect(terminal4.schematicPoint != terminal5.schematicPoint)
+        #expect(terminal4.schematicPoint != terminals23.schematicPoint)
+        #expect(terminal5.schematicPoint != terminals23.schematicPoint)
+
+        let geometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: [:],
+            preferredCornerRadius: 28
+        )
+        let loop = try #require(geometry.supplementaryRoutes.first { $0.lineID == .piccadilly })
+        #expect(loop.path.start == terminal5.schematicPoint)
+        #expect(loop.path.sampledPoints.last == terminal4.schematicPoint)
+    }
+
+    @Test @MainActor func maximumZoomRevealsEveryVisibleStationLabel() {
+        #expect(!SchematicMapView.showsAllStationLabels(at: 2.19))
+        #expect(SchematicMapView.showsAllStationLabels(at: 2.2))
+        #expect(SchematicMapView.showsAllStationLabels(at: 2.4))
+    }
+
+    @Test @MainActor func labelCollisionIndexAvoidsFullNetworkScansDuringPanning() throws {
+        let graph = try TubeGraph.bundled()
+        let geometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: [:],
+            laneTranslationOverrides: SchematicMapView.makeLaneTranslationOverrides(for: graph),
+            preferredCornerRadius: 28
+        )
+        let lineBounds = SchematicMapView.makeLineCollisionBounds(renderingGeometry: geometry)
+        let index = SchematicLineSpatialIndex(bounds: lineBounds)
+        let typicalLabelArea = CGRect(x: 650, y: 390, width: 100, height: 40)
+        let localCandidateCount = index.candidateCount(in: typicalLabelArea)
+        #expect(index.totalBoundsCount > graph.segments.count)
+        #expect(localCandidateCount > 0)
+        #expect(localCandidateCount * 5 < index.totalBoundsCount)
+        #expect(index.intersects(typicalLabelArea))
+    }
+
     @Test func disruptionResolverFindsCamdenToEdgwareSection() throws {
         let graph = try TubeGraph.bundled()
         let resolver = DisruptionResolver(repository: TubeNetworkRepository(graph: graph))

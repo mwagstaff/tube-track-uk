@@ -1,0 +1,4173 @@
+{
+  "artworkSize": {
+    "height": 1050,
+    "width": 1950
+  },
+  "debugReference": {
+    "geometryOpacity": 0.52,
+    "resourceExtension": "png",
+    "resourceName": "north-connector-reference-debug"
+  },
+  "geometryStatus": "authored",
+  "identifier": "tube-track-uk.beck.north-connector.v1",
+  "labels": [
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUEGW",
+      "position": {
+        "x": 180,
+        "y": 155
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUEGW",
+      "text": "Edgware"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUBTK",
+      "position": {
+        "x": 245,
+        "y": 207
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBTK",
+      "text": "Burnt Oak"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUCND",
+      "position": {
+        "x": 287,
+        "y": 250
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCND",
+      "text": "Colindale"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUHCL",
+      "position": {
+        "x": 397,
+        "y": 334
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHCL",
+      "text": "Hendon Central"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUBTX",
+      "position": {
+        "x": 447,
+        "y": 385
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBTX",
+      "text": "Brent Cross"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUGGN",
+      "position": {
+        "x": 486,
+        "y": 423
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUGGN",
+      "text": "Golders Green"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUHTD",
+      "position": {
+        "x": 541,
+        "y": 479
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHTD",
+      "text": "Hampstead"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUBZP",
+      "position": {
+        "x": 578,
+        "y": 582
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBZP",
+      "text": "Belsize Park"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUCFM",
+      "position": {
+        "x": 635,
+        "y": 638
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCFM",
+      "text": "Chalk Farm"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUCTN",
+      "position": {
+        "x": 742,
+        "y": 727
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCTN",
+      "text": "Camden Town"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUHBT",
+      "position": {
+        "x": 848,
+        "y": 96
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHBT",
+      "text": "High Barnet"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUTAW",
+      "position": {
+        "x": 847,
+        "y": 141
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTAW",
+      "text": "Totteridge & Whetstone"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUWOP",
+      "position": {
+        "x": 847,
+        "y": 184
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWOP",
+      "text": "Woodside Park"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUWFN",
+      "position": {
+        "x": 847,
+        "y": 226
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWFN",
+      "text": "West Finchley"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUFYC",
+      "position": {
+        "x": 847,
+        "y": 278
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUFYC",
+      "text": "Finchley Central"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUEFY",
+      "position": {
+        "x": 847,
+        "y": 330
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUEFY",
+      "text": "East Finchley"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUHGT",
+      "position": {
+        "x": 847,
+        "y": 376
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHGT",
+      "text": "Highgate"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUACY",
+      "position": {
+        "x": 847,
+        "y": 450
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUACY",
+      "text": "Archway"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUTFP",
+      "position": {
+        "x": 878,
+        "y": 512
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTFP",
+      "text": "Tufnell Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUKSH",
+      "position": {
+        "x": 878,
+        "y": 586
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUKSH",
+      "text": "Kentish\nTown"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUMTC",
+      "position": {
+        "x": 730,
+        "y": 797
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUMTC",
+      "text": "Mornington\nCrescent"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUEUS",
+      "position": {
+        "x": 713,
+        "y": 851
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUEUS",
+      "text": "Euston"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUMHL",
+      "position": {
+        "x": 810,
+        "y": 252
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUMHL",
+      "text": "Mill Hill East"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUKSX",
+      "position": {
+        "x": 913,
+        "y": 922
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUKSX",
+      "text": "King's Cross\n& St Pancras"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUCAR",
+      "position": {
+        "x": 967,
+        "y": 779
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCAR",
+      "text": "Caledonian\nRoad"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUHWY",
+      "position": {
+        "x": 1030,
+        "y": 713
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHWY",
+      "text": "Holloway\nRoad"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUASL",
+      "position": {
+        "x": 1089,
+        "y": 647
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUASL",
+      "text": "Arsenal"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUFPK",
+      "position": {
+        "x": 1174,
+        "y": 611
+      },
+      "priority": 10,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUFPK",
+      "text": "Finsbury\nPark"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUMRH",
+      "position": {
+        "x": 1253,
+        "y": 462
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUMRH",
+      "text": "Manor House"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUTPN",
+      "position": {
+        "x": 1221,
+        "y": 360
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTPN",
+      "text": "Turnpike\nLane"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUWOG",
+      "position": {
+        "x": 1221,
+        "y": 296
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWOG",
+      "text": "Wood Green"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUBDS",
+      "position": {
+        "x": 1221,
+        "y": 236
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBDS",
+      "text": "Bounds Green"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUASG",
+      "position": {
+        "x": 1221,
+        "y": 191
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUASG",
+      "text": "Arnos Grove"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUSGT",
+      "position": {
+        "x": 1221,
+        "y": 149
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSGT",
+      "text": "Southgate"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUOAK",
+      "position": {
+        "x": 1221,
+        "y": 111
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUOAK",
+      "text": "Oakwood"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUCKS",
+      "position": {
+        "x": 1221,
+        "y": 67
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUCKS",
+      "text": "Cockfosters"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUHAI",
+      "position": {
+        "x": 1174,
+        "y": 741
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUHAI",
+      "text": "Highbury &\nIslington"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZLUSVS",
+      "position": {
+        "x": 1318,
+        "y": 489
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUSVS",
+      "text": "Seven\nSisters"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZLUTMH",
+      "position": {
+        "x": 1480,
+        "y": 535
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUTMH",
+      "text": "Tottenham\nHale"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZLUBLR",
+      "position": {
+        "x": 1639,
+        "y": 485
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUBLR",
+      "text": "Blackhorse\nRoad"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZLUWWL",
+      "position": {
+        "x": 1774,
+        "y": 509
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZLUWWL",
+      "text": "Walthamstow\nCentral"
+    }
+  ],
+  "paths": [
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 199.781,
+            "y": 167.906
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 255.749,
+            "y": 223.874
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 255.749,
+            "y": 223.874
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 297.864,
+            "y": 265.989
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 297.864,
+            "y": 265.989
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 380.431,
+            "y": 348.556
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 380.431,
+            "y": 348.556
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 433.074,
+            "y": 401.199
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 433.074,
+            "y": 401.199
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 470.756,
+            "y": 438.881
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 470.756,
+            "y": 438.881
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 526.17,
+            "y": 494.295
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 526.17,
+            "y": 494.295
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 592.667,
+            "y": 560.792
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 592.667,
+            "y": 560.792
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 648.081,
+            "y": 616.206
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 648.081,
+            "y": 616.206
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 753.922,
+            "y": 722.047
+          }
+        },
+        {
+          "control1": {
+            "x": 758.422,
+            "y": 726.547
+          },
+          "control2": {
+            "x": 762.109,
+            "y": 735.469
+          },
+          "op": "cubic",
+          "to": {
+            "x": 762.109,
+            "y": 741.844
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.edgware.north-connector.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 113.328
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 156.848
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 156.848
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 199.862
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 199.862
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 241.864
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 241.864
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 293.987
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 293.987
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 346.11
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 346.11
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 392.16
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 392.16
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 466.043
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 466.043
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 525.25
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 525.25
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 599.133
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 862.609,
+            "y": 599.133
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 862.609,
+            "y": 619.375
+          }
+        },
+        {
+          "control1": {
+            "x": 862.609,
+            "y": 624.187
+          },
+          "control2": {
+            "x": 858.906,
+            "y": 633.094
+          },
+          "op": "cubic",
+          "to": {
+            "x": 854.406,
+            "y": 637.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 770.313,
+            "y": 721.703
+          }
+        },
+        {
+          "control1": {
+            "x": 765.797,
+            "y": 726.219
+          },
+          "control2": {
+            "x": 762.109,
+            "y": 735.125
+          },
+          "op": "cubic",
+          "to": {
+            "x": 762.109,
+            "y": 741.5
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 762.107,
+            "y": 741.997
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 762.107,
+            "y": 741.997
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 762.047,
+            "y": 754.594
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 762.078,
+            "y": 758.672
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 762.016,
+            "y": 775.39
+          }
+        },
+        {
+          "control1": {
+            "x": 762.016,
+            "y": 781.765
+          },
+          "control2": {
+            "x": 758.313,
+            "y": 790.672
+          },
+          "op": "cubic",
+          "to": {
+            "x": 753.813,
+            "y": 795.187
+          }
+        },
+        {
+          "control1": {
+            "x": 749.281,
+            "y": 799.703
+          },
+          "control2": {
+            "x": 745.594,
+            "y": 808.609
+          },
+          "op": "cubic",
+          "to": {
+            "x": 745.594,
+            "y": 814.984
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 745.594,
+            "y": 814.984
+          }
+        },
+        {
+          "control1": {
+            "x": 745.594,
+            "y": 814.984
+          },
+          "control2": {
+            "x": 745.594,
+            "y": 814.984
+          },
+          "op": "cubic",
+          "to": {
+            "x": 745.594,
+            "y": 814.984
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 745.594,
+            "y": 857.062
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 745.589,
+            "y": 870.009
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.high-barnet.north-connector.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 825.807,
+            "y": 268.167
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 854.406,
+            "y": 296.75
+          }
+        },
+        {
+          "control1": {
+            "x": 858.922,
+            "y": 301.266
+          },
+          "control2": {
+            "x": 862.609,
+            "y": 308.609
+          },
+          "op": "cubic",
+          "to": {
+            "x": 862.609,
+            "y": 315.0
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.mill-hill-east.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 762.016,
+            "y": 775.391
+          }
+        },
+        {
+          "control1": {
+            "x": 762.016,
+            "y": 781.766
+          },
+          "control2": {
+            "x": 765.703,
+            "y": 790.672
+          },
+          "op": "cubic",
+          "to": {
+            "x": 770.203,
+            "y": 795.188
+          }
+        },
+        {
+          "control1": {
+            "x": 774.719,
+            "y": 799.703
+          },
+          "control2": {
+            "x": 778.422,
+            "y": 808.61
+          },
+          "op": "cubic",
+          "to": {
+            "x": 778.422,
+            "y": 814.985
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 778.422,
+            "y": 844.641
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 778.406,
+            "y": 849.407
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 778.407,
+            "y": 850.0
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.bank-join.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 778.407,
+            "y": 850.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 778.437,
+            "y": 865.453
+          }
+        },
+        {
+          "control1": {
+            "x": 778.437,
+            "y": 870.813
+          },
+          "control2": {
+            "x": 780.531,
+            "y": 875.828
+          },
+          "op": "cubic",
+          "to": {
+            "x": 784.312,
+            "y": 879.625
+          }
+        },
+        {
+          "control1": {
+            "x": 788.094,
+            "y": 883.406
+          },
+          "control2": {
+            "x": 793.125,
+            "y": 885.485
+          },
+          "op": "cubic",
+          "to": {
+            "x": 798.484,
+            "y": 885.485
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 833.406,
+            "y": 885.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 840.375,
+            "y": 885.469
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 854.516,
+            "y": 885.453
+          }
+        },
+        {
+          "control1": {
+            "x": 862.328,
+            "y": 885.453
+          },
+          "control2": {
+            "x": 869.422,
+            "y": 888.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 874.531,
+            "y": 893.75
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 887.402,
+            "y": 906.621
+          }
+        }
+      ],
+      "id": "beck.v1.path.northern.bank-join.north-connector.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 887.593,
+            "y": 906.006
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 887.593,
+            "y": 861.594
+          }
+        },
+        {
+          "control1": {
+            "x": 887.593,
+            "y": 855.203
+          },
+          "control2": {
+            "x": 891.296,
+            "y": 846.297
+          },
+          "op": "cubic",
+          "to": {
+            "x": 895.796,
+            "y": 841.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 949.639,
+            "y": 787.939
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 949.639,
+            "y": 787.939
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1014.781,
+            "y": 722.797
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1014.781,
+            "y": 722.797
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1074.938,
+            "y": 662.64
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1074.938,
+            "y": 662.64
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1142.739,
+            "y": 594.839
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1142.739,
+            "y": 594.839
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1228.156,
+            "y": 509.422
+          }
+        },
+        {
+          "control1": {
+            "x": 1232.671,
+            "y": 504.907
+          },
+          "control2": {
+            "x": 1236.359,
+            "y": 496.0
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1236.359,
+            "y": 489.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 475.829
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 475.829
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 375.195
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 375.195
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 311.893
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 311.893
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 251.838
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 251.838
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 207.202
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 207.202
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 165.0
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 165.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 126.857
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1236.359,
+            "y": 126.857
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1236.359,
+            "y": 83.844
+          }
+        }
+      ],
+      "id": "beck.v1.path.piccadilly.north-connector.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 777.754,
+            "y": 913.652
+          }
+        },
+        {
+          "control1": {
+            "x": 782.58,
+            "y": 910.13
+          },
+          "control2": {
+            "x": 789.744,
+            "y": 907.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 795.125,
+            "y": 907.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 888.054,
+            "y": 907.516
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 888.054,
+            "y": 907.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 912.906,
+            "y": 907.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 920.016,
+            "y": 907.532
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1044.125,
+            "y": 907.391
+          }
+        },
+        {
+          "control1": {
+            "x": 1050.5,
+            "y": 907.391
+          },
+          "control2": {
+            "x": 1059.406,
+            "y": 903.703
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1063.922,
+            "y": 899.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1127.719,
+            "y": 837.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1132.203,
+            "y": 832.641
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1147.922,
+            "y": 817.203
+          }
+        },
+        {
+          "control1": {
+            "x": 1152.437,
+            "y": 812.688
+          },
+          "control2": {
+            "x": 1156.125,
+            "y": 803.782
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1156.125,
+            "y": 797.407
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1156.132,
+            "y": 722.964
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1156.132,
+            "y": 722.964
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1156.141,
+            "y": 628.985
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1156.125,
+            "y": 623.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1156.125,
+            "y": 608.407
+          }
+        },
+        {
+          "control1": {
+            "x": 1156.125,
+            "y": 608.273
+          },
+          "control2": {
+            "x": 1156.127,
+            "y": 608.138
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1156.13,
+            "y": 608.002
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1156.13,
+            "y": 608.002
+          }
+        },
+        {
+          "control1": {
+            "x": 1156.281,
+            "y": 601.659
+          },
+          "control2": {
+            "x": 1159.923,
+            "y": 593.015
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1164.328,
+            "y": 588.61
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1182.719,
+            "y": 570.125
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1234.875,
+            "y": 517.969
+          }
+        },
+        {
+          "control1": {
+            "x": 1239.406,
+            "y": 513.454
+          },
+          "control2": {
+            "x": 1248.312,
+            "y": 509.766
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1254.687,
+            "y": 509.766
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1328.156,
+            "y": 509.766
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1334.89,
+            "y": 509.782
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1334.89,
+            "y": 509.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1334.89,
+            "y": 509.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1480.162,
+            "y": 509.782
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1480.162,
+            "y": 509.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1639.833,
+            "y": 509.782
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1639.833,
+            "y": 509.782
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1757.998,
+            "y": 509.782
+          }
+        }
+      ],
+      "id": "beck.v1.path.victoria.north-connector.v1.6"
+    }
+  ],
+  "routes": [
+    {
+      "id": "northern.edgware.north-connector.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUBTK:940GZZLUEGW",
+        "northern:940GZZLUBTK:940GZZLUCND",
+        "northern:940GZZLUCND:940GZZLUHCL",
+        "northern:940GZZLUBTX:940GZZLUHCL",
+        "northern:940GZZLUBTX:940GZZLUGGN",
+        "northern:940GZZLUGGN:940GZZLUHTD",
+        "northern:940GZZLUBZP:940GZZLUHTD",
+        "northern:940GZZLUBZP:940GZZLUCFM",
+        "northern:940GZZLUCFM:940GZZLUCTN"
+      ],
+      "stationIDs": [
+        "940GZZLUEGW",
+        "940GZZLUBTK",
+        "940GZZLUCND",
+        "940GZZLUHCL",
+        "940GZZLUBTX",
+        "940GZZLUGGN",
+        "940GZZLUHTD",
+        "940GZZLUBZP",
+        "940GZZLUCFM",
+        "940GZZLUCTN"
+      ]
+    },
+    {
+      "id": "northern.high-barnet.north-connector.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUHBT:940GZZLUTAW",
+        "northern:940GZZLUTAW:940GZZLUWOP",
+        "northern:940GZZLUWFN:940GZZLUWOP",
+        "northern:940GZZLUFYC:940GZZLUWFN",
+        "northern:940GZZLUEFY:940GZZLUFYC",
+        "northern:940GZZLUEFY:940GZZLUHGT",
+        "northern:940GZZLUACY:940GZZLUHGT",
+        "northern:940GZZLUACY:940GZZLUTFP",
+        "northern:940GZZLUKSH:940GZZLUTFP",
+        "northern:940GZZLUCTN:940GZZLUKSH",
+        "northern:940GZZLUCTN:940GZZLUMTC",
+        "northern:940GZZLUEUS:940GZZLUMTC"
+      ],
+      "stationIDs": [
+        "940GZZLUHBT",
+        "940GZZLUTAW",
+        "940GZZLUWOP",
+        "940GZZLUWFN",
+        "940GZZLUFYC",
+        "940GZZLUEFY",
+        "940GZZLUHGT",
+        "940GZZLUACY",
+        "940GZZLUTFP",
+        "940GZZLUKSH",
+        "940GZZLUCTN",
+        "940GZZLUMTC",
+        "940GZZLUEUS"
+      ]
+    },
+    {
+      "id": "northern.mill-hill-east.north-connector.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUFYC:940GZZLUMHL"
+      ],
+      "stationIDs": [
+        "940GZZLUMHL",
+        "940GZZLUFYC"
+      ]
+    },
+    {
+      "id": "northern.bank-join.north-connector.v1",
+      "lineID": "northern",
+      "segmentIDs": [
+        "northern:940GZZLUCTN:940GZZLUEUS",
+        "northern:940GZZLUEUS:940GZZLUKSX"
+      ],
+      "stationIDs": [
+        "940GZZLUCTN",
+        "940GZZLUEUS",
+        "940GZZLUKSX"
+      ]
+    },
+    {
+      "id": "piccadilly.north-connector.v1",
+      "lineID": "piccadilly",
+      "segmentIDs": [
+        "piccadilly:940GZZLUCAR:940GZZLUKSX",
+        "piccadilly:940GZZLUCAR:940GZZLUHWY",
+        "piccadilly:940GZZLUASL:940GZZLUHWY",
+        "piccadilly:940GZZLUASL:940GZZLUFPK",
+        "piccadilly:940GZZLUFPK:940GZZLUMRH",
+        "piccadilly:940GZZLUMRH:940GZZLUTPN",
+        "piccadilly:940GZZLUTPN:940GZZLUWOG",
+        "piccadilly:940GZZLUBDS:940GZZLUWOG",
+        "piccadilly:940GZZLUASG:940GZZLUBDS",
+        "piccadilly:940GZZLUASG:940GZZLUSGT",
+        "piccadilly:940GZZLUOAK:940GZZLUSGT",
+        "piccadilly:940GZZLUCKS:940GZZLUOAK"
+      ],
+      "stationIDs": [
+        "940GZZLUKSX",
+        "940GZZLUCAR",
+        "940GZZLUHWY",
+        "940GZZLUASL",
+        "940GZZLUFPK",
+        "940GZZLUMRH",
+        "940GZZLUTPN",
+        "940GZZLUWOG",
+        "940GZZLUBDS",
+        "940GZZLUASG",
+        "940GZZLUSGT",
+        "940GZZLUOAK",
+        "940GZZLUCKS"
+      ]
+    },
+    {
+      "id": "victoria.north-connector.v1",
+      "lineID": "victoria",
+      "segmentIDs": [
+        "victoria:940GZZLUEUS:940GZZLUKSX",
+        "victoria:940GZZLUHAI:940GZZLUKSX",
+        "victoria:940GZZLUFPK:940GZZLUHAI",
+        "victoria:940GZZLUFPK:940GZZLUSVS",
+        "victoria:940GZZLUSVS:940GZZLUTMH",
+        "victoria:940GZZLUBLR:940GZZLUTMH",
+        "victoria:940GZZLUBLR:940GZZLUWWL"
+      ],
+      "stationIDs": [
+        "940GZZLUEUS",
+        "940GZZLUKSX",
+        "940GZZLUHAI",
+        "940GZZLUFPK",
+        "940GZZLUSVS",
+        "940GZZLUTMH",
+        "940GZZLUBLR",
+        "940GZZLUWWL"
+      ]
+    }
+  ],
+  "schemaVersion": {
+    "major": 1,
+    "minor": 2
+  },
+  "segments": [
+    {
+      "fromPort": {
+        "x": 199.781,
+        "y": 167.906
+      },
+      "fromStationID": "940GZZLUEGW",
+      "id": "northern:940GZZLUBTK:940GZZLUEGW",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.0",
+      "toPort": {
+        "x": 255.749,
+        "y": 223.874
+      },
+      "toStationID": "940GZZLUBTK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 255.749,
+        "y": 223.874
+      },
+      "fromStationID": "940GZZLUBTK",
+      "id": "northern:940GZZLUBTK:940GZZLUCND",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.1",
+      "toPort": {
+        "x": 297.864,
+        "y": 265.989
+      },
+      "toStationID": "940GZZLUCND",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 297.864,
+        "y": 265.989
+      },
+      "fromStationID": "940GZZLUCND",
+      "id": "northern:940GZZLUCND:940GZZLUHCL",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.2",
+      "toPort": {
+        "x": 380.431,
+        "y": 348.556
+      },
+      "toStationID": "940GZZLUHCL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 380.431,
+        "y": 348.556
+      },
+      "fromStationID": "940GZZLUHCL",
+      "id": "northern:940GZZLUBTX:940GZZLUHCL",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.3",
+      "toPort": {
+        "x": 433.074,
+        "y": 401.199
+      },
+      "toStationID": "940GZZLUBTX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 433.074,
+        "y": 401.199
+      },
+      "fromStationID": "940GZZLUBTX",
+      "id": "northern:940GZZLUBTX:940GZZLUGGN",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.4",
+      "toPort": {
+        "x": 470.756,
+        "y": 438.881
+      },
+      "toStationID": "940GZZLUGGN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 470.756,
+        "y": 438.881
+      },
+      "fromStationID": "940GZZLUGGN",
+      "id": "northern:940GZZLUGGN:940GZZLUHTD",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.5",
+      "toPort": {
+        "x": 526.17,
+        "y": 494.295
+      },
+      "toStationID": "940GZZLUHTD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 526.17,
+        "y": 494.295
+      },
+      "fromStationID": "940GZZLUHTD",
+      "id": "northern:940GZZLUBZP:940GZZLUHTD",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.6",
+      "toPort": {
+        "x": 592.667,
+        "y": 560.792
+      },
+      "toStationID": "940GZZLUBZP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 592.667,
+        "y": 560.792
+      },
+      "fromStationID": "940GZZLUBZP",
+      "id": "northern:940GZZLUBZP:940GZZLUCFM",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.7",
+      "toPort": {
+        "x": 648.081,
+        "y": 616.206
+      },
+      "toStationID": "940GZZLUCFM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 648.081,
+        "y": 616.206
+      },
+      "fromStationID": "940GZZLUCFM",
+      "id": "northern:940GZZLUCFM:940GZZLUCTN",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.edgware.north-connector.v1.8",
+      "toPort": {
+        "x": 762.109,
+        "y": 741.844
+      },
+      "toStationID": "940GZZLUCTN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 113.328
+      },
+      "fromStationID": "940GZZLUHBT",
+      "id": "northern:940GZZLUHBT:940GZZLUTAW",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.0",
+      "toPort": {
+        "x": 862.609,
+        "y": 156.848
+      },
+      "toStationID": "940GZZLUTAW",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 156.848
+      },
+      "fromStationID": "940GZZLUTAW",
+      "id": "northern:940GZZLUTAW:940GZZLUWOP",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.1",
+      "toPort": {
+        "x": 862.609,
+        "y": 199.862
+      },
+      "toStationID": "940GZZLUWOP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 199.862
+      },
+      "fromStationID": "940GZZLUWOP",
+      "id": "northern:940GZZLUWFN:940GZZLUWOP",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.2",
+      "toPort": {
+        "x": 862.609,
+        "y": 241.864
+      },
+      "toStationID": "940GZZLUWFN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 241.864
+      },
+      "fromStationID": "940GZZLUWFN",
+      "id": "northern:940GZZLUFYC:940GZZLUWFN",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.3",
+      "toPort": {
+        "x": 862.609,
+        "y": 293.987
+      },
+      "toStationID": "940GZZLUFYC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 293.987
+      },
+      "fromStationID": "940GZZLUFYC",
+      "id": "northern:940GZZLUEFY:940GZZLUFYC",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.4",
+      "toPort": {
+        "x": 862.609,
+        "y": 346.11
+      },
+      "toStationID": "940GZZLUEFY",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 346.11
+      },
+      "fromStationID": "940GZZLUEFY",
+      "id": "northern:940GZZLUEFY:940GZZLUHGT",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.5",
+      "toPort": {
+        "x": 862.609,
+        "y": 392.16
+      },
+      "toStationID": "940GZZLUHGT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 392.16
+      },
+      "fromStationID": "940GZZLUHGT",
+      "id": "northern:940GZZLUACY:940GZZLUHGT",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.6",
+      "toPort": {
+        "x": 862.609,
+        "y": 466.043
+      },
+      "toStationID": "940GZZLUACY",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 466.043
+      },
+      "fromStationID": "940GZZLUACY",
+      "id": "northern:940GZZLUACY:940GZZLUTFP",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.7",
+      "toPort": {
+        "x": 862.609,
+        "y": 525.25
+      },
+      "toStationID": "940GZZLUTFP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 525.25
+      },
+      "fromStationID": "940GZZLUTFP",
+      "id": "northern:940GZZLUKSH:940GZZLUTFP",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.8",
+      "toPort": {
+        "x": 862.609,
+        "y": 599.133
+      },
+      "toStationID": "940GZZLUKSH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 862.609,
+        "y": 599.133
+      },
+      "fromStationID": "940GZZLUKSH",
+      "id": "northern:940GZZLUCTN:940GZZLUKSH",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.9",
+      "toPort": {
+        "x": 762.107,
+        "y": 741.997
+      },
+      "toStationID": "940GZZLUCTN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 762.107,
+        "y": 741.997
+      },
+      "fromStationID": "940GZZLUCTN",
+      "id": "northern:940GZZLUCTN:940GZZLUMTC",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.10",
+      "toPort": {
+        "x": 745.594,
+        "y": 814.984
+      },
+      "toStationID": "940GZZLUMTC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 745.594,
+        "y": 814.984
+      },
+      "fromStationID": "940GZZLUMTC",
+      "id": "northern:940GZZLUEUS:940GZZLUMTC",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.11",
+      "toPort": {
+        "x": 745.589,
+        "y": 870.009
+      },
+      "toStationID": "940GZZLUEUS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 825.807,
+        "y": 268.167
+      },
+      "fromStationID": "940GZZLUMHL",
+      "id": "northern:940GZZLUFYC:940GZZLUMHL",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.mill-hill-east.north-connector.v1.0",
+      "toPort": {
+        "x": 862.609,
+        "y": 315.0
+      },
+      "toStationID": "940GZZLUFYC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 762.016,
+        "y": 775.391
+      },
+      "fromStationID": "940GZZLUCTN",
+      "id": "northern:940GZZLUCTN:940GZZLUEUS",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.bank-join.north-connector.v1.0",
+      "toPort": {
+        "x": 778.407,
+        "y": 850.0
+      },
+      "toStationID": "940GZZLUEUS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 778.407,
+        "y": 850.0
+      },
+      "fromStationID": "940GZZLUEUS",
+      "id": "northern:940GZZLUEUS:940GZZLUKSX",
+      "lineID": "northern",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.northern.bank-join.north-connector.v1.1",
+      "toPort": {
+        "x": 887.402,
+        "y": 906.621
+      },
+      "toStationID": "940GZZLUKSX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 887.593,
+        "y": 906.006
+      },
+      "fromStationID": "940GZZLUKSX",
+      "id": "piccadilly:940GZZLUCAR:940GZZLUKSX",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.0",
+      "toPort": {
+        "x": 949.639,
+        "y": 787.939
+      },
+      "toStationID": "940GZZLUCAR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 949.639,
+        "y": 787.939
+      },
+      "fromStationID": "940GZZLUCAR",
+      "id": "piccadilly:940GZZLUCAR:940GZZLUHWY",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.1",
+      "toPort": {
+        "x": 1014.781,
+        "y": 722.797
+      },
+      "toStationID": "940GZZLUHWY",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1014.781,
+        "y": 722.797
+      },
+      "fromStationID": "940GZZLUHWY",
+      "id": "piccadilly:940GZZLUASL:940GZZLUHWY",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.2",
+      "toPort": {
+        "x": 1074.938,
+        "y": 662.64
+      },
+      "toStationID": "940GZZLUASL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1074.938,
+        "y": 662.64
+      },
+      "fromStationID": "940GZZLUASL",
+      "id": "piccadilly:940GZZLUASL:940GZZLUFPK",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.3",
+      "toPort": {
+        "x": 1142.739,
+        "y": 594.839
+      },
+      "toStationID": "940GZZLUFPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1142.739,
+        "y": 594.839
+      },
+      "fromStationID": "940GZZLUFPK",
+      "id": "piccadilly:940GZZLUFPK:940GZZLUMRH",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.4",
+      "toPort": {
+        "x": 1236.359,
+        "y": 475.829
+      },
+      "toStationID": "940GZZLUMRH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 475.829
+      },
+      "fromStationID": "940GZZLUMRH",
+      "id": "piccadilly:940GZZLUMRH:940GZZLUTPN",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.5",
+      "toPort": {
+        "x": 1236.359,
+        "y": 375.195
+      },
+      "toStationID": "940GZZLUTPN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 375.195
+      },
+      "fromStationID": "940GZZLUTPN",
+      "id": "piccadilly:940GZZLUTPN:940GZZLUWOG",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.6",
+      "toPort": {
+        "x": 1236.359,
+        "y": 311.893
+      },
+      "toStationID": "940GZZLUWOG",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 311.893
+      },
+      "fromStationID": "940GZZLUWOG",
+      "id": "piccadilly:940GZZLUBDS:940GZZLUWOG",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.7",
+      "toPort": {
+        "x": 1236.359,
+        "y": 251.838
+      },
+      "toStationID": "940GZZLUBDS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 251.838
+      },
+      "fromStationID": "940GZZLUBDS",
+      "id": "piccadilly:940GZZLUASG:940GZZLUBDS",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.8",
+      "toPort": {
+        "x": 1236.359,
+        "y": 207.202
+      },
+      "toStationID": "940GZZLUASG",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 207.202
+      },
+      "fromStationID": "940GZZLUASG",
+      "id": "piccadilly:940GZZLUASG:940GZZLUSGT",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.9",
+      "toPort": {
+        "x": 1236.359,
+        "y": 165.0
+      },
+      "toStationID": "940GZZLUSGT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 165.0
+      },
+      "fromStationID": "940GZZLUSGT",
+      "id": "piccadilly:940GZZLUOAK:940GZZLUSGT",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.10",
+      "toPort": {
+        "x": 1236.359,
+        "y": 126.857
+      },
+      "toStationID": "940GZZLUOAK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1236.359,
+        "y": 126.857
+      },
+      "fromStationID": "940GZZLUOAK",
+      "id": "piccadilly:940GZZLUCKS:940GZZLUOAK",
+      "lineID": "piccadilly",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.piccadilly.north-connector.v1.11",
+      "toPort": {
+        "x": 1236.359,
+        "y": 83.844
+      },
+      "toStationID": "940GZZLUCKS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 777.754,
+        "y": 913.652
+      },
+      "fromStationID": "940GZZLUEUS",
+      "id": "victoria:940GZZLUEUS:940GZZLUKSX",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.0",
+      "toPort": {
+        "x": 888.054,
+        "y": 907.516
+      },
+      "toStationID": "940GZZLUKSX",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 888.054,
+        "y": 907.516
+      },
+      "fromStationID": "940GZZLUKSX",
+      "id": "victoria:940GZZLUHAI:940GZZLUKSX",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.1",
+      "toPort": {
+        "x": 1156.132,
+        "y": 722.964
+      },
+      "toStationID": "940GZZLUHAI",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1156.132,
+        "y": 722.964
+      },
+      "fromStationID": "940GZZLUHAI",
+      "id": "victoria:940GZZLUFPK:940GZZLUHAI",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.2",
+      "toPort": {
+        "x": 1156.13,
+        "y": 608.002
+      },
+      "toStationID": "940GZZLUFPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1156.13,
+        "y": 608.002
+      },
+      "fromStationID": "940GZZLUFPK",
+      "id": "victoria:940GZZLUFPK:940GZZLUSVS",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.3",
+      "toPort": {
+        "x": 1334.89,
+        "y": 509.782
+      },
+      "toStationID": "940GZZLUSVS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1334.89,
+        "y": 509.782
+      },
+      "fromStationID": "940GZZLUSVS",
+      "id": "victoria:940GZZLUSVS:940GZZLUTMH",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.4",
+      "toPort": {
+        "x": 1480.162,
+        "y": 509.782
+      },
+      "toStationID": "940GZZLUTMH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1480.162,
+        "y": 509.782
+      },
+      "fromStationID": "940GZZLUTMH",
+      "id": "victoria:940GZZLUBLR:940GZZLUTMH",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.5",
+      "toPort": {
+        "x": 1639.833,
+        "y": 509.782
+      },
+      "toStationID": "940GZZLUBLR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1639.833,
+        "y": 509.782
+      },
+      "fromStationID": "940GZZLUBLR",
+      "id": "victoria:940GZZLUBLR:940GZZLUWWL",
+      "lineID": "victoria",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.victoria.north-connector.v1.6",
+      "toPort": {
+        "x": 1757.998,
+        "y": 509.782
+      },
+      "toStationID": "940GZZLUWWL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    }
+  ],
+  "source": {
+    "graphGeneratedAt": "2026-08-18T09:26:41.336750+00:00",
+    "graphSchemaVersion": 1,
+    "note": "Exact master paths extracted offline from the April 2026 TfL vector map; north-central station ports and labels manually identified in a fixed 1950x1050 crop."
+  },
+  "stationMarkers": [
+    {
+      "anchor": {
+        "x": 199.8,
+        "y": 167.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Edgware",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 194.85,
+              "y": 172.85
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 204.75,
+              "y": 162.95
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUEGW"
+    },
+    {
+      "anchor": {
+        "x": 256.3,
+        "y": 224.4
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Burnt Oak",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 251.35,
+              "y": 229.35
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 261.25,
+              "y": 219.45
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUBTK"
+    },
+    {
+      "anchor": {
+        "x": 297.9,
+        "y": 266.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Colindale",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 292.95,
+              "y": 270.95
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 302.85,
+              "y": 261.05
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUCND"
+    },
+    {
+      "anchor": {
+        "x": 380.4,
+        "y": 348.6
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Hendon Central",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 375.45,
+              "y": 353.55
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 385.35,
+              "y": 343.65
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHCL"
+    },
+    {
+      "anchor": {
+        "x": 432.5,
+        "y": 400.6
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Brent Cross",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 427.55,
+              "y": 405.55
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 437.45,
+              "y": 395.65
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUBTX"
+    },
+    {
+      "anchor": {
+        "x": 470.8,
+        "y": 438.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Golders Green",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 465.85,
+              "y": 443.85
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 475.75,
+              "y": 433.95
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUGGN"
+    },
+    {
+      "anchor": {
+        "x": 526.2,
+        "y": 494.3
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Hampstead",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 521.25,
+              "y": 499.25
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 531.15,
+              "y": 489.35
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHTD"
+    },
+    {
+      "anchor": {
+        "x": 592.7,
+        "y": 560.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Belsize Park",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 587.75,
+              "y": 565.75
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 597.65,
+              "y": 555.85
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUBZP"
+    },
+    {
+      "anchor": {
+        "x": 648.1,
+        "y": 616.2
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Chalk Farm",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 643.15,
+              "y": 621.15
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 653.05,
+              "y": 611.25
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUCFM"
+    },
+    {
+      "anchor": {
+        "x": 762.1,
+        "y": 758.5
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Camden Town",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 762.109,
+              "y": 741.844
+            },
+            "start": {
+              "x": 762.1,
+              "y": 758.5
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 762.016,
+              "y": 775.391
+            },
+            "start": {
+              "x": 762.1,
+              "y": 758.5
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 762.1,
+              "y": 758.5
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 762.109,
+              "y": 741.844
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 762.016,
+              "y": 775.391
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUCTN"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 113.3
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "High Barnet",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 113.3
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 113.3
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHBT"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 156.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Totteridge & Whetstone",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 156.8
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 156.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUTAW"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 199.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Woodside Park",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 199.9
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 199.9
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUWOP"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 241.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "West Finchley",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 241.9
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 241.9
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUWFN"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 294.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Finchley Central",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 862.609,
+              "y": 315.0
+            },
+            "start": {
+              "x": 862.6,
+              "y": 294.0
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 862.6,
+              "y": 294.0
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 862.609,
+              "y": 315.0
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUFYC"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 346.1
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "East Finchley",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 346.1
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 346.1
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUEFY"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 392.2
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Highgate",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 392.2
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 392.2
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHGT"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 466.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Archway",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 466.0
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 466.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUACY"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 525.3
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Tufnell Park",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 525.3
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 525.3
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUTFP"
+    },
+    {
+      "anchor": {
+        "x": 862.6,
+        "y": 599.1
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Kentish Town",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 855.6,
+              "y": 599.1
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 869.6,
+              "y": 599.1
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUKSH"
+    },
+    {
+      "anchor": {
+        "x": 745.6,
+        "y": 815.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Mornington Crescent",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 738.6,
+              "y": 815.0
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 752.6,
+              "y": 815.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUMTC"
+    },
+    {
+      "anchor": {
+        "x": 745.6,
+        "y": 870.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "victoria"
+      ],
+      "name": "Euston",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 778.407,
+              "y": 850.0
+            },
+            "start": {
+              "x": 745.6,
+              "y": 870.0
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 777.754,
+              "y": 913.652
+            },
+            "start": {
+              "x": 745.6,
+              "y": 870.0
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 745.6,
+              "y": 870.0
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 778.407,
+              "y": 850.0
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 777.754,
+              "y": 913.652
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUEUS"
+    },
+    {
+      "anchor": {
+        "x": 825.8,
+        "y": 268.2
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern"
+      ],
+      "name": "Mill Hill East",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 830.748,
+              "y": 263.249
+            },
+            "lineID": "northern",
+            "start": {
+              "x": 820.852,
+              "y": 273.151
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUMHL"
+    },
+    {
+      "anchor": {
+        "x": 887.7,
+        "y": 906.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "northern",
+        "piccadilly",
+        "victoria"
+      ],
+      "name": "King's Cross St. Pancras",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 887.7,
+              "y": 906.8
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUKSX"
+    },
+    {
+      "anchor": {
+        "x": 949.6,
+        "y": 787.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Caledonian Road",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 954.55,
+              "y": 792.85
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 944.65,
+              "y": 782.95
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUCAR"
+    },
+    {
+      "anchor": {
+        "x": 1014.8,
+        "y": 722.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Holloway Road",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1019.75,
+              "y": 727.75
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1009.85,
+              "y": 717.85
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHWY"
+    },
+    {
+      "anchor": {
+        "x": 1074.9,
+        "y": 662.6
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Arsenal",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1079.85,
+              "y": 667.55
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1069.95,
+              "y": 657.65
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUASL"
+    },
+    {
+      "anchor": {
+        "x": 1149.5,
+        "y": 601.5
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly",
+        "victoria"
+      ],
+      "name": "Finsbury Park",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1142.739,
+              "y": 594.839
+            },
+            "start": {
+              "x": 1149.5,
+              "y": 601.5
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 1156.13,
+              "y": 608.002
+            },
+            "start": {
+              "x": 1149.5,
+              "y": 601.5
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1149.5,
+              "y": 601.5
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1142.739,
+              "y": 594.839
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1156.13,
+              "y": 608.002
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZLUFPK"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 475.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Manor House",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 475.8
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 475.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUMRH"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 375.2
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Turnpike Lane",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 375.2
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 375.2
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUTPN"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 311.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Wood Green",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 311.9
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 311.9
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUWOG"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 251.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Bounds Green",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 251.8
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 251.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUBDS"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 207.2
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Arnos Grove",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 207.2
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 207.2
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUASG"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 165.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Southgate",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 165.0
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 165.0
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUSGT"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 126.9
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Oakwood",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 126.9
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 126.9
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUOAK"
+    },
+    {
+      "anchor": {
+        "x": 1236.4,
+        "y": 83.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "piccadilly"
+      ],
+      "name": "Cockfosters",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1243.4,
+              "y": 83.8
+            },
+            "lineID": "piccadilly",
+            "start": {
+              "x": 1229.4,
+              "y": 83.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUCKS"
+    },
+    {
+      "anchor": {
+        "x": 1156.1,
+        "y": 723.0
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Highbury & Islington",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1163.1,
+              "y": 723.001
+            },
+            "lineID": "victoria",
+            "start": {
+              "x": 1149.1,
+              "y": 722.999
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUHAI"
+    },
+    {
+      "anchor": {
+        "x": 1334.9,
+        "y": 509.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Seven Sisters",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1334.884,
+              "y": 516.8
+            },
+            "lineID": "victoria",
+            "start": {
+              "x": 1334.916,
+              "y": 502.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUSVS"
+    },
+    {
+      "anchor": {
+        "x": 1480.2,
+        "y": 509.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Tottenham Hale",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1480.2,
+              "y": 516.8
+            },
+            "lineID": "victoria",
+            "start": {
+              "x": 1480.2,
+              "y": 502.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUTMH"
+    },
+    {
+      "anchor": {
+        "x": 1639.8,
+        "y": 509.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Blackhorse Road",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1639.8,
+              "y": 516.8
+            },
+            "lineID": "victoria",
+            "start": {
+              "x": 1639.8,
+              "y": 502.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUBLR"
+    },
+    {
+      "anchor": {
+        "x": 1758.0,
+        "y": 509.8
+      },
+      "hitRadius": 24,
+      "lineIDs": [
+        "victoria"
+      ],
+      "name": "Walthamstow Central",
+      "primitives": [
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1758.0,
+              "y": 516.8
+            },
+            "lineID": "victoria",
+            "start": {
+              "x": 1758.0,
+              "y": 502.8
+            },
+            "width": 3.2
+          }
+        }
+      ],
+      "stationID": "940GZZLUWWL"
+    }
+  ],
+  "styles": {
+    "affectedKnockoutStrokeWidth": 15,
+    "affectedOuterStrokeWidth": 19,
+    "affectedRouteStrokeWidth": 10,
+    "labelPadding": 2,
+    "primaryLabelFontSize": 18,
+    "routeStrokeWidth": 8.3,
+    "secondaryLabelFontSize": 16
+  }
+}

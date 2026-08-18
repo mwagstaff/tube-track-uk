@@ -2,6 +2,7 @@ import SwiftUI
 
 struct LiveStatusDock: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Binding var expanded: Bool
 
     private var summary: (symbol: String, color: Color, title: String, detail: String) {
@@ -30,36 +31,73 @@ struct LiveStatusDock: View {
                 expanded.toggle()
             }
         } label: {
-            HStack(spacing: 12) {
-                Image(systemName: summary.symbol)
-                    .font(.headline)
-                    .foregroundStyle(summary.color)
-                    .symbolEffect(.pulse, isActive: appState.isRefreshingStatus)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(summary.title)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
-                    Text(summary.detail)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-                FreshnessLabel(date: appState.statusUpdatedAt, cached: appState.isUsingCachedStatus)
-                Image(systemName: expanded ? "chevron.down" : "chevron.up")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(.secondary)
+            if dynamicTypeSize.isAccessibilitySize {
+                accessibilityLayout
+            } else {
+                regularLayout
             }
-            .padding(.horizontal, 14)
-            .frame(minHeight: 56)
-            .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
         }
         .buttonStyle(.plain)
         .contentShape(.rect)
         .zIndex(1)
         .accessibilityHint(expanded ? "Collapses live status" : "Expands live status")
+    }
+
+    private var regularLayout: some View {
+        HStack(spacing: 12) {
+            statusIcon
+            statusText(lineLimit: 1)
+            Spacer()
+            FreshnessLabel(date: appState.statusUpdatedAt, cached: appState.isUsingCachedStatus)
+            disclosureIcon
+        }
+        .padding(.horizontal, 14)
+        .frame(minHeight: 56)
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
+    }
+
+    private var accessibilityLayout: some View {
+        HStack(alignment: .top, spacing: 12) {
+            statusIcon
+                .frame(width: 44, height: 44)
+
+            VStack(alignment: .leading, spacing: 7) {
+                statusText(lineLimit: 2)
+                FreshnessLabel(date: appState.statusUpdatedAt, cached: appState.isUsingCachedStatus)
+            }
+
+            Spacer(minLength: 4)
+            disclosureIcon
+                .frame(width: 44, height: 44)
+        }
+        .padding(14)
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
+    }
+
+    private var statusIcon: some View {
+        Image(systemName: summary.symbol)
+            .font(.headline)
+            .foregroundStyle(summary.color)
+            .symbolEffect(.pulse, isActive: appState.isRefreshingStatus)
+    }
+
+    private func statusText(lineLimit: Int) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(summary.title)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .lineLimit(lineLimit)
+            Text(summary.detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(lineLimit)
+        }
+    }
+
+    private var disclosureIcon: some View {
+        Image(systemName: expanded ? "chevron.down" : "chevron.up")
+            .font(.caption.weight(.bold))
+            .foregroundStyle(.secondary)
     }
 }
 

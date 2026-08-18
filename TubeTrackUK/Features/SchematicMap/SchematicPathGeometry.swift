@@ -232,6 +232,13 @@ struct SchematicRouteConnector: Sendable {
     let path: RoundedSchematicPath
 }
 
+/// Map-only route geometry for a service pattern which TfL's adjacent-stop
+/// pairs do not express. It is intentionally excluded from graph topology.
+struct SchematicSupplementaryRoute: Sendable {
+    let lineID: TubeLineID
+    let path: RoundedSchematicPath
+}
+
 /// Converts the graph's layout vertices into reusable render geometry.
 ///
 /// All coloured siblings on a shared station pair use the same rounded master
@@ -241,13 +248,17 @@ struct SchematicNetworkGeometry: Sendable {
     let segmentPaths: [String: RoundedSchematicPath]
     let connectors: [SchematicRouteConnector]
     let laneTranslations: [String: SchematicPoint]
+    /// Untrimmed route-aligned endpoints, keyed by segment then station. The
+    /// renderer uses these as platform positions for interchange bars.
+    let renderedStationPoints: [String: [String: SchematicPoint]]
+    let supplementaryRoutes: [SchematicSupplementaryRoute]
 
     init(
         graph: TubeGraph,
         laneOffsets: [String: Double],
+        laneTranslationOverrides: [String: SchematicPoint] = [:],
         preferredCornerRadius: Double
     ) {
-        let stationsByID = graph.stationsByID
         let segmentLookup = Dictionary(uniqueKeysWithValues: graph.segments.map { segment in
             (Self.segmentKey(lineID: segment.lineID, stationA: segment.fromStationID, stationB: segment.toStationID), segment)
         })
@@ -279,8 +290,7 @@ struct SchematicNetworkGeometry: Sendable {
                             lineID: line.id,
                             stationA: stationID,
                             stationB: nextStationID
-                        )],
-                        let corner = stationsByID[stationID]?.schematicPoint
+                        )]
                     else { continue }
 
                     let incomingPoints = Self.orientedPoints(
@@ -293,7 +303,10 @@ struct SchematicNetworkGeometry: Sendable {
                         from: stationID,
                         to: nextStationID
                     )
-                    guard let incomingPoint = incomingPoints.dropLast().last,
+                    guard let corner = incomingPoints.last,
+                          let outgoingCorner = outgoingPoints.first,
+                          corner.distance(to: outgoingCorner) < 0.01,
+                          let incomingPoint = incomingPoints.dropLast().last,
                           let outgoingPoint = outgoingPoints.dropFirst().first,
                           let fillet = SchematicFillet(
                             incomingPoint: incomingPoint,
@@ -330,6 +343,7 @@ struct SchematicNetworkGeometry: Sendable {
         }
         var segmentPaths: [String: RoundedSchematicPath] = [:]
         var translations: [String: SchematicPoint] = [:]
+        var renderedStationPoints: [String: [String: SchematicPoint]] = [:]
 
         for siblings in groups.values {
             guard let representative = siblings.sorted(by: { $0.lineID.rawValue < $1.lineID.rawValue }).first else { continue }
@@ -342,6 +356,8 @@ struct SchematicNetworkGeometry: Sendable {
                 from: canonicalStartID,
                 to: canonicalEndID
             )
+            guard let untrimmedStart = masterPoints.first,
+                  let untrimmedEnd = masterPoints.last else { continue }
 
             let startTrim = siblings.map { endpointTrims[$0.id]?[canonicalStartID] ?? 0 }.max() ?? 0
             let endTrim = siblings.map { endpointTrims[$0.id]?[canonicalEndID] ?? 0 }.max() ?? 0
@@ -356,10 +372,15 @@ struct SchematicNetworkGeometry: Sendable {
             let unitNormal = SchematicPoint(x: -direction.y / directionLength, y: direction.x / directionLength)
 
             for sibling in siblings {
-                let laneTranslation = unitNormal * (laneOffsets[sibling.id] ?? 0)
+                let laneTranslation = laneTranslationOverrides[sibling.id]
+                    ?? unitNormal * (laneOffsets[sibling.id] ?? 0)
                 translations[sibling.id] = laneTranslation
                 let orientedMaster = sibling.fromStationID == canonicalStartID ? masterPath : masterPath.reversed()
                 segmentPaths[sibling.id] = orientedMaster.translated(by: laneTranslation)
+                renderedStationPoints[sibling.id] = [
+                    canonicalStartID: untrimmedStart + laneTranslation,
+                    canonicalEndID: untrimmedEnd + laneTranslation,
+                ]
             }
         }
 
@@ -382,6 +403,23 @@ struct SchematicNetworkGeometry: Sendable {
         self.segmentPaths = segmentPaths
         self.connectors = connectors
         self.laneTranslations = translations
+        self.renderedStationPoints = renderedStationPoints
+
+        // The official diagram closes the Terminal 4 service loop. TfL's stop
+        // sequences expose only the two branches through Terminals 2 & 3, so
+        // close it visually without adding a navigable or disruptable edge.
+        if let terminal5 = graph.stationsByID["940GZZLUHR5"]?.schematicPoint,
+           let terminal4 = graph.stationsByID["940GZZLUHR4"]?.schematicPoint,
+           let loopPath = RoundedSchematicPath(
+               points: [terminal5, terminal4],
+               preferredCornerRadius: preferredCornerRadius
+           ) {
+            self.supplementaryRoutes = [
+                SchematicSupplementaryRoute(lineID: .piccadilly, path: loopPath),
+            ]
+        } else {
+            self.supplementaryRoutes = []
+        }
     }
 
     private static func trimmingEndpoints(
@@ -437,6 +475,10 @@ private extension SchematicPoint {
     static let zero = SchematicPoint(x: 0, y: 0)
 
     var length: Double { hypot(x, y) }
+
+    func distance(to other: Self) -> Double {
+        (self - other).length
+    }
 
     func dot(_ other: Self) -> Double {
         x * other.x + y * other.y
