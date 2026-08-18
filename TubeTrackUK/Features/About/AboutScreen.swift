@@ -44,7 +44,10 @@ struct AboutScreen: View {
 
                 Section("Mapping") {
                     Label("Apple MapKit", systemImage: "map")
-                    Text("The Real World view preserves Apple’s map attribution. Tube route topology is compiled from TfL route data for reliable offline rendering.")
+                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+                        Label("© OpenStreetMap contributors", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
+                    }
+                    Text("The Real World view preserves Apple’s map attribution. Underground routes use an offline OSM railway graph so lines and train estimates follow the mapped track alignment instead of station-to-station chords.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

@@ -57,6 +57,8 @@ struct LiveStatusDock: View {
             .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
         }
         .buttonStyle(.plain)
+        .contentShape(.rect)
+        .zIndex(1)
         .accessibilityHint(expanded ? "Collapses live status" : "Expands live status")
     }
 }
@@ -80,6 +82,11 @@ struct LiveStatusPanel: View {
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
+                    .font(.title2)
+                    .frame(width: 44, height: 44)
+                    .contentShape(.rect)
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Collapses live status")
                 }
 
                 if appState.disruptions.isEmpty {
@@ -88,7 +95,9 @@ struct LiveStatusPanel: View {
                     ScrollView {
                         LazyVStack(spacing: 10) {
                             ForEach(appState.disruptions) { disruption in
-                                DisruptionRow(disruption: disruption)
+                                DisruptionRow(disruption: disruption) {
+                                    withAnimation(.spring(duration: 0.35)) { expanded = false }
+                                }
                             }
                         }
                     }
@@ -107,7 +116,8 @@ struct LiveStatusPanel: View {
         if !overnightStatuses.isEmpty {
             ScrollView {
                 LazyVStack(spacing: 8) {
-                    ForEach(overnightStatuses, id: \.0) { lineID, status in
+                    ForEach(Array(overnightStatuses.enumerated()), id: \.offset) { _, entry in
+                        let (lineID, status) = entry
                         HStack {
                             LineBadge(lineID: lineID)
                             Spacer()
@@ -133,11 +143,13 @@ struct LiveStatusPanel: View {
 private struct DisruptionRow: View {
     @Environment(TubeAppState.self) private var appState
     let disruption: ResolvedDisruption
+    let onSelect: () -> Void
 
     var body: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.55)) {
                 appState.select(disruption: disruption)
+                onSelect()
             }
         } label: {
             HStack(spacing: 12) {
@@ -169,6 +181,7 @@ private struct DisruptionRow: View {
             .background(.primary.opacity(0.055), in: .rect(cornerRadius: 14))
         }
         .buttonStyle(.plain)
+        .contentShape(.rect)
+        .accessibilityHint("Highlights the affected section on the map")
     }
 }
-

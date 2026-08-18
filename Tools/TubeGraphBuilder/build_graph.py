@@ -8,6 +8,7 @@ library so it can be rerun without installing project dependencies.
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 import sys
@@ -37,6 +38,133 @@ LINE_IDS = (
 )
 OUTPUT = Path(__file__).resolve().parents[2] / "TubeTrackUK" / "Resources" / "TubeGraph.json"
 
+# These coordinates are an original, topology-led central London composition.
+# They use the reference map's design language (long shared axes and 45-degree
+# transitions) without copying its artwork or production coordinates.
+CENTRAL_SCHEMATIC_POINTS: dict[str, tuple[float, float]] = {
+    "Paddington": (350, 245),
+    "Paddington (H&C Line)-Underground": (370, 325),
+    "Edgware Road (Bakerloo)": (395, 245),
+    "Edgware Road (Circle Line)": (430, 325),
+    "Marylebone": (440, 285),
+    "Baker Street": (490, 285),
+    "Regent's Park": (535, 330),
+    "Great Portland Street": (550, 285),
+    "Euston Square": (615, 285),
+    "Euston": (670, 225),
+    "King's Cross St. Pancras": (790, 225),
+    "Angel": (850, 270),
+    "Old Street": (910, 315),
+    "Farringdon": (835, 345),
+    "Barbican": (875, 385),
+    "Moorgate": (915, 385),
+    "Liverpool Street": (975, 345),
+    "Aldgate": (1035, 405),
+    "Aldgate East": (1085, 455),
+    "Whitechapel": (1075, 455),
+    "Tower Hill": (1035, 485),
+    "Monument": (935, 485),
+    "Bank": (935, 445),
+    "Cannon Street": (895, 525),
+    "Mansion House": (855, 565),
+    "Blackfriars": (815, 625),
+    "Temple": (755, 625),
+    "Embankment": (695, 625),
+    "Westminster": (625, 625),
+    "St. James's Park": (565, 625),
+    "Victoria": (505, 625),
+    "Sloane Square": (445, 625),
+    "South Kensington": (385, 625),
+    "Gloucester Road": (325, 625),
+    "Earl's Court": (265, 625),
+    "High Street Kensington": (265, 565),
+    "Notting Hill Gate": (265, 445),
+    "Bayswater": (315, 365),
+    "Queensway": (315, 445),
+    "Lancaster Gate": (375, 405),
+    "Marble Arch": (435, 405),
+    "Bond Street": (495, 405),
+    "Oxford Circus": (555, 405),
+    "Tottenham Court Road": (625, 405),
+    "Holborn": (705, 405),
+    "Chancery Lane": (765, 465),
+    "St. Paul's": (825, 465),
+    "Green Park": (555, 525),
+    "Piccadilly Circus": (615, 525),
+    "Leicester Square": (665, 525),
+    "Covent Garden": (705, 485),
+    "Goodge Street": (625, 345),
+    "Warren Street": (625, 285),
+    "Russell Square": (745, 285),
+    "Charing Cross": (665, 585),
+    "Waterloo": (725, 705),
+    "Southwark": (795, 705),
+    "London Bridge": (875, 625),
+    "Borough": (875, 705),
+    "Knightsbridge": (445, 565),
+    "Hyde Park Corner": (495, 525),
+    # Inner branches are explicitly aligned so they enter the central grid on
+    # calm diagonals instead of inheriting geographic zig-zags.
+    "Camden Town": (610, 165),
+    "Mornington Crescent": (650, 205),
+    "Chalk Farm": (565, 120),
+    "Belsize Park": (520, 75),
+    "Hampstead": (475, 30),
+    "Kentish Town": (655, 120),
+    "Tufnell Park": (625, 75),
+    "Archway": (595, 30),
+    "Caledonian Road": (830, 185),
+    "Holloway Road": (870, 145),
+    "Arsenal": (910, 105),
+    "Highbury & Islington": (890, 125),
+    "Finsbury Park": (950, 65),
+    "Bethnal Green": (1035, 345),
+    "Mile End": (1135, 405),
+    "Stratford": (1255, 285),
+    "Stepney Green": (1135, 455),
+    "Bow Road": (1195, 455),
+    "Bromley-by-Bow": (1255, 455),
+    "West Ham": (1315, 395),
+    "Plaistow": (1375, 395),
+    "Bermondsey": (935, 625),
+    "Canada Water": (995, 625),
+    "Canary Wharf": (1055, 565),
+    "North Greenwich": (1115, 565),
+    "Canning Town": (1175, 505),
+    "Lambeth North": (755, 745),
+    "Elephant & Castle": (815, 765),
+    "Kennington": (725, 805),
+    "Nine Elms": (625, 805),
+    "Battersea Power Station": (565, 805),
+    "Oval": (725, 865),
+    "Stockwell": (725, 925),
+    "Pimlico": (565, 685),
+    "Vauxhall": (625, 745),
+    "West Kensington": (205, 625),
+    "Barons Court": (145, 625),
+    "Hammersmith (Dist&Picc Line)": (85, 625),
+    "Kensington (Olympia)": (205, 685),
+    "Royal Oak": (310, 325),
+    "Westbourne Park": (250, 325),
+    "Ladbroke Grove": (190, 325),
+    "Latimer Road": (130, 385),
+    "Wood Lane": (130, 445),
+    "Shepherd's Bush Market": (130, 505),
+    "Goldhawk Road": (130, 565),
+    "Hammersmith (H&C Line)": (85, 610),
+}
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--osm-pbf",
+        type=Path,
+        help="Filtered OSM PBF containing London Underground route relations and railway ways.",
+    )
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    return parser.parse_args()
+
 
 def fetch_json(path: str) -> Any:
     request = urllib.request.Request(
@@ -58,14 +186,114 @@ def clean_station_name(name: str) -> str:
     return name
 
 
-def schematic_point(latitude: float, longitude: float) -> tuple[float, float]:
-    # A deterministic London projection tuned for a landscape network canvas.
-    # Segment paths are octilinearized below while station endpoints stay shared.
-    min_lon, max_lon = -0.52, 0.34
-    min_lat, max_lat = 51.38, 51.71
-    x = 56 + ((longitude - min_lon) / (max_lon - min_lon)) * 1088
-    y = 48 + ((max_lat - latitude) / (max_lat - min_lat)) * 804
-    return round(x, 2), round(y, 2)
+def schematic_point(name: str, latitude: float, longitude: float) -> tuple[float, float]:
+    if name in CENTRAL_SCHEMATIC_POINTS:
+        return CENTRAL_SCHEMATIC_POINTS[name]
+
+    # A piecewise geographic warp gives central London the whitespace needed
+    # for interchange and label clarity while compressing the long outer arms.
+    def piecewise(value: float, knots: tuple[tuple[float, float], ...]) -> float:
+        for (input_a, output_a), (input_b, output_b) in zip(knots, knots[1:]):
+            if value <= input_b:
+                fraction = min(1.0, max(0.0, (value - input_a) / (input_b - input_a)))
+                return output_a + (output_b - output_a) * fraction
+        return knots[-1][1]
+
+    x = piecewise(longitude, ((-0.52, 45), (-0.25, 235), (0.05, 1085), (0.34, 1355)))
+    y = piecewise(latitude, ((51.38, 955), (51.46, 795), (51.57, 175), (51.71, 35)))
+    grid = 5.0
+    return round(x / grid) * grid, round(y / grid) * grid
+
+
+def snapped_direction(start: dict[str, Any], end: dict[str, Any]) -> tuple[int, int]:
+    dx = (float(end["longitude"]) - float(start["longitude"])) * 0.62
+    dy = -(float(end["latitude"]) - float(start["latitude"]))
+    if abs(dx) > abs(dy) * 1.8:
+        return (1 if dx >= 0 else -1, 0)
+    if abs(dy) > abs(dx) * 1.8:
+        return (0, 1 if dy >= 0 else -1)
+    return (1 if dx >= 0 else -1, 1 if dy >= 0 else -1)
+
+
+def topology_schematic_points(
+    stations: dict[str, dict[str, Any]],
+    line_payloads: dict[str, dict[str, Any]],
+) -> dict[str, tuple[float, float]]:
+    """Lay outer branches out as long octilinear runs from central anchors.
+
+    The central composition is hand-balanced above. This propagation step makes
+    the rest of each route follow stable 0/45/90-degree corridors, so bends occur
+    at stations and branches rather than as a staircase inside every edge.
+    """
+    positions = {
+        station_id: CENTRAL_SCHEMATIC_POINTS[station["name"]]
+        for station_id, station in stations.items()
+        if station["name"] in CENTRAL_SCHEMATIC_POINTS
+    }
+    routes = [
+        [station_id for station_id in route.get("naptanIds", []) if station_id in stations]
+        for payload in line_payloads.values()
+        for route in payload.get("orderedLineRoutes", [])
+    ]
+    routes = [route for route in routes if len(route) >= 2]
+    spacing = 24.0
+
+    for _ in range(6):
+        changed = False
+        for route in routes:
+            known = [index for index, station_id in enumerate(route) if station_id in positions]
+            if not known:
+                continue
+
+            # Fill gaps between known interchanges. The final connection to the
+            # next anchor may turn at that station, which keeps edge paths simple.
+            for left_index, right_index in zip(known, known[1:]):
+                if right_index - left_index <= 1:
+                    continue
+                direction = snapped_direction(stations[route[left_index]], stations[route[right_index]])
+                x, y = positions[route[left_index]]
+                for index in range(left_index + 1, right_index):
+                    station_id = route[index]
+                    if station_id in positions:
+                        x, y = positions[station_id]
+                        continue
+                    x += direction[0] * spacing
+                    y += direction[1] * spacing
+                    positions[station_id] = (x, y)
+                    changed = True
+
+            first_known = known[0]
+            if first_known > 0:
+                direction = snapped_direction(stations[route[first_known]], stations[route[0]])
+                x, y = positions[route[first_known]]
+                for index in range(first_known - 1, -1, -1):
+                    x += direction[0] * spacing
+                    y += direction[1] * spacing
+                    station_id = route[index]
+                    if station_id not in positions:
+                        positions[station_id] = (x, y)
+                        changed = True
+
+            last_known = known[-1]
+            if last_known < len(route) - 1:
+                direction = snapped_direction(stations[route[last_known]], stations[route[-1]])
+                x, y = positions[route[last_known]]
+                for index in range(last_known + 1, len(route)):
+                    x += direction[0] * spacing
+                    y += direction[1] * spacing
+                    station_id = route[index]
+                    if station_id not in positions:
+                        positions[station_id] = (x, y)
+                        changed = True
+        if not changed:
+            break
+
+    for station_id, station in stations.items():
+        positions.setdefault(
+            station_id,
+            schematic_point(station["name"], station["latitude"], station["longitude"]),
+        )
+    return positions
 
 
 def octilinear_path(start: tuple[float, float], end: tuple[float, float]) -> list[dict[str, float]]:
@@ -159,6 +387,16 @@ def routed_geographic_path(
 
 
 def main() -> int:
+    args = parse_args()
+    osm_router = None
+    if args.osm_pbf is not None:
+        if not args.osm_pbf.is_file():
+            raise FileNotFoundError(f"OSM PBF not found: {args.osm_pbf}")
+        from osm_railway_router import OSMTubeRailwayRouter
+
+        print(f"Loading OpenStreetMap Tube railway graph from {args.osm_pbf}...", file=sys.stderr)
+        osm_router = OSMTubeRailwayRouter(args.osm_pbf)
+
     station_records: dict[str, dict[str, Any]] = {}
     station_lines: defaultdict[str, set[str]] = defaultdict(set)
     line_payloads: dict[str, dict[str, Any]] = {}
@@ -190,10 +428,9 @@ def main() -> int:
                 station_lines[station_id].add(line_id)
 
     stations: list[dict[str, Any]] = []
-    station_points: dict[str, tuple[float, float]] = {}
+    station_points = topology_schematic_points(station_records, line_payloads)
     for station_id, station in station_records.items():
-        x, y = schematic_point(station["latitude"], station["longitude"])
-        station_points[station_id] = (x, y)
+        x, y = station_points[station_id]
         lines = sorted(station_lines[station_id])
         stations.append(
             {
@@ -233,6 +470,24 @@ def main() -> int:
                 segment_ids.append(segment_id)
                 from_station = station_records[from_id]
                 to_station = station_records[to_id]
+                geographic_points = None
+                if osm_router is not None:
+                    geographic_points = osm_router.path(
+                        line_id,
+                        (float(from_station["longitude"]), float(from_station["latitude"])),
+                        (float(to_station["longitude"]), float(to_station["latitude"])),
+                    )
+                    if geographic_points is None:
+                        print(
+                            f"WARNING: OSM route unavailable for {line_id} "
+                            f"{from_station['name']} -> {to_station['name']}; using TfL fallback",
+                            file=sys.stderr,
+                        )
+                if geographic_points is None:
+                    geographic_points = routed_geographic_path(
+                        from_station, to_station, line_strings
+                    )
+
                 segments.append(
                     {
                         "id": segment_id,
@@ -240,9 +495,7 @@ def main() -> int:
                         "fromStationID": from_id,
                         "toStationID": to_id,
                         "schematicPoints": octilinear_path(station_points[from_id], station_points[to_id]),
-                        "geographicPoints": routed_geographic_path(
-                            from_station, to_station, line_strings
-                        ),
+                        "geographicPoints": geographic_points,
                     }
                 )
 
@@ -263,11 +516,11 @@ def main() -> int:
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "source": {
-            "name": "Transport for London Unified API",
-            "url": f"{API_BASE}/Line/{{lineId}}/Route/Sequence/outbound",
-            "attribution": "Data provided by Transport for London",
+            "name": "TfL topology with OpenStreetMap railway geometry" if osm_router else "Transport for London Unified API",
+            "url": "https://www.openstreetmap.org/copyright" if osm_router else f"{API_BASE}/Line/{{lineId}}/Route/Sequence/outbound",
+            "attribution": "Data provided by Transport for London; © OpenStreetMap contributors" if osm_router else "Data provided by Transport for London",
         },
-        "schematicSize": {"width": 1200.0, "height": 900.0},
+        "schematicSize": {"width": 1400.0, "height": 1000.0},
         "stations": stations,
         "segments": segments,
         "lines": lines,
@@ -289,9 +542,10 @@ def main() -> int:
             print(f"ERROR: {error}", file=sys.stderr)
         return 1
 
-    OUTPUT.write_text(json.dumps(graph, indent=2, sort_keys=False) + "\n", encoding="utf-8")
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(graph, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     print(
-        f"Wrote {OUTPUT}: {len(stations)} stations, {len(segments)} line segments, {len(lines)} lines",
+        f"Wrote {args.output}: {len(stations)} stations, {len(segments)} line segments, {len(lines)} lines",
         file=sys.stderr,
     )
     return 0

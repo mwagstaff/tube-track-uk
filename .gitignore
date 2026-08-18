@@ -5,5 +5,7 @@ build/
 xcuserdata/
 Configuration/Secrets.xcconfig
 design_brief/UNIFIED_TFL_API_KEY_FOR_DEVELOPMENT.md
+tmp/
+__pycache__/
 
 _temp*

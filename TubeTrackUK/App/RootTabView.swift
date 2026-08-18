@@ -3,6 +3,7 @@ import SwiftUI
 struct RootTabView: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         @Bindable var state = appState
@@ -24,7 +25,9 @@ struct RootTabView: View {
                 .tabItem { Label(AppTab.about.title, systemImage: AppTab.about.symbol) }
                 .tag(AppTab.about)
         }
-        .tint(.tubeBlue)
+        .tint(colorScheme == .dark ? .white : .tubeBlue)
+        .toolbarBackground(colorScheme == .dark ? Color.black : Color(.systemBackground), for: .tabBar)
+        .toolbarBackground(.visible, for: .tabBar)
         .task {
             await appState.start()
         }

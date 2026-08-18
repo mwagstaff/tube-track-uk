@@ -40,7 +40,21 @@ struct RealWorldMapScreen: View {
             }
         }
         .overlay(alignment: .top) {
-            MapToolbar { resetCamera() }
+            VStack(spacing: 6) {
+                MapToolbar { resetCamera() }
+                HStack {
+                    Spacer()
+                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+                        Text("© OpenStreetMap contributors")
+                            .font(.caption2.weight(.medium))
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 5)
+                            .glassEffect(.regular, in: .capsule)
+                    }
+                    .foregroundStyle(.primary)
+                }
+                .padding(.horizontal, 12)
+            }
         }
         .overlay(alignment: .bottom) {
             bottomOverlay
@@ -70,7 +84,7 @@ struct RealWorldMapScreen: View {
             let issuesMode = appState.disruptionDisplayMode == .issues && !appState.activeAffectedSegmentIDs.isEmpty
             let muted = (issuesMode && !affected)
                 || (appState.selectedLineID != nil && appState.selectedLineID != segment.lineID)
-            MapPolyline(coordinates: segment.geographicPoints.map(\.coordinate))
+            MapPolyline(coordinates: displayCoordinates(for: segment))
                 .stroke(
                     muted ? Color.secondary.opacity(0.24) : (affected && issuesMode ? .red : .tubeLine(segment.lineID)),
                     style: StrokeStyle(lineWidth: affected ? 7 : 4, lineCap: .round, lineJoin: .round)
@@ -162,11 +176,12 @@ struct RealWorldMapScreen: View {
     }
 
     private func trainCoordinate(_ train: LiveTubeTrain, graph: TubeGraph, date: Date) -> CLLocationCoordinate2D? {
-        guard let segment = graph.segmentsByID[train.segmentID],
-              let first = segment.geographicPoints.first else { return nil }
+        guard let segment = graph.segmentsByID[train.segmentID] else { return nil }
+        let points = displayCoordinates(for: segment)
+        guard let first = points.first else { return nil }
         let progress = train.projectedProgress(at: date)
-        guard segment.geographicPoints.count > 1 else { return first.coordinate }
-        let lengths = zip(segment.geographicPoints, segment.geographicPoints.dropFirst()).map {
+        guard points.count > 1 else { return first }
+        let lengths = zip(points, points.dropFirst()).map {
             hypot(($1.longitude - $0.longitude) * 0.62, $1.latitude - $0.latitude)
         }
         let target = lengths.reduce(0, +) * min(1, max(0, progress))
@@ -174,8 +189,8 @@ struct RealWorldMapScreen: View {
         for (index, length) in lengths.enumerated() {
             if travelled + length >= target, length > 0 {
                 let fraction = (target - travelled) / length
-                let start = segment.geographicPoints[index]
-                let end = segment.geographicPoints[index + 1]
+                let start = points[index]
+                let end = points[index + 1]
                 return CLLocationCoordinate2D(
                     latitude: start.latitude + (end.latitude - start.latitude) * fraction,
                     longitude: start.longitude + (end.longitude - start.longitude) * fraction
@@ -183,6 +198,34 @@ struct RealWorldMapScreen: View {
             }
             travelled += length
         }
-        return segment.geographicPoints.last?.coordinate
+        return points.last
+    }
+
+    private func displayCoordinates(for segment: TubeSegment) -> [CLLocationCoordinate2D] {
+        let coordinates = segment.geographicPoints.map(\.coordinate)
+        guard coordinates.count >= 2 else { return coordinates }
+        let laneMetres: [TubeLineID: Double] = [
+            .bakerloo: -8, .central: 0, .circle: -6, .district: 6,
+            .hammersmithCity: 10, .jubilee: -4, .metropolitan: -10,
+            .northern: 0, .piccadilly: 4, .victoria: 8, .waterlooCity: -4,
+        ]
+        let offset = laneMetres[segment.lineID, default: 0]
+        guard offset != 0 else { return coordinates }
+
+        return coordinates.indices.map { index in
+            let before = coordinates[index == coordinates.startIndex ? index : index - 1]
+            let after = coordinates[index == coordinates.index(before: coordinates.endIndex) ? index : index + 1]
+            let latitude = coordinates[index].latitude
+            let metresPerLongitude = max(1, 111_320 * cos(latitude * .pi / 180))
+            let dx = (after.longitude - before.longitude) * metresPerLongitude
+            let dy = (after.latitude - before.latitude) * 110_574
+            let length = max(0.001, hypot(dx, dy))
+            let normalX = -dy / length * offset
+            let normalY = dx / length * offset
+            return CLLocationCoordinate2D(
+                latitude: coordinates[index].latitude + normalY / 110_574,
+                longitude: coordinates[index].longitude + normalX / metresPerLongitude
+            )
+        }
     }
 }

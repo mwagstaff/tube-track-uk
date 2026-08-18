@@ -15,9 +15,25 @@ struct TubeTrackUKTests {
         #expect(graph.segments.count > 350)
         #expect(graph.segments.allSatisfy { $0.schematicPoints.count >= 2 })
         #expect(graph.segments.allSatisfy { $0.geographicPoints.count >= 2 })
+        #expect(graph.segments.filter { $0.geographicPoints.count > 2 }.count > 340)
+        #expect(graph.source.attribution.contains("OpenStreetMap contributors"))
         #expect(graph.segments.allSatisfy {
             graph.stationsByID[$0.fromStationID] != nil && graph.stationsByID[$0.toStationID] != nil
         })
+    }
+
+    @Test func schematicSegmentsUseOnlyBeckStyleAngles() throws {
+        let graph = try TubeGraph.bundled()
+        var bendCount = 0
+        for segment in graph.segments {
+            bendCount += max(0, segment.schematicPoints.count - 2)
+            for (start, end) in zip(segment.schematicPoints, segment.schematicPoints.dropFirst()) {
+                let dx = abs(end.x - start.x)
+                let dy = abs(end.y - start.y)
+                #expect(dx < 0.01 || dy < 0.01 || abs(dx - dy) < 0.01)
+            }
+        }
+        #expect(bendCount < 68)
     }
 
     @Test func disruptionResolverFindsCamdenToEdgwareSection() throws {
@@ -39,6 +55,16 @@ struct TubeTrackUKTests {
 
         #expect(result.confidence == .lineOnly)
         #expect(result.affectedSegmentIDs.count == graph.segments(for: .victoria).count)
+    }
+
+    @Test func disruptionRowsHaveStableDistinctIDsWhenTfLReusesStatusID() throws {
+        let graph = try TubeGraph.bundled()
+        let resolver = DisruptionResolver(repository: TubeNetworkRepository(graph: graph))
+        let first = resolver.resolve(status(reason: "Minor delays between White City and Ealing Broadway"), lineID: .central)
+        let second = resolver.resolve(status(reason: "Minor delays between Leytonstone and Epping"), lineID: .central)
+
+        #expect(first.id != second.id)
+        #expect(first.id == resolver.resolve(status(reason: "Minor delays between White City and Ealing Broadway"), lineID: .central).id)
     }
 
     @Test func routineOvernightClosureIsNotAnActionableDisruption() {
