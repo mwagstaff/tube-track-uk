@@ -4,6 +4,7 @@ struct SchematicMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
     @State private var resetToken = 0
+    private let routesOnlyDebugEnabled = ProcessInfo.processInfo.arguments.contains("--schematic-routes-only")
 
     var body: some View {
         ZStack {
@@ -23,10 +24,14 @@ struct SchematicMapScreen: View {
             }
         }
         .overlay(alignment: .top) {
-            MapToolbar { resetToken += 1 }
+            if !routesOnlyDebugEnabled {
+                MapToolbar { resetToken += 1 }
+            }
         }
         .overlay(alignment: .bottom) {
-            bottomOverlay
+            if !routesOnlyDebugEnabled {
+                bottomOverlay
+            }
         }
     }
 

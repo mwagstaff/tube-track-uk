@@ -8,7 +8,7 @@ struct SchematicMapView: View {
 
     let graph: TubeGraph
     let resetToken: Int
-    private let laneOffsets: [String: CGFloat]
+    private let renderingGeometry: SchematicNetworkGeometry
 
     @State private var cameraScale: CGFloat = 0.72
     @State private var cameraOffset = CGSize(width: -220, height: -65)
@@ -18,11 +18,18 @@ struct SchematicMapView: View {
     @State private var pinchMapPoint: CGPoint?
 
     private let mapCentre = CGPoint(x: 712, y: 480)
+    private let routesOnlyDebugEnabled = ProcessInfo.processInfo.arguments.contains("--schematic-routes-only")
+    private static let preferredCornerRadius = 28.0
 
     init(graph: TubeGraph, resetToken: Int) {
         self.graph = graph
         self.resetToken = resetToken
-        self.laneOffsets = Self.makeLaneOffsets(for: graph)
+        let laneOffsets = Self.makeLaneOffsets(for: graph)
+        self.renderingGeometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: laneOffsets,
+            preferredCornerRadius: Self.preferredCornerRadius
+        )
     }
 
     var body: some View {
@@ -169,27 +176,74 @@ struct SchematicMapView: View {
         let issuesMode = appState.disruptionDisplayMode == .issues && !affectedSegments.isEmpty
 
         for segment in graph.segments {
-            guard let path = path(for: segment), !segment.schematicPoints.isEmpty else { continue }
+            guard let geometry = renderingGeometry.segmentPaths[segment.id] else { continue }
+            let path = path(for: geometry)
             let isAffected = affectedSegments.contains(segment.id)
             let isSelectedLine = appState.selectedLineID == nil || appState.selectedLineID == segment.lineID
             let muted = (issuesMode && !isAffected) || !isSelectedLine
-            let color = displayColor(for: segment.lineID)
-
-            if isAffected && issuesMode {
-                context.stroke(path, with: .color(.white.opacity(colorScheme == .dark ? 0.75 : 1)), lineWidth: 11 * cameraScale)
-                context.stroke(path, with: .color(.red.opacity(0.25)), lineWidth: 16 * cameraScale)
-            }
-            context.stroke(
+            strokeRoute(
                 path,
-                with: .color(muted ? Color.secondary.opacity(issuesMode ? 0.26 : 0.18) : color),
-                style: StrokeStyle(lineWidth: (isAffected ? 7 : 5.5) * cameraScale, lineCap: .round, lineJoin: .round)
+                lineID: segment.lineID,
+                isAffected: isAffected,
+                muted: muted,
+                issuesMode: issuesMode,
+                context: &context
             )
         }
 
-        drawStations(context: &context, size: size)
-        if appState.showLiveTrains {
-            drawTrains(context: &context, date: date)
+        // Curves that pass through stations are separate path geometry. The
+        // station is merely overlaid later; it never hides a line-to-line join.
+        for connector in renderingGeometry.connectors {
+            let isAffected = affectedSegments.contains(connector.incomingSegmentID)
+                || affectedSegments.contains(connector.outgoingSegmentID)
+            let isSelectedLine = appState.selectedLineID == nil || appState.selectedLineID == connector.lineID
+            let muted = (issuesMode && !isAffected) || !isSelectedLine
+            strokeRoute(
+                path(for: connector.path),
+                lineID: connector.lineID,
+                isAffected: isAffected,
+                muted: muted,
+                issuesMode: issuesMode,
+                context: &context
+            )
         }
+
+        if !routesOnlyDebugEnabled {
+            drawStations(context: &context, size: size)
+            if appState.showLiveTrains {
+                drawTrains(context: &context, date: date)
+            }
+        }
+    }
+
+    private func strokeRoute(
+        _ path: Path,
+        lineID: TubeLineID,
+        isAffected: Bool,
+        muted: Bool,
+        issuesMode: Bool,
+        context: inout GraphicsContext
+    ) {
+        if isAffected && issuesMode {
+            context.stroke(path, with: .color(.white.opacity(colorScheme == .dark ? 0.75 : 1)), lineWidth: 11 * cameraScale)
+            context.stroke(path, with: .color(.red.opacity(0.25)), lineWidth: 16 * cameraScale)
+        }
+        context.stroke(
+            path,
+            with: .color(
+                muted
+                    ? Color.secondary.opacity(issuesMode ? 0.26 : 0.18)
+                    : displayColor(for: lineID)
+            ),
+            style: StrokeStyle(
+                lineWidth: (isAffected ? 7 : 5.5) * cameraScale,
+                // Square caps overlap the separately stroked tangent connector
+                // by half a line width, preventing antialias seams. They do not
+                // soften direction changes; those are cubic path geometry.
+                lineCap: .square,
+                lineJoin: .miter
+            )
+        )
     }
 
     private func drawStations(context: inout GraphicsContext, size: CGSize) {
@@ -200,7 +254,7 @@ struct SchematicMapView: View {
         var occupiedLabelFrames: [CGRect] = []
         let labelViewport = CGRect(origin: .zero, size: size).insetBy(dx: 4, dy: 4)
         let lineBounds = graph.segments.flatMap { segment in
-            let points = segment.schematicPoints.map(screenPoint)
+            let points = (renderingGeometry.segmentPaths[segment.id]?.sampledPoints ?? segment.schematicPoints).map(screenPoint)
             return zip(points, points.dropFirst()).map { start, end in
                 CGRect(
                     x: min(start.x, end.x), y: min(start.y, end.y),
@@ -298,8 +352,10 @@ struct SchematicMapView: View {
     private func drawTrains(context: inout GraphicsContext, date: Date) {
         let segments = graph.segmentsByID
         for train in appState.liveTrains {
-            guard let segment = segments[train.segmentID], let point = interpolatedPoint(
-                along: segment.schematicPoints,
+            guard let segment = segments[train.segmentID],
+                  let routePoints = renderingGeometry.segmentPaths[segment.id]?.sampledPoints,
+                  let point = interpolatedPoint(
+                along: routePoints,
                 progress: train.projectedProgress(at: date)
             ) else { continue }
 
@@ -324,7 +380,7 @@ struct SchematicMapView: View {
 
         var nearest: (segment: TubeSegment, distance: CGFloat)?
         for segment in graph.segments {
-            let points = segment.schematicPoints.map(screenPoint)
+            let points = (renderingGeometry.segmentPaths[segment.id]?.sampledPoints ?? segment.schematicPoints).map(screenPoint)
             for pair in zip(points, points.dropFirst()) {
                 let candidate = distanceFromPoint(location, to: pair.0, and: pair.1)
                 if candidate < (nearest?.distance ?? .greatestFiniteMagnitude) {
@@ -347,38 +403,34 @@ struct SchematicMapView: View {
         return .tubeLine(line)
     }
 
-    private func path(for segment: TubeSegment) -> Path? {
-        let points = segment.schematicPoints
-        guard let first = points.first else { return nil }
-        let last = points.last ?? first
-        let dx = last.x - first.x
-        let dy = last.y - first.y
-        let length = max(1, hypot(dx, dy))
-        let laneOffset = laneOffsets[segment.id, default: 0] * cameraScale
-        let translation = CGSize(
-            width: -dy / length * laneOffset,
-            height: dx / length * laneOffset
-        )
-        func displayedPoint(_ point: SchematicPoint) -> CGPoint {
-            let base = screenPoint(point)
-            return CGPoint(x: base.x + translation.width, y: base.y + translation.height)
-        }
+    private func path(for geometry: RoundedSchematicPath) -> Path {
         var path = Path()
-        path.move(to: displayedPoint(first))
-        for point in points.dropFirst() { path.addLine(to: displayedPoint(point)) }
+        path.move(to: screenPoint(geometry.start))
+        for element in geometry.elements {
+            switch element {
+            case let .line(to):
+                path.addLine(to: screenPoint(to))
+            case let .curve(to, control1, control2):
+                path.addCurve(
+                    to: screenPoint(to),
+                    control1: screenPoint(control1),
+                    control2: screenPoint(control2)
+                )
+            }
+        }
         return path
     }
 
-    private static func makeLaneOffsets(for graph: TubeGraph) -> [String: CGFloat] {
+    private static func makeLaneOffsets(for graph: TubeGraph) -> [String: Double] {
         let groups = Dictionary(grouping: graph.segments) { segment in
             [segment.fromStationID, segment.toStationID].sorted().joined(separator: ":")
         }
-        var result: [String: CGFloat] = [:]
+        var result: [String: Double] = [:]
         for siblings in groups.values where siblings.count > 1 {
             let ordered = siblings.sorted { $0.lineID.rawValue < $1.lineID.rawValue }
-            let midpoint = CGFloat(ordered.count - 1) / 2
+            let midpoint = Double(ordered.count - 1) / 2
             for (index, segment) in ordered.enumerated() {
-                result[segment.id] = (CGFloat(index) - midpoint) * 7
+                result[segment.id] = (Double(index) - midpoint) * 7
             }
         }
         return result

@@ -36,6 +36,106 @@ struct TubeTrackUKTests {
         #expect(bendCount < 68)
     }
 
+    @Test func schematicCornerIsReplacedByATangentCubic() throws {
+        let corner = SchematicPoint(x: 100, y: 0)
+        let path = try #require(RoundedSchematicPath(
+            points: [SchematicPoint(x: 0, y: 0), corner, SchematicPoint(x: 100, y: 100)],
+            preferredCornerRadius: 20
+        ))
+
+        #expect(path.elements.count == 3)
+        guard case let .line(entry) = path.elements[0],
+              case let .curve(exit, control1, control2) = path.elements[1] else {
+            Issue.record("A direction change must be a line followed by a cubic fillet")
+            return
+        }
+
+        #expect(approximatelyEqual(entry, SchematicPoint(x: 80, y: 0)))
+        #expect(approximatelyEqual(exit, SchematicPoint(x: 100, y: 20)))
+        #expect(abs(control1.y - entry.y) < 0.000_001)
+        #expect(abs(control2.x - exit.x) < 0.000_001)
+        #expect(!path.sampledPoints.contains(corner))
+    }
+
+    @Test func schematicFilletRadiusIsClampedToShortLegs() throws {
+        let fillet = try #require(SchematicFillet(
+            incomingPoint: SchematicPoint(x: 0, y: 0),
+            corner: SchematicPoint(x: 10, y: 0),
+            outgoingPoint: SchematicPoint(x: 10, y: 10),
+            preferredRadius: 100
+        ))
+
+        #expect(abs(fillet.tangentDistance - 4.5) < 0.000_001)
+        #expect(abs(fillet.effectiveRadius - 4.5) < 0.000_001)
+        #expect(approximatelyEqual(fillet.entry, SchematicPoint(x: 5.5, y: 0)))
+        #expect(approximatelyEqual(fillet.exit, SchematicPoint(x: 10, y: 4.5)))
+    }
+
+    @Test func neighbouringSchematicFilletsCannotOverlap() throws {
+        let path = try #require(RoundedSchematicPath(
+            points: [
+                SchematicPoint(x: 0, y: 0),
+                SchematicPoint(x: 10, y: 0),
+                SchematicPoint(x: 10, y: 10),
+                SchematicPoint(x: 20, y: 10),
+            ],
+            preferredCornerRadius: 100
+        ))
+
+        let curves = path.elements.compactMap { element -> (SchematicPoint, SchematicPoint)? in
+            guard case let .curve(to, _, control2) = element else { return nil }
+            return (to, control2)
+        }
+        #expect(curves.count == 2)
+        #expect(curves[0].0.y <= 4.5 + 0.000_001)
+        guard case let .line(secondEntry) = path.elements[2] else {
+            Issue.record("The second fillet must retain a straight run after the first")
+            return
+        }
+        #expect(secondEntry.y >= 5.5 - 0.000_001)
+    }
+
+    @Test func straightSchematicRunsRemainStraight() throws {
+        let path = try #require(RoundedSchematicPath(
+            points: [
+                SchematicPoint(x: 0, y: 0),
+                SchematicPoint(x: 50, y: 0),
+                SchematicPoint(x: 100, y: 0),
+            ],
+            preferredCornerRadius: 28
+        ))
+        #expect(path.elements.allSatisfy { element in
+            if case .line = element { return true }
+            return false
+        })
+    }
+
+    @Test func bundledSchematicAddsCurvesThroughStations() throws {
+        let graph = try TubeGraph.bundled()
+        let geometry = SchematicNetworkGeometry(
+            graph: graph,
+            laneOffsets: [:],
+            preferredCornerRadius: 28
+        )
+
+        #expect(geometry.segmentPaths.count == graph.segments.count)
+        #expect(geometry.connectors.count > 100)
+        let holbornID = try #require(graph.stations.first { $0.name == "Holborn" }?.id)
+        let holbornSegments = Set(graph.segments.filter {
+            $0.lineID == .piccadilly && ($0.fromStationID == holbornID || $0.toStationID == holbornID)
+        }.map(\.id))
+        let holbornConnector = geometry.connectors.first {
+            $0.lineID == .piccadilly
+                && holbornSegments.contains($0.incomingSegmentID)
+                && holbornSegments.contains($0.outgoingSegmentID)
+        }
+        #expect(holbornConnector != nil)
+        #expect(holbornConnector?.path.elements.contains { element in
+            if case .curve = element { return true }
+            return false
+        } == true)
+    }
+
     @Test func disruptionResolverFindsCamdenToEdgwareSection() throws {
         let graph = try TubeGraph.bundled()
         let resolver = DisruptionResolver(repository: TubeNetworkRepository(graph: graph))
@@ -128,5 +228,13 @@ struct TubeTrackUKTests {
             endDate: start.addingTimeInterval(3_600), source: source,
             fetchedAt: start, confidence: confidence
         )
+    }
+
+    private func approximatelyEqual(
+        _ left: SchematicPoint,
+        _ right: SchematicPoint,
+        tolerance: Double = 0.000_001
+    ) -> Bool {
+        abs(left.x - right.x) <= tolerance && abs(left.y - right.y) <= tolerance
     }
 }
