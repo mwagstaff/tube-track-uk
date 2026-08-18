@@ -1,0 +1,9 @@
+.DS_Store
+DerivedData/
+build/
+*.xcuserstate
+xcuserdata/
+Configuration/Secrets.xcconfig
+design_brief/UNIFIED_TFL_API_KEY_FOR_DEVELOPMENT.md
+
+_temp*
