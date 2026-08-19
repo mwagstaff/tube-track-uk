@@ -1,6 +1,7 @@
 import Foundation
 
 enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
+    case fullUnderground = "full-underground"
     case easternFan = "eastern-fan"
     case centralCompletion = "central-completion"
     case centralCoreJoin = "central-core-join"
@@ -17,6 +18,7 @@ enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
+        case .fullUnderground: "Full"
         case .easternFan: "Eastern fan"
         case .centralCompletion: "Central completion"
         case .centralCoreJoin: "Core"
@@ -33,6 +35,7 @@ enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
 
     var accessibilityDescription: String {
         switch self {
+        case .fullUnderground: "Complete Underground map composed from trace-verified official TfL vector artwork"
         case .easternFan: "Eastern Underground branches traced from the official TfL vector map"
         case .centralCompletion: "Final central Underground joins traced from the official TfL vector map"
         case .centralCoreJoin: "Central core join traced from the official TfL vector map"

@@ -108,6 +108,21 @@ LABELS: dict[str, tuple[str, vector.Point, str]] = {
 }
 
 
+def tick_primitive(line_id: str, match: vector.Match) -> dict:
+    dx, dy = match.tangent
+    magnitude = math.hypot(dx, dy) or 1
+    normal = (-dy / magnitude * 7, dx / magnitude * 7)
+    return {
+        "kind": "tick",
+        "tick": {
+            "lineID": line_id,
+            "start": vector.rounded((match.point[0] - normal[0], match.point[1] - normal[1])),
+            "end": vector.rounded((match.point[0] + normal[0], match.point[1] + normal[1])),
+            "width": 3.2,
+        },
+    }
+
+
 def build(svg: Path, graph_path: Path) -> dict:
     root = ET.parse(svg).getroot()
     graph = json.loads(graph_path.read_text())
@@ -156,7 +171,63 @@ def build(svg: Path, graph_path: Path) -> dict:
         ports = vector.unique_points((match.point for _, match in line_matches), tolerance=3)
         is_interchange = station["interchange"] or len(line_ids) > 1
         primitives: list[dict] = []
-        if is_interchange:
+        if name in {"Aldgate", "Aldgate East"}:
+            # The official map uses ordinary line ticks here. These stations
+            # share parallel Underground lines, but they are not drawn as
+            # multi-point internal interchanges with white connector circles.
+            anchor = tuple(
+                sum(match.point[index] for _, match in line_matches) / len(line_matches)
+                for index in (0, 1)
+            )
+            primitives = [tick_primitive(line_id, match) for line_id, match in line_matches]
+            is_interchange = False
+        elif name == "Liverpool Street":
+            # The official interchange has two visible station points joined
+            # by a right-angle internal connector. The bend itself is not a
+            # third platform, and the three shared-corridor lanes use one
+            # grouped lower station point.
+            central_port = next(match.point for line_id, match in line_matches if line_id == "central")
+            shared_matches = [
+                match for line_id, match in line_matches
+                if line_id in {"circle", "hammersmith-city", "metropolitan"}
+            ]
+            shared_port = tuple(
+                sum(match.point[index] for match in shared_matches) / len(shared_matches)
+                for index in (0, 1)
+            )
+            elbow = (shared_port[0], central_port[1])
+            anchor = central_port
+            primitives = [
+                {
+                    "kind": "connector",
+                    "connector": {
+                        "start": vector.rounded(central_port),
+                        "end": vector.rounded(elbow),
+                        "width": 7.5,
+                    },
+                },
+                {
+                    "kind": "connector",
+                    "connector": {
+                        "start": vector.rounded(elbow),
+                        "end": vector.rounded(shared_port),
+                        "width": 7.5,
+                    },
+                },
+                {
+                    "kind": "circle",
+                    "circle": {
+                        "centre": vector.rounded(central_port), "radius": 8.5, "outlineWidth": 3.5,
+                    },
+                },
+                {
+                    "kind": "circle",
+                    "circle": {
+                        "centre": vector.rounded(shared_port), "radius": 8.5, "outlineWidth": 3.5,
+                    },
+                },
+            ]
+        elif is_interchange:
             for port in ports:
                 if math.dist(port, anchor) > 4:
                     primitives.append({
@@ -172,18 +243,7 @@ def build(svg: Path, graph_path: Path) -> dict:
                 })
         else:
             line_id, match = line_matches[0]
-            dx, dy = match.tangent
-            magnitude = math.hypot(dx, dy) or 1
-            normal = (-dy / magnitude * 7, dx / magnitude * 7)
-            primitives.append({
-                "kind": "tick",
-                "tick": {
-                    "lineID": line_id,
-                    "start": vector.rounded((anchor[0] - normal[0], anchor[1] - normal[1])),
-                    "end": vector.rounded((anchor[0] + normal[0], anchor[1] + normal[1])),
-                    "width": 3.2,
-                },
-            })
+            primitives.append(tick_primitive(line_id, match))
         markers.append({
             "stationID": station["id"], "name": station["name"], "lineIDs": line_ids,
             "anchor": vector.rounded(anchor), "hitRadius": 24, "primitives": primitives,

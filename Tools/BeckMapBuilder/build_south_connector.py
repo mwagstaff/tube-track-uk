@@ -36,7 +36,7 @@ ROUTES = (
     vector.RouteSpec(
         "northern.bank.south-connector.v1", "northern", "13.729858%", 6,
         (("Kennington", (658, 750)), ("Elephant & Castle", (811, 621)),
-         ("Borough", (950, 481)), ("London Bridge", (1105, 335))),
+         ("Borough", (950, 481)), ("London Bridge", (1105, 285))),
     ),
     vector.RouteSpec(
         "northern.battersea.south-connector.v1", "northern", "13.729858%", 4,
@@ -65,7 +65,7 @@ MARKER_ANCHORS: dict[str, vector.Point] = {
     "Tooting Bec": (349.9, 1057.8), "Tooting Broadway": (305.0, 1102.7),
     "Colliers Wood": (259.9, 1147.7), "South Wimbledon": (208.0, 1199.7),
     "Morden": (180.9, 1226.9), "Elephant & Castle": (810.6, 620.7),
-    "Borough": (950.0, 481.3), "London Bridge": (1104.7, 334.8),
+    "Borough": (950.0, 481.3), "London Bridge": (1104.7, 285.0),
     "Battersea Power Station": (312.5, 639.1), "Nine Elms": (392.5, 639.1),
     "Brixton": (712.5, 900.4), "Vauxhall": (502.9, 690.7),
     "Pimlico": (479.0, 550.0), "Victoria": (479.2, 319.0),
@@ -83,7 +83,7 @@ MARKER_PORT_OVERRIDES: dict[str, tuple[vector.Point, ...]] = {
 
 
 LABELS: dict[str, tuple[str, vector.Point, str]] = {
-    "Waterloo": ("Waterloo", (607, 424), "trailing"),
+    "Waterloo": ("Waterloo", (695, 445), "trailing"),
     "Kennington": ("Kennington", (603, 657), "trailing"),
     "Oval": ("Oval", (664, 758), "leading"),
     "Stockwell": ("Stockwell", (628, 788), "leading"),

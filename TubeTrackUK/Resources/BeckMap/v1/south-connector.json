@@ -15,8 +15,8 @@
       "alignment": "trailing",
       "id": "label.940GZZLUWLO",
       "position": {
-        "x": 607,
-        "y": 424
+        "x": 695,
+        "y": 445
       },
       "priority": 10,
       "rotationDegrees": 0,
@@ -749,17 +749,24 @@
         },
         {
           "control1": {
-            "x": 1097.452,
-            "y": 333.845
+            "x": 1100.953,
+            "y": 330.344
           },
           "control2": {
-            "x": 1098.412,
-            "y": 332.628
+            "x": 1104.656,
+            "y": 321.422
           },
           "op": "cubic",
           "to": {
-            "x": 1099.3,
-            "y": 331.269
+            "x": 1104.656,
+            "y": 315.047
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1104.656,
+            "y": 285.037
           }
         }
       ],
@@ -1453,8 +1460,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.northern.bank.south-connector.v1.2",
       "toPort": {
-        "x": 1099.3,
-        "y": 331.269
+        "x": 1104.656,
+        "y": 285.037
       },
       "toStationID": "940GZZLULNB",
       "translation": {
@@ -2129,7 +2136,7 @@
     {
       "anchor": {
         "x": 1104.7,
-        "y": 334.8
+        "y": 285.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -2138,24 +2145,10 @@
       "name": "London Bridge",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 1099.3,
-              "y": 331.269
-            },
-            "start": {
-              "x": 1104.7,
-              "y": 334.8
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 1104.7,
-              "y": 334.8
+              "y": 285.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5

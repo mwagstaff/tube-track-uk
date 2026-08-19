@@ -3,7 +3,6 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
     case map
-    case beck
     case realWorld
     case works
     case about
@@ -13,7 +12,6 @@ enum AppTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .map: "Map"
-        case .beck: "Beck"
         case .realWorld: "Real World"
         case .works: "Works"
         case .about: "About"
@@ -23,7 +21,6 @@ enum AppTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .map: "map"
-        case .beck: "point.3.connected.trianglepath.dotted"
         case .realWorld: "globe.europe.africa"
         case .works: "wrench.and.screwdriver"
         case .about: "info.circle"

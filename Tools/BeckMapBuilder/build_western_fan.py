@@ -129,7 +129,7 @@ ROUTES = (
     vector.RouteSpec(
         "circle.edgware-branch.western-fan.v1", "circle", "98.728943%", 1,
         tuple((name, p(x, y)) for name, (x, y) in (
-            ("Gloucester Road", (762, 920)), ("High Street Kensington", (710, 870)),
+            ("Gloucester Road", (725, 932)), ("High Street Kensington", (710, 870)),
             ("Notting Hill Gate", (710, 842)), ("Bayswater", (710, 748)),
             ("Paddington", (730, 705)), ("Edgware Road (Circle Line)", (745, 700)),
         )),
@@ -326,9 +326,11 @@ def build(svg: Path, graph_path: Path) -> dict:
                 "centre": vector.rounded(anchor), "radius": 8.5, "outlineWidth": 3.5,
             }}]
             interchange = True
-        elif name == "Earl's Court":
+        elif name in {"Turnham Green", "Earl's Court"}:
             # Multiple District branches meet one District platform axis. Keep
             # only one authored port per line for the passenger interchange.
+            # At Turnham Green the Richmond branch joins west of the District
+            # platform and must remain a hidden topology port.
             representatives: dict[str, vector.Match] = {}
             for line_id, match in line_matches:
                 representatives.setdefault(line_id, match)

@@ -257,8 +257,8 @@ enum BeckMapLabelAlignment: String, Codable, Hashable, Sendable {
     case trailing
 }
 
-/// Labels are placed by artwork coordinates. Runtime collision avoidance is
-/// intentionally absent because label placement is part of the map design.
+/// Labels keep an authored preferred position. The renderer preserves that
+/// direction while enforcing screen-space clearance from map content.
 struct BeckMapLabelRecord: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let stationID: String

@@ -46,12 +46,12 @@ struct BeckMapScreen: View {
                 .ignoresSafeArea(edges: .top)
             } else if appState.graph != nil, let documentLoadError {
                 ContentUnavailableView(
-                    "Beck map unavailable",
+                    "Map unavailable",
                     systemImage: "map.fill",
                     description: Text(documentLoadError)
                 )
             } else if appState.graph != nil || isLoadingDocument {
-                ProgressView("Loading authored Beck map…")
+                ProgressView("Loading Underground map…")
             } else if appState.isLoadingGraph {
                 ProgressView("Loading Underground map…")
             } else {
@@ -162,7 +162,7 @@ struct BeckMapScreen: View {
             return region
         }
         #endif
-        return .centralCoreJoin
+        return .fullUnderground
     }
 
     private var referenceOverlayVisible: Bool {
@@ -174,7 +174,9 @@ struct BeckMapScreen: View {
     }
 
     private var regionStatusTitle: String {
-        "\(selectedRegion.title) · authored slice"
+        selectedRegion == .fullUnderground
+            ? "Full Underground map"
+            : "\(selectedRegion.title) · authored slice"
     }
 
     private func presentation(
@@ -285,7 +287,11 @@ private struct BeckMapCanvas: View {
             return RenderedSegment(
                 id: segment.id,
                 lineID: segment.lineID,
-                path: Self.makePath(commands: commands, translation: segment.translation)
+                path: Self.makePath(commands: commands, translation: segment.translation),
+                collisionEdges: Self.makeCollisionEdges(
+                    commands: commands,
+                    translation: segment.translation
+                )
             )
         }
         self.renderedSegments = renderedSegments
@@ -357,7 +363,7 @@ private struct BeckMapCanvas: View {
                 }
             }
         }
-        .accessibilityLabel("Interactive London Underground Beck map")
+        .accessibilityLabel("Interactive London Underground map")
     }
 
     private var isReferenceOverlayActive: Bool {
@@ -455,8 +461,11 @@ private struct BeckMapCanvas: View {
         }
 
         if !traceMode {
+            // Labels are screen-space UI, so they remain readable instead of
+            // growing with the artwork. Station markers are drawn last to
+            // guarantee that a label background can never conceal a station.
+            drawLabels(context: &context, viewport: size)
             drawStationMarkers(context: &mapContext)
-            drawLabels(context: &mapContext, viewport: size)
         }
     }
 
@@ -529,17 +538,90 @@ private struct BeckMapCanvas: View {
             return
         }
         let viewportRect = CGRect(origin: .zero, size: viewport).insetBy(dx: 4, dy: 4)
-        for label in document.labels {
-            if document.geometryStatus != .authored, cameraScale < 0.72, label.priority < 10 {
-                continue
+        let zoomRatio = cameraScale / max(0.001, minimumCameraScale)
+        let showsSecondaryLabels = document.geometryStatus != .authored
+            ? cameraScale >= 0.72
+            : zoomRatio >= 2.15
+        let selectedStationID = presentation.selectedStationID
+        let labels = document.labels
+            .filter { label in
+                label.priority >= 10
+                    || showsSecondaryLabels
+                    || label.stationID == selectedStationID
             }
-            let screenPosition = screenPoint(label.position)
+            .sorted { lhs, rhs in
+                let lhsSelected = lhs.stationID == selectedStationID
+                let rhsSelected = rhs.stationID == selectedStationID
+                if lhsSelected != rhsSelected { return lhsSelected }
+                if lhs.priority != rhs.priority { return lhs.priority > rhs.priority }
+                return lhs.id < rhs.id
+            }
+        let markerFrames = markerExclusionFrames()
+        let lineBlockers = lineExclusionBlockers(in: viewportRect)
+        let stationAnchors = Dictionary(uniqueKeysWithValues: document.stationMarkers.map {
+            ($0.stationID, CGPoint($0.anchor))
+        })
+        var occupiedLabelFrames: [CGRect] = []
+
+        for label in labels {
             let artworkPosition = CGPoint(label.position)
-            let metrics = Self.labelMetrics(for: label, styles: document.styles)
-            var text = context.resolve(Text(label.text).font(.system(size: metrics.fontSize, weight: .semibold)))
+            let candidates: [BeckMapLabelPlacementCandidate]
+            if let stationAnchor = stationAnchors[label.stationID] {
+                candidates = BeckMapLabelPlacementResolver.candidates(
+                    stationScreenPosition: screenPoint(BeckMapPoint(
+                        x: stationAnchor.x,
+                        y: stationAnchor.y
+                    )),
+                    artworkOffset: CGVector(
+                        dx: artworkPosition.x - stationAnchor.x,
+                        dy: artworkPosition.y - stationAnchor.y
+                    )
+                )
+            } else {
+                candidates = [.init(
+                    position: screenPoint(label.position),
+                    alignment: label.alignment
+                )]
+            }
+            let screenFontSize: CGFloat = label.priority >= 10 ? 16 : 14
+            let rotation = CGAffineTransform(rotationAngle: label.rotationDegrees * .pi / 180)
+            var placement: (
+                candidate: BeckMapLabelPlacementCandidate,
+                metrics: LabelMetrics,
+                frame: CGRect
+            )?
+            for candidate in candidates {
+                let metrics = Self.labelMetrics(
+                    for: label,
+                    styles: document.styles,
+                    fontSizeOverride: screenFontSize,
+                    alignmentOverride: candidate.alignment
+                )
+                let labelFrame = metrics.bounds
+                    .applying(rotation)
+                    .standardized
+                    .offsetBy(dx: candidate.position.x, dy: candidate.position.y)
+                guard viewportRect.intersects(labelFrame) else { continue }
+                let collisionFrame = labelFrame.insetBy(dx: -3, dy: -2)
+                guard BeckMapLabelCollisionResolver.accepts(
+                    collisionFrame,
+                    markerBlockers: markerFrames,
+                    lineBlockers: lineBlockers,
+                    occupied: occupiedLabelFrames
+                ) else { continue }
+                placement = (candidate, metrics, collisionFrame)
+                break
+            }
+            guard let placement else { continue }
+
+            let weight: Font.Weight = label.priority >= 10 ? .semibold : .medium
+            var text = context.resolve(Text(label.text).font(.system(
+                size: placement.metrics.fontSize,
+                weight: weight
+            )))
             text.shading = .color(Color(red: 0.04, green: 0.12, blue: 0.25))
             let anchor: UnitPoint
-            switch label.alignment {
+            switch placement.candidate.alignment {
             case .leading:
                 anchor = .leading
             case .centre:
@@ -547,25 +629,105 @@ private struct BeckMapCanvas: View {
             case .trailing:
                 anchor = .trailing
             }
-            let labelFrame = CGRect(
-                x: screenPosition.x + metrics.bounds.minX * cameraScale,
-                y: screenPosition.y + metrics.bounds.minY * cameraScale,
-                width: metrics.bounds.width * cameraScale,
-                height: metrics.bounds.height * cameraScale
-            )
-            guard viewportRect.contains(labelFrame) else { continue }
 
             var labelContext = context
             labelContext.concatenate(
-                CGAffineTransform(translationX: artworkPosition.x, y: artworkPosition.y)
+                CGAffineTransform(
+                    translationX: placement.candidate.position.x,
+                    y: placement.candidate.position.y
+                )
                     .rotated(by: label.rotationDegrees * .pi / 180)
             )
             labelContext.fill(
-                Path(roundedRect: metrics.bounds, cornerRadius: 2),
-                with: .color(.white.opacity(0.9))
+                Path(roundedRect: placement.metrics.bounds, cornerRadius: 2),
+                with: .color(.white.opacity(0.86))
             )
             labelContext.draw(text, at: .zero, anchor: anchor)
+            occupiedLabelFrames.append(placement.frame)
         }
+    }
+
+    private func markerExclusionFrames() -> [BeckMapLabelBlocker] {
+        document.stationMarkers.flatMap { marker in
+            marker.primitives.compactMap { primitive -> BeckMapLabelBlocker? in
+                switch primitive {
+                case let .circle(circle):
+                    let centre = screenPoint(circle.centre)
+                    let radius = max(6, circle.radius * cameraScale) + 4
+                    return BeckMapLabelBlocker(
+                        stationID: marker.stationID,
+                        frame: CGRect(
+                            x: centre.x - radius,
+                            y: centre.y - radius,
+                            width: radius * 2,
+                            height: radius * 2
+                        )
+                    )
+                case let .tick(tick):
+                    let start = screenPoint(tick.start)
+                    let end = screenPoint(tick.end)
+                    return BeckMapLabelBlocker(
+                        stationID: marker.stationID,
+                        frame: CGRect(
+                            x: min(start.x, end.x),
+                            y: min(start.y, end.y),
+                            width: max(1, abs(end.x - start.x)),
+                            height: max(1, abs(end.y - start.y))
+                        ).insetBy(dx: -6, dy: -6)
+                    )
+                case .connector, .walkingConnector:
+                    return nil
+                }
+            }
+        }
+    }
+
+    private func lineExclusionBlockers(in viewport: CGRect) -> [BeckMapLineBlocker] {
+        let issuesActive = presentation.emphasizesIssues
+            && !presentation.affectedSegmentIDs.isEmpty
+        var blockers = renderedSegments.flatMap { segment in
+            let visibleWidth = issuesActive && presentation.affectedSegmentIDs.contains(segment.id)
+                ? document.styles.affectedOuterStrokeWidth
+                : document.styles.routeStrokeWidth
+            let routeClearance = visibleWidth * cameraScale / 2 + 4
+            return segment.collisionEdges.compactMap { edge -> BeckMapLineBlocker? in
+                let blocker = BeckMapLineBlocker(
+                    start: screenPoint(edge.start),
+                    end: screenPoint(edge.end),
+                    clearance: routeClearance
+                )
+                return blocker.bounds.intersects(viewport) ? blocker : nil
+            }
+        }
+
+        for marker in document.stationMarkers {
+            for primitive in marker.primitives {
+                let start: BeckMapPoint
+                let end: BeckMapPoint
+                let width: Double
+                switch primitive {
+                case let .connector(connector):
+                    start = connector.start
+                    end = connector.end
+                    width = connector.width
+                case let .walkingConnector(connector):
+                    start = connector.start
+                    end = connector.end
+                    width = connector.width
+                case .circle, .tick:
+                    continue
+                }
+                let blocker = BeckMapLineBlocker(
+                    start: screenPoint(start),
+                    end: screenPoint(end),
+                    clearance: width * cameraScale / 2 + 4
+                )
+                if blocker.bounds.intersects(viewport) {
+                    blockers.append(blocker)
+                }
+            }
+        }
+        return blockers
     }
 
     private func resetCamera(in size: CGSize) {
@@ -664,6 +826,13 @@ private struct BeckMapCanvas: View {
         )
     }
 
+    private func screenPoint(_ point: CGPoint) -> CGPoint {
+        CGPoint(
+            x: point.x * cameraScale + cameraOffset.width,
+            y: point.y * cameraScale + cameraOffset.height
+        )
+    }
+
     private func distance(_ start: CGPoint, _ end: CGPoint) -> CGFloat {
         hypot(start.x - end.x, start.y - end.y)
     }
@@ -690,6 +859,88 @@ private struct BeckMapCanvas: View {
             }
         }
         return path
+    }
+
+    private static func makeCollisionEdges(
+        commands: [BeckMapPathCommand],
+        translation: BeckMapTranslation
+    ) -> [BeckMapCollisionEdge] {
+        func point(_ value: BeckMapPoint) -> CGPoint {
+            CGPoint(x: value.x + translation.x, y: value.y + translation.y)
+        }
+
+        func cubicPoint(
+            from start: CGPoint,
+            control1: CGPoint,
+            control2: CGPoint,
+            to end: CGPoint,
+            progress: CGFloat
+        ) -> CGPoint {
+            let inverse = 1 - progress
+            let startWeight = inverse * inverse * inverse
+            let control1Weight = 3 * inverse * inverse * progress
+            let control2Weight = 3 * inverse * progress * progress
+            let endWeight = progress * progress * progress
+            return CGPoint(
+                x: start.x * startWeight
+                    + control1.x * control1Weight
+                    + control2.x * control2Weight
+                    + end.x * endWeight,
+                y: start.y * startWeight
+                    + control1.y * control1Weight
+                    + control2.y * control2Weight
+                    + end.y * endWeight
+            )
+        }
+
+        var edges: [BeckMapCollisionEdge] = []
+        var current: CGPoint?
+        var subpathStart: CGPoint?
+        for command in commands {
+            switch command {
+            case let .move(to):
+                let destination = point(to)
+                current = destination
+                subpathStart = destination
+            case let .line(to):
+                let destination = point(to)
+                if let current {
+                    edges.append(.init(start: current, end: destination))
+                }
+                current = destination
+            case let .cubic(control1, control2, to):
+                let destination = point(to)
+                guard let start = current else {
+                    current = destination
+                    continue
+                }
+                let firstControl = point(control1)
+                let secondControl = point(control2)
+                let controlLength = hypot(firstControl.x - start.x, firstControl.y - start.y)
+                    + hypot(secondControl.x - firstControl.x, secondControl.y - firstControl.y)
+                    + hypot(destination.x - secondControl.x, destination.y - secondControl.y)
+                let steps = max(4, min(64, Int(ceil(controlLength / 8))))
+                var previous = start
+                for step in 1 ... steps {
+                    let sampled = cubicPoint(
+                        from: start,
+                        control1: firstControl,
+                        control2: secondControl,
+                        to: destination,
+                        progress: CGFloat(step) / CGFloat(steps)
+                    )
+                    edges.append(.init(start: previous, end: sampled))
+                    previous = sampled
+                }
+                current = destination
+            case .close:
+                if let current, let subpathStart, current != subpathStart {
+                    edges.append(.init(start: current, end: subpathStart))
+                }
+                current = subpathStart
+            }
+        }
+        return edges
     }
 
     private static func loadDebugReference(for document: BeckMapDocument) -> UIImage? {
@@ -781,9 +1032,11 @@ private struct BeckMapCanvas: View {
 
     private static func labelMetrics(
         for label: BeckMapLabelRecord,
-        styles: BeckMapStyleRecord
+        styles: BeckMapStyleRecord,
+        fontSizeOverride: CGFloat? = nil,
+        alignmentOverride: BeckMapLabelAlignment? = nil
     ) -> LabelMetrics {
-        let fontSize = CGFloat(
+        let fontSize = fontSizeOverride ?? CGFloat(
             label.priority >= 10 ? styles.primaryLabelFontSize : styles.secondaryLabelFontSize
         )
         let padding = CGFloat(styles.labelPadding)
@@ -792,7 +1045,7 @@ private struct BeckMapCanvas: View {
         let width = max(fontSize * 2.8, CGFloat(longestLine) * fontSize * 0.54)
         let height = max(fontSize * 1.44, CGFloat(lines.count) * fontSize * 1.1)
         let originX: CGFloat
-        switch label.alignment {
+        switch alignmentOverride ?? label.alignment {
         case .leading:
             originX = -padding
         case .centre:
@@ -815,6 +1068,7 @@ private struct BeckMapCanvas: View {
         let id: String
         let lineID: TubeLineID
         let path: Path
+        let collisionEdges: [BeckMapCollisionEdge]
     }
 
     private struct LabelMetrics {
@@ -828,6 +1082,125 @@ private struct BeckMapCanvas: View {
         let width: CGFloat
         let height: CGFloat
         let referenceOverlayVisible: Bool
+    }
+}
+
+struct BeckMapLabelBlocker: Equatable {
+    let stationID: String
+    let frame: CGRect
+}
+
+struct BeckMapCollisionEdge: Equatable {
+    let start: CGPoint
+    let end: CGPoint
+}
+
+struct BeckMapLineBlocker: Equatable {
+    let start: CGPoint
+    let end: CGPoint
+    let clearance: CGFloat
+
+    var bounds: CGRect {
+        CGRect(
+            x: min(start.x, end.x),
+            y: min(start.y, end.y),
+            width: max(0.5, abs(end.x - start.x)),
+            height: max(0.5, abs(end.y - start.y))
+        ).insetBy(dx: -clearance, dy: -clearance)
+    }
+
+    func intersects(_ frame: CGRect) -> Bool {
+        let rect = frame.insetBy(dx: -clearance, dy: -clearance)
+        guard bounds.intersects(frame) else { return false }
+        if rect.contains(start) || rect.contains(end) { return true }
+
+        let deltaX = end.x - start.x
+        let deltaY = end.y - start.y
+        let boundaries: [(CGFloat, CGFloat)] = [
+            (-deltaX, start.x - rect.minX),
+            (deltaX, rect.maxX - start.x),
+            (-deltaY, start.y - rect.minY),
+            (deltaY, rect.maxY - start.y),
+        ]
+        var minimumProgress: CGFloat = 0
+        var maximumProgress: CGFloat = 1
+        for (direction, distance) in boundaries {
+            if abs(direction) < 0.000_001 {
+                if distance < 0 { return false }
+                continue
+            }
+            let progress = distance / direction
+            if direction < 0 {
+                minimumProgress = max(minimumProgress, progress)
+            } else {
+                maximumProgress = min(maximumProgress, progress)
+            }
+            if minimumProgress > maximumProgress { return false }
+        }
+        return true
+    }
+}
+
+enum BeckMapLabelCollisionResolver {
+    static func accepts(
+        _ frame: CGRect,
+        markerBlockers: [BeckMapLabelBlocker],
+        lineBlockers: [BeckMapLineBlocker],
+        occupied: [CGRect]
+    ) -> Bool {
+        !markerBlockers.contains(where: { $0.frame.intersects(frame) })
+            && !lineBlockers.contains(where: { $0.intersects(frame) })
+            && !occupied.contains(where: { $0.intersects(frame) })
+    }
+}
+
+struct BeckMapLabelPlacementCandidate: Equatable {
+    let position: CGPoint
+    let alignment: BeckMapLabelAlignment
+}
+
+enum BeckMapLabelPlacementResolver {
+    static let preferredTether: CGFloat = 30
+    static let maximumTether: CGFloat = 68
+    private static let tetherDistances: [CGFloat] = [30, 38, 46, 56, 68]
+    private static let angleOffsets: [CGFloat] = [
+        0,
+        .pi / 4,
+        -.pi / 4,
+        .pi / 2,
+        -.pi / 2,
+        .pi * 3 / 4,
+        -.pi * 3 / 4,
+        .pi,
+    ]
+
+    static func candidates(
+        stationScreenPosition: CGPoint,
+        artworkOffset: CGVector
+    ) -> [BeckMapLabelPlacementCandidate] {
+        let distance = hypot(artworkOffset.dx, artworkOffset.dy)
+        let baseAngle = distance > 0.001 ? atan2(artworkOffset.dy, artworkOffset.dx) : 0
+        return tetherDistances.flatMap { tether in
+            angleOffsets.map { angleOffset in
+                let angle = baseAngle + angleOffset
+                let direction = CGVector(dx: cos(angle), dy: sin(angle))
+                let alignment: BeckMapLabelAlignment
+                if direction.dx > 0.25 {
+                    alignment = .leading
+                } else if direction.dx < -0.25 {
+                    alignment = .trailing
+                } else {
+                    alignment = .centre
+                }
+                return BeckMapLabelPlacementCandidate(
+                    position: CGPoint(
+                        x: stationScreenPosition.x + direction.dx * tether,
+                        y: stationScreenPosition.y + direction.dy * tether
+                    ),
+                    alignment: alignment
+                )
+            }
+        }
     }
 }
 

@@ -3267,7 +3267,7 @@
         {
           "op": "move",
           "to": {
-            "x": 1423.878,
+            "x": 1350.238,
             "y": 1264.734
           }
         },
@@ -5844,7 +5844,7 @@
     },
     {
       "fromPort": {
-        "x": 1423.878,
+        "x": 1350.238,
         "y": 1264.734
       },
       "fromStationID": "940GZZLUGTR",
@@ -7323,20 +7323,6 @@
           "kind": "connector"
         },
         {
-          "connector": {
-            "end": {
-              "x": 804.516,
-              "y": 1273.031
-            },
-            "start": {
-              "x": 819.842,
-              "y": 1243.188
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 819.842,
@@ -7352,17 +7338,6 @@
             "centre": {
               "x": 819.595,
               "y": 1273.046
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 804.516,
-              "y": 1273.031
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -7555,20 +7530,6 @@
         {
           "connector": {
             "end": {
-              "x": 1423.878,
-              "y": 1264.734
-            },
-            "start": {
-              "x": 1350.196,
-              "y": 1243.188
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
               "x": 1350.238,
               "y": 1264.734
             },
@@ -7596,17 +7557,6 @@
             "centre": {
               "x": 1349.973,
               "y": 1273.04
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1423.878,
-              "y": 1264.734
             },
             "outlineWidth": 3.5,
             "radius": 8.5

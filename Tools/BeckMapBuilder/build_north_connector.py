@@ -189,7 +189,21 @@ def build(svg: Path, graph_path: Path) -> dict:
         ports = vector.unique_points((match.point for _, match in line_matches), tolerance=3)
         is_interchange = station["interchange"] or len(line_ids) > 1 or len(ports) > 1
         primitives: list[dict] = []
-        if is_interchange:
+        if name in {"Camden Town", "Finchley Central"}:
+            # These Northern branches join at the station without creating
+            # separate passenger interchange points. Keep every segment port
+            # for topology, but render only the visible station point on the
+            # shared trunk shown in the official artwork.
+            if name == "Camden Town":
+                anchor = ports[0]
+            primitives.append({
+                "kind": "circle",
+                "circle": {
+                    "centre": vector.rounded(anchor), "radius": 8.5, "outlineWidth": 3.5,
+                },
+            })
+            is_interchange = False
+        elif is_interchange:
             for port in ports:
                 if math.dist(port, anchor) > 4:
                     primitives.append({

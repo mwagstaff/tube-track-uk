@@ -1,7 +1,7 @@
 # TubeTrack UK
 
 TubeTrack UK is a native, iPhone-only iOS 26 app for exploring the London
-Underground as a schematic network or on an Apple map. It combines a bundled
+Underground on an authored network map or on an Apple map. It combines a bundled
 offline Tube graph with live Transport for London status, planned work and
 arrival-prediction data.
 
@@ -18,7 +18,7 @@ ignored by Git and is included conditionally by `Shared.xcconfig`.
 
 ## MVP features
 
-- vector, octilinear schematic map with pan, pinch zoom and map hit testing;
+- authored Underground map with pan, pinch zoom and map hit testing;
 - MapKit view using the same station, segment, disruption and train state;
 - 11 centrally defined Tube line styles and a 272-station bundled network;
 - 30-second live status refresh with section-aware disruption resolution;

@@ -126,7 +126,7 @@
         "x": 742,
         "y": 727
       },
-      "priority": 10,
+      "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCTN",
       "text": "Camden Town"
@@ -186,7 +186,7 @@
         "x": 847,
         "y": 278
       },
-      "priority": 10,
+      "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFYC",
       "text": "Finchley Central"
@@ -3075,8 +3075,8 @@
     },
     {
       "anchor": {
-        "x": 762.1,
-        "y": 758.5
+        "x": 762.109,
+        "y": 741.844
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -3085,60 +3085,10 @@
       "name": "Camden Town",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 762.109,
-              "y": 741.844
-            },
-            "start": {
-              "x": 762.1,
-              "y": 758.5
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
-              "x": 762.016,
-              "y": 775.391
-            },
-            "start": {
-              "x": 762.1,
-              "y": 758.5
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 762.1,
-              "y": 758.5
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
           "circle": {
             "centre": {
               "x": 762.109,
               "y": 741.844
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 762.016,
-              "y": 775.391
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -3276,35 +3226,10 @@
       "name": "Finchley Central",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 862.609,
-              "y": 315.0
-            },
-            "start": {
-              "x": 862.6,
-              "y": 294.0
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 862.6,
               "y": 294.0
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 862.609,
-              "y": 315.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5

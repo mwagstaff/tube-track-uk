@@ -150,7 +150,7 @@
         "x": 1281,
         "y": 999
       },
-      "priority": 10,
+      "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUALD",
       "text": "Aldgate"
@@ -162,7 +162,7 @@
         "x": 1436,
         "y": 969
       },
-      "priority": 10,
+      "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUADE",
       "text": "Aldgate\nEast"
@@ -2517,12 +2517,12 @@
           "tick": {
             "end": {
               "x": 932.0,
-              "y": 1055.0
+              "y": 1054.547
             },
             "lineID": "central",
             "start": {
               "x": 932.0,
-              "y": 1041.0
+              "y": 1040.547
             },
             "width": 3.2
           }
@@ -2545,13 +2545,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1005.0,
-              "y": 1055.0
+              "x": 1005.065,
+              "y": 1054.547
             },
             "lineID": "central",
             "start": {
-              "x": 1005.0,
-              "y": 1041.0
+              "x": 1005.065,
+              "y": 1040.547
             },
             "width": 3.2
           }
@@ -2637,8 +2637,8 @@
     },
     {
       "anchor": {
-        "x": 1185,
-        "y": 899
+        "x": 1235.344,
+        "y": 899.359
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -2652,12 +2652,12 @@
         {
           "connector": {
             "end": {
-              "x": 1235.344,
+              "x": 1185.124,
               "y": 899.359
             },
             "start": {
-              "x": 1185,
-              "y": 899
+              "x": 1235.344,
+              "y": 899.359
             },
             "width": 7.5
           },
@@ -2666,55 +2666,16 @@
         {
           "connector": {
             "end": {
-              "x": 1184.994,
-              "y": 949.402
+              "x": 1185.124,
+              "y": 949.446
             },
             "start": {
-              "x": 1185,
-              "y": 899
+              "x": 1185.124,
+              "y": 899.359
             },
             "width": 7.5
           },
           "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
-              "x": 1185.385,
-              "y": 941.266
-            },
-            "start": {
-              "x": 1185,
-              "y": 899
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
-              "x": 1184.994,
-              "y": 957.672
-            },
-            "start": {
-              "x": 1185,
-              "y": 899
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1185,
-              "y": 899
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
         },
         {
           "circle": {
@@ -2730,30 +2691,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1184.994,
-              "y": 949.402
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1185.385,
-              "y": 941.266
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1184.994,
-              "y": 957.672
+              "x": 1185.124,
+              "y": 949.446
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -2778,13 +2717,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1545.0,
-              "y": 898.0
+              "x": 1545.067,
+              "y": 898.016
             },
             "lineID": "central",
             "start": {
-              "x": 1545.0,
-              "y": 884.0
+              "x": 1545.067,
+              "y": 884.016
             },
             "width": 3.2
           }
@@ -3033,8 +2972,8 @@
     },
     {
       "anchor": {
-        "x": 1359,
-        "y": 988
+        "x": 1358.979,
+        "y": 988.007
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -3044,73 +2983,42 @@
       "name": "Aldgate",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1364.984,
+              "x": 1357.984,
               "y": 1010.001
             },
+            "lineID": "circle",
             "start": {
-              "x": 1359,
-              "y": 988
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
-              "x": 1352.974,
-              "y": 966.012
-            },
-            "start": {
-              "x": 1359,
-              "y": 988
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1359,
-              "y": 988
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1364.984,
+              "x": 1371.984,
               "y": 1010.001
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         },
         {
-          "circle": {
-            "centre": {
-              "x": 1352.974,
-              "y": 966.012
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1347.3,
+              "y": 970.111
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "metropolitan",
+            "start": {
+              "x": 1358.648,
+              "y": 961.913
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUALD"
     },
     {
       "anchor": {
-        "x": 1455,
-        "y": 945
+        "x": 1455.236,
+        "y": 945.428
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -3120,29 +3028,34 @@
       "name": "Aldgate East",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
               "x": 1454.932,
-              "y": 949.594
+              "y": 942.594
             },
+            "lineID": "district",
             "start": {
-              "x": 1455,
-              "y": 945
+              "x": 1454.932,
+              "y": 956.594
             },
-            "width": 7.5
-          },
-          "kind": "connector"
+            "width": 3.2
+          }
         },
         {
-          "circle": {
-            "centre": {
-              "x": 1455,
-              "y": 945
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1455.54,
+              "y": 948.263
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "hammersmith-city",
+            "start": {
+              "x": 1455.54,
+              "y": 934.263
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUADE"
@@ -3267,13 +3180,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1050.0,
-              "y": 793.0
+              "x": 1049.985,
+              "y": 793.375
             },
             "lineID": "northern",
             "start": {
-              "x": 1050.0,
-              "y": 807.0
+              "x": 1049.985,
+              "y": 807.375
             },
             "width": 3.2
           }
@@ -3296,13 +3209,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1135.95,
-              "y": 824.05
+              "x": 1135.967,
+              "y": 824.037
             },
             "lineID": "northern",
             "start": {
-              "x": 1126.05,
-              "y": 833.95
+              "x": 1126.068,
+              "y": 833.936
             },
             "width": 3.2
           }
@@ -3376,13 +3289,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1365.169,
-              "y": 1315.066
+              "x": 1365.474,
+              "y": 1314.739
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1374.831,
-              "y": 1304.934
+              "x": 1375.137,
+              "y": 1304.608
             },
             "width": 3.2
           }
@@ -3405,13 +3318,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1505.003,
-              "y": 1325.0
+              "x": 1505.054,
+              "y": 1324.55
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1504.997,
-              "y": 1311.0
+              "x": 1505.049,
+              "y": 1310.55
             },
             "width": 3.2
           }
@@ -3434,13 +3347,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1785.061,
-              "y": 1342.961
+              "x": 1784.981,
+              "y": 1343.045
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1794.939,
-              "y": 1333.039
+              "x": 1794.859,
+              "y": 1333.124
             },
             "width": 3.2
           }
@@ -3463,13 +3376,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1963.582,
-              "y": 1365.292
+              "x": 1963.37,
+              "y": 1365.059
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1954.418,
-              "y": 1354.708
+              "x": 1954.206,
+              "y": 1354.476
             },
             "width": 3.2
           }
