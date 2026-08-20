@@ -37,7 +37,8 @@ enum DisruptionDisplayMode: String, CaseIterable {
 @Observable
 final class TubeAppState {
     var selectedTab: AppTab = .map
-    var disruptionDisplayMode: DisruptionDisplayMode = .normal
+    var disruptionDisplayMode: DisruptionDisplayMode = .issues
+    var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
     var showLiveTrains = false
     var trainLineFilter: Set<TubeLineID> = []
     var selectedLineID: TubeLineID?
@@ -104,16 +105,20 @@ final class TubeAppState {
         disruptions.first { $0.id == selectedDisruptionID }
     }
 
+    var highlightedDisruptions: [ResolvedDisruption] {
+        disruptions.filter { highlightedDisruptionCategories.contains($0.category) }
+    }
+
     var activeAffectedSegmentIDs: Set<String> {
         if hasFocusedMapSection { return focusedSegmentIDs }
         if let selectedDisruption { return selectedDisruption.affectedSegmentIDs }
-        return Set(disruptions.flatMap(\.affectedSegmentIDs))
+        return Set(highlightedDisruptions.flatMap(\.affectedSegmentIDs))
     }
 
     var activeAffectedStationIDs: Set<String> {
         if hasFocusedMapSection { return focusedStationIDs }
         if let selectedDisruption { return selectedDisruption.affectedStationIDs }
-        return Set(disruptions.flatMap(\.affectedStationIDs))
+        return Set(highlightedDisruptions.flatMap(\.affectedStationIDs))
     }
 
     var hasFocusedMapSection: Bool {
@@ -210,6 +215,27 @@ final class TubeAppState {
         trainLineFilter = newFilter
         if showLiveTrains {
             requestTrainRefresh()
+        }
+    }
+
+    func setDisruptionCategory(_ category: DisruptionCategory, highlighted: Bool) {
+        var categories = highlightedDisruptionCategories
+        if highlighted {
+            categories.insert(category)
+        } else {
+            categories.remove(category)
+        }
+        highlightedDisruptionCategories = categories
+        if !highlighted, selectedDisruption?.category == category {
+            selectedDisruptionID = nil
+            selectedLineID = nil
+        }
+    }
+
+    func enableDisruptionHighlighting() {
+        disruptionDisplayMode = .issues
+        if highlightedDisruptionCategories.isEmpty {
+            highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
         }
     }
 

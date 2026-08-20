@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import Testing
 @testable import TubeTrackUK
@@ -126,6 +127,56 @@ struct TubeTrackUKTests {
         #expect(first.id == resolver.resolve(status(reason: "Minor delays between White City and Ealing Broadway"), lineID: .central).id)
     }
 
+    @Test func disruptionSeveritiesMapToUserFacingCategories() {
+        for severity in [1, 2, 3, 4, 5, 11, 16, 20] {
+            #expect(disruption(severity: severity).category == .closures)
+        }
+        #expect(disruption(severity: 6).category == .severeDelays)
+        #expect(disruption(severity: 9).category == .minorDelays)
+        #expect(disruption(severity: 7).category == .other)
+        #expect(disruption(severity: 19).category == .other)
+    }
+
+    @Test @MainActor func defaultDisruptionHighlightsPrioritizeClosuresAndSevereDelays() {
+        let appState = TubeAppState()
+        let closure = disruption(id: "closure", severity: 5, segmentID: "closure-segment")
+        let severe = disruption(id: "severe", severity: 6, segmentID: "severe-segment")
+        let minor = disruption(id: "minor", severity: 9, segmentID: "minor-segment")
+        appState.disruptions = [closure, severe, minor]
+
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.highlightedDisruptionCategories == [.closures, .severeDelays])
+        #expect(appState.highlightedDisruptions.map(\.id) == ["closure", "severe"])
+        #expect(appState.activeAffectedSegmentIDs == ["closure-segment", "severe-segment"])
+
+        appState.setDisruptionCategory(.minorDelays, highlighted: true)
+        #expect(appState.activeAffectedSegmentIDs.contains("minor-segment"))
+
+        appState.select(disruption: minor)
+        appState.setDisruptionCategory(.minorDelays, highlighted: false)
+        #expect(appState.selectedDisruptionID == nil)
+        #expect(appState.selectedLineID == nil)
+    }
+
+    @Test @MainActor func enablingDisruptionHighlightsPreservesAnExistingCategoryChoice() {
+        let appState = TubeAppState()
+        appState.disruptionDisplayMode = .normal
+        appState.highlightedDisruptionCategories = [.minorDelays]
+
+        appState.enableDisruptionHighlighting()
+
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.highlightedDisruptionCategories == [.minorDelays])
+
+        appState.disruptionDisplayMode = .normal
+        appState.highlightedDisruptionCategories = []
+
+        appState.enableDisruptionHighlighting()
+
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.highlightedDisruptionCategories == DisruptionCategory.defaultHighlighted)
+    }
+
     @Test func routineOvernightClosureIsNotAnActionableDisruption() {
         let closure = TfLStatusEntry(
             id: 20, statusSeverity: 20, statusSeverityDescription: "Service Closed",
@@ -134,6 +185,15 @@ struct TubeTrackUKTests {
         )
         #expect(closure.isOvernightClosure)
         #expect(!closure.isActionableIssue)
+    }
+
+    @Test func noIssuesSeverityIsNotAnActionableDisruption() {
+        let noIssues = TfLStatusEntry(
+            id: 18, statusSeverity: 18, statusSeverityDescription: "No Issues",
+            reason: nil, validityPeriods: nil, disruption: nil
+        )
+        #expect(noIssues.isGoodService)
+        #expect(!noIssues.isActionableIssue)
     }
 
     @Test func tflDecoderHandlesFractionalDatesAndNullableFields() throws {
@@ -152,8 +212,101 @@ struct TubeTrackUKTests {
             previousStationID: "a", nextStationID: "b", segmentID: "segment",
             progress: 0.25, secondsToNextStation: 100, updatedAt: Date(timeIntervalSince1970: 1_000)
         )
-        #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_050)) == 0.75)
+        #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_050)) == 0.625)
+        #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_100)) == 1)
         #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_500)) == 1)
+    }
+
+    @Test func beckMapTrainPathRespectsTravelAndAuthoredDirections() throws {
+        let edges = [
+            BeckMapCollisionEdge(start: CGPoint(x: 0, y: 4), end: CGPoint(x: 10, y: 4)),
+            BeckMapCollisionEdge(start: CGPoint(x: 10, y: 4), end: CGPoint(x: 30, y: 4)),
+        ]
+        let forward = BeckMapTrainPath(
+            fromStationID: "a", toStationID: "b", pathDirection: .forward, edges: edges
+        )
+        let reverse = BeckMapTrainPath(
+            fromStationID: "a", toStationID: "b", pathDirection: .reverse, edges: edges
+        )
+
+        let forwardPoint = try #require(forward.point(
+            progress: 0.5, previousStationID: "a", nextStationID: "b"
+        ))
+        #expect(forwardPoint == CGPoint(x: 15, y: 4))
+
+        let oppositeTravelPoint = try #require(forward.point(
+            progress: 0.25, previousStationID: "b", nextStationID: "a"
+        ))
+        #expect(oppositeTravelPoint == CGPoint(x: 22.5, y: 4))
+
+        let reverseAuthoredPoint = try #require(reverse.point(
+            progress: 0.25, previousStationID: "a", nextStationID: "b"
+        ))
+        #expect(reverseAuthoredPoint == CGPoint(x: 22.5, y: 4))
+
+        #expect(reverse.point(
+            progress: 0.5, previousStationID: "missing", nextStationID: "b"
+        ) == nil)
+    }
+
+    @Test func realWorldLineHitTestingMeasuresPolylineDistanceAndReservesStations() {
+        let route = [CGPoint(x: 0, y: 0), CGPoint(x: 10, y: 0)]
+
+        #expect(RealWorldLineHitTesting.distance(
+            from: CGPoint(x: 5, y: 3),
+            toPolyline: route
+        ) == 3)
+        #expect(RealWorldLineHitTesting.distance(
+            from: CGPoint(x: 14, y: 0),
+            toPolyline: route
+        ) == 4)
+        #expect(RealWorldLineHitTesting.distance(
+            from: .zero,
+            toPolyline: []
+        ) == nil)
+        #expect(RealWorldLineHitTesting.isNearStation(
+            CGPoint(x: 20, y: 20),
+            stationPoints: [CGPoint(x: 24, y: 23)],
+            radius: 5
+        ))
+        #expect(!RealWorldLineHitTesting.isNearStation(
+            CGPoint(x: 20, y: 20),
+            stationPoints: [CGPoint(x: 26, y: 20)],
+            radius: 5
+        ))
+    }
+
+    @Test func beckMapLineHitTestingChoosesNearestDisruptedSegmentWithinTolerance() {
+        let horizontal = BeckMapLineHitTarget(
+            segmentID: "horizontal",
+            edges: [BeckMapCollisionEdge(
+                start: CGPoint(x: 0, y: 0),
+                end: CGPoint(x: 20, y: 0)
+            )]
+        )
+        let vertical = BeckMapLineHitTarget(
+            segmentID: "vertical",
+            edges: [BeckMapCollisionEdge(
+                start: CGPoint(x: 30, y: 0),
+                end: CGPoint(x: 30, y: 20)
+            )]
+        )
+
+        #expect(BeckMapLineHitTester.nearestSegmentID(
+            to: CGPoint(x: 12, y: 3),
+            among: [horizontal, vertical],
+            maximumDistance: 4
+        ) == "horizontal")
+        #expect(BeckMapLineHitTester.nearestSegmentID(
+            to: CGPoint(x: 28, y: 12),
+            among: [horizontal, vertical],
+            maximumDistance: 4
+        ) == "vertical")
+        #expect(BeckMapLineHitTester.nearestSegmentID(
+            to: CGPoint(x: 12, y: 8),
+            among: [horizontal, vertical],
+            maximumDistance: 4
+        ) == nil)
     }
 
     @Test func engineeringWorksPreferStructuredSourceAndSortChronologically() {
@@ -171,6 +324,23 @@ struct TubeTrackUKTests {
         TfLStatusEntry(
             id: 1, statusSeverity: 6, statusSeverityDescription: "Severe Delays",
             reason: reason, validityPeriods: nil, disruption: nil
+        )
+    }
+
+    private func disruption(
+        id: String = "issue",
+        severity: Int,
+        segmentID: String = "segment"
+    ) -> ResolvedDisruption {
+        ResolvedDisruption(
+            id: id,
+            lineID: .central,
+            title: "Issue",
+            reason: "Testing",
+            severity: severity,
+            affectedStationIDs: ["station"],
+            affectedSegmentIDs: [segmentID],
+            confidence: .exact
         )
     }
 

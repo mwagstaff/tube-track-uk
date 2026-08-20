@@ -16,7 +16,10 @@ struct LiveTubeTrain: Identifiable, Codable, Hashable, Sendable {
     func projectedProgress(at date: Date) -> Double {
         guard secondsToNextStation > 0 else { return progress }
         let elapsed = max(0, date.timeIntervalSince(updatedAt))
-        return min(1, progress + elapsed / Double(secondsToNextStation))
+        let remainingProgress = max(0, 1 - progress)
+        return min(
+            1,
+            progress + remainingProgress * elapsed / Double(secondsToNextStation)
+        )
     }
 }
-

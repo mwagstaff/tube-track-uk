@@ -41,6 +41,17 @@ struct RealWorldMapScreen: View {
                         .onMapCameraChange(frequency: .continuous) { context in
                             viewport.mapDidMove(to: context.region)
                         }
+                        .simultaneousGesture(
+                            SpatialTapGesture()
+                                .onEnded { value in
+                                    handleLineTap(
+                                        at: value.location,
+                                        proxy: proxy,
+                                        graph: graph,
+                                        renderData: renderData
+                                    )
+                                }
+                        )
 
                         if appState.showLiveTrains, appState.selectedTab == .realWorld {
                             RealWorldTrainCanvas(
@@ -105,16 +116,44 @@ struct RealWorldMapScreen: View {
         let affectedSegmentIDs = appState.activeAffectedSegmentIDs
         let issuesMode = appState.disruptionDisplayMode == .issues && !affectedSegmentIDs.isEmpty
         let selectedLineID = appState.selectedLineID
+
         ForEach(renderData.segments) { segment in
             let affected = affectedSegmentIDs.contains(segment.id)
             let muted = (issuesMode && !affected)
                 || (selectedLineID != nil && selectedLineID != segment.lineID)
             MapPolyline(coordinates: segment.path.coordinates)
                 .stroke(
-                    muted ? Color.secondary.opacity(0.24) : (affected && issuesMode ? .red : .tubeLine(segment.lineID)),
-                    style: StrokeStyle(lineWidth: affected ? 7 : 4, lineCap: .round, lineJoin: .round)
+                    muted ? Color.secondary.opacity(0.24) : .tubeLine(segment.lineID),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
                 )
                 .mapOverlayLevel(level: .aboveLabels)
+        }
+
+        if issuesMode {
+            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
+                MapPolyline(coordinates: segment.path.coordinates)
+                    .stroke(
+                        Color.red.opacity(0.82),
+                        style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round)
+                    )
+                    .mapOverlayLevel(level: .aboveLabels)
+            }
+            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
+                MapPolyline(coordinates: segment.path.coordinates)
+                    .stroke(
+                        Color.white,
+                        style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round)
+                    )
+                    .mapOverlayLevel(level: .aboveLabels)
+            }
+            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
+                MapPolyline(coordinates: segment.path.coordinates)
+                    .stroke(
+                        Color.tubeLine(segment.lineID),
+                        style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                    )
+                    .mapOverlayLevel(level: .aboveLabels)
+            }
         }
     }
 
@@ -145,13 +184,60 @@ struct RealWorldMapScreen: View {
         )
     }
 
+    private func handleLineTap(
+        at location: CGPoint,
+        proxy: MapProxy,
+        graph: TubeGraph,
+        renderData: RealWorldMapRenderData
+    ) {
+        let stationPoints = displayStations(graph: graph).compactMap {
+            proxy.convert($0.coordinate, to: .local)
+        }
+        guard !RealWorldLineHitTesting.isNearStation(
+            location,
+            stationPoints: stationPoints
+        ) else { return }
+
+        var disruptionsBySegmentID: [String: [ResolvedDisruption]] = [:]
+        for disruption in appState.disruptions {
+            for segmentID in disruption.affectedSegmentIDs {
+                disruptionsBySegmentID[segmentID, default: []].append(disruption)
+            }
+        }
+
+        var nearestHit: (distance: CGFloat, disruption: ResolvedDisruption)?
+        for segment in renderData.segments {
+            guard let disruptions = disruptionsBySegmentID[segment.id],
+                  let disruption = disruptions.first else { continue }
+            let screenPoints = segment.path.coordinates.compactMap {
+                proxy.convert($0, to: .local)
+            }
+            guard let distance = RealWorldLineHitTesting.distance(
+                from: location,
+                toPolyline: screenPoints
+            ), distance <= RealWorldLineHitTesting.lineHitRadius else { continue }
+
+            if nearestHit == nil || distance < nearestHit!.distance {
+                nearestHit = (distance, disruption)
+            }
+        }
+
+        guard let disruption = nearestHit?.disruption else { return }
+        withAnimation(.spring(duration: 0.35)) {
+            appState.select(disruption: disruption)
+        }
+    }
+
     private var bottomOverlay: some View {
         VStack(spacing: 9) {
             if appState.showLiveTrains { TrainFilterBar() }
             if let station = appState.selectedStation {
                 StationDetailCard(station: station)
                     .padding(.horizontal, 12)
-            } else if let lineID = appState.selectedLineID, appState.selectedDisruptionID == nil {
+            } else if let disruption = appState.selectedDisruption {
+                DisruptionDetailCard(disruption: disruption)
+                    .padding(.horizontal, 12)
+            } else if let lineID = appState.selectedLineID {
                 LineDetailCard(lineID: lineID)
                     .padding(.horizontal, 12)
             }
@@ -191,6 +277,53 @@ struct RealWorldMapScreen: View {
         withAnimation(.smooth(duration: 0.6)) { position = .region(region) }
     }
 
+}
+
+enum RealWorldLineHitTesting {
+    static let lineHitRadius: CGFloat = 16
+    static let stationExclusionRadius: CGFloat = 28
+
+    static func isNearStation(
+        _ point: CGPoint,
+        stationPoints: [CGPoint],
+        radius: CGFloat = stationExclusionRadius
+    ) -> Bool {
+        stationPoints.contains { hypot(point.x - $0.x, point.y - $0.y) <= radius }
+    }
+
+    static func distance(from point: CGPoint, toPolyline points: [CGPoint]) -> CGFloat? {
+        guard let first = points.first else { return nil }
+        guard points.count > 1 else {
+            return hypot(point.x - first.x, point.y - first.y)
+        }
+
+        return zip(points, points.dropFirst()).reduce(nil as CGFloat?) { nearest, pair in
+            let distance = distance(from: point, toSegmentFrom: pair.0, to: pair.1)
+            return min(nearest ?? distance, distance)
+        }
+    }
+
+    private static func distance(
+        from point: CGPoint,
+        toSegmentFrom start: CGPoint,
+        to end: CGPoint
+    ) -> CGFloat {
+        let dx = end.x - start.x
+        let dy = end.y - start.y
+        let squaredLength = dx * dx + dy * dy
+        guard squaredLength > 0 else {
+            return hypot(point.x - start.x, point.y - start.y)
+        }
+
+        let projectedFraction = ((point.x - start.x) * dx + (point.y - start.y) * dy)
+            / squaredLength
+        let clampedFraction = min(1, max(0, projectedFraction))
+        let projectedPoint = CGPoint(
+            x: start.x + clampedFraction * dx,
+            y: start.y + clampedFraction * dy
+        )
+        return hypot(point.x - projectedPoint.x, point.y - projectedPoint.y)
+    }
 }
 
 @Observable

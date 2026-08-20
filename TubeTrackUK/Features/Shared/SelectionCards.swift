@@ -2,6 +2,7 @@ import SwiftUI
 
 struct StationDetailCard: View {
     @Environment(TubeAppState.self) private var appState
+    @State private var presentedDisruption: ResolvedDisruption?
     let station: TubeStation
 
     var body: some View {
@@ -47,7 +48,13 @@ struct StationDetailCard: View {
                     Text(issue.reason)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(3)
+                    Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
+                        presentedDisruption = issue
+                    }
+                    .font(.caption.weight(.semibold))
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.tint)
                 } else if appState.isRefreshingStationArrivals {
                     ProgressView("Loading live departures…")
                         .font(.caption)
@@ -69,6 +76,9 @@ struct StationDetailCard: View {
             if appState.stationArrivals.isEmpty {
                 await appState.refreshArrivals(for: station.id)
             }
+        }
+        .sheet(item: $presentedDisruption) { disruption in
+            DisruptionDetailSheet(disruption: disruption)
         }
     }
 
@@ -96,6 +106,93 @@ struct StationDetailCard: View {
         guard let seconds else { return "—" }
         if seconds < 45 { return "Due" }
         return "\(max(1, seconds / 60)) min"
+    }
+}
+
+struct DisruptionDetailCard: View {
+    @Environment(TubeAppState.self) private var appState
+    @State private var presentedDisruption: ResolvedDisruption?
+    let disruption: ResolvedDisruption
+
+    var body: some View {
+        GlassPanel {
+            VStack(alignment: .leading, spacing: 11) {
+                HStack(alignment: .top) {
+                    LineBadge(lineID: disruption.lineID)
+                    Spacer()
+                    Button("Close", systemImage: "xmark.circle.fill") {
+                        appState.clearMapSelection()
+                    }
+                    .labelStyle(.iconOnly)
+                    .foregroundStyle(.secondary)
+                }
+
+                Label(disruption.title, systemImage: "exclamationmark.triangle.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.red)
+
+                Text(disruption.reason)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(4)
+
+                HStack {
+                    Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
+                        presentedDisruption = disruption
+                    }
+                    .font(.caption.weight(.semibold))
+
+                    Spacer()
+
+                    Text(disruption.confidence.userDescription)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .sheet(item: $presentedDisruption) { disruption in
+            DisruptionDetailSheet(disruption: disruption)
+        }
+    }
+}
+
+private struct DisruptionDetailSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let disruption: ResolvedDisruption
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    LineBadge(lineID: disruption.lineID)
+
+                    Label(disruption.title, systemImage: "exclamationmark.triangle.fill")
+                        .font(.headline)
+                        .foregroundStyle(.red)
+
+                    Text(disruption.reason)
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .textSelection(.enabled)
+
+                    Label(disruption.confidence.userDescription, systemImage: "map")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(20)
+            }
+            .navigationTitle("Disruption details")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }
 

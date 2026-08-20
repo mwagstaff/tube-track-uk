@@ -27,6 +27,7 @@ struct LiveStatusDock: View {
 
     var body: some View {
         Button {
+            appState.enableDisruptionHighlighting()
             withAnimation(.spring(duration: 0.4, bounce: 0.18)) {
                 expanded.toggle()
             }
@@ -38,7 +39,7 @@ struct LiveStatusDock: View {
             }
         }
         .buttonStyle(.plain)
-        .contentShape(.rect)
+        .frame(maxWidth: .infinity)
         .zIndex(1)
         .accessibilityHint(expanded ? "Collapses live status" : "Expands live status")
     }
@@ -52,7 +53,8 @@ struct LiveStatusDock: View {
             disclosureIcon
         }
         .padding(.horizontal, 14)
-        .frame(minHeight: 56)
+        .frame(maxWidth: .infinity, minHeight: 56)
+        .contentShape(.interaction, Rectangle())
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
     }
 
@@ -71,6 +73,8 @@ struct LiveStatusDock: View {
                 .frame(width: 44, height: 44)
         }
         .padding(14)
+        .frame(maxWidth: .infinity)
+        .contentShape(.interaction, Rectangle())
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
     }
 

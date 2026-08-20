@@ -7,22 +7,31 @@ struct MapToolbar: View {
     var body: some View {
         GlassEffectContainer(spacing: 10) {
             HStack(spacing: 8) {
-                TubeTrackMark(compact: true)
-
                 Spacer(minLength: 4)
 
-                Button {
-                    withAnimation(.easeInOut(duration: 0.55)) {
-                        appState.disruptionDisplayMode = appState.disruptionDisplayMode == .normal ? .issues : .normal
+                Menu {
+                    Toggle(isOn: highlightingBinding) {
+                        Label("Highlight disruptions", systemImage: "eye")
+                    }
+
+                    Divider()
+
+                    Section("Highlight") {
+                        ForEach(DisruptionCategory.allCases) { category in
+                            Toggle(isOn: categoryBinding(for: category)) {
+                                Label(category.title, systemImage: category.symbol)
+                            }
+                        }
                     }
                 } label: {
-                    Label("Issues", systemImage: appState.disruptionDisplayMode == .issues ? "exclamationmark.triangle.fill" : "exclamationmark.triangle")
-                        .labelStyle(.iconOnly)
+                    Image(systemName: appState.disruptionDisplayMode == .issues ? "exclamationmark.triangle.fill" : "exclamationmark.triangle")
                         .foregroundStyle(appState.disruptionDisplayMode == .issues ? .red : .primary)
                         .frame(width: 34, height: 34)
                 }
                 .buttonStyle(.glass)
-                .accessibilityLabel(appState.disruptionDisplayMode == .issues ? "Show normal map" : "Highlight issues")
+                .menuActionDismissBehavior(.disabled)
+                .accessibilityLabel("Disruption highlight filters")
+                .accessibilityValue(highlightAccessibilityValue)
 
                 Button {
                     appState.setLiveTrains(!appState.showLiveTrains)
@@ -45,5 +54,26 @@ struct MapToolbar: View {
         .padding(.horizontal, 12)
         .padding(.top, 6)
     }
-}
 
+    private var highlightingBinding: Binding<Bool> {
+        Binding(
+            get: { appState.disruptionDisplayMode == .issues },
+            set: { appState.disruptionDisplayMode = $0 ? .issues : .normal }
+        )
+    }
+
+    private func categoryBinding(for category: DisruptionCategory) -> Binding<Bool> {
+        Binding(
+            get: { appState.highlightedDisruptionCategories.contains(category) },
+            set: { appState.setDisruptionCategory(category, highlighted: $0) }
+        )
+    }
+
+    private var highlightAccessibilityValue: String {
+        guard appState.disruptionDisplayMode == .issues else { return "Off" }
+        let titles = DisruptionCategory.allCases
+            .filter { appState.highlightedDisruptionCategories.contains($0) }
+            .map(\.title)
+        return titles.isEmpty ? "No categories selected" : titles.joined(separator: ", ")
+    }
+}

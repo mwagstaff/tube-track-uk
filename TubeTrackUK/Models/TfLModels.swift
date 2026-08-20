@@ -14,7 +14,7 @@ struct TfLStatusEntry: Codable, Identifiable, Sendable {
     let validityPeriods: [TfLValidityPeriod]?
     let disruption: TfLDisruption?
 
-    var isGoodService: Bool { statusSeverity == 10 }
+    var isGoodService: Bool { statusSeverity == 10 || statusSeverity == 18 }
 
     var isOvernightClosure: Bool {
         guard statusSeverity == 20 else { return false }

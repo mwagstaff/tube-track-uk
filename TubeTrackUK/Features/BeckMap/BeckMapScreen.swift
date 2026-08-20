@@ -35,12 +35,27 @@ struct BeckMapScreen: View {
                     document: document,
                     renderCache: renderCache,
                     presentation: presentation(document: document, graph: graph),
+                    disruptionIDsBySegmentID: projectedDisruptionIDsBySegmentID(
+                        document: document,
+                        graph: graph
+                    ),
+                    liveTrains: appState.showLiveTrains && appState.selectedTab == .map
+                        ? appState.liveTrains
+                        : [],
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
                     onStationTap: { stationID in
                         guard let station = graph.stationsByID[stationID] else { return }
                         withAnimation(.smooth(duration: 0.35)) {
                             appState.select(station: station)
+                        }
+                    },
+                    onDisruptionTap: { disruptionID in
+                        guard let disruption = appState.disruptions.first(where: {
+                            $0.id == disruptionID
+                        }) else { return }
+                        withAnimation(.smooth(duration: 0.35)) {
+                            appState.select(disruption: disruption)
                         }
                     },
                     onBackgroundTap: appState.clearMapSelection
@@ -66,69 +81,8 @@ struct BeckMapScreen: View {
             }
         }
         .overlay(alignment: .top) {
-            VStack(spacing: 7) {
-                MapToolbar { resetToken += 1 }
-                    .tint(.tubeBlue)
-
-                ScrollView(.horizontal) {
-                    HStack(spacing: 6) {
-                        ForEach(BeckMapRegion.allCases) { region in
-                            Button {
-                                selectedRegion = region
-                            } label: {
-                                Text(region.title)
-                                    .font(.caption2.weight(.semibold))
-                                    .lineLimit(1)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .foregroundStyle(region == selectedRegion ? Color.white : Color.tubeBlue)
-                                    .background(
-                                        region == selectedRegion ? Color.tubeBlue : Color.white,
-                                        in: .capsule
-                                    )
-                                    .overlay {
-                                        Capsule()
-                                            .stroke(Color.tubeBlue.opacity(region == selectedRegion ? 0 : 0.28))
-                                    }
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityAddTraits(region == selectedRegion ? .isSelected : [])
-                        }
-                    }
-                    .padding(.horizontal, 12)
-                }
-                .scrollIndicators(.hidden)
-                .accessibilityLabel("Authored map region")
-
-                HStack {
-                    #if DEBUG
-                    Button {
-                        withAnimation(.smooth(duration: 0.3)) {
-                            showsReferenceOverlay.toggle()
-                        }
-                    } label: {
-                        Label(
-                            showsReferenceOverlay ? "Hide trace" : "Trace",
-                            systemImage: "square.2.layers.3d"
-                        )
-                        .font(.caption2.weight(.semibold))
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.tubeBlue)
-                    .accessibilityHint("Overlays the official reference crop for geometry comparison")
-                    #endif
-
-                    Spacer()
-                    Label(regionStatusTitle, systemImage: "point.3.connected.trianglepath.dotted")
-                        .font(.caption2.weight(.semibold))
-                        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 6)
-                        .background(.thinMaterial, in: .capsule)
-                        .accessibilityLabel(selectedRegion.accessibilityDescription)
-                }
-                .padding(.horizontal, 12)
-            }
+            MapToolbar { resetToken += 1 }
+                .tint(.tubeBlue)
         }
         .overlay(alignment: .bottom) {
             bottomOverlay
@@ -182,12 +136,6 @@ struct BeckMapScreen: View {
         #endif
     }
 
-    private var regionStatusTitle: String {
-        selectedRegion == .fullUnderground
-            ? "Full London rail map"
-            : "\(selectedRegion.title) · authored slice"
-    }
-
     private func presentation(
         document: BeckMapDocument,
         graph: TubeGraph
@@ -209,7 +157,7 @@ struct BeckMapScreen: View {
         } else if let disruption = appState.selectedDisruption {
             affectedSegmentIDs = projector.projectedSegmentIDs(for: disruption)
         } else {
-            affectedSegmentIDs = Set(appState.disruptions.flatMap {
+            affectedSegmentIDs = Set(appState.highlightedDisruptions.flatMap {
                 projector.projectedSegmentIDs(for: $0)
             })
         }
@@ -223,6 +171,20 @@ struct BeckMapScreen: View {
         )
     }
 
+    private func projectedDisruptionIDsBySegmentID(
+        document: BeckMapDocument,
+        graph: TubeGraph
+    ) -> [String: [String]] {
+        let projector = BeckMapAffectedSegmentProjector(document: document, graph: graph)
+        var disruptionIDsBySegmentID: [String: [String]] = [:]
+        for disruption in appState.disruptions {
+            for segmentID in projector.projectedSegmentIDs(for: disruption) {
+                disruptionIDsBySegmentID[segmentID, default: []].append(disruption.id)
+            }
+        }
+        return disruptionIDsBySegmentID
+    }
+
     private var bottomOverlay: some View {
         VStack(spacing: 9) {
             if appState.showLiveTrains {
@@ -234,7 +196,11 @@ struct BeckMapScreen: View {
                 StationDetailCard(station: station)
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let lineID = appState.selectedLineID, appState.selectedDisruptionID == nil {
+            } else if let disruption = appState.selectedDisruption {
+                DisruptionDetailCard(disruption: disruption)
+                    .padding(.horizontal, 12)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            } else if let lineID = appState.selectedLineID {
                 LineDetailCard(lineID: lineID)
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -259,9 +225,12 @@ private struct BeckMapCanvas: View {
     let document: BeckMapDocument
     let renderCache: RenderCache
     let presentation: BeckMapPresentationSnapshot
+    let disruptionIDsBySegmentID: [String: [String]]
+    let liveTrains: [LiveTubeTrain]
     let referenceOverlayVisible: Bool
     let resetToken: Int
     let onStationTap: (String) -> Void
+    let onDisruptionTap: (String) -> Void
     let onBackgroundTap: () -> Void
 
     private var renderedSegments: [RenderedSegment] { renderCache.renderedSegments }
@@ -284,17 +253,23 @@ private struct BeckMapCanvas: View {
         document: BeckMapDocument,
         renderCache: RenderCache,
         presentation: BeckMapPresentationSnapshot,
+        disruptionIDsBySegmentID: [String: [String]],
+        liveTrains: [LiveTubeTrain],
         referenceOverlayVisible: Bool,
         resetToken: Int,
         onStationTap: @escaping (String) -> Void,
+        onDisruptionTap: @escaping (String) -> Void,
         onBackgroundTap: @escaping () -> Void
     ) {
         self.document = document
         self.renderCache = renderCache
         self.presentation = presentation
+        self.disruptionIDsBySegmentID = disruptionIDsBySegmentID
+        self.liveTrains = liveTrains
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
         self.onStationTap = onStationTap
+        self.onDisruptionTap = onDisruptionTap
         self.onBackgroundTap = onBackgroundTap
     }
 
@@ -307,10 +282,20 @@ private struct BeckMapCanvas: View {
                 }
                 .allowsHitTesting(false)
 
+                if !liveTrains.isEmpty, !isReferenceOverlayActive {
+                    TimelineView(.periodic(from: .now, by: 1)) { timeline in
+                        Canvas { context, size in
+                            drawTrains(context: &context, size: size, date: timeline.date)
+                        }
+                    }
+                    .allowsHitTesting(false)
+                    .accessibilityHidden(true)
+                }
+
                 BeckMapGestureSurface(
                     onPan: handlePan,
                     onPinch: handlePinch,
-                    onTap: selectStation(at:)
+                    onTap: selectMapFeature(at:)
                 )
                 .accessibilityHidden(true)
             }
@@ -490,6 +475,33 @@ private struct BeckMapCanvas: View {
                 drawLabels(context: &context, viewport: size)
             }
             drawStationMarkers(context: &mapContext)
+        }
+    }
+
+    private func drawTrains(
+        context: inout GraphicsContext,
+        size: CGSize,
+        date: Date
+    ) {
+        let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
+        var trainIcon = context.resolve(Image(systemName: "tram.fill"))
+        trainIcon.shading = .color(.white)
+
+        for train in liveTrains {
+            guard let path = renderCache.trainPathsBySegmentID[train.segmentID],
+                  let artworkPoint = path.point(
+                      progress: train.projectedProgress(at: date),
+                      previousStationID: train.previousStationID,
+                      nextStationID: train.nextStationID
+                  ) else { continue }
+
+            let point = screenPoint(artworkPoint)
+            guard visibleBounds.contains(point) else { continue }
+            let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
+            let marker = Path(roundedRect: markerRect, cornerRadius: 6)
+            context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
+            context.stroke(marker, with: .color(.white), lineWidth: 1.5)
+            context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
         }
     }
 
@@ -818,16 +830,43 @@ private struct BeckMapCanvas: View {
         }
     }
 
-    private func selectStation(at location: CGPoint) {
+    private func selectMapFeature(at location: CGPoint) {
         let nearest = document.stationMarkers.min {
             distance(screenPoint($0.anchor), location) < distance(screenPoint($1.anchor), location)
         }
         if let nearest,
            distance(screenPoint(nearest.anchor), location) <= max(24, nearest.hitRadius * cameraScale) {
             onStationTap(nearest.stationID)
+        } else if let disruptionID = disruptionID(at: location) {
+            onDisruptionTap(disruptionID)
         } else {
             onBackgroundTap()
         }
+    }
+
+    private func disruptionID(at screenLocation: CGPoint) -> String? {
+        let scale = max(0.000_001, cameraScale)
+        let artworkLocation = CGPoint(
+            x: (screenLocation.x - cameraOffset.width) / scale,
+            y: (screenLocation.y - cameraOffset.height) / scale
+        )
+        let screenHitDistance = max(
+            20,
+            document.styles.affectedOuterStrokeWidth * scale / 2 + 10
+        )
+        let hitTargets = renderedSegments.compactMap { segment -> BeckMapLineHitTarget? in
+            guard disruptionIDsBySegmentID[segment.id]?.isEmpty == false else { return nil }
+            return BeckMapLineHitTarget(
+                segmentID: segment.id,
+                edges: segment.collisionEdges
+            )
+        }
+        guard let segmentID = BeckMapLineHitTester.nearestSegmentID(
+            to: artworkLocation,
+            among: hitTargets,
+            maximumDistance: screenHitDistance / scale
+        ) else { return nil }
+        return disruptionIDsBySegmentID[segmentID]?.first
     }
 
     private func screenPoint(_ point: BeckMapPoint) -> CGPoint {
@@ -1079,6 +1118,7 @@ private struct BeckMapCanvas: View {
     struct RenderCache {
         let renderedSegments: [RenderedSegment]
         let renderedLineGroups: [RenderedLineGroup]
+        let trainPathsBySegmentID: [String: BeckMapTrainPath]
         let renderedLabels: [RenderedLabel]
         let artworkBounds: CGRect
         let debugReferenceImage: UIImage?
@@ -1090,6 +1130,10 @@ private struct BeckMapCanvas: View {
             let renderedSegments = document.segments.compactMap {
                 segment -> RenderedSegment? in
                 guard let commands = paths[segment.pathID] else { return nil }
+                let collisionEdges = BeckMapCanvas.makeCollisionEdges(
+                    commands: commands,
+                    translation: segment.translation
+                )
                 return RenderedSegment(
                     id: segment.id,
                     lineID: segment.lineID,
@@ -1097,13 +1141,19 @@ private struct BeckMapCanvas: View {
                         commands: commands,
                         translation: segment.translation
                     ),
-                    collisionEdges: BeckMapCanvas.makeCollisionEdges(
-                        commands: commands,
-                        translation: segment.translation
+                    collisionEdges: collisionEdges,
+                    trainPath: BeckMapTrainPath(
+                        fromStationID: segment.fromStationID,
+                        toStationID: segment.toStationID,
+                        pathDirection: segment.pathDirection,
+                        edges: collisionEdges
                     )
                 )
             }
             self.renderedSegments = renderedSegments
+            self.trainPathsBySegmentID = Dictionary(
+                uniqueKeysWithValues: renderedSegments.map { ($0.id, $0.trainPath) }
+            )
 
             var seenLineIDs: Set<TubeLineID> = []
             let orderedLineIDs = renderedSegments.compactMap { segment in
@@ -1188,6 +1238,7 @@ private struct BeckMapCanvas: View {
         let lineID: TubeLineID
         let path: Path
         let collisionEdges: [BeckMapCollisionEdge]
+        let trainPath: BeckMapTrainPath
     }
 
     struct RenderedLineGroup {
@@ -1231,6 +1282,100 @@ private struct BeckMapCanvas: View {
     }
 }
 
+struct BeckMapTrainPath {
+    let fromStationID: String
+    let toStationID: String
+    let pathDirection: BeckMapPathDirection
+
+    private let points: [CGPoint]
+    private let cumulativeLengths: [CGFloat]
+    private let totalLength: CGFloat
+
+    init(
+        fromStationID: String,
+        toStationID: String,
+        pathDirection: BeckMapPathDirection,
+        edges: [BeckMapCollisionEdge]
+    ) {
+        self.fromStationID = fromStationID
+        self.toStationID = toStationID
+        self.pathDirection = pathDirection
+
+        guard let firstEdge = edges.first else {
+            points = []
+            cumulativeLengths = []
+            totalLength = 0
+            return
+        }
+
+        let points = [firstEdge.start] + edges.map(\.end)
+        var cumulativeLengths: [CGFloat] = [0]
+        cumulativeLengths.reserveCapacity(points.count)
+        for (start, end) in zip(points, points.dropFirst()) {
+            cumulativeLengths.append(
+                cumulativeLengths[cumulativeLengths.endIndex - 1]
+                    + hypot(end.x - start.x, end.y - start.y)
+            )
+        }
+        self.points = points
+        self.cumulativeLengths = cumulativeLengths
+        totalLength = cumulativeLengths.last ?? 0
+    }
+
+    func point(
+        progress: Double,
+        previousStationID: String,
+        nextStationID: String
+    ) -> CGPoint? {
+        let logicalProgress: Double
+        if previousStationID == fromStationID, nextStationID == toStationID {
+            logicalProgress = progress
+        } else if previousStationID == toStationID, nextStationID == fromStationID {
+            logicalProgress = 1 - progress
+        } else {
+            return nil
+        }
+
+        let pathProgress = pathDirection == .forward
+            ? logicalProgress
+            : 1 - logicalProgress
+        return point(atPathProgress: pathProgress)
+    }
+
+    private func point(atPathProgress progress: Double) -> CGPoint? {
+        guard let first = points.first else { return nil }
+        guard points.count > 1, totalLength > 0 else { return first }
+
+        let clampedProgress = min(1, max(0, progress))
+        if clampedProgress <= 0 { return first }
+        if clampedProgress >= 1 { return points.last }
+
+        let target = totalLength * CGFloat(clampedProgress)
+        var lowerBound = 1
+        var upperBound = cumulativeLengths.count - 1
+        while lowerBound < upperBound {
+            let midpoint = (lowerBound + upperBound) / 2
+            if cumulativeLengths[midpoint] < target {
+                lowerBound = midpoint + 1
+            } else {
+                upperBound = midpoint
+            }
+        }
+
+        let endIndex = lowerBound
+        let startIndex = endIndex - 1
+        let edgeLength = cumulativeLengths[endIndex] - cumulativeLengths[startIndex]
+        guard edgeLength > 0 else { return points[endIndex] }
+        let fraction = (target - cumulativeLengths[startIndex]) / edgeLength
+        let start = points[startIndex]
+        let end = points[endIndex]
+        return CGPoint(
+            x: start.x + (end.x - start.x) * fraction,
+            y: start.y + (end.y - start.y) * fraction
+        )
+    }
+}
+
 struct BeckMapLabelBlocker: Equatable {
     let stationID: String
     let frame: CGRect
@@ -1239,6 +1384,65 @@ struct BeckMapLabelBlocker: Equatable {
 struct BeckMapCollisionEdge: Equatable {
     let start: CGPoint
     let end: CGPoint
+}
+
+struct BeckMapLineHitTarget: Equatable {
+    let segmentID: String
+    let edges: [BeckMapCollisionEdge]
+}
+
+enum BeckMapLineHitTester {
+    static func nearestSegmentID(
+        to point: CGPoint,
+        among targets: [BeckMapLineHitTarget],
+        maximumDistance: CGFloat
+    ) -> String? {
+        guard maximumDistance >= 0, maximumDistance.isFinite else { return nil }
+        let maximumSquaredDistance = maximumDistance * maximumDistance
+        var nearestSegmentID: String?
+        var nearestSquaredDistance = maximumSquaredDistance
+
+        for target in targets {
+            for edge in target.edges {
+                let candidateSquaredDistance = squaredDistance(from: point, to: edge)
+                if candidateSquaredDistance <= nearestSquaredDistance {
+                    nearestSegmentID = target.segmentID
+                    nearestSquaredDistance = candidateSquaredDistance
+                }
+            }
+        }
+        return nearestSegmentID
+    }
+
+    private static func squaredDistance(
+        from point: CGPoint,
+        to edge: BeckMapCollisionEdge
+    ) -> CGFloat {
+        let deltaX = edge.end.x - edge.start.x
+        let deltaY = edge.end.y - edge.start.y
+        let squaredLength = deltaX * deltaX + deltaY * deltaY
+        guard squaredLength > 0.000_001 else {
+            let pointDeltaX = point.x - edge.start.x
+            let pointDeltaY = point.y - edge.start.y
+            return pointDeltaX * pointDeltaX + pointDeltaY * pointDeltaY
+        }
+
+        let progress = min(
+            1,
+            max(
+                0,
+                ((point.x - edge.start.x) * deltaX + (point.y - edge.start.y) * deltaY)
+                    / squaredLength
+            )
+        )
+        let closestPoint = CGPoint(
+            x: edge.start.x + deltaX * progress,
+            y: edge.start.y + deltaY * progress
+        )
+        let pointDeltaX = point.x - closestPoint.x
+        let pointDeltaY = point.y - closestPoint.y
+        return pointDeltaX * pointDeltaX + pointDeltaY * pointDeltaY
+    }
 }
 
 struct BeckMapLineBlocker: Equatable {
