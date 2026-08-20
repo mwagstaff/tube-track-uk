@@ -177,6 +177,263 @@ struct TubeTrackUKTests {
         #expect(appState.highlightedDisruptionCategories == DisruptionCategory.defaultHighlighted)
     }
 
+    @Test func weekendDateSelectionsUseUpcomingLondonDays() throws {
+        let thursday = try #require(londonDate(year: 2026, month: 8, day: 20, hour: 12))
+        let saturday = try #require(londonDate(year: 2026, month: 8, day: 22))
+        let sunday = try #require(londonDate(year: 2026, month: 8, day: 23))
+
+        #expect(DisruptionDateSelection.thisSaturday.date(relativeTo: thursday) == saturday)
+        #expect(DisruptionDateSelection.thisSunday.date(relativeTo: thursday) == sunday)
+        #expect(DisruptionDateSelection.thisSaturday.date(relativeTo: saturday) == saturday)
+        #expect(DisruptionDateSelection.thisSunday.date(relativeTo: saturday) == sunday)
+        #expect(DisruptionDateSelection.thisSunday.date(relativeTo: sunday) == sunday)
+        #expect(
+            DisruptionDateSelection.thisSaturday.date(relativeTo: sunday)
+                == LondonRailDate.calendar.date(byAdding: .day, value: 6, to: sunday)
+        )
+    }
+
+    @Test func londonDayIntervalsHandleDSTAndHalfOpenWorkBoundaries() throws {
+        let springChange = try #require(londonDate(year: 2026, month: 3, day: 29))
+        let autumnChange = try #require(londonDate(year: 2026, month: 10, day: 25))
+        #expect(LondonRailDate.dayInterval(for: springChange).duration == 23 * 3_600)
+        #expect(LondonRailDate.dayInterval(for: autumnChange).duration == 25 * 3_600)
+
+        let saturday = try #require(londonDate(year: 2026, month: 8, day: 22))
+        let sunday = try #require(londonDate(year: 2026, month: 8, day: 23))
+        let fridayEvening = try #require(londonDate(year: 2026, month: 8, day: 21, hour: 23))
+        let saturdayMorning = try #require(londonDate(year: 2026, month: 8, day: 22, hour: 2))
+
+        let endingAtMidnight = work(
+            id: "ending",
+            start: fridayEvening.addingTimeInterval(-3_600),
+            end: saturday,
+            detail: "Ends at midnight"
+        )
+        let overnight = work(
+            id: "overnight",
+            start: fridayEvening,
+            end: saturdayMorning,
+            detail: "Runs overnight"
+        )
+        let startingNextDay = work(
+            id: "next-day",
+            start: sunday,
+            end: sunday.addingTimeInterval(3_600),
+            detail: "Starts next day"
+        )
+
+        let matches = LondonRailDate.works(
+            [endingAtMidnight, overnight, startingNextDay],
+            overlapping: saturday
+        )
+        #expect(matches.map(\.id) == ["overnight"])
+    }
+
+    @Test func disruptionTimeWindowsUseLondonClockBoundariesAcrossDST() throws {
+        let springChange = try #require(londonDate(year: 2026, month: 3, day: 29))
+        let autumnChange = try #require(londonDate(year: 2026, month: 10, day: 25))
+
+        let springOvernight = DisruptionTimeWindow.overnight.interval(on: springChange)
+        let autumnOvernight = DisruptionTimeWindow.overnight.interval(on: autumnChange)
+        #expect(springOvernight.duration == 5 * 3_600)
+        #expect(autumnOvernight.duration == 7 * 3_600)
+
+        for date in [springChange, autumnChange] {
+            let am = DisruptionTimeWindow.am.interval(on: date)
+            let pm = DisruptionTimeWindow.pm.interval(on: date)
+            #expect(LondonRailDate.calendar.component(.hour, from: am.start) == 6)
+            #expect(LondonRailDate.calendar.component(.hour, from: am.end) == 12)
+            #expect(am.end == pm.start)
+            #expect(pm.end == LondonRailDate.dayInterval(for: date).end)
+        }
+    }
+
+    @Test func timeWindowFilteringUsesHalfOpenBoundariesAndCombinationUnion() throws {
+        let saturday = try #require(londonDate(year: 2026, month: 8, day: 22))
+        let works = [
+            work(
+                id: "overnight",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 1, minute: 45)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 4, minute: 45)),
+                detail: "Piccadilly overnight closure"
+            ),
+            work(
+                id: "ends-at-six",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 5)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 6)),
+                detail: "Ends at the AM boundary"
+            ),
+            work(
+                id: "am",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 6)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 8)),
+                detail: "AM closure"
+            ),
+            work(
+                id: "crosses-noon",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 11)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 13)),
+                detail: "Spans AM and PM"
+            ),
+            work(
+                id: "pm",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 15)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 18)),
+                detail: "PM closure"
+            ),
+        ]
+
+        let overnight = LondonRailDate.works(works, overlappingAny: [.overnight], on: saturday)
+        let am = LondonRailDate.works(works, overlappingAny: [.am], on: saturday)
+        let pm = LondonRailDate.works(works, overlappingAny: [.pm], on: saturday)
+        let daytime = LondonRailDate.works(
+            works,
+            overlappingAny: DisruptionTimeWindow.defaultSelected,
+            on: saturday
+        )
+
+        #expect(overnight.map(\.id) == ["overnight", "ends-at-six"])
+        #expect(am.map(\.id) == ["am", "crosses-noon"])
+        #expect(pm.map(\.id) == ["crosses-noon", "pm"])
+        #expect(daytime.map(\.id) == ["am", "crosses-noon", "pm"])
+    }
+
+    @Test @MainActor func plannedWorkTimeSelectionsDefaultToDaytimeAndUpdateMapGeometry() throws {
+        let saturday = try #require(londonDate(year: 2026, month: 8, day: 22))
+        let appState = TubeAppState()
+        appState.engineeringWorks = [
+            work(
+                id: "overnight",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 1)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 5)),
+                detail: "Overnight only",
+                segmentID: "overnight-segment"
+            ),
+            work(
+                id: "am",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 7)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 9)),
+                detail: "AM only",
+                segmentID: "am-segment"
+            ),
+            work(
+                id: "both",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 11)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 13)),
+                detail: "Both daytime windows",
+                segmentID: "both-segment"
+            ),
+            work(
+                id: "pm",
+                start: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 14)),
+                end: try #require(londonDate(year: 2026, month: 8, day: 22, hour: 16)),
+                detail: "PM only",
+                segmentID: "pm-segment"
+            ),
+        ]
+
+        appState.setDisruptionDateSelection(.custom(saturday))
+
+        #expect(appState.selectedDisruptionTimeWindows == [.am, .pm])
+        #expect(appState.plannedWorkCount(in: .overnight) == 1)
+        #expect(appState.plannedWorkCount(in: .am) == 2)
+        #expect(appState.plannedWorkCount(in: .pm) == 2)
+        #expect(appState.selectedEngineeringWorks.map(\.id) == ["am", "both", "pm"])
+        #expect(appState.currentIssueCount == 3)
+        #expect(appState.activeAffectedSegmentIDs == ["am-segment", "both-segment", "pm-segment"])
+
+        appState.toggleDisruptionTimeWindow(.am)
+        #expect(appState.selectedEngineeringWorks.map(\.id) == ["both", "pm"])
+
+        appState.toggleDisruptionTimeWindow(.pm)
+        #expect(appState.selectedEngineeringWorks.isEmpty)
+        #expect(appState.activeAffectedSegmentIDs.isEmpty)
+
+        appState.toggleDisruptionTimeWindow(.overnight)
+        #expect(appState.selectedEngineeringWorks.map(\.id) == ["overnight"])
+        #expect(appState.activeAffectedSegmentIDs == ["overnight-segment"])
+    }
+
+    @Test @MainActor func futureDisruptionDateUsesPlannedWorksAndClearsLiveSelection() throws {
+        let selectedDate = try #require(londonDate(year: 2026, month: 9, day: 5))
+        let graph = try TubeGraph.bundled()
+        let centralSegment = try #require(graph.segments(for: .central).first)
+        let plannedWork = work(
+            id: "weekend-work",
+            start: selectedDate.addingTimeInterval(7 * 3_600),
+            end: selectedDate.addingTimeInterval(9 * 3_600),
+            detail: "No service between A and B",
+            segmentID: centralSegment.id
+        )
+        let appState = TubeAppState()
+        appState.graph = graph
+        appState.disruptions = [disruption(id: "live", severity: 6, segmentID: "live-segment")]
+        appState.engineeringWorks = [plannedWork]
+        appState.select(disruption: appState.disruptions[0])
+
+        #expect(appState.disruptionDateSelection == .today)
+        #expect(appState.visibleDisruptions.map(\.id) == ["live"])
+
+        appState.setDisruptionDateSelection(.custom(selectedDate))
+
+        #expect(appState.selectedDisruptionID == nil)
+        #expect(appState.selectedEngineeringWorkID == nil)
+        #expect(appState.selectedEngineeringWorks.map(\.id) == ["weekend-work"])
+        #expect(appState.visibleDisruptions.count == 1)
+        #expect(appState.visibleDisruptions[0].category == .closures)
+        #expect(appState.activeAffectedSegmentIDs == plannedWork.affectedSegmentIDs)
+    }
+
+    @Test func engineeringWorksBuilderKeepsEveryPlannedValidityPeriodAndUniqueID() throws {
+        let graph = try TubeGraph.bundled()
+        let firstStart = try #require(londonDate(year: 2026, month: 8, day: 22, hour: 1))
+        let firstEnd = try #require(londonDate(year: 2026, month: 8, day: 22, hour: 5))
+        let secondStart = try #require(londonDate(year: 2026, month: 8, day: 23, hour: 1))
+        let secondEnd = try #require(londonDate(year: 2026, month: 8, day: 23, hour: 5))
+        let periods = [
+            TfLValidityPeriod(fromDate: firstStart, toDate: firstEnd, isNow: false),
+            TfLValidityPeriod(fromDate: secondStart, toDate: secondEnd, isNow: false),
+        ]
+        let informationClosure = TfLDisruption(
+            category: "Information",
+            categoryDescription: "Information",
+            description: nil,
+            affectedRoutes: nil,
+            affectedStops: nil,
+            closureText: "plannedClosure"
+        )
+        let entries = [
+            TfLStatusEntry(
+                id: 0,
+                statusSeverity: 5,
+                statusSeverityDescription: "Planned Closure",
+                reason: "First closure",
+                validityPeriods: periods,
+                disruption: informationClosure
+            ),
+            TfLStatusEntry(
+                id: 0,
+                statusSeverity: 5,
+                statusSeverityDescription: "Planned Closure",
+                reason: "Different closure with the same TfL ID",
+                validityPeriods: periods,
+                disruption: informationClosure
+            ),
+        ]
+        let statuses = [TfLLineStatus(id: .district, name: "District", lineStatuses: entries)]
+
+        let works = EngineeringWorksBuilder(
+            repository: TubeNetworkRepository(graph: graph)
+        ).works(from: statuses, fetchedAt: firstStart)
+
+        #expect(informationClosure.closureText == "plannedClosure")
+        #expect(entries.allSatisfy { $0.isPlannedEngineeringWork })
+        #expect(works.count == 4)
+        #expect(Set(works.map(\.id)).count == 4)
+        #expect(Set(works.map(\.startDate)) == [firstStart, secondStart])
+    }
+
     @Test func routineOvernightClosureIsNotAnActionableDisruption() {
         let closure = TfLStatusEntry(
             id: 20, statusSeverity: 20, statusSeverityDescription: "Service Closed",
@@ -380,6 +637,47 @@ struct TubeTrackUKTests {
             affectedStationIDs: [], affectedSegmentIDs: [], startDate: start,
             endDate: start.addingTimeInterval(3_600), source: source,
             fetchedAt: start, confidence: confidence
+        )
+    }
+
+    private func work(
+        id: String,
+        start: Date,
+        end: Date,
+        detail: String,
+        segmentID: String = "segment"
+    ) -> EngineeringWork {
+        EngineeringWork(
+            id: id,
+            title: "Planned Closure",
+            detail: detail,
+            lineIDs: [.central],
+            affectedStationIDs: ["station"],
+            affectedSegmentIDs: [segmentID],
+            startDate: start,
+            endDate: end,
+            source: .unifiedAPI,
+            fetchedAt: start,
+            confidence: .exact
+        )
+    }
+
+    private func londonDate(
+        year: Int,
+        month: Int,
+        day: Int,
+        hour: Int = 0,
+        minute: Int = 0
+    ) -> Date? {
+        LondonRailDate.calendar.date(
+            from: DateComponents(
+                timeZone: LondonRailDate.timeZone,
+                year: year,
+                month: month,
+                day: day,
+                hour: hour,
+                minute: minute
+            )
         )
     }
 

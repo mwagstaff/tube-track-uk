@@ -41,7 +41,7 @@ struct StationDetailCard: View {
 
                 Divider()
 
-                if let issue = appState.disruptions.first(where: { $0.affectedStationIDs.contains(station.id) }) {
+                if let issue = appState.visibleDisruptions.first(where: { $0.affectedStationIDs.contains(station.id) }) {
                     Label(issue.title, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.red)
@@ -148,6 +148,68 @@ struct DisruptionDetailCard: View {
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
         }
+    }
+}
+
+struct PlannedWorkDetailCard: View {
+    @Environment(TubeAppState.self) private var appState
+    @State private var presentsDetails = false
+    let work: EngineeringWork
+
+    var body: some View {
+        GlassPanel {
+            VStack(alignment: .leading, spacing: 11) {
+                HStack(alignment: .top) {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 6) {
+                            ForEach(work.lineIDs) { LineBadge(lineID: $0) }
+                        }
+                    }
+                    .scrollIndicators(.hidden)
+
+                    Spacer(minLength: 8)
+
+                    Button("Close", systemImage: "xmark.circle.fill") {
+                        appState.clearMapSelection()
+                    }
+                    .labelStyle(.iconOnly)
+                    .foregroundStyle(.secondary)
+                }
+
+                Label(work.title, systemImage: "wrench.and.screwdriver.fill")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.orange)
+
+                Text(work.detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(4)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Button("View details", systemImage: "doc.text.magnifyingglass") {
+                        presentsDetails = true
+                    }
+                    .font(.caption.weight(.semibold))
+
+                    Spacer(minLength: 8)
+
+                    Label(validityLabel, systemImage: "calendar")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+        }
+        .sheet(isPresented: $presentsDetails) {
+            WorkDetailView(work: work)
+        }
+    }
+
+    private var validityLabel: String {
+        let start = LondonRailDate.formatted(work.startDate, dateFormat: "EEE d MMM")
+        let end = LondonRailDate.formatted(work.endDate, dateFormat: "EEE d MMM")
+        return LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.endDate)
+            ? start
+            : "\(start) – \(end)"
     }
 }
 

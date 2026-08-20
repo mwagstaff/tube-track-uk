@@ -12,8 +12,9 @@ struct EngineeringWorksNormalizer: Sendable {
     private func deduplicationKey(_ work: EngineeringWork) -> String {
         let normalizedDetail = work.detail.lowercased().filter(\.isLetter)
         let lines = work.lineIDs.map(\.rawValue).sorted().joined(separator: ",")
-        let day = Int(work.startDate.timeIntervalSince1970 / 86_400)
-        return "\(lines):\(normalizedDetail.prefix(80)):\(day)"
+        let start = LondonRailDate.dateIdentifier(for: work.startDate)
+        let end = LondonRailDate.dateIdentifier(for: work.endDate)
+        return "\(lines):\(normalizedDetail.prefix(80)):\(start):\(end)"
     }
 
     private func preferredWork(_ candidates: [EngineeringWork]) -> EngineeringWork? {

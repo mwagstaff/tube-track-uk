@@ -51,7 +51,7 @@ struct BeckMapScreen: View {
                         }
                     },
                     onDisruptionTap: { disruptionID in
-                        guard let disruption = appState.disruptions.first(where: {
+                        guard let disruption = appState.visibleDisruptions.first(where: {
                             $0.id == disruptionID
                         }) else { return }
                         withAnimation(.smooth(duration: 0.35)) {
@@ -180,7 +180,7 @@ struct BeckMapScreen: View {
     ) -> [String: [String]] {
         let projector = BeckMapAffectedSegmentProjector(document: document, graph: graph)
         var disruptionIDsBySegmentID: [String: [String]] = [:]
-        for disruption in appState.disruptions {
+        for disruption in appState.visibleDisruptions {
             for segmentID in projector.projectedSegmentIDs(for: disruption) {
                 disruptionIDsBySegmentID[segmentID, default: []].append(disruption.id)
             }
@@ -199,6 +199,10 @@ struct BeckMapScreen: View {
                 StationDetailCard(station: station)
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
+            } else if let work = appState.selectedEngineeringWork {
+                PlannedWorkDetailCard(work: work)
+                    .padding(.horizontal, 12)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if let disruption = appState.selectedDisruption {
                 DisruptionDetailCard(disruption: disruption)
                     .padding(.horizontal, 12)
@@ -214,8 +218,7 @@ struct BeckMapScreen: View {
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             } else {
-                LiveStatusDock(expanded: $statusExpanded)
-                    .padding(.horizontal, 12)
+                MapStatusDock(expanded: $statusExpanded)
             }
         }
         .animation(.smooth(duration: 0.35), value: appState.showLiveTrains)

@@ -31,9 +31,21 @@ struct WorkDetailView: View {
 
                     GlassPanel {
                         VStack(spacing: 12) {
-                            LabeledContent("From", value: work.startDate.formatted(date: .abbreviated, time: .shortened))
+                            LabeledContent(
+                                "From",
+                                value: LondonRailDate.formatted(
+                                    work.startDate,
+                                    dateFormat: "d MMM yyyy, HH:mm"
+                                )
+                            )
                             Divider()
-                            LabeledContent("Until", value: work.endDate.formatted(date: .abbreviated, time: .shortened))
+                            LabeledContent(
+                                "Until",
+                                value: LondonRailDate.formatted(
+                                    work.endDate,
+                                    dateFormat: "d MMM yyyy, HH:mm"
+                                )
+                            )
                             Divider()
                             LabeledContent("Source", value: work.source.title)
                             Divider()

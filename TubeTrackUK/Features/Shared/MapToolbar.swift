@@ -9,30 +9,6 @@ struct MapToolbar: View {
             HStack(spacing: 8) {
                 Spacer(minLength: 4)
 
-                Menu {
-                    Toggle(isOn: highlightingBinding) {
-                        Label("Highlight disruptions", systemImage: "eye")
-                    }
-
-                    Divider()
-
-                    Section("Highlight") {
-                        ForEach(DisruptionCategory.allCases) { category in
-                            Toggle(isOn: categoryBinding(for: category)) {
-                                Label(category.title, systemImage: category.symbol)
-                            }
-                        }
-                    }
-                } label: {
-                    Image(systemName: appState.disruptionDisplayMode == .issues ? "exclamationmark.triangle.fill" : "exclamationmark.triangle")
-                        .foregroundStyle(appState.disruptionDisplayMode == .issues ? .red : .primary)
-                        .frame(width: 34, height: 34)
-                }
-                .buttonStyle(.glass)
-                .menuActionDismissBehavior(.disabled)
-                .accessibilityLabel("Disruption highlight filters")
-                .accessibilityValue(highlightAccessibilityValue)
-
                 Button {
                     appState.setLiveTrains(!appState.showLiveTrains)
                 } label: {
@@ -54,12 +30,46 @@ struct MapToolbar: View {
         .padding(.horizontal, 12)
         .padding(.top, 6)
     }
+}
 
-    private var highlightingBinding: Binding<Bool> {
-        Binding(
-            get: { appState.disruptionDisplayMode == .issues },
-            set: { appState.disruptionDisplayMode = $0 ? .issues : .normal }
+struct DisruptionHighlightMenu: View {
+    @Environment(TubeAppState.self) private var appState
+
+    var body: some View {
+        Menu {
+            Section("Highlight") {
+                ForEach(DisruptionCategory.allCases) { category in
+                    Toggle(isOn: categoryBinding(for: category)) {
+                        Label(category.title, systemImage: category.symbol)
+                    }
+                }
+            }
+        } label: {
+            Image(
+                systemName: appState.disruptionDisplayMode == .issues
+                    ? "exclamationmark.triangle.fill"
+                    : "exclamationmark.triangle"
+            )
+            .font(.headline)
+            .foregroundStyle(
+                appState.disruptionDisplayMode == .issues ? .red : .primary
+            )
+            .frame(width: 56, height: 56)
+            .contentShape(.rect)
+        } primaryAction: {
+            withAnimation(.smooth(duration: 0.25)) {
+                appState.toggleDisruptionHighlighting()
+            }
+        }
+        .buttonStyle(.glass)
+        .menuActionDismissBehavior(.disabled)
+        .accessibilityLabel(
+            appState.disruptionDisplayMode == .issues
+                ? "Hide disruption highlights"
+                : "Show disruption highlights"
         )
+        .accessibilityValue(highlightAccessibilityValue)
+        .accessibilityHint("Touch and hold for disruption category filters")
     }
 
     private func categoryBinding(for category: DisruptionCategory) -> Binding<Bool> {

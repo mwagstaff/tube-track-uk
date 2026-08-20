@@ -19,12 +19,13 @@ actor EngineeringWorksService {
 
     func fetch(days: Int = 60) async throws -> EngineeringWorksSnapshot {
         do {
-            let calendar = Calendar(identifier: .gregorian)
+            let calendar = LondonRailDate.calendar
             let start = calendar.startOfDay(for: .now)
             let end = calendar.date(byAdding: .day, value: days, to: start) ?? start
             let formatter = DateFormatter()
             formatter.locale = Locale(identifier: "en_US_POSIX")
             formatter.calendar = calendar
+            formatter.timeZone = LondonRailDate.timeZone
             formatter.dateFormat = "yyyy-MM-dd"
             let lineIDs = TubeLineID.allCases.map(\.rawValue).joined(separator: ",")
             let path = "/Line/\(lineIDs)/Status/\(formatter.string(from: start))/to/\(formatter.string(from: end))"
@@ -32,32 +33,17 @@ actor EngineeringWorksService {
                 path,
                 queryItems: [URLQueryItem(name: "detail", value: "true")]
             )
-            let resolver = DisruptionResolver(repository: repository)
-            var works: [EngineeringWork] = []
-            for line in statuses {
-                for status in line.lineStatuses where isPlannedWork(status) {
-                    let validity = status.validityPeriods?.first
-                    guard let startDate = validity?.fromDate, let endDate = validity?.toDate else { continue }
-                    let resolved = resolver.resolve(status, lineID: line.id)
-                    works.append(
-                        EngineeringWork(
-                            id: "\(line.id.rawValue):\(status.id):\(Int(startDate.timeIntervalSince1970))",
-                            title: status.statusSeverityDescription,
-                            detail: status.reason ?? status.disruption?.description ?? status.statusSeverityDescription,
-                            lineIDs: [line.id],
-                            affectedStationIDs: resolved.affectedStationIDs,
-                            affectedSegmentIDs: resolved.affectedSegmentIDs,
-                            startDate: startDate,
-                            endDate: endDate,
-                            source: .unifiedAPI,
-                            fetchedAt: .now,
-                            confidence: resolved.confidence
-                        )
-                    )
-                }
-            }
+            let fetchedAt = Date.now
+            let works = EngineeringWorksBuilder(repository: repository).works(
+                from: statuses,
+                fetchedAt: fetchedAt
+            )
             let deduplicated = EngineeringWorksNormalizer().deduplicatedAndSorted(works)
-            let snapshot = EngineeringWorksSnapshot(works: deduplicated, fetchedAt: .now, cached: false)
+            let snapshot = EngineeringWorksSnapshot(
+                works: deduplicated,
+                fetchedAt: fetchedAt,
+                cached: false
+            )
             try? await cache.save(snapshot, named: "works.json")
             return snapshot
         } catch {
@@ -66,12 +52,6 @@ actor EngineeringWorksService {
             }
             throw error
         }
-    }
-
-    private func isPlannedWork(_ status: TfLStatusEntry) -> Bool {
-        let category = status.disruption?.category ?? status.disruption?.categoryDescription ?? ""
-        return category.localizedCaseInsensitiveContains("plannedwork")
-            || category.localizedCaseInsensitiveContains("planned work")
     }
 
 }

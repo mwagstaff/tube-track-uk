@@ -38,12 +38,15 @@ enum DisruptionDisplayMode: String, CaseIterable {
 final class TubeAppState {
     var selectedTab: AppTab = .map
     var disruptionDisplayMode: DisruptionDisplayMode = .issues
+    var disruptionDateSelection: DisruptionDateSelection = .today
+    var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
     var showLiveTrains = false
     var trainLineFilter: Set<TubeLineID> = []
     var selectedLineID: TubeLineID?
     var selectedStationID: String?
     var selectedDisruptionID: String?
+    var selectedEngineeringWorkID: String?
     var focusedSegmentIDs: Set<String> = []
     var focusedStationIDs: Set<String> = []
     var focusedLineIDs: Set<TubeLineID> = []
@@ -105,11 +108,53 @@ final class TubeAppState {
     }
 
     var selectedDisruption: ResolvedDisruption? {
-        disruptions.first { $0.id == selectedDisruptionID }
+        visibleDisruptions.first { $0.id == selectedDisruptionID }
+    }
+
+    var selectedEngineeringWork: EngineeringWork? {
+        guard let selectedEngineeringWorkID else { return nil }
+        return engineeringWorks.first { $0.id == selectedEngineeringWorkID }
+    }
+
+    var isViewingLiveStatus: Bool {
+        disruptionDateSelection == .today
+    }
+
+    var selectedDisruptionDate: Date {
+        disruptionDateSelection.date()
+    }
+
+    var latestSelectableDisruptionDate: Date {
+        LondonRailDate.calendar.date(
+            byAdding: .day,
+            value: 60,
+            to: DisruptionDateSelection.today.date()
+        ) ?? DisruptionDateSelection.today.date()
+    }
+
+    var plannedWorksForSelectedDate: [EngineeringWork] {
+        guard !isViewingLiveStatus else { return [] }
+        return LondonRailDate.works(
+            engineeringWorks,
+            overlapping: selectedDisruptionDate
+        )
+    }
+
+    var selectedEngineeringWorks: [EngineeringWork] {
+        LondonRailDate.works(
+            plannedWorksForSelectedDate,
+            overlappingAny: selectedDisruptionTimeWindows,
+            on: selectedDisruptionDate
+        )
+    }
+
+    var visibleDisruptions: [ResolvedDisruption] {
+        if isViewingLiveStatus { return disruptions }
+        return selectedEngineeringWorks.flatMap { resolvedDisruptions(for: $0) }
     }
 
     var highlightedDisruptions: [ResolvedDisruption] {
-        disruptions.filter { highlightedDisruptionCategories.contains($0.category) }
+        visibleDisruptions.filter { highlightedDisruptionCategories.contains($0.category) }
     }
 
     var activeAffectedSegmentIDs: Set<String> {
@@ -128,7 +173,33 @@ final class TubeAppState {
         !focusedLineIDs.isEmpty || !focusedSegmentIDs.isEmpty || !focusedStationIDs.isEmpty
     }
 
-    var currentIssueCount: Int { disruptions.count }
+    var currentIssueCount: Int {
+        isViewingLiveStatus ? disruptions.count : selectedEngineeringWorks.count
+    }
+
+    func plannedWorkCount(in window: DisruptionTimeWindow) -> Int {
+        LondonRailDate.works(
+            plannedWorksForSelectedDate,
+            overlappingAny: [window],
+            on: selectedDisruptionDate
+        ).count
+    }
+
+    var disruptionDataUpdatedAt: Date? {
+        isViewingLiveStatus ? statusUpdatedAt : worksUpdatedAt
+    }
+
+    var isUsingCachedDisruptionData: Bool {
+        isViewingLiveStatus ? isUsingCachedStatus : isUsingCachedWorks
+    }
+
+    var isRefreshingDisruptionData: Bool {
+        isViewingLiveStatus ? isRefreshingStatus : isRefreshingWorks
+    }
+
+    var disruptionDataError: String? {
+        isViewingLiveStatus ? statusError : worksError
+    }
 
     var goodServiceLineCount: Int {
         statuses.filter { line in
@@ -204,6 +275,9 @@ final class TubeAppState {
             worksUpdatedAt = snapshot.fetchedAt
             isUsingCachedWorks = snapshot.cached
             worksError = nil
+            if selectedEngineeringWorkID != nil && selectedEngineeringWork == nil {
+                clearMapSelection()
+            }
         } catch {
             worksError = error.localizedDescription
         }
@@ -239,8 +313,30 @@ final class TubeAppState {
         }
         highlightedDisruptionCategories = categories
         if !highlighted, selectedDisruption?.category == category {
-            selectedDisruptionID = nil
-            selectedLineID = nil
+            clearMapSelection()
+        }
+    }
+
+    func setDisruptionDateSelection(_ selection: DisruptionDateSelection) {
+        guard selection != disruptionDateSelection else { return }
+        clearMapSelection()
+        disruptionDateSelection = selection
+    }
+
+    func toggleDisruptionTimeWindow(_ window: DisruptionTimeWindow) {
+        clearMapSelection()
+        if selectedDisruptionTimeWindows.contains(window) {
+            selectedDisruptionTimeWindows.remove(window)
+        } else {
+            selectedDisruptionTimeWindows.insert(window)
+        }
+    }
+
+    func toggleDisruptionHighlighting() {
+        if disruptionDisplayMode == .issues {
+            disruptionDisplayMode = .normal
+        } else {
+            enableDisruptionHighlighting()
         }
     }
 
@@ -256,6 +352,7 @@ final class TubeAppState {
         selectedStationID = station.id
         selectedLineID = nil
         selectedDisruptionID = nil
+        selectedEngineeringWorkID = nil
         stationArrivals = []
         stationArrivalsError = nil
         requestStationArrivals(for: station.id)
@@ -276,6 +373,9 @@ final class TubeAppState {
 
     func select(disruption: ResolvedDisruption) {
         selectedDisruptionID = disruption.id
+        selectedEngineeringWorkID = engineeringWork(
+            matchingProjectedDisruptionID: disruption.id
+        )?.id
         selectedLineID = disruption.lineID
         selectedStationID = nil
         focusedSegmentIDs = []
@@ -286,7 +386,26 @@ final class TubeAppState {
     }
 
     func focus(on work: EngineeringWork, in tab: AppTab) {
+        let workIsInSelectedPlannedDay = !isViewingLiveStatus
+            && !LondonRailDate.works(
+                [work],
+                overlapping: selectedDisruptionDate
+            ).isEmpty
+        clearMapSelection()
+        if !workIsInSelectedPlannedDay {
+            disruptionDateSelection = .custom(work.startDate)
+        }
+        let workDate = selectedDisruptionDate
+        let matchingWindows = Set(DisruptionTimeWindow.allCases.filter { window in
+            !LondonRailDate.works(
+                [work],
+                overlappingAny: [window],
+                on: workDate
+            ).isEmpty
+        })
+        selectedDisruptionTimeWindows.formUnion(matchingWindows)
         selectedTab = tab
+        selectedEngineeringWorkID = work.id
         selectedDisruptionID = nil
         selectedLineID = work.lineIDs.first
         focusedSegmentIDs = work.affectedSegmentIDs
@@ -300,6 +419,7 @@ final class TubeAppState {
         clearStationSelection()
         selectedLineID = nil
         selectedDisruptionID = nil
+        selectedEngineeringWorkID = nil
         focusedSegmentIDs = []
         focusedStationIDs = []
         focusedLineIDs = []
@@ -332,6 +452,39 @@ final class TubeAppState {
         showLiveTrains = false
         liveTrains.removeAll(keepingCapacity: false)
         stationArrivals.removeAll(keepingCapacity: false)
+    }
+
+    private func resolvedDisruptions(for work: EngineeringWork) -> [ResolvedDisruption] {
+        let segmentsByID = graph?.segmentsByID
+        return work.lineIDs.map { lineID in
+            let segmentIDs: Set<String>
+            if let segmentsByID {
+                segmentIDs = Set(work.affectedSegmentIDs.filter {
+                    segmentsByID[$0]?.lineID == lineID
+                })
+            } else {
+                segmentIDs = work.affectedSegmentIDs
+            }
+
+            return ResolvedDisruption(
+                id: "planned:\(work.id):\(lineID.rawValue)",
+                lineID: lineID,
+                title: work.title,
+                reason: work.detail,
+                severity: 5,
+                affectedStationIDs: work.affectedStationIDs,
+                affectedSegmentIDs: segmentIDs,
+                confidence: work.confidence
+            )
+        }
+    }
+
+    private func engineeringWork(
+        matchingProjectedDisruptionID disruptionID: String
+    ) -> EngineeringWork? {
+        selectedEngineeringWorks.first { work in
+            resolvedDisruptions(for: work).contains { $0.id == disruptionID }
+        }
     }
 
     private func startStatusPolling() {

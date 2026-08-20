@@ -22,7 +22,7 @@ struct WorksScreen: View {
     }
 
     private var groupedWorks: [(date: Date, works: [EngineeringWork])] {
-        let calendar = Calendar.current
+        let calendar = LondonRailDate.calendar
         let groups = Dictionary(grouping: filteredWorks) { calendar.startOfDay(for: $0.startDate) }
         return groups.keys.sorted().map { ($0, groups[$0, default: []].sorted { $0.startDate < $1.startDate }) }
     }
@@ -72,7 +72,7 @@ struct WorksScreen: View {
                                 .buttonStyle(.plain)
                         }
                     } header: {
-                        Text(group.date.formatted(.dateTime.weekday(.wide).day().month(.wide)))
+                        Text(LondonRailDate.formatted(group.date, dateFormat: "EEEE d MMMM"))
                             .font(.subheadline.weight(.bold))
                             .textCase(.uppercase)
                             .foregroundStyle(.secondary)
@@ -133,16 +133,16 @@ struct WorksScreen: View {
         case .all:
             return true
         case .thirtyDays:
-            let end = Calendar.current.date(byAdding: .day, value: 30, to: .now) ?? .now
+            let end = LondonRailDate.calendar.date(byAdding: .day, value: 30, to: .now) ?? .now
             return work.startDate <= end && work.endDate >= .now
         case .weekend:
-            let calendar = Calendar.current
+            let calendar = LondonRailDate.calendar
             let today = calendar.startOfDay(for: .now)
             let weekday = calendar.component(.weekday, from: today)
             let daysToSaturday = (7 - weekday + 7) % 7
             let saturday = calendar.date(byAdding: .day, value: daysToSaturday, to: today) ?? today
             let monday = calendar.date(byAdding: .day, value: 2, to: saturday) ?? saturday
-            return work.startDate < monday && work.endDate >= saturday
+            return work.startDate < monday && work.endDate > saturday
         }
     }
 }
@@ -193,9 +193,14 @@ private struct WorkCard: View {
     }
 
     private var dateRange: String {
-        if Calendar.current.isDate(work.startDate, inSameDayAs: work.endDate) {
-            return work.startDate.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated).hour().minute())
+        if LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.endDate) {
+            return LondonRailDate.formatted(
+                work.startDate,
+                dateFormat: "EEE d MMM, HH:mm"
+            )
         }
-        return "\(work.startDate.formatted(.dateTime.day().month(.abbreviated))) – \(work.endDate.formatted(.dateTime.day().month(.abbreviated)))"
+        let start = LondonRailDate.formatted(work.startDate, dateFormat: "d MMM")
+        let end = LondonRailDate.formatted(work.endDate, dateFormat: "d MMM")
+        return "\(start) – \(end)"
     }
 }

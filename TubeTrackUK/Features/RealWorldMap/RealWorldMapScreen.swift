@@ -97,7 +97,7 @@ struct RealWorldMapScreen: View {
             if let stationID { focus(on: [stationID]) }
         }
         .onAppear {
-            if !appState.activeAffectedStationIDs.isEmpty {
+            if appState.hasFocusedMapSection || appState.selectedDisruption != nil {
                 focus(on: appState.activeAffectedStationIDs)
             }
         }
@@ -198,7 +198,7 @@ struct RealWorldMapScreen: View {
         ) else { return }
 
         var disruptionsBySegmentID: [String: [ResolvedDisruption]] = [:]
-        for disruption in appState.disruptions {
+        for disruption in appState.visibleDisruptions {
             for segmentID in disruption.affectedSegmentIDs {
                 disruptionsBySegmentID[segmentID, default: []].append(disruption)
             }
@@ -233,6 +233,9 @@ struct RealWorldMapScreen: View {
             if let station = appState.selectedStation {
                 StationDetailCard(station: station)
                     .padding(.horizontal, 12)
+            } else if let work = appState.selectedEngineeringWork {
+                PlannedWorkDetailCard(work: work)
+                    .padding(.horizontal, 12)
             } else if let disruption = appState.selectedDisruption {
                 DisruptionDetailCard(disruption: disruption)
                     .padding(.horizontal, 12)
@@ -244,8 +247,7 @@ struct RealWorldMapScreen: View {
                 LiveStatusPanel(expanded: $statusExpanded)
                     .padding(.horizontal, 12)
             } else {
-                LiveStatusDock(expanded: $statusExpanded)
-                    .padding(.horizontal, 12)
+                MapStatusDock(expanded: $statusExpanded)
             }
         }
         .safeAreaPadding(.bottom, 4)
