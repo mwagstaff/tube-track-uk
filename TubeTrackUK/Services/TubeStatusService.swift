@@ -30,7 +30,7 @@ actor TubeStatusService {
                 return left.lineID.displayName < right.lineID.displayName
             }
             let snapshot = TubeStatusSnapshot(
-                statuses: statuses,
+                statuses: statuses.map(\.compactedForDisplay),
                 disruptions: disruptions,
                 fetchedAt: .now,
                 cached: false
@@ -48,5 +48,24 @@ actor TubeStatusService {
             }
             throw error
         }
+    }
+}
+
+private extension TfLLineStatus {
+    var compactedForDisplay: TfLLineStatus {
+        TfLLineStatus(
+            id: id,
+            name: name,
+            lineStatuses: lineStatuses.map { status in
+                TfLStatusEntry(
+                    id: status.id,
+                    statusSeverity: status.statusSeverity,
+                    statusSeverityDescription: status.statusSeverityDescription,
+                    reason: status.reason,
+                    validityPeriods: nil,
+                    disruption: nil
+                )
+            }
+        )
     }
 }

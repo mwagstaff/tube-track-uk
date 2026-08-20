@@ -72,11 +72,14 @@ final class TubeAppState {
     @ObservationIgnored private var worksService: EngineeringWorksService?
     @ObservationIgnored private var trainService: TubeTrainService?
     @ObservationIgnored private var stationArrivalsService: StationArrivalsService?
+    @ObservationIgnored private var stationArrivalsTask: Task<Void, Never>?
+    @ObservationIgnored private var stationArrivalsGeneration: UInt = 0
     @ObservationIgnored private var statusPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainRefreshTask: Task<Void, Never>?
     @ObservationIgnored private var trainRefreshFilter: Set<TubeLineID>?
     @ObservationIgnored private var trainRefreshGeneration: UInt = 0
+    @ObservationIgnored private var appIsActive = true
     @ObservationIgnored private var started = false
 
     init() {
@@ -149,7 +152,9 @@ final class TubeAppState {
             stationArrivalsService = StationArrivalsService(client: client)
             isLoadingGraph = false
             await refreshStatus()
+            guard !Task.isCancelled else { return }
             await refreshWorks()
+            guard appIsActive, !Task.isCancelled else { return }
             startStatusPolling()
             if showLiveTrains { startTrainPolling() }
         } catch {
@@ -164,11 +169,18 @@ final class TubeAppState {
         defer { isRefreshingStatus = false }
         do {
             let snapshot = try await statusService.fetch()
-            statuses = snapshot.statuses
-            disruptions = snapshot.disruptions
+            if statuses != snapshot.statuses {
+                statuses = snapshot.statuses
+            }
+            let disruptionsChanged = disruptions != snapshot.disruptions
+            if disruptionsChanged {
+                disruptions = snapshot.disruptions
+            }
             #if DEBUG
-            for disruption in snapshot.disruptions {
-                print("[TubeTrack] disruption=\(disruption.lineID.rawValue) segments=\(disruption.affectedSegmentIDs.count) confidence=\(disruption.confidence.rawValue)")
+            if disruptionsChanged {
+                for disruption in snapshot.disruptions {
+                    print("[TubeTrack] disruption=\(disruption.lineID.rawValue) segments=\(disruption.affectedSegmentIDs.count) confidence=\(disruption.confidence.rawValue)")
+                }
             }
             #endif
             statusUpdatedAt = snapshot.fetchedAt
@@ -240,35 +252,20 @@ final class TubeAppState {
     }
 
     func select(station: TubeStation) {
+        cancelStationArrivalsRefresh()
         selectedStationID = station.id
         selectedLineID = nil
         selectedDisruptionID = nil
         stationArrivals = []
         stationArrivalsError = nil
-        Task { await refreshArrivals(for: station.id) }
+        requestStationArrivals(for: station.id)
     }
 
     func clearStationSelection() {
+        cancelStationArrivalsRefresh()
         selectedStationID = nil
         stationArrivals = []
         stationArrivalsError = nil
-    }
-
-    func refreshArrivals(for stationID: String) async {
-        guard let stationArrivalsService, selectedStationID == stationID, !isRefreshingStationArrivals else { return }
-        isRefreshingStationArrivals = true
-        defer { isRefreshingStationArrivals = false }
-        do {
-            guard let station = graph?.stationsByID[stationID] else { return }
-            let stopIDs = graph?.stations(inSamePlaceAs: station).map(\.id) ?? [stationID]
-            let arrivals = try await stationArrivalsService.fetch(stationIDs: stopIDs)
-            guard selectedStationID == stationID else { return }
-            stationArrivals = Array(arrivals.prefix(12))
-            stationArrivalsError = nil
-        } catch {
-            guard selectedStationID == stationID else { return }
-            stationArrivalsError = error.localizedDescription
-        }
     }
 
     func refreshTrains() async {
@@ -310,20 +307,35 @@ final class TubeAppState {
     }
 
     func setActive(_ active: Bool) {
+        appIsActive = active
         if active {
             startStatusPolling()
             if showLiveTrains { startTrainPolling() }
+            if let selectedStationID, stationArrivals.isEmpty {
+                requestStationArrivals(for: selectedStationID)
+            }
         } else {
             statusPollingTask?.cancel()
             statusPollingTask = nil
             trainPollingTask?.cancel()
             trainPollingTask = nil
             cancelTrainRefresh()
+            cancelStationArrivalsRefresh()
         }
     }
 
+    func handleMemoryWarning() {
+        trainPollingTask?.cancel()
+        trainPollingTask = nil
+        cancelTrainRefresh()
+        cancelStationArrivalsRefresh()
+        showLiveTrains = false
+        liveTrains.removeAll(keepingCapacity: false)
+        stationArrivals.removeAll(keepingCapacity: false)
+    }
+
     private func startStatusPolling() {
-        guard statusPollingTask == nil else { return }
+        guard appIsActive, statusPollingTask == nil else { return }
         statusPollingTask = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(30))
@@ -334,7 +346,7 @@ final class TubeAppState {
     }
 
     private func startTrainPolling() {
-        guard trainPollingTask == nil, trainService != nil else { return }
+        guard appIsActive, trainPollingTask == nil, trainService != nil else { return }
         trainPollingTask = Task { [weak self] in
             await self?.refreshTrains()
             while !Task.isCancelled {
@@ -423,5 +435,61 @@ final class TubeAppState {
         trainRefreshTask?.cancel()
         trainRefreshTask = nil
         trainRefreshFilter = nil
+    }
+
+    private func requestStationArrivals(for stationID: String) {
+        guard appIsActive,
+              stationArrivalsService != nil,
+              selectedStationID == stationID else {
+            return
+        }
+
+        stationArrivalsTask?.cancel()
+        stationArrivalsGeneration &+= 1
+        let generation = stationArrivalsGeneration
+        isRefreshingStationArrivals = true
+        stationArrivalsTask = Task { [weak self] in
+            await self?.loadStationArrivals(for: stationID, generation: generation)
+        }
+    }
+
+    private func loadStationArrivals(for stationID: String, generation: UInt) async {
+        defer { finishStationArrivalsRefresh(generation: generation) }
+        guard let stationArrivalsService,
+              let station = graph?.stationsByID[stationID] else {
+            return
+        }
+
+        do {
+            let stopIDs = graph?.stations(inSamePlaceAs: station).map(\.id) ?? [stationID]
+            let arrivals = try await stationArrivalsService.fetch(stationIDs: stopIDs)
+            guard !Task.isCancelled,
+                  generation == stationArrivalsGeneration,
+                  selectedStationID == stationID else {
+                return
+            }
+            stationArrivals = Array(arrivals.prefix(12))
+            stationArrivalsError = nil
+        } catch {
+            guard !Task.isCancelled,
+                  generation == stationArrivalsGeneration,
+                  selectedStationID == stationID else {
+                return
+            }
+            stationArrivalsError = error.localizedDescription
+        }
+    }
+
+    private func finishStationArrivalsRefresh(generation: UInt) {
+        guard generation == stationArrivalsGeneration else { return }
+        stationArrivalsTask = nil
+        isRefreshingStationArrivals = false
+    }
+
+    private func cancelStationArrivalsRefresh() {
+        stationArrivalsGeneration &+= 1
+        stationArrivalsTask?.cancel()
+        stationArrivalsTask = nil
+        isRefreshingStationArrivals = false
     }
 }

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct RootTabView: View {
     @Environment(TubeAppState.self) private var appState
@@ -9,13 +10,25 @@ struct RootTabView: View {
         @Bindable var state = appState
 
         TabView(selection: $state.selectedTab) {
-            BeckMapScreen()
-                .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
-                .tag(AppTab.map)
+            Group {
+                if appState.selectedTab == .map {
+                    BeckMapScreen()
+                } else {
+                    Color.clear
+                }
+            }
+            .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
+            .tag(AppTab.map)
 
-            RealWorldMapScreen()
-                .tabItem { Label(AppTab.realWorld.title, systemImage: AppTab.realWorld.symbol) }
-                .tag(AppTab.realWorld)
+            Group {
+                if appState.selectedTab == .realWorld {
+                    RealWorldMapScreen()
+                } else {
+                    Color.clear
+                }
+            }
+            .tabItem { Label(AppTab.realWorld.title, systemImage: AppTab.realWorld.symbol) }
+            .tag(AppTab.realWorld)
 
             WorksScreen()
                 .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
@@ -33,6 +46,11 @@ struct RootTabView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             appState.setActive(phase == .active)
+        }
+        .onReceive(NotificationCenter.default.publisher(
+            for: UIApplication.didReceiveMemoryWarningNotification
+        )) { _ in
+            appState.handleMemoryWarning()
         }
     }
 }

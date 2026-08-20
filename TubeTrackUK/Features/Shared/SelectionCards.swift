@@ -72,11 +72,6 @@ struct StationDetailCard: View {
             }
         }
         .accessibilityElement(children: .contain)
-        .task(id: station.id) {
-            if appState.stationArrivals.isEmpty {
-                await appState.refreshArrivals(for: station.id)
-            }
-        }
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
         }

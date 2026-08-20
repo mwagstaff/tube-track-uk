@@ -10,39 +10,43 @@ actor TubeTrainService {
     }
 
     func fetch(lineIDs: Set<TubeLineID>) async throws -> [LiveTubeTrain] {
-        let requested = Set(
-            (lineIDs.isEmpty ? Set(TubeLineID.allCases) : lineIDs)
-                .filter(\.supportsEstimatedTrains)
-        )
-        guard !requested.isEmpty else { return [] }
+        let requestedLines = TubeTrainRequestBatcher.requestedLines(for: lineIDs)
+        guard !requestedLines.isEmpty else { return [] }
 
-        let pathIDs = requested.map(\.rawValue).sorted().joined(separator: ",")
-        let predictions: [TfLLiveTrainPrediction] = try await client.get("/Line/\(pathIDs)/Arrivals")
+        let requested = Set(requestedLines)
         var nearestByVehicle: [LiveVehicleKey: NearestLivePrediction] = [:]
-        nearestByVehicle.reserveCapacity(min(512, predictions.count))
+        nearestByVehicle.reserveCapacity(512)
 
-        for prediction in predictions {
-            guard let vehicleID = prediction.vehicleId,
-                  let lineID = TubeLineID(rawValue: prediction.lineId),
-                  requested.contains(lineID),
-                  let nextStationID = prediction.naptanId,
-                  let seconds = prediction.timeToStation,
-                  seconds >= 0 else {
-                continue
-            }
+        for batch in TubeTrainRequestBatcher.batches(from: requestedLines) {
+            try Task.checkCancellation()
+            let pathIDs = batch.map(\.rawValue).joined(separator: ",")
+            let predictions: [TfLLiveTrainPrediction] = try await client.get("/Line/\(pathIDs)/Arrivals")
+            try Task.checkCancellation()
 
-            let key = LiveVehicleKey(lineID: lineID, vehicleID: vehicleID)
-            if let existing = nearestByVehicle[key], existing.seconds <= seconds {
-                continue
+            for prediction in predictions {
+                guard let vehicleID = prediction.vehicleId,
+                      let lineID = TubeLineID(rawValue: prediction.lineId),
+                      requested.contains(lineID),
+                      let nextStationID = prediction.naptanId,
+                      let seconds = prediction.timeToStation,
+                      seconds >= 0 else {
+                    continue
+                }
+
+                let key = LiveVehicleKey(lineID: lineID, vehicleID: vehicleID)
+                if let existing = nearestByVehicle[key], existing.seconds <= seconds {
+                    continue
+                }
+                nearestByVehicle[key] = NearestLivePrediction(
+                    prediction: prediction,
+                    lineID: lineID,
+                    vehicleID: vehicleID,
+                    nextStationID: nextStationID,
+                    seconds: seconds
+                )
             }
-            nearestByVehicle[key] = NearestLivePrediction(
-                prediction: prediction,
-                lineID: lineID,
-                vehicleID: vehicleID,
-                nextStationID: nextStationID,
-                seconds: seconds
-            )
         }
+        try Task.checkCancellation()
         let now = Date.now
 
         return nearestByVehicle.values.compactMap { nearest in
@@ -81,6 +85,24 @@ actor TubeTrainService {
             )
         }
         .sorted { $0.id < $1.id }
+    }
+}
+
+enum TubeTrainRequestBatcher {
+    static let maximumBatchSize = 3
+
+    static func requestedLines(for lineIDs: Set<TubeLineID>) -> [TubeLineID] {
+        (lineIDs.isEmpty ? TubeLineID.allCases : Array(lineIDs))
+            .filter(\.supportsEstimatedTrains)
+            .sorted { $0.rawValue < $1.rawValue }
+    }
+
+    static func batches(from requestedLines: [TubeLineID]) -> [[TubeLineID]] {
+        guard !requestedLines.isEmpty else { return [] }
+        return stride(from: 0, to: requestedLines.count, by: maximumBatchSize).map { start in
+            let end = min(start + maximumBatchSize, requestedLines.count)
+            return Array(requestedLines[start ..< end])
+        }
     }
 }
 

@@ -1,5 +1,4 @@
 import MapKit
-import Observation
 import SwiftUI
 
 struct RealWorldMapScreen: View {
@@ -7,7 +6,7 @@ struct RealWorldMapScreen: View {
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
-    @State private var viewport = RealWorldMapViewport()
+    @State private var visibleRegion = Self.centralLondon
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
 
     private static let centralLondon = MKCoordinateRegion(
@@ -38,8 +37,8 @@ struct RealWorldMapScreen: View {
                                 appState.select(station: station)
                             }
                         }
-                        .onMapCameraChange(frequency: .continuous) { context in
-                            viewport.mapDidMove(to: context.region)
+                        .onMapCameraChange(frequency: .onEnd) { context in
+                            visibleRegion = context.region
                         }
                         .simultaneousGesture(
                             SpatialTapGesture()
@@ -57,7 +56,7 @@ struct RealWorldMapScreen: View {
                             RealWorldTrainCanvas(
                                 proxy: proxy,
                                 pathsBySegmentID: renderData.pathsBySegmentID,
-                                viewport: viewport
+                                visibleRegion: visibleRegion
                             )
                         }
                     }
@@ -116,40 +115,42 @@ struct RealWorldMapScreen: View {
         let affectedSegmentIDs = appState.activeAffectedSegmentIDs
         let issuesMode = appState.disruptionDisplayMode == .issues && !affectedSegmentIDs.isEmpty
         let selectedLineID = appState.selectedLineID
+        let affectedPolylines = issuesMode
+            ? renderData.polylines(covering: affectedSegmentIDs)
+            : []
 
-        ForEach(renderData.segments) { segment in
-            let affected = affectedSegmentIDs.contains(segment.id)
-            let muted = (issuesMode && !affected)
-                || (selectedLineID != nil && selectedLineID != segment.lineID)
-            MapPolyline(coordinates: segment.path.coordinates)
+        ForEach(renderData.polylines) { polyline in
+            let muted = issuesMode
+                || (selectedLineID != nil && selectedLineID != polyline.lineID)
+            MapPolyline(polyline.overlay)
                 .stroke(
-                    muted ? Color.secondary.opacity(0.24) : .tubeLine(segment.lineID),
+                    muted ? Color.secondary.opacity(0.24) : .tubeLine(polyline.lineID),
                     style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
                 )
                 .mapOverlayLevel(level: .aboveLabels)
         }
 
         if issuesMode {
-            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
-                MapPolyline(coordinates: segment.path.coordinates)
+            ForEach(affectedPolylines) { polyline in
+                MapPolyline(polyline.overlay)
                     .stroke(
                         Color.red.opacity(0.82),
                         style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round)
                     )
                     .mapOverlayLevel(level: .aboveLabels)
             }
-            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
-                MapPolyline(coordinates: segment.path.coordinates)
+            ForEach(affectedPolylines) { polyline in
+                MapPolyline(polyline.overlay)
                     .stroke(
                         Color.white,
                         style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round)
                     )
                     .mapOverlayLevel(level: .aboveLabels)
             }
-            ForEach(renderData.segments.filter { affectedSegmentIDs.contains($0.id) }) { segment in
-                MapPolyline(coordinates: segment.path.coordinates)
+            ForEach(affectedPolylines) { polyline in
+                MapPolyline(polyline.overlay)
                     .stroke(
-                        Color.tubeLine(segment.lineID),
+                        Color.tubeLine(polyline.lineID),
                         style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
                     )
                     .mapOverlayLevel(level: .aboveLabels)
@@ -161,17 +162,11 @@ struct RealWorldMapScreen: View {
     private func stationAnnotations(graph: TubeGraph) -> some MapContent {
         ForEach(displayStations(graph: graph)) { station in
             Annotation(station.name, coordinate: station.coordinate, anchor: .center) {
-                Button {
-                    mapSelection = station.id
-                } label: {
-                    Circle()
-                        .fill(.background)
-                        .stroke(appState.selectedStationID == station.id ? Color.blue : Color.primary, lineWidth: 2)
-                        .frame(width: appState.selectedStationID == station.id ? 18 : 11)
-                        .shadow(radius: 1)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(station.name)
+                Circle()
+                    .fill(.background)
+                    .stroke(appState.selectedStationID == station.id ? Color.blue : Color.primary, lineWidth: 2)
+                    .frame(width: appState.selectedStationID == station.id ? 18 : 11)
+                    .accessibilityLabel(station.name)
             }
             .tag(station.id)
         }
@@ -182,6 +177,10 @@ struct RealWorldMapScreen: View {
             in: graph,
             selectedStationID: appState.selectedStationID
         )
+        .filter {
+            $0.id == appState.selectedStationID
+                || visibleRegion.containsExpanded($0.coordinate)
+        }
     }
 
     private func handleLineTap(
@@ -326,45 +325,33 @@ enum RealWorldLineHitTesting {
     }
 }
 
-@Observable
-private final class RealWorldMapViewport {
-    private(set) var region: MKCoordinateRegion?
-
-    func mapDidMove(to region: MKCoordinateRegion) {
-        self.region = region
-    }
-}
-
 private struct RealWorldTrainCanvas: View {
     @Environment(TubeAppState.self) private var appState
 
     let proxy: MapProxy
     let pathsBySegmentID: [String: RealWorldRenderPath]
-    let viewport: RealWorldMapViewport
+    let visibleRegion: MKCoordinateRegion
 
     var body: some View {
         let trains = appState.liveTrains
-        let visibleRegion = viewport.region
 
-        TimelineView(.periodic(from: .now, by: 1)) { timeline in
-            Canvas { context, size in
-                let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
-                var trainIcon = context.resolve(Image(systemName: "tram.fill"))
-                trainIcon.shading = .color(.white)
+        Canvas { context, size in
+            let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
+            var trainIcon = context.resolve(Image(systemName: "tram.fill"))
+            trainIcon.shading = .color(.white)
 
-                for train in trains {
-                    guard let path = pathsBySegmentID[train.segmentID],
-                          let coordinate = path.coordinate(at: train.projectedProgress(at: timeline.date)),
-                          visibleRegion?.containsExpanded(coordinate) != false,
-                          let point = proxy.convert(coordinate, to: .local),
-                          visibleBounds.contains(point) else { continue }
+            for train in trains {
+                guard let path = pathsBySegmentID[train.segmentID],
+                      let coordinate = path.coordinate(at: train.projectedProgress(at: .now)),
+                      visibleRegion.containsExpanded(coordinate),
+                      let point = proxy.convert(coordinate, to: .local),
+                      visibleBounds.contains(point) else { continue }
 
-                    let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
-                    let marker = Path(roundedRect: markerRect, cornerRadius: 6)
-                    context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
-                    context.stroke(marker, with: .color(.white), lineWidth: 1.5)
-                    context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
-                }
+                let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
+                let marker = Path(roundedRect: markerRect, cornerRadius: 6)
+                context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
+                context.stroke(marker, with: .color(.white), lineWidth: 1.5)
+                context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -386,9 +373,10 @@ private extension MKCoordinateRegion {
     }
 }
 
-private struct RealWorldMapRenderData {
+struct RealWorldMapRenderData {
     let graphID: String
     let segments: [RealWorldRenderedSegment]
+    let polylines: [RealWorldRenderedPolyline]
     let pathsBySegmentID: [String: RealWorldRenderPath]
 
     init(graph: TubeGraph) {
@@ -397,19 +385,153 @@ private struct RealWorldMapRenderData {
             RealWorldRenderedSegment(
                 id: segment.id,
                 lineID: segment.lineID,
+                fromStationID: segment.fromStationID,
+                toStationID: segment.toStationID,
                 path: RealWorldRenderPath(segment: segment, stationsByID: stationsByID)
             )
         }
         graphID = graph.generatedAt
         segments = renderedSegments
+        polylines = RealWorldPolylineBuilder.polylines(from: renderedSegments)
         pathsBySegmentID = Dictionary(uniqueKeysWithValues: renderedSegments.map { ($0.id, $0.path) })
+    }
+
+    func polylines(covering segmentIDs: Set<String>) -> [RealWorldRenderedPolyline] {
+        RealWorldPolylineBuilder.polylines(
+            from: segments.filter { segmentIDs.contains($0.id) }
+        )
     }
 }
 
-private struct RealWorldRenderedSegment: Identifiable {
+struct RealWorldRenderedSegment: Identifiable {
     let id: String
     let lineID: TubeLineID
+    let fromStationID: String
+    let toStationID: String
     let path: RealWorldRenderPath
+}
+
+struct RealWorldRenderedPolyline: Identifiable {
+    let id: String
+    let lineID: TubeLineID
+    let segmentIDs: [String]
+    let coordinates: [CLLocationCoordinate2D]
+    let overlay: MKPolyline
+
+    init(
+        id: String,
+        lineID: TubeLineID,
+        segmentIDs: [String],
+        coordinates: [CLLocationCoordinate2D]
+    ) {
+        self.id = id
+        self.lineID = lineID
+        self.segmentIDs = segmentIDs
+        self.coordinates = coordinates
+        self.overlay = MKPolyline(coordinates: coordinates, count: coordinates.count)
+    }
+}
+
+enum RealWorldPolylineBuilder {
+    static func polylines(from segments: [RealWorldRenderedSegment]) -> [RealWorldRenderedPolyline] {
+        Dictionary(grouping: segments, by: \.lineID)
+            .keys
+            .sorted { $0.rawValue < $1.rawValue }
+            .flatMap { lineID in
+                buildLinePolylines(
+                    lineID: lineID,
+                    segments: segments.filter { $0.lineID == lineID }
+                )
+            }
+    }
+
+    private static func buildLinePolylines(
+        lineID: TubeLineID,
+        segments: [RealWorldRenderedSegment]
+    ) -> [RealWorldRenderedPolyline] {
+        guard !segments.isEmpty else { return [] }
+
+        var indicesByStationID: [String: [Int]] = [:]
+        for (index, segment) in segments.enumerated() {
+            indicesByStationID[segment.fromStationID, default: []].append(index)
+            indicesByStationID[segment.toStationID, default: []].append(index)
+        }
+
+        var unusedIndices = Set(segments.indices)
+        var results: [RealWorldRenderedPolyline] = []
+
+        for stationID in indicesByStationID.keys.sorted()
+        where indicesByStationID[stationID, default: []].count != 2 {
+            for segmentIndex in indicesByStationID[stationID, default: []]
+            where unusedIndices.contains(segmentIndex) {
+                results.append(consumePolyline(
+                    lineID: lineID,
+                    startingAt: stationID,
+                    segmentIndex: segmentIndex,
+                    segments: segments,
+                    indicesByStationID: indicesByStationID,
+                    unusedIndices: &unusedIndices
+                ))
+            }
+        }
+
+        while let segmentIndex = unusedIndices.min() {
+            results.append(consumePolyline(
+                lineID: lineID,
+                startingAt: segments[segmentIndex].fromStationID,
+                segmentIndex: segmentIndex,
+                segments: segments,
+                indicesByStationID: indicesByStationID,
+                unusedIndices: &unusedIndices
+            ))
+        }
+        return results
+    }
+
+    private static func consumePolyline(
+        lineID: TubeLineID,
+        startingAt startStationID: String,
+        segmentIndex firstSegmentIndex: Int,
+        segments: [RealWorldRenderedSegment],
+        indicesByStationID: [String: [Int]],
+        unusedIndices: inout Set<Int>
+    ) -> RealWorldRenderedPolyline {
+        var stationID = startStationID
+        var segmentIndex = firstSegmentIndex
+        var segmentIDs: [String] = []
+        var coordinates: [CLLocationCoordinate2D] = []
+
+        while unusedIndices.remove(segmentIndex) != nil {
+            let segment = segments[segmentIndex]
+            let travelsForward = segment.fromStationID == stationID
+            let nextStationID = travelsForward ? segment.toStationID : segment.fromStationID
+            if travelsForward, coordinates.isEmpty {
+                coordinates.append(contentsOf: segment.path.coordinates)
+            } else if travelsForward {
+                coordinates.append(contentsOf: segment.path.coordinates.dropFirst())
+            } else if coordinates.isEmpty {
+                coordinates.append(contentsOf: segment.path.coordinates.reversed())
+            } else {
+                coordinates.append(contentsOf: segment.path.coordinates.reversed().dropFirst())
+            }
+            segmentIDs.append(segment.id)
+            stationID = nextStationID
+
+            guard indicesByStationID[stationID, default: []].count == 2,
+                  let nextSegmentIndex = indicesByStationID[stationID, default: []]
+                    .first(where: { unusedIndices.contains($0) }) else {
+                break
+            }
+            segmentIndex = nextSegmentIndex
+        }
+
+        return RealWorldRenderedPolyline(
+            id: "\(lineID.rawValue):\(segmentIDs.joined(separator: "|"))",
+            lineID: lineID,
+            segmentIDs: segmentIDs,
+            coordinates: coordinates
+        )
+    }
 }
 
 struct RealWorldRenderPath {

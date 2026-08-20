@@ -33,9 +33,16 @@ actor TfLClient {
     private let configuration: TfLConfiguration
     private let session: URLSession
 
-    init(configuration: TfLConfiguration = .app, session: URLSession = .shared) {
+    init(configuration: TfLConfiguration = .app, session: URLSession? = nil) {
         self.configuration = configuration
-        self.session = session
+        self.session = session ?? URLSession(configuration: Self.defaultSessionConfiguration())
+    }
+
+    nonisolated static func defaultSessionConfiguration() -> URLSessionConfiguration {
+        let configuration = URLSessionConfiguration.ephemeral
+        configuration.urlCache = nil
+        configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
+        return configuration
     }
 
     func get<Value: Decodable & Sendable>(
@@ -58,7 +65,7 @@ actor TfLClient {
 
         var request = URLRequest(url: url)
         request.timeoutInterval = 20
-        request.cachePolicy = .reloadRevalidatingCacheData
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("TubeTrackUK/1.0", forHTTPHeaderField: "User-Agent")
 
@@ -76,4 +83,3 @@ actor TfLClient {
         }
     }
 }
-

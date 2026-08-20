@@ -103,7 +103,10 @@ struct BeckMapScreen: View {
                     region: selectedRegion,
                     graph: graph
                 )
-                renderCache = BeckMapCanvas.RenderCache(document: loadedDocument)
+                renderCache = BeckMapCanvas.RenderCache(
+                    document: loadedDocument,
+                    loadsDebugReference: referenceOverlayVisible
+                )
                 document = loadedDocument
                 loadedGraphGeneratedAt = graph.generatedAt
             } catch {
@@ -1123,7 +1126,7 @@ private struct BeckMapCanvas: View {
         let artworkBounds: CGRect
         let debugReferenceImage: UIImage?
 
-        init(document: BeckMapDocument) {
+        init(document: BeckMapDocument, loadsDebugReference: Bool = false) {
             let paths = Dictionary(uniqueKeysWithValues: document.paths.map {
                 ($0.id, $0.commands)
             })
@@ -1229,7 +1232,9 @@ private struct BeckMapCanvas: View {
                 document: document,
                 renderedSegments: renderedSegments
             )
-            self.debugReferenceImage = BeckMapCanvas.loadDebugReference(for: document)
+            self.debugReferenceImage = loadsDebugReference
+                ? BeckMapCanvas.loadDebugReference(for: document)
+                : nil
         }
     }
 

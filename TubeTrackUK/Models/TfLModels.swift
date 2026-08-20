@@ -1,12 +1,12 @@
 import Foundation
 
-struct TfLLineStatus: Codable, Identifiable, Sendable {
+struct TfLLineStatus: Codable, Identifiable, Equatable, Sendable {
     let id: TubeLineID
     let name: String
     let lineStatuses: [TfLStatusEntry]
 }
 
-struct TfLStatusEntry: Codable, Identifiable, Sendable {
+struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
     let id: Int
     let statusSeverity: Int
     let statusSeverityDescription: String
@@ -29,13 +29,13 @@ struct TfLStatusEntry: Codable, Identifiable, Sendable {
     }
 }
 
-struct TfLValidityPeriod: Codable, Sendable {
+struct TfLValidityPeriod: Codable, Equatable, Sendable {
     let fromDate: Date?
     let toDate: Date?
     let isNow: Bool?
 }
 
-struct TfLDisruption: Codable, Sendable {
+struct TfLDisruption: Codable, Equatable, Sendable {
     let category: String?
     let categoryDescription: String?
     let description: String?
@@ -44,7 +44,7 @@ struct TfLDisruption: Codable, Sendable {
     let closureText: String?
 }
 
-struct TfLDisruptedRoute: Codable, Sendable {
+struct TfLDisruptedRoute: Codable, Equatable, Sendable {
     let id: String?
     let name: String?
     let direction: String?
@@ -54,12 +54,12 @@ struct TfLDisruptedRoute: Codable, Sendable {
     let routeSectionNaptanEntrySequence: [TfLRouteStopEntry]?
 }
 
-struct TfLRouteStopEntry: Codable, Sendable {
+struct TfLRouteStopEntry: Codable, Equatable, Sendable {
     let ordinal: Int?
     let stopPoint: TfLStopPoint?
 }
 
-struct TfLStopPoint: Codable, Sendable {
+struct TfLStopPoint: Codable, Equatable, Sendable {
     let naptanId: String?
     let id: String?
     let commonName: String?

@@ -217,6 +217,30 @@ struct TubeTrackUKTests {
         #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_500)) == 1)
     }
 
+    @Test @MainActor func memoryWarningDropsSupplementalLiveData() {
+        let appState = TubeAppState()
+        appState.showLiveTrains = true
+        appState.liveTrains = [LiveTubeTrain(
+            id: "victoria:1", vehicleID: "1", lineID: .victoria,
+            destination: "Brixton", direction: "southbound",
+            previousStationID: "a", nextStationID: "b", segmentID: "segment",
+            progress: 0.25, secondsToNextStation: 100, updatedAt: .now
+        )]
+        appState.stationArrivals = [TfLArrivalPrediction(
+            id: "arrival", vehicleId: "1", lineId: TubeLineID.victoria.rawValue,
+            stationName: "Victoria", naptanId: "station", platformName: nil,
+            direction: nil, destinationName: nil, destinationNaptanId: nil,
+            towards: nil, expectedArrival: nil, timeToStation: 30,
+            currentLocation: nil
+        )]
+
+        appState.handleMemoryWarning()
+
+        #expect(!appState.showLiveTrains)
+        #expect(appState.liveTrains.isEmpty)
+        #expect(appState.stationArrivals.isEmpty)
+    }
+
     @Test func beckMapTrainPathRespectsTravelAndAuthoredDirections() throws {
         let edges = [
             BeckMapCollisionEdge(start: CGPoint(x: 0, y: 4), end: CGPoint(x: 10, y: 4)),
