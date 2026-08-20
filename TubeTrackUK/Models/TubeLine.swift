@@ -12,6 +12,8 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case piccadilly
     case victoria
     case waterlooCity = "waterloo-city"
+    case dlr
+    case elizabeth
 
     var id: String { rawValue }
 
@@ -28,6 +30,29 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .piccadilly: "Piccadilly"
         case .victoria: "Victoria"
         case .waterlooCity: "Waterloo & City"
+        case .dlr: "DLR"
+        case .elizabeth: "Elizabeth line"
+        }
+    }
+
+    static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
+
+    var isUnderground: Bool { self != .dlr && self != .elizabeth }
+
+    var modeName: String {
+        switch self {
+        case .dlr: "dlr"
+        case .elizabeth: "elizabeth-line"
+        default: "tube"
+        }
+    }
+
+    var usesParallelSchematicStroke: Bool { !isUnderground }
+
+    var supportsEstimatedTrains: Bool {
+        switch self {
+        case .dlr: false
+        default: true
         }
     }
 }
@@ -48,7 +73,8 @@ extension Color {
         case .piccadilly: Color(red: 0.00, green: 0.10, blue: 0.65)
         case .victoria: Color(red: 0.00, green: 0.63, blue: 0.88)
         case .waterlooCity: Color(red: 0.46, green: 0.82, blue: 0.75)
+        case .dlr: Color(red: 0.00, green: 0.686, blue: 0.678)
+        case .elizabeth: Color(red: 0.376, green: 0.224, blue: 0.620)
         }
     }
 }
-

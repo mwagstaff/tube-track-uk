@@ -73,6 +73,9 @@ final class TubeAppState {
     @ObservationIgnored private var stationArrivalsService: StationArrivalsService?
     @ObservationIgnored private var statusPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainPollingTask: Task<Void, Never>?
+    @ObservationIgnored private var trainRefreshTask: Task<Void, Never>?
+    @ObservationIgnored private var trainRefreshFilter: Set<TubeLineID>?
+    @ObservationIgnored private var trainRefreshGeneration: UInt = 0
     @ObservationIgnored private var started = false
 
     init() {
@@ -196,14 +199,17 @@ final class TubeAppState {
         } else {
             trainPollingTask?.cancel()
             trainPollingTask = nil
+            cancelTrainRefresh()
             liveTrains = []
         }
     }
 
     func setTrainFilter(_ lineID: TubeLineID?) {
-        trainLineFilter = lineID.map { [$0] } ?? []
+        let newFilter = lineID.map { Set([$0]) } ?? []
+        guard newFilter != trainLineFilter else { return }
+        trainLineFilter = newFilter
         if showLiveTrains {
-            Task { await refreshTrains() }
+            requestTrainRefresh()
         }
     }
 
@@ -227,7 +233,9 @@ final class TubeAppState {
         isRefreshingStationArrivals = true
         defer { isRefreshingStationArrivals = false }
         do {
-            let arrivals = try await stationArrivalsService.fetch(stationID: stationID)
+            guard let station = graph?.stationsByID[stationID] else { return }
+            let stopIDs = graph?.stations(inSamePlaceAs: station).map(\.id) ?? [stationID]
+            let arrivals = try await stationArrivalsService.fetch(stationIDs: stopIDs)
             guard selectedStationID == stationID else { return }
             stationArrivals = Array(arrivals.prefix(12))
             stationArrivalsError = nil
@@ -238,17 +246,9 @@ final class TubeAppState {
     }
 
     func refreshTrains() async {
-        guard showLiveTrains, let trainService else { return }
-        do {
-            liveTrains = try await trainService.fetch(lineIDs: trainLineFilter)
-            #if DEBUG
-            print("[TubeTrack] live trains resolved=\(liveTrains.count) filter=\(trainLineFilter.map(\.rawValue).sorted())")
-            #endif
-        } catch {
-            // Live trains are supplemental. Keep the last positions until they
-            // naturally become stale instead of replacing the whole map error state.
-            liveTrains = liveTrains.filter { Date.now.timeIntervalSince($0.updatedAt) < 90 }
-        }
+        requestTrainRefresh()
+        let refreshTask = trainRefreshTask
+        await refreshTask?.value
     }
 
     func select(disruption: ResolvedDisruption) {
@@ -292,6 +292,7 @@ final class TubeAppState {
             statusPollingTask = nil
             trainPollingTask?.cancel()
             trainPollingTask = nil
+            cancelTrainRefresh()
         }
     }
 
@@ -307,14 +308,94 @@ final class TubeAppState {
     }
 
     private func startTrainPolling() {
-        guard trainPollingTask == nil else { return }
+        guard trainPollingTask == nil, trainService != nil else { return }
         trainPollingTask = Task { [weak self] in
             await self?.refreshTrains()
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(20))
+                try? await Task.sleep(for: .seconds(30))
                 guard !Task.isCancelled else { return }
                 await self?.refreshTrains()
             }
         }
+    }
+
+    private func requestTrainRefresh() {
+        guard showLiveTrains, let trainService else { return }
+
+        let requestedFilter = trainLineFilter
+        if trainRefreshTask != nil, trainRefreshFilter == requestedFilter {
+            return
+        }
+
+        trainRefreshTask?.cancel()
+        trainRefreshGeneration &+= 1
+        let generation = trainRefreshGeneration
+        trainRefreshFilter = requestedFilter
+
+        trainRefreshTask = Task { [weak self] in
+            defer { self?.finishTrainRefresh(generation: generation) }
+            do {
+                let trains = try await trainService.fetch(lineIDs: requestedFilter)
+                guard !Task.isCancelled else { return }
+                self?.applyTrainRefresh(
+                    trains,
+                    requestedFilter: requestedFilter,
+                    generation: generation
+                )
+            } catch {
+                guard !Task.isCancelled else { return }
+                self?.handleTrainRefreshFailure(
+                    requestedFilter: requestedFilter,
+                    generation: generation
+                )
+            }
+        }
+    }
+
+    private func applyTrainRefresh(
+        _ trains: [LiveTubeTrain],
+        requestedFilter: Set<TubeLineID>,
+        generation: UInt
+    ) {
+        guard generation == trainRefreshGeneration,
+              showLiveTrains,
+              requestedFilter == trainLineFilter else {
+            return
+        }
+        liveTrains = trains
+        #if DEBUG
+        print("[TubeTrack] live trains resolved=\(trains.count) filter=\(requestedFilter.map(\.rawValue).sorted())")
+        #endif
+    }
+
+    private func handleTrainRefreshFailure(
+        requestedFilter: Set<TubeLineID>,
+        generation: UInt
+    ) {
+        guard generation == trainRefreshGeneration,
+              showLiveTrains,
+              requestedFilter == trainLineFilter else {
+            return
+        }
+
+        // Live trains are supplemental. Keep the last positions until they
+        // naturally become stale instead of replacing the whole map error state.
+        let freshTrains = liveTrains.filter { Date.now.timeIntervalSince($0.updatedAt) < 90 }
+        if freshTrains.count != liveTrains.count {
+            liveTrains = freshTrains
+        }
+    }
+
+    private func finishTrainRefresh(generation: UInt) {
+        guard generation == trainRefreshGeneration else { return }
+        trainRefreshTask = nil
+        trainRefreshFilter = nil
+    }
+
+    private func cancelTrainRefresh() {
+        trainRefreshGeneration &+= 1
+        trainRefreshTask?.cancel()
+        trainRefreshTask = nil
+        trainRefreshFilter = nil
     }
 }

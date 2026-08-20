@@ -10,52 +10,89 @@ actor TubeTrainService {
     }
 
     func fetch(lineIDs: Set<TubeLineID>) async throws -> [LiveTubeTrain] {
-        let requested = lineIDs.isEmpty ? Set(TubeLineID.allCases) : lineIDs
+        let requested = Set(
+            (lineIDs.isEmpty ? Set(TubeLineID.allCases) : lineIDs)
+                .filter(\.supportsEstimatedTrains)
+        )
+        guard !requested.isEmpty else { return [] }
+
         let pathIDs = requested.map(\.rawValue).sorted().joined(separator: ",")
-        let predictions: [TfLArrivalPrediction] = try await client.get("/Line/\(pathIDs)/Arrivals")
-        let grouped = Dictionary(grouping: predictions) { prediction in
-            "\(prediction.lineId):\(prediction.vehicleId ?? prediction.id)"
+        let predictions: [TfLLiveTrainPrediction] = try await client.get("/Line/\(pathIDs)/Arrivals")
+        var nearestByVehicle: [LiveVehicleKey: NearestLivePrediction] = [:]
+        nearestByVehicle.reserveCapacity(min(512, predictions.count))
+
+        for prediction in predictions {
+            guard let vehicleID = prediction.vehicleId,
+                  let lineID = TubeLineID(rawValue: prediction.lineId),
+                  requested.contains(lineID),
+                  let nextStationID = prediction.naptanId,
+                  let seconds = prediction.timeToStation,
+                  seconds >= 0 else {
+                continue
+            }
+
+            let key = LiveVehicleKey(lineID: lineID, vehicleID: vehicleID)
+            if let existing = nearestByVehicle[key], existing.seconds <= seconds {
+                continue
+            }
+            nearestByVehicle[key] = NearestLivePrediction(
+                prediction: prediction,
+                lineID: lineID,
+                vehicleID: vehicleID,
+                nextStationID: nextStationID,
+                seconds: seconds
+            )
         }
         let now = Date.now
 
-        return grouped.values.compactMap { entries in
-            guard let next = entries
-                .filter({ ($0.timeToStation ?? -1) >= 0 })
-                .min(by: { ($0.timeToStation ?? .max) < ($1.timeToStation ?? .max) }),
-                  let vehicleID = next.vehicleId,
-                  let lineID = TubeLineID(rawValue: next.lineId),
-                  let nextStationID = next.naptanId,
-                  let previousStationID = repository.neighboringStation(
-                      for: nextStationID,
-                      on: lineID,
-                      direction: next.direction
+        return nearestByVehicle.values.compactMap { nearest in
+            let prediction = nearest.prediction
+            guard let previousStationID = repository.neighboringStation(
+                      for: nearest.nextStationID,
+                      on: nearest.lineID,
+                      direction: prediction.direction,
+                      destinationStationID: prediction.destinationNaptanId
                   ),
                   let segment = repository.segment(
                       between: previousStationID,
-                      and: nextStationID,
-                      on: lineID
+                      and: nearest.nextStationID,
+                      on: nearest.lineID
                   ) else {
                 return nil
             }
 
-            let seconds = max(0, next.timeToStation ?? 0)
-            let baselineDuration = max(75, min(180, seconds + 45))
-            let atPlatform = next.currentLocation?.localizedCaseInsensitiveContains("at platform") == true
-            let progress = atPlatform ? 1.0 : max(0.05, min(0.95, 1 - Double(seconds) / Double(baselineDuration)))
+            let baselineDuration = max(75, min(180, nearest.seconds + 45))
+            let atPlatform = prediction.currentLocation?.localizedCaseInsensitiveContains("at platform") == true
+            let progress = atPlatform
+                ? 1.0
+                : max(0.05, min(0.95, 1 - Double(nearest.seconds) / Double(baselineDuration)))
             return LiveTubeTrain(
-                id: "\(lineID.rawValue):\(vehicleID)",
-                vehicleID: vehicleID,
-                lineID: lineID,
-                destination: next.destinationName ?? next.towards,
-                direction: next.direction,
+                id: "\(nearest.lineID.rawValue):\(nearest.vehicleID)",
+                vehicleID: nearest.vehicleID,
+                lineID: nearest.lineID,
+                destination: prediction.destinationName ?? prediction.towards,
+                direction: prediction.direction,
                 previousStationID: previousStationID,
-                nextStationID: nextStationID,
+                nextStationID: nearest.nextStationID,
                 segmentID: segment.id,
                 progress: progress,
-                secondsToNextStation: max(seconds, 1),
+                secondsToNextStation: max(nearest.seconds, 1),
                 updatedAt: now
             )
         }
         .sorted { $0.id < $1.id }
     }
+}
+
+private struct LiveVehicleKey: Hashable, Sendable {
+    let lineID: TubeLineID
+    let vehicleID: String
+}
+
+private struct NearestLivePrediction: Sendable {
+    let prediction: TfLLiveTrainPrediction
+    let lineID: TubeLineID
+    let vehicleID: String
+    let nextStationID: String
+    let seconds: Int
 }

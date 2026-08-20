@@ -76,8 +76,24 @@ struct TfLArrivalPrediction: Codable, Identifiable, Sendable {
     let platformName: String?
     let direction: String?
     let destinationName: String?
+    let destinationNaptanId: String?
     let towards: String?
     let expectedArrival: Date?
+    let timeToStation: Int?
+    let currentLocation: String?
+}
+
+/// The subset of a TfL arrival prediction needed to estimate a vehicle's
+/// position. Keeping this separate from station departures avoids decoding
+/// thousands of unused strings and ISO-8601 dates on every network-wide poll.
+struct TfLLiveTrainPrediction: Decodable, Sendable {
+    let vehicleId: String?
+    let lineId: String
+    let naptanId: String?
+    let direction: String?
+    let destinationName: String?
+    let destinationNaptanId: String?
+    let towards: String?
     let timeToStation: Int?
     let currentLocation: String?
 }

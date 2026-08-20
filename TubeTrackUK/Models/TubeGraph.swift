@@ -25,6 +25,7 @@ struct TubeStation: Codable, Identifiable, Hashable, Sendable {
     let lineIDs: [TubeLineID]
     let interchange: Bool
     let searchAliases: [String]
+    let hubID: String?
 
     var schematicPoint: SchematicPoint {
         SchematicPoint(x: schematicX, y: schematicY)
@@ -79,6 +80,17 @@ struct TubeGraph: Codable, Sendable {
         Dictionary(uniqueKeysWithValues: segments.map { ($0.id, $0) })
     }
 
+    func stations(inSamePlaceAs station: TubeStation) -> [TubeStation] {
+        guard let hubID = station.hubID else { return [station] }
+        return stations.filter { $0.hubID == hubID }
+    }
+
+    func lineIDs(at station: TubeStation) -> [TubeLineID] {
+        Array(Set(stations(inSamePlaceAs: station).flatMap(\.lineIDs))).sorted {
+            $0.displayName < $1.displayName
+        }
+    }
+
     func segments(for lineID: TubeLineID) -> [TubeSegment] {
         segments.filter { $0.lineID == lineID }
     }
@@ -111,4 +123,3 @@ enum TubeGraphError: LocalizedError {
         }
     }
 }
-

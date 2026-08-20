@@ -12,6 +12,354 @@
   "identifier": "tube-track-uk.beck.full-underground.v1",
   "labels": [
     {
+      "alignment": "trailing",
+      "id": "label.910GABWDXR",
+      "position": {
+        "x": 3547.892,
+        "y": 2299.98
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GABWDXR",
+      "text": "Abbey Wood"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GACTONML",
+      "position": {
+        "x": 857.971,
+        "y": 1484.933
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GACTONML",
+      "text": "Acton Main Line"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GBNHAM",
+      "position": {
+        "x": 144.281,
+        "y": 1226.776
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GBNHAM",
+      "text": "Burnham (Berks)"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GBRTWOOD",
+      "position": {
+        "x": 3959.764,
+        "y": 813.348
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GBRTWOOD",
+      "text": "Brentwood"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GCHDWLHT",
+      "position": {
+        "x": 3699.561,
+        "y": 1041.56
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GCHDWLHT",
+      "text": "Chadwell Heath"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GCUSTMHS",
+      "position": {
+        "x": 3560.305,
+        "y": 1868.695
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GCUSTMHS",
+      "text": "Custom House"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GFRSTGT",
+      "position": {
+        "x": 3359.951,
+        "y": 1135.437
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GFRSTGT",
+      "text": "Forest Gate"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GGIDEAPK",
+      "position": {
+        "x": 3833.911,
+        "y": 939.206
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GGIDEAPK",
+      "text": "Gidea Park"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GGODMAYS",
+      "position": {
+        "x": 3641.942,
+        "y": 1099.182
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GGODMAYS",
+      "text": "Goodmayes"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GHANWELL",
+      "position": {
+        "x": 482.966,
+        "y": 1639.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GHANWELL",
+      "text": "Hanwell"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GHAYESAH",
+      "position": {
+        "x": 355.843,
+        "y": 1639.188
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GHAYESAH",
+      "text": "Hayes & Harlington"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GHRLDWOD",
+      "position": {
+        "x": 3847.779,
+        "y": 893.336
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GHRLDWOD",
+      "text": "Harold Wood"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GILFORD",
+      "position": {
+        "x": 3530.986,
+        "y": 1135.437
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GILFORD",
+      "text": "Ilford"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GIVER",
+      "position": {
+        "x": 144.281,
+        "y": 1448.754
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GIVER",
+      "text": "Iver"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GLANGLEY",
+      "position": {
+        "x": 144.281,
+        "y": 1377.241
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GLANGLEY",
+      "text": "Langley (Berks)"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GMANRPK",
+      "position": {
+        "x": 3493.053,
+        "y": 1135.437
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GMANRPK",
+      "text": "Manor Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GMDNHEAD",
+      "position": {
+        "x": 176.281,
+        "y": 1080.888
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GMDNHEAD",
+      "text": "Maidenhead"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GMRYLAND",
+      "position": {
+        "x": 3303.07,
+        "y": 1184.953
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GMRYLAND",
+      "text": "Maryland"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GRDNGSTN",
+      "position": {
+        "x": 144.281,
+        "y": 944.726
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GRDNGSTN",
+      "text": "Reading"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GROMFORD",
+      "position": {
+        "x": 3789.56,
+        "y": 983.559
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GROMFORD",
+      "text": "Romford"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GSHENFLD",
+      "position": {
+        "x": 3992.964,
+        "y": 748.145
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GSHENFLD",
+      "text": "Shenfield"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GSLOUGH",
+      "position": {
+        "x": 144.281,
+        "y": 1302.866
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GSLOUGH",
+      "text": "Slough"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GSTHALL",
+      "position": {
+        "x": 405.123,
+        "y": 1639.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GSTHALL",
+      "text": "Southall"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.910GSVNKNGS",
+      "position": {
+        "x": 3578.918,
+        "y": 1135.437
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GSVNKNGS",
+      "text": "Seven Kings"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GTAPLOW",
+      "position": {
+        "x": 176.281,
+        "y": 1148.969
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GTAPLOW",
+      "text": "Taplow"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GTWYFORD",
+      "position": {
+        "x": 176.281,
+        "y": 1012.807
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GTWYFORD",
+      "text": "Twyford"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GWDRYTON",
+      "position": {
+        "x": 176.267,
+        "y": 1531.006
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GWDRYTON",
+      "text": "West Drayton"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GWEALING",
+      "position": {
+        "x": 550.132,
+        "y": 1639.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GWEALING",
+      "text": "West Ealing"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.910GWOLWXR",
+      "position": {
+        "x": 3579.904,
+        "y": 2228.013
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "910GWOLWXR",
+      "text": "Woolwich"
+    },
+    {
       "alignment": "centre",
       "id": "label.940GZZBPSUST",
       "position": {
@@ -22,6 +370,486 @@
       "rotationDegrees": 0,
       "stationID": "940GZZBPSUST",
       "text": "Battersea\nPower Station"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLABR",
+      "position": {
+        "x": 3264.781,
+        "y": 1424.878
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLABR",
+      "text": "Abbey Road"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLALL",
+      "position": {
+        "x": 3011.294,
+        "y": 1685.869
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLALL",
+      "text": "All Saints"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLBEC",
+      "position": {
+        "x": 3643.875,
+        "y": 2147.031
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLBEC",
+      "text": "Beckton"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLBLA",
+      "position": {
+        "x": 3088.015,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLBLA",
+      "text": "Blackwall"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLBOW",
+      "position": {
+        "x": 3043.297,
+        "y": 1498.553
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLBOW",
+      "text": "Bow Church"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLBPK",
+      "position": {
+        "x": 3611.875,
+        "y": 1996.896
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLBPK",
+      "text": "Beckton Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLCLA",
+      "position": {
+        "x": 3043.287,
+        "y": 2065.256
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLCLA",
+      "text": "Crossharbour"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLCUS",
+      "position": {
+        "x": 3574.996,
+        "y": 1822.598
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLCUS",
+      "text": "Custom House (for ExCel)"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLCUT",
+      "position": {
+        "x": 3043.285,
+        "y": 2223.096
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLCUT",
+      "text": "Cutty Sark (for Maritime Greenwich)"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLCYP",
+      "position": {
+        "x": 3643.875,
+        "y": 2047.953
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLCYP",
+      "text": "Cyprus"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLDEP",
+      "position": {
+        "x": 3011.283,
+        "y": 2348.607
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLDEP",
+      "text": "Deptford Bridge"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLDEV",
+      "position": {
+        "x": 3011.295,
+        "y": 1595.539
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLDEV",
+      "text": "Devons Road"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLEIN",
+      "position": {
+        "x": 3218.059,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLEIN",
+      "text": "East India"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLELV",
+      "position": {
+        "x": 3011.282,
+        "y": 2395.199
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLELV",
+      "text": "Elverson Road"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLGAL",
+      "position": {
+        "x": 3643.875,
+        "y": 2100.114
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLGAL",
+      "text": "Gallions Reach"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLGRE",
+      "position": {
+        "x": 3043.284,
+        "y": 2300.114
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLGRE",
+      "text": "Greenwich"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLHEQ",
+      "position": {
+        "x": 3043.289,
+        "y": 1981.582
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLHEQ",
+      "text": "Heron Quays"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLISL",
+      "position": {
+        "x": 3043.286,
+        "y": 2147.029
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLISL",
+      "text": "Island Gardens"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLKGV",
+      "position": {
+        "x": 3510.422,
+        "y": 2145.02
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLKGV",
+      "text": "King George V"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLLCA",
+      "position": {
+        "x": 3510.422,
+        "y": 2066.913
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLLCA",
+      "text": "London City Airport"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLLDP",
+      "position": {
+        "x": 3043.294,
+        "y": 1644.032
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLLDP",
+      "text": "Langdon Park"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLLEW",
+      "position": {
+        "x": 3043.281,
+        "y": 2438.937
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLLEW",
+      "text": "Lewisham"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLLIM",
+      "position": {
+        "x": 2843.781,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLLIM",
+      "text": "Limehouse"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLMUD",
+      "position": {
+        "x": 3043.287,
+        "y": 2107.093
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLMUD",
+      "text": "Mudchute"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLPDK",
+      "position": {
+        "x": 3478.422,
+        "y": 1997.895
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLPDK",
+      "text": "Pontoon Dock"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLPOP",
+      "position": {
+        "x": 3010.981,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLPOP",
+      "text": "Poplar"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLPRE",
+      "position": {
+        "x": 3611.875,
+        "y": 1893.954
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLPRE",
+      "text": "Prince Regent"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLPUD",
+      "position": {
+        "x": 3114.004,
+        "y": 1374.074
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLPUD",
+      "text": "Pudding Mill Lane"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLRAL",
+      "position": {
+        "x": 3611.875,
+        "y": 1945.011
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLRAL",
+      "text": "Royal Albert"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLRVC",
+      "position": {
+        "x": 3438.95,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLRVC",
+      "text": "Royal Victoria"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLSHA",
+      "position": {
+        "x": 2763.634,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLSHA",
+      "text": "Shadwell"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLSHS",
+      "position": {
+        "x": 3296.781,
+        "y": 1342.112
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLSHS",
+      "text": "Stratford High Street"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLSIT",
+      "position": {
+        "x": 3086.859,
+        "y": 1143.188
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLSIT",
+      "text": "Stratford International"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLSOQ",
+      "position": {
+        "x": 3011.288,
+        "y": 2023.419
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLSOQ",
+      "text": "South Quay"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLSTL",
+      "position": {
+        "x": 3264.781,
+        "y": 1625.156
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLSTL",
+      "text": "Star Lane"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLTWG",
+      "position": {
+        "x": 2589.0,
+        "y": 1715.031
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLTWG",
+      "text": "Tower Gateway"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLWFE",
+      "position": {
+        "x": 2924.706,
+        "y": 1740.203
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLWFE",
+      "text": "Westferry"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZDLWIQ",
+      "position": {
+        "x": 3011.292,
+        "y": 1814.233
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLWIQ",
+      "text": "West India Quay"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLWLA",
+      "position": {
+        "x": 3510.422,
+        "y": 2227.168
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLWLA",
+      "text": "Woolwich Arsenal"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZDLWSV",
+      "position": {
+        "x": 3510.422,
+        "y": 1926.857
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZDLWSV",
+      "text": "West Silvertown"
     },
     {
       "alignment": "leading",
@@ -1314,7 +2142,7 @@
         "x": 319.051,
         "y": 2322.247
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHR4",
       "text": "Heathrow\nTerminal 4"
@@ -1326,7 +2154,7 @@
         "x": 202.359,
         "y": 2321.734
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHR5",
       "text": "Heathrow\nTerminal 5"
@@ -1338,7 +2166,7 @@
         "x": 296.513,
         "y": 2094.585
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHRC",
       "text": "Heathrow\nTerminals 2 & 3"
@@ -8168,6 +8996,3157 @@
         {
           "op": "move",
           "to": {
+            "x": 2355.375,
+            "y": 1652.422
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2589.859,
+            "y": 1652.422
+          }
+        },
+        {
+          "control1": {
+            "x": 2596.234,
+            "y": 1652.422
+          },
+          "control2": {
+            "x": 2605.156,
+            "y": 1656.109
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2609.672,
+            "y": 1660.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2666.094,
+            "y": 1717.062
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2699.031,
+            "y": 1750.0
+          }
+        },
+        {
+          "control1": {
+            "x": 2703.547,
+            "y": 1754.516
+          },
+          "control2": {
+            "x": 2712.469,
+            "y": 1758.203
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2718.844,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2747.634,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2747.634,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2827.781,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3627.875,
+            "y": 1911.954
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 1963.011
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3627.875,
+            "y": 1963.011
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 2014.896
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3627.875,
+            "y": 2014.896
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 2065.953
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.12"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3627.875,
+            "y": 2065.953
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 2118.114
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.13"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3627.875,
+            "y": 2118.114
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 2165.031
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.14"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2827.781,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2908.706,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2908.706,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3026.981,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3026.981,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3104.015,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3104.015,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3202.059,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3202.059,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3254.194,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3254.194,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3454.95,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3454.95,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3496.968,
+            "y": 1758.203
+          }
+        },
+        {
+          "control1": {
+            "x": 3503.343,
+            "y": 1758.203
+          },
+          "control2": {
+            "x": 3512.25,
+            "y": 1761.859
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3516.75,
+            "y": 1766.375
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3588.843,
+            "y": 1838.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3590.996,
+            "y": 1840.598
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3590.996,
+            "y": 1840.598
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3597.593,
+            "y": 1847.172
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3619.672,
+            "y": 1869.25
+          }
+        },
+        {
+          "control1": {
+            "x": 3624.187,
+            "y": 1873.766
+          },
+          "control2": {
+            "x": 3627.875,
+            "y": 1882.672
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3627.875,
+            "y": 1889.047
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3627.875,
+            "y": 1911.954
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.bank-beckton.official.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3254.194,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3359.24,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3332.547,
+            "y": 1758.219
+          }
+        },
+        {
+          "control1": {
+            "x": 3326.156,
+            "y": 1758.219
+          },
+          "control2": {
+            "x": 3317.25,
+            "y": 1754.531
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3312.734,
+            "y": 1750.016
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3289.016,
+            "y": 1726.297
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3288.969,
+            "y": 1726.25
+          }
+        },
+        {
+          "control1": {
+            "x": 3284.469,
+            "y": 1721.734
+          },
+          "control2": {
+            "x": 3280.766,
+            "y": 1712.828
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3280.766,
+            "y": 1706.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.766,
+            "y": 1698.996
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.781,
+            "y": 1643.156
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3280.781,
+            "y": 1643.156
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.781,
+            "y": 1545.945
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3280.781,
+            "y": 1545.945
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.781,
+            "y": 1442.878
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3280.781,
+            "y": 1442.878
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.781,
+            "y": 1360.112
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3280.781,
+            "y": 1360.112
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3280.781,
+            "y": 1308.578
+          }
+        },
+        {
+          "control1": {
+            "x": 3280.781,
+            "y": 1302.203
+          },
+          "control2": {
+            "x": 3277.094,
+            "y": 1293.297
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3272.578,
+            "y": 1288.781
+          }
+        },
+        {
+          "control1": {
+            "x": 3271.116,
+            "y": 1287.32
+          },
+          "control2": {
+            "x": 3263.972,
+            "y": 1280.162
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3253.847,
+            "y": 1270.019
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3253.847,
+            "y": 1270.019
+          }
+        },
+        {
+          "control1": {
+            "x": 3220.144,
+            "y": 1236.251
+          },
+          "control2": {
+            "x": 3153.422,
+            "y": 1169.391
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3153.422,
+            "y": 1169.391
+          }
+        },
+        {
+          "control1": {
+            "x": 3148.906,
+            "y": 1164.891
+          },
+          "control2": {
+            "x": 3139.984,
+            "y": 1161.188
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3133.609,
+            "y": 1161.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3070.859,
+            "y": 1161.188
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-stratford-international.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3254.194,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3335.119,
+            "y": 1758.203
+          }
+        },
+        {
+          "control1": {
+            "x": 3341.75,
+            "y": 1758.219
+          },
+          "control2": {
+            "x": 3350.672,
+            "y": 1761.906
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3355.172,
+            "y": 1766.422
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3411.375,
+            "y": 1822.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3418.203,
+            "y": 1829.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3486.234,
+            "y": 1897.453
+          }
+        },
+        {
+          "control1": {
+            "x": 3490.734,
+            "y": 1901.969
+          },
+          "control2": {
+            "x": 3494.422,
+            "y": 1910.875
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3494.422,
+            "y": 1917.25
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3494.422,
+            "y": 1944.857
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-woolwich.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3494.422,
+            "y": 1944.857
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3494.422,
+            "y": 2015.895
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-woolwich.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3494.422,
+            "y": 2015.895
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3494.422,
+            "y": 2084.913
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-woolwich.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3494.422,
+            "y": 2084.913
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3494.422,
+            "y": 2163.02
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-woolwich.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3494.422,
+            "y": 2163.02
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3494.422,
+            "y": 2245.168
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.canning-woolwich.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3252.75,
+            "y": 1271.032
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3130.004,
+            "y": 1392.074
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3130.004,
+            "y": 1392.074
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3035.5,
+            "y": 1485.266
+          }
+        },
+        {
+          "control1": {
+            "x": 3030.984,
+            "y": 1489.781
+          },
+          "control2": {
+            "x": 3027.297,
+            "y": 1499.656
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3027.297,
+            "y": 1506.094
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.297,
+            "y": 1516.553
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.288,
+            "y": 2041.419
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.287,
+            "y": 2083.256
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.287,
+            "y": 2083.256
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.287,
+            "y": 2125.093
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.287,
+            "y": 2125.093
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.286,
+            "y": 2165.029
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.12"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.286,
+            "y": 2165.029
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.285,
+            "y": 2241.096
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.13"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.285,
+            "y": 2241.096
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.284,
+            "y": 2318.114
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.14"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.284,
+            "y": 2318.114
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.283,
+            "y": 2366.607
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.15"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.283,
+            "y": 2366.607
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.282,
+            "y": 2413.199
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.16"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.282,
+            "y": 2413.199
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.281,
+            "y": 2456.937
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.17"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.297,
+            "y": 1516.553
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.295,
+            "y": 1613.539
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.295,
+            "y": 1613.539
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.294,
+            "y": 1662.032
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.294,
+            "y": 1662.032
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.294,
+            "y": 1703.869
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.294,
+            "y": 1703.869
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.293,
+            "y": 1758.068
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.293,
+            "y": 1758.068
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.292,
+            "y": 1832.233
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.292,
+            "y": 1832.233
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.29,
+            "y": 1903.547
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.29,
+            "y": 1903.547
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.289,
+            "y": 1999.582
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3027.289,
+            "y": 1999.582
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.288,
+            "y": 2041.419
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.stratford-lewisham.official.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2573.0,
+            "y": 1733.031
+          }
+        },
+        {
+          "control1": {
+            "x": 2573.0,
+            "y": 1733.031
+          },
+          "control2": {
+            "x": 2585.906,
+            "y": 1745.938
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2589.969,
+            "y": 1750.016
+          }
+        },
+        {
+          "control1": {
+            "x": 2594.469,
+            "y": 1754.516
+          },
+          "control2": {
+            "x": 2603.391,
+            "y": 1758.203
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2609.766,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2747.703,
+            "y": 1758.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.tower-gateway-shadwell.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2909.011,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2946.834,
+            "y": 1758.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2973.484,
+            "y": 1758.203
+          }
+        },
+        {
+          "control1": {
+            "x": 2979.859,
+            "y": 1758.203
+          },
+          "control2": {
+            "x": 2988.781,
+            "y": 1761.891
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2993.281,
+            "y": 1766.391
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3016.781,
+            "y": 1789.891
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3019.062,
+            "y": 1792.187
+          }
+        },
+        {
+          "control1": {
+            "x": 3023.578,
+            "y": 1796.687
+          },
+          "control2": {
+            "x": 3027.266,
+            "y": 1805.594
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3027.266,
+            "y": 1811.984
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.266,
+            "y": 1842.297
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3027.29,
+            "y": 1903.547
+          }
+        }
+      ],
+      "id": "beck.v1.path.dlr.westferry-canary.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 342.687,
+            "y": 1657.187
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 188.141,
+            "y": 1657.187
+          }
+        },
+        {
+          "control1": {
+            "x": 180.438,
+            "y": 1657.187
+          },
+          "control2": {
+            "x": 173.469,
+            "y": 1654.078
+          },
+          "op": "cubic",
+          "to": {
+            "x": 168.422,
+            "y": 1649.031
+          }
+        },
+        {
+          "control1": {
+            "x": 163.391,
+            "y": 1643.984
+          },
+          "control2": {
+            "x": 160.266,
+            "y": 1637.016
+          },
+          "op": "cubic",
+          "to": {
+            "x": 160.266,
+            "y": 1629.328
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.266,
+            "y": 1550.594
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.267,
+            "y": 1549.006
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.267,
+            "y": 1549.006
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1532.547
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1466.754
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1466.754
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1395.241
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1395.241
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1320.866
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1320.866
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1244.776
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1244.776
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1166.969
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1166.969
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1098.888
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1098.888
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 1030.807
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 160.281,
+            "y": 1030.807
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 160.281,
+            "y": 962.726
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.hayes-reading.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 292.0,
+            "y": 2257.891
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 292.026,
+            "y": 2089.008
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 292.026,
+            "y": 2089.008
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 292.031,
+            "y": 2054.906
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 292.031,
+            "y": 1685.063
+          }
+        },
+        {
+          "control1": {
+            "x": 292.031,
+            "y": 1677.36
+          },
+          "control2": {
+            "x": 295.141,
+            "y": 1670.391
+          },
+          "op": "cubic",
+          "to": {
+            "x": 300.187,
+            "y": 1665.344
+          }
+        },
+        {
+          "control1": {
+            "x": 305.234,
+            "y": 1660.297
+          },
+          "control2": {
+            "x": 312.203,
+            "y": 1657.188
+          },
+          "op": "cubic",
+          "to": {
+            "x": 319.891,
+            "y": 1657.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 336.999,
+            "y": 1657.188
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 336.999,
+            "y": 1657.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 345.734,
+            "y": 1657.188
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 352.891,
+            "y": 1657.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 421.123,
+            "y": 1657.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 421.123,
+            "y": 1657.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 466.966,
+            "y": 1657.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 466.966,
+            "y": 1657.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 534.132,
+            "y": 1657.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 534.132,
+            "y": 1657.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 597.033,
+            "y": 1657.203
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 597.033,
+            "y": 1657.203
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 708.266,
+            "y": 1657.203
+          }
+        },
+        {
+          "control1": {
+            "x": 714.641,
+            "y": 1657.203
+          },
+          "control2": {
+            "x": 723.531,
+            "y": 1653.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 728.047,
+            "y": 1649.0
+          }
+        },
+        {
+          "control1": {
+            "x": 728.047,
+            "y": 1649.0
+          },
+          "control2": {
+            "x": 789.89,
+            "y": 1587.078
+          },
+          "op": "cubic",
+          "to": {
+            "x": 839.015,
+            "y": 1537.922
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 850.969,
+            "y": 1525.953
+          }
+        },
+        {
+          "control1": {
+            "x": 859.552,
+            "y": 1517.364
+          },
+          "control2": {
+            "x": 867.4,
+            "y": 1509.511
+          },
+          "op": "cubic",
+          "to": {
+            "x": 873.971,
+            "y": 1502.933
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 873.971,
+            "y": 1502.933
+          }
+        },
+        {
+          "control1": {
+            "x": 885.355,
+            "y": 1491.54
+          },
+          "control2": {
+            "x": 892.912,
+            "y": 1483.973
+          },
+          "op": "cubic",
+          "to": {
+            "x": 893.844,
+            "y": 1483.031
+          }
+        },
+        {
+          "control1": {
+            "x": 898.359,
+            "y": 1478.531
+          },
+          "control2": {
+            "x": 906.344,
+            "y": 1475.219
+          },
+          "op": "cubic",
+          "to": {
+            "x": 912.562,
+            "y": 1475.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1019.969,
+            "y": 1475.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1458.781,
+            "y": 1474.985
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 291.984,
+            "y": 2089.002
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 292.016,
+            "y": 2100.031
+          }
+        },
+        {
+          "control1": {
+            "x": 292.016,
+            "y": 2109.469
+          },
+          "control2": {
+            "x": 288.203,
+            "y": 2118.0
+          },
+          "op": "cubic",
+          "to": {
+            "x": 282.016,
+            "y": 2124.172
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 238.344,
+            "y": 2167.844
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 186.813,
+            "y": 2219.328
+          }
+        },
+        {
+          "control1": {
+            "x": 180.625,
+            "y": 2225.516
+          },
+          "control2": {
+            "x": 176.813,
+            "y": 2234.031
+          },
+          "op": "cubic",
+          "to": {
+            "x": 176.813,
+            "y": 2243.469
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 176.813,
+            "y": 2286.98
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.heathrow-terminal-five.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1460.011,
+            "y": 1474.984
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1514.172,
+            "y": 1474.984
+          }
+        },
+        {
+          "control1": {
+            "x": 1520.562,
+            "y": 1474.984
+          },
+          "control2": {
+            "x": 1529.469,
+            "y": 1478.672
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1533.984,
+            "y": 1483.187
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1604.266,
+            "y": 1553.594
+          }
+        },
+        {
+          "control1": {
+            "x": 1608.781,
+            "y": 1558.094
+          },
+          "control2": {
+            "x": 1617.687,
+            "y": 1561.797
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1624.062,
+            "y": 1561.797
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1767.999,
+            "y": 1561.797
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1767.999,
+            "y": 1561.797
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1914.844,
+            "y": 1561.797
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1966.983,
+            "y": 1561.804
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1966.983,
+            "y": 1561.804
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2034.156,
+            "y": 1561.812
+          }
+        },
+        {
+          "control1": {
+            "x": 2040.531,
+            "y": 1561.812
+          },
+          "control2": {
+            "x": 2049.437,
+            "y": 1558.125
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2053.953,
+            "y": 1553.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2093.14,
+            "y": 1514.422
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2099.562,
+            "y": 1508.016
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2113.203,
+            "y": 1494.344
+          }
+        },
+        {
+          "control1": {
+            "x": 2117.719,
+            "y": 1489.844
+          },
+          "control2": {
+            "x": 2126.625,
+            "y": 1486.141
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2133.0,
+            "y": 1486.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2169.964,
+            "y": 1486.141
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2169.964,
+            "y": 1486.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2248.875,
+            "y": 1486.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2263.344,
+            "y": 1486.094
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2384.986,
+            "y": 1486.094
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2384.986,
+            "y": 1486.094
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2407.64,
+            "y": 1486.094
+          }
+        },
+        {
+          "control1": {
+            "x": 2414.015,
+            "y": 1486.094
+          },
+          "control2": {
+            "x": 2422.937,
+            "y": 1489.781
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2427.437,
+            "y": 1494.297
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2432.359,
+            "y": 1499.219
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2435.625,
+            "y": 1502.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2441.0,
+            "y": 1507.844
+          }
+        },
+        {
+          "control1": {
+            "x": 2445.515,
+            "y": 1512.359
+          },
+          "control2": {
+            "x": 2454.437,
+            "y": 1516.047
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2460.812,
+            "y": 1516.047
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2508.343,
+            "y": 1516.047
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2524.437,
+            "y": 1516.031
+          }
+        },
+        {
+          "control1": {
+            "x": 2580.812,
+            "y": 1516.031
+          },
+          "control2": {
+            "x": 2573.406,
+            "y": 1516.281
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2672.687,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2735.05,
+            "y": 1516.281
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2735.05,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2774.922,
+            "y": 1516.281
+          }
+        },
+        {
+          "control1": {
+            "x": 2781.297,
+            "y": 1516.281
+          },
+          "control2": {
+            "x": 2790.218,
+            "y": 1519.984
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2794.734,
+            "y": 1524.484
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2830.328,
+            "y": 1560.078
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2832.453,
+            "y": 1562.187
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2929.609,
+            "y": 1659.375
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2932.515,
+            "y": 1662.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2959.64,
+            "y": 1689.578
+          }
+        },
+        {
+          "control1": {
+            "x": 2964.156,
+            "y": 1694.078
+          },
+          "control2": {
+            "x": 2967.843,
+            "y": 1702.984
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2967.843,
+            "y": 1709.375
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2967.843,
+            "y": 1799.937
+          }
+        },
+        {
+          "control1": {
+            "x": 2967.843,
+            "y": 1806.312
+          },
+          "control2": {
+            "x": 2971.531,
+            "y": 1815.234
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2976.046,
+            "y": 1819.734
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3016.046,
+            "y": 1859.734
+          }
+        },
+        {
+          "control1": {
+            "x": 3020.546,
+            "y": 1864.25
+          },
+          "control2": {
+            "x": 3029.468,
+            "y": 1867.937
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3035.843,
+            "y": 1867.937
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3063.096,
+            "y": 1867.937
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3063.096,
+            "y": 1867.937
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3513.953,
+            "y": 1867.937
+          }
+        },
+        {
+          "control1": {
+            "x": 3520.343,
+            "y": 1867.937
+          },
+          "control2": {
+            "x": 3529.249,
+            "y": 1871.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3533.749,
+            "y": 1876.141
+          }
+        },
+        {
+          "control1": {
+            "x": 3535.593,
+            "y": 1877.969
+          },
+          "control2": {
+            "x": 3538.718,
+            "y": 1881.109
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3541.656,
+            "y": 1884.031
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3544.305,
+            "y": 1886.695
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3544.305,
+            "y": 1886.695
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3544.468,
+            "y": 1886.859
+          }
+        },
+        {
+          "control1": {
+            "x": 3553.343,
+            "y": 1895.734
+          },
+          "control2": {
+            "x": 3555.703,
+            "y": 1898.094
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3555.703,
+            "y": 1898.094
+          }
+        },
+        {
+          "control1": {
+            "x": 3560.203,
+            "y": 1902.594
+          },
+          "control2": {
+            "x": 3563.906,
+            "y": 1911.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3563.906,
+            "y": 1917.891
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3563.906,
+            "y": 2169.344
+          }
+        },
+        {
+          "control1": {
+            "x": 3563.906,
+            "y": 2171.435
+          },
+          "control2": {
+            "x": 3563.906,
+            "y": 2208.999
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3563.904,
+            "y": 2246.013
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3563.904,
+            "y": 2246.013
+          }
+        },
+        {
+          "control1": {
+            "x": 3563.902,
+            "y": 2278.705
+          },
+          "control2": {
+            "x": 3563.899,
+            "y": 2310.968
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3563.892,
+            "y": 2317.98
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1458.781,
+            "y": 1474.985
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1019.969,
+            "y": 1475.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 912.562,
+            "y": 1475.0
+          }
+        },
+        {
+          "control1": {
+            "x": 906.344,
+            "y": 1475.219
+          },
+          "control2": {
+            "x": 898.359,
+            "y": 1478.531
+          },
+          "op": "cubic",
+          "to": {
+            "x": 893.844,
+            "y": 1483.031
+          }
+        },
+        {
+          "control1": {
+            "x": 892.912,
+            "y": 1483.973
+          },
+          "control2": {
+            "x": 885.355,
+            "y": 1491.54
+          },
+          "op": "cubic",
+          "to": {
+            "x": 873.971,
+            "y": 1502.933
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.paddington-mainline-acton.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 4008.964,
+            "y": 766.145
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3943.764,
+            "y": 831.348
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3943.764,
+            "y": 831.348
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3863.779,
+            "y": 911.336
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3375.951,
+            "y": 1153.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3348.188,
+            "y": 1153.437
+          }
+        },
+        {
+          "control1": {
+            "x": 3341.797,
+            "y": 1153.437
+          },
+          "control2": {
+            "x": 3332.891,
+            "y": 1157.141
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3328.375,
+            "y": 1161.641
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3287.07,
+            "y": 1202.953
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3287.07,
+            "y": 1202.953
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3223.004,
+            "y": 1267.029
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3863.779,
+            "y": 911.336
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3817.911,
+            "y": 957.206
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3817.911,
+            "y": 957.206
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3773.56,
+            "y": 1001.559
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3773.56,
+            "y": 1001.559
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3715.561,
+            "y": 1059.56
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3715.561,
+            "y": 1059.56
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3657.942,
+            "y": 1117.182
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3657.942,
+            "y": 1117.182
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3629.891,
+            "y": 1145.234
+          }
+        },
+        {
+          "control1": {
+            "x": 3625.391,
+            "y": 1149.75
+          },
+          "control2": {
+            "x": 3616.484,
+            "y": 1153.437
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3610.109,
+            "y": 1153.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3594.918,
+            "y": 1153.437
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3594.918,
+            "y": 1153.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3546.986,
+            "y": 1153.437
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3546.986,
+            "y": 1153.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3477.053,
+            "y": 1153.437
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3477.053,
+            "y": 1153.437
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3375.951,
+            "y": 1153.437
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3223.004,
+            "y": 1267.029
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3139.875,
+            "y": 1350.172
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3130.438,
+            "y": 1359.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3049.61,
+            "y": 1440.422
+          }
+        },
+        {
+          "control1": {
+            "x": 3045.11,
+            "y": 1444.937
+          },
+          "control2": {
+            "x": 3036.188,
+            "y": 1448.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3029.797,
+            "y": 1448.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3008.657,
+            "y": 1448.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2995.407,
+            "y": 1448.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2871.047,
+            "y": 1448.609
+          }
+        },
+        {
+          "control1": {
+            "x": 2864.672,
+            "y": 1448.609
+          },
+          "control2": {
+            "x": 2855.766,
+            "y": 1452.297
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2851.25,
+            "y": 1456.812
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2832.75,
+            "y": 1475.344
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2823.313,
+            "y": 1484.75
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2800.0,
+            "y": 1508.078
+          }
+        },
+        {
+          "control1": {
+            "x": 2795.484,
+            "y": 1512.594
+          },
+          "control2": {
+            "x": 2786.563,
+            "y": 1516.281
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2780.188,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2759.031,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2672.687,
+            "y": 1516.281
+          }
+        },
+        {
+          "control1": {
+            "x": 2573.406,
+            "y": 1516.281
+          },
+          "control2": {
+            "x": 2580.812,
+            "y": 1516.031
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2524.437,
+            "y": 1516.031
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2508.343,
+            "y": 1516.047
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2460.812,
+            "y": 1516.047
+          }
+        },
+        {
+          "control1": {
+            "x": 2454.437,
+            "y": 1516.047
+          },
+          "control2": {
+            "x": 2445.515,
+            "y": 1512.359
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2441.0,
+            "y": 1507.844
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2435.625,
+            "y": 1502.453
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2432.359,
+            "y": 1499.219
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2427.437,
+            "y": 1494.297
+          }
+        },
+        {
+          "control1": {
+            "x": 2422.937,
+            "y": 1489.781
+          },
+          "control2": {
+            "x": 2414.015,
+            "y": 1486.094
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2407.64,
+            "y": 1486.094
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2384.986,
+            "y": 1486.094
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.stratford-liverpool-mainline.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3223.004,
+            "y": 1267.029
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3139.875,
+            "y": 1350.172
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3130.438,
+            "y": 1359.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3049.61,
+            "y": 1440.422
+          }
+        },
+        {
+          "control1": {
+            "x": 3045.11,
+            "y": 1444.937
+          },
+          "control2": {
+            "x": 3036.188,
+            "y": 1448.625
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3029.797,
+            "y": 1448.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3008.657,
+            "y": 1448.625
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2995.407,
+            "y": 1448.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2871.047,
+            "y": 1448.609
+          }
+        },
+        {
+          "control1": {
+            "x": 2864.672,
+            "y": 1448.609
+          },
+          "control2": {
+            "x": 2855.766,
+            "y": 1452.297
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2851.25,
+            "y": 1456.812
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2832.75,
+            "y": 1475.344
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2823.313,
+            "y": 1484.75
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2800.0,
+            "y": 1508.078
+          }
+        },
+        {
+          "control1": {
+            "x": 2795.484,
+            "y": 1512.594
+          },
+          "control2": {
+            "x": 2786.563,
+            "y": 1516.281
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2780.188,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2759.031,
+            "y": 1516.281
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2735.05,
+            "y": 1516.281
+          }
+        }
+      ],
+      "id": "beck.v1.path.elizabeth.stratford-whitechapel.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
             "x": 2385.385,
             "y": 1541.266
           }
@@ -8733,14 +12712,14 @@
           "op": "move",
           "to": {
             "x": 1168.656,
-            "y": 1789.903
+            "y": 1800.069
           }
         },
         {
           "op": "line",
           "to": {
             "x": 1168.656,
-            "y": 1731.963
+            "y": 1744.045
           }
         }
       ],
@@ -8752,14 +12731,14 @@
           "op": "move",
           "to": {
             "x": 1168.656,
-            "y": 1731.963
+            "y": 1744.045
           }
         },
         {
           "op": "line",
           "to": {
             "x": 1168.656,
-            "y": 1691.942
+            "y": 1703.971
           }
         }
       ],
@@ -8771,7 +12750,7 @@
           "op": "move",
           "to": {
             "x": 1168.656,
-            "y": 1691.942
+            "y": 1703.971
           }
         },
         {
@@ -15202,6 +19181,560 @@
       ]
     },
     {
+      "id": "dlr.graph-route.0.v1",
+      "lineID": "dlr",
+      "segmentIDs": [
+        "dlr:940GZZDLBNK:940GZZDLSHA",
+        "dlr:940GZZDLLIM:940GZZDLSHA",
+        "dlr:940GZZDLLIM:940GZZDLWFE",
+        "dlr:940GZZDLCAN:940GZZDLWFE",
+        "dlr:940GZZDLCAN:940GZZDLHEQ",
+        "dlr:940GZZDLHEQ:940GZZDLSOQ",
+        "dlr:940GZZDLCLA:940GZZDLSOQ",
+        "dlr:940GZZDLCLA:940GZZDLMUD",
+        "dlr:940GZZDLISL:940GZZDLMUD",
+        "dlr:940GZZDLCUT:940GZZDLISL",
+        "dlr:940GZZDLCUT:940GZZDLGRE",
+        "dlr:940GZZDLDEP:940GZZDLGRE",
+        "dlr:940GZZDLDEP:940GZZDLELV",
+        "dlr:940GZZDLELV:940GZZDLLEW"
+      ],
+      "stationIDs": [
+        "940GZZDLBNK",
+        "940GZZDLSHA",
+        "940GZZDLLIM",
+        "940GZZDLWFE",
+        "940GZZDLCAN",
+        "940GZZDLHEQ",
+        "940GZZDLSOQ",
+        "940GZZDLCLA",
+        "940GZZDLMUD",
+        "940GZZDLISL",
+        "940GZZDLCUT",
+        "940GZZDLGRE",
+        "940GZZDLDEP",
+        "940GZZDLELV",
+        "940GZZDLLEW"
+      ]
+    },
+    {
+      "id": "dlr.graph-route.1.v1",
+      "lineID": "dlr",
+      "segmentIDs": [
+        "dlr:940GZZDLBNK:940GZZDLSHA",
+        "dlr:940GZZDLLIM:940GZZDLSHA",
+        "dlr:940GZZDLLIM:940GZZDLWFE",
+        "dlr:940GZZDLPOP:940GZZDLWFE",
+        "dlr:940GZZDLBLA:940GZZDLPOP",
+        "dlr:940GZZDLBLA:940GZZDLEIN",
+        "dlr:940GZZDLCGT:940GZZDLEIN",
+        "dlr:940GZZDLCGT:940GZZDLWSV",
+        "dlr:940GZZDLPDK:940GZZDLWSV",
+        "dlr:940GZZDLLCA:940GZZDLPDK",
+        "dlr:940GZZDLKGV:940GZZDLLCA",
+        "dlr:940GZZDLKGV:940GZZDLWLA"
+      ],
+      "stationIDs": [
+        "940GZZDLBNK",
+        "940GZZDLSHA",
+        "940GZZDLLIM",
+        "940GZZDLWFE",
+        "940GZZDLPOP",
+        "940GZZDLBLA",
+        "940GZZDLEIN",
+        "940GZZDLCGT",
+        "940GZZDLWSV",
+        "940GZZDLPDK",
+        "940GZZDLLCA",
+        "940GZZDLKGV",
+        "940GZZDLWLA"
+      ]
+    },
+    {
+      "id": "dlr.graph-route.2.v1",
+      "lineID": "dlr",
+      "segmentIDs": [
+        "dlr:940GZZDLPUD:940GZZDLSTD",
+        "dlr:940GZZDLBOW:940GZZDLPUD",
+        "dlr:940GZZDLBOW:940GZZDLDEV",
+        "dlr:940GZZDLDEV:940GZZDLLDP",
+        "dlr:940GZZDLALL:940GZZDLLDP",
+        "dlr:940GZZDLALL:940GZZDLPOP",
+        "dlr:940GZZDLPOP:940GZZDLWIQ",
+        "dlr:940GZZDLCAN:940GZZDLWIQ"
+      ],
+      "stationIDs": [
+        "940GZZDLSTD",
+        "940GZZDLPUD",
+        "940GZZDLBOW",
+        "940GZZDLDEV",
+        "940GZZDLLDP",
+        "940GZZDLALL",
+        "940GZZDLPOP",
+        "940GZZDLWIQ",
+        "940GZZDLCAN"
+      ]
+    },
+    {
+      "id": "dlr.graph-route.3.v1",
+      "lineID": "dlr",
+      "segmentIDs": [
+        "dlr:940GZZDLSIT:940GZZDLSTD",
+        "dlr:940GZZDLSHS:940GZZDLSTD",
+        "dlr:940GZZDLABR:940GZZDLSHS",
+        "dlr:940GZZDLABR:940GZZDLWHM",
+        "dlr:940GZZDLSTL:940GZZDLWHM",
+        "dlr:940GZZDLCGT:940GZZDLSTL",
+        "dlr:940GZZDLCGT:940GZZDLWSV",
+        "dlr:940GZZDLPDK:940GZZDLWSV",
+        "dlr:940GZZDLLCA:940GZZDLPDK",
+        "dlr:940GZZDLKGV:940GZZDLLCA",
+        "dlr:940GZZDLKGV:940GZZDLWLA"
+      ],
+      "stationIDs": [
+        "940GZZDLSIT",
+        "940GZZDLSTD",
+        "940GZZDLSHS",
+        "940GZZDLABR",
+        "940GZZDLWHM",
+        "940GZZDLSTL",
+        "940GZZDLCGT",
+        "940GZZDLWSV",
+        "940GZZDLPDK",
+        "940GZZDLLCA",
+        "940GZZDLKGV",
+        "940GZZDLWLA"
+      ]
+    },
+    {
+      "id": "dlr.graph-route.4.v1",
+      "lineID": "dlr",
+      "segmentIDs": [
+        "dlr:940GZZDLSHA:940GZZDLTWG",
+        "dlr:940GZZDLLIM:940GZZDLSHA",
+        "dlr:940GZZDLLIM:940GZZDLWFE",
+        "dlr:940GZZDLPOP:940GZZDLWFE",
+        "dlr:940GZZDLBLA:940GZZDLPOP",
+        "dlr:940GZZDLBLA:940GZZDLEIN",
+        "dlr:940GZZDLCGT:940GZZDLEIN",
+        "dlr:940GZZDLCGT:940GZZDLRVC",
+        "dlr:940GZZDLCUS:940GZZDLRVC",
+        "dlr:940GZZDLCUS:940GZZDLPRE",
+        "dlr:940GZZDLPRE:940GZZDLRAL",
+        "dlr:940GZZDLBPK:940GZZDLRAL",
+        "dlr:940GZZDLBPK:940GZZDLCYP",
+        "dlr:940GZZDLCYP:940GZZDLGAL",
+        "dlr:940GZZDLBEC:940GZZDLGAL"
+      ],
+      "stationIDs": [
+        "940GZZDLTWG",
+        "940GZZDLSHA",
+        "940GZZDLLIM",
+        "940GZZDLWFE",
+        "940GZZDLPOP",
+        "940GZZDLBLA",
+        "940GZZDLEIN",
+        "940GZZDLCGT",
+        "940GZZDLRVC",
+        "940GZZDLCUS",
+        "940GZZDLPRE",
+        "940GZZDLRAL",
+        "940GZZDLBPK",
+        "940GZZDLCYP",
+        "940GZZDLGAL",
+        "940GZZDLBEC"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.0.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GABWDXR:910GWOLWXR",
+        "elizabeth:910GCUSTMHS:910GWOLWXR",
+        "elizabeth:910GCANWHRF:910GCUSTMHS",
+        "elizabeth:910GCANWHRF:910GWCHAPXR",
+        "elizabeth:910GLIVSTLL:910GWCHAPXR",
+        "elizabeth:910GFRNDXR:910GLIVSTLL",
+        "elizabeth:910GFRNDXR:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GPADTLL",
+        "elizabeth:910GACTONML:910GPADTLL",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM4"
+      ],
+      "stationIDs": [
+        "910GABWDXR",
+        "910GWOLWXR",
+        "910GCUSTMHS",
+        "910GCANWHRF",
+        "910GWCHAPXR",
+        "910GLIVSTLL",
+        "910GFRNDXR",
+        "910GTOTCTRD",
+        "910GBONDST",
+        "910GPADTLL",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM4"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.1.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GABWDXR:910GWOLWXR",
+        "elizabeth:910GCUSTMHS:910GWOLWXR",
+        "elizabeth:910GCANWHRF:910GCUSTMHS",
+        "elizabeth:910GCANWHRF:910GWCHAPXR",
+        "elizabeth:910GLIVSTLL:910GWCHAPXR",
+        "elizabeth:910GFRNDXR:910GLIVSTLL",
+        "elizabeth:910GFRNDXR:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GPADTLL",
+        "elizabeth:910GACTONML:910GPADTLL",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM5"
+      ],
+      "stationIDs": [
+        "910GABWDXR",
+        "910GWOLWXR",
+        "910GCUSTMHS",
+        "910GCANWHRF",
+        "910GWCHAPXR",
+        "910GLIVSTLL",
+        "910GFRNDXR",
+        "910GTOTCTRD",
+        "910GBONDST",
+        "910GPADTLL",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM5"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.2.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GABWDXR:910GWOLWXR",
+        "elizabeth:910GCUSTMHS:910GWOLWXR",
+        "elizabeth:910GCANWHRF:910GCUSTMHS",
+        "elizabeth:910GCANWHRF:910GWCHAPXR",
+        "elizabeth:910GLIVSTLL:910GWCHAPXR",
+        "elizabeth:910GFRNDXR:910GLIVSTLL",
+        "elizabeth:910GFRNDXR:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GPADTLL",
+        "elizabeth:910GACTONML:910GPADTLL",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GWDRYTON",
+        "elizabeth:910GIVER:910GWDRYTON",
+        "elizabeth:910GIVER:910GLANGLEY",
+        "elizabeth:910GLANGLEY:910GSLOUGH",
+        "elizabeth:910GBNHAM:910GSLOUGH",
+        "elizabeth:910GBNHAM:910GTAPLOW",
+        "elizabeth:910GMDNHEAD:910GTAPLOW",
+        "elizabeth:910GMDNHEAD:910GTWYFORD",
+        "elizabeth:910GRDNGSTN:910GTWYFORD"
+      ],
+      "stationIDs": [
+        "910GABWDXR",
+        "910GWOLWXR",
+        "910GCUSTMHS",
+        "910GCANWHRF",
+        "910GWCHAPXR",
+        "910GLIVSTLL",
+        "910GFRNDXR",
+        "910GTOTCTRD",
+        "910GBONDST",
+        "910GPADTLL",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GWDRYTON",
+        "910GIVER",
+        "910GLANGLEY",
+        "910GSLOUGH",
+        "910GBNHAM",
+        "910GTAPLOW",
+        "910GMDNHEAD",
+        "910GTWYFORD",
+        "910GRDNGSTN"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.3.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GACTONML:910GPADTON",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM4"
+      ],
+      "stationIDs": [
+        "910GPADTON",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM4"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.4.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GACTONML:910GPADTON",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM5"
+      ],
+      "stationIDs": [
+        "910GPADTON",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM5"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.5.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GACTONML:910GPADTON",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GWDRYTON",
+        "elizabeth:910GIVER:910GWDRYTON",
+        "elizabeth:910GIVER:910GLANGLEY",
+        "elizabeth:910GLANGLEY:910GSLOUGH",
+        "elizabeth:910GBNHAM:910GSLOUGH",
+        "elizabeth:910GBNHAM:910GTAPLOW",
+        "elizabeth:910GMDNHEAD:910GTAPLOW",
+        "elizabeth:910GMDNHEAD:910GTWYFORD",
+        "elizabeth:910GRDNGSTN:910GTWYFORD"
+      ],
+      "stationIDs": [
+        "910GPADTON",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GWDRYTON",
+        "910GIVER",
+        "910GLANGLEY",
+        "910GSLOUGH",
+        "910GBNHAM",
+        "910GTAPLOW",
+        "910GMDNHEAD",
+        "910GTWYFORD",
+        "910GRDNGSTN"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.6.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GBRTWOOD:910GSHENFLD",
+        "elizabeth:910GBRTWOOD:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GGODMAYS",
+        "elizabeth:910GGODMAYS:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMRYLAND",
+        "elizabeth:910GMRYLAND:910GSTFD",
+        "elizabeth:910GLIVST:910GSTFD"
+      ],
+      "stationIDs": [
+        "910GSHENFLD",
+        "910GBRTWOOD",
+        "910GHRLDWOD",
+        "910GGIDEAPK",
+        "910GROMFORD",
+        "910GCHDWLHT",
+        "910GGODMAYS",
+        "910GSVNKNGS",
+        "910GILFORD",
+        "910GMANRPK",
+        "910GFRSTGT",
+        "910GMRYLAND",
+        "910GSTFD",
+        "910GLIVST"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.7.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GBRTWOOD:910GSHENFLD",
+        "elizabeth:910GBRTWOOD:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GGODMAYS",
+        "elizabeth:910GGODMAYS:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMRYLAND",
+        "elizabeth:910GMRYLAND:910GSTFD",
+        "elizabeth:910GSTFD:910GWCHAPXR",
+        "elizabeth:910GLIVSTLL:910GWCHAPXR",
+        "elizabeth:910GFRNDXR:910GLIVSTLL",
+        "elizabeth:910GFRNDXR:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GPADTLL",
+        "elizabeth:910GACTONML:910GPADTLL",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM4"
+      ],
+      "stationIDs": [
+        "910GSHENFLD",
+        "910GBRTWOOD",
+        "910GHRLDWOD",
+        "910GGIDEAPK",
+        "910GROMFORD",
+        "910GCHDWLHT",
+        "910GGODMAYS",
+        "910GSVNKNGS",
+        "910GILFORD",
+        "910GMANRPK",
+        "910GFRSTGT",
+        "910GMRYLAND",
+        "910GSTFD",
+        "910GWCHAPXR",
+        "910GLIVSTLL",
+        "910GFRNDXR",
+        "910GTOTCTRD",
+        "910GBONDST",
+        "910GPADTLL",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM4"
+      ]
+    },
+    {
+      "id": "elizabeth.graph-route.8.v1",
+      "lineID": "elizabeth",
+      "segmentIDs": [
+        "elizabeth:910GBRTWOOD:910GSHENFLD",
+        "elizabeth:910GBRTWOOD:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GHRLDWOD",
+        "elizabeth:910GGIDEAPK:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GROMFORD",
+        "elizabeth:910GCHDWLHT:910GGODMAYS",
+        "elizabeth:910GGODMAYS:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GSVNKNGS",
+        "elizabeth:910GILFORD:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMANRPK",
+        "elizabeth:910GFRSTGT:910GMRYLAND",
+        "elizabeth:910GMRYLAND:910GSTFD",
+        "elizabeth:910GSTFD:910GWCHAPXR",
+        "elizabeth:910GLIVSTLL:910GWCHAPXR",
+        "elizabeth:910GFRNDXR:910GLIVSTLL",
+        "elizabeth:910GFRNDXR:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GTOTCTRD",
+        "elizabeth:910GBONDST:910GPADTLL",
+        "elizabeth:910GACTONML:910GPADTLL",
+        "elizabeth:910GACTONML:910GEALINGB",
+        "elizabeth:910GEALINGB:910GWEALING",
+        "elizabeth:910GHANWELL:910GWEALING",
+        "elizabeth:910GHANWELL:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GSTHALL",
+        "elizabeth:910GHAYESAH:910GHTRWAPT",
+        "elizabeth:910GHTRWAPT:910GHTRWTM5"
+      ],
+      "stationIDs": [
+        "910GSHENFLD",
+        "910GBRTWOOD",
+        "910GHRLDWOD",
+        "910GGIDEAPK",
+        "910GROMFORD",
+        "910GCHDWLHT",
+        "910GGODMAYS",
+        "910GSVNKNGS",
+        "910GILFORD",
+        "910GMANRPK",
+        "910GFRSTGT",
+        "910GMRYLAND",
+        "910GSTFD",
+        "910GWCHAPXR",
+        "910GLIVSTLL",
+        "910GFRNDXR",
+        "910GTOTCTRD",
+        "910GBONDST",
+        "910GPADTLL",
+        "910GACTONML",
+        "910GEALINGB",
+        "910GWEALING",
+        "910GHANWELL",
+        "910GSTHALL",
+        "910GHAYESAH",
+        "910GHTRWAPT",
+        "910GHTRWTM5"
+      ]
+    },
+    {
       "id": "hammersmith-city.east-connector.v1",
       "lineID": "hammersmith-city",
       "segmentIDs": [
@@ -19371,6 +23904,1766 @@
     },
     {
       "fromPort": {
+        "x": 3280.781,
+        "y": 1360.112
+      },
+      "fromStationID": "940GZZDLSHS",
+      "id": "dlr:940GZZDLABR:940GZZDLSHS",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.3",
+      "toPort": {
+        "x": 3280.781,
+        "y": 1442.878
+      },
+      "toStationID": "940GZZDLABR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3280.781,
+        "y": 1442.878
+      },
+      "fromStationID": "940GZZDLABR",
+      "id": "dlr:940GZZDLABR:940GZZDLWHM",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.2",
+      "toPort": {
+        "x": 3280.781,
+        "y": 1545.945
+      },
+      "toStationID": "940GZZDLWHM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.294,
+        "y": 1662.032
+      },
+      "fromStationID": "940GZZDLLDP",
+      "id": "dlr:940GZZDLALL:940GZZDLLDP",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.4",
+      "toPort": {
+        "x": 3027.294,
+        "y": 1703.869
+      },
+      "toStationID": "940GZZDLALL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.294,
+        "y": 1703.869
+      },
+      "fromStationID": "940GZZDLALL",
+      "id": "dlr:940GZZDLALL:940GZZDLPOP",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.5",
+      "toPort": {
+        "x": 3027.293,
+        "y": 1758.068
+      },
+      "toStationID": "940GZZDLPOP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3627.875,
+        "y": 2118.114
+      },
+      "fromStationID": "940GZZDLGAL",
+      "id": "dlr:940GZZDLBEC:940GZZDLGAL",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.14",
+      "toPort": {
+        "x": 3627.875,
+        "y": 2165.031
+      },
+      "toStationID": "940GZZDLBEC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3104.015,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLBLA",
+      "id": "dlr:940GZZDLBLA:940GZZDLEIN",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.5",
+      "toPort": {
+        "x": 3202.059,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLEIN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3026.981,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLPOP",
+      "id": "dlr:940GZZDLBLA:940GZZDLPOP",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.4",
+      "toPort": {
+        "x": 3104.015,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLBLA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2355.375,
+        "y": 1652.422
+      },
+      "fromStationID": "940GZZDLBNK",
+      "id": "dlr:940GZZDLBNK:940GZZDLSHA",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.0",
+      "toPort": {
+        "x": 2747.634,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLSHA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.297,
+        "y": 1516.553
+      },
+      "fromStationID": "940GZZDLBOW",
+      "id": "dlr:940GZZDLBOW:940GZZDLDEV",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.2",
+      "toPort": {
+        "x": 3027.295,
+        "y": 1613.539
+      },
+      "toStationID": "940GZZDLDEV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3130.004,
+        "y": 1392.074
+      },
+      "fromStationID": "940GZZDLPUD",
+      "id": "dlr:940GZZDLBOW:940GZZDLPUD",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.1",
+      "toPort": {
+        "x": 3027.297,
+        "y": 1516.553
+      },
+      "toStationID": "940GZZDLBOW",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3627.875,
+        "y": 2014.896
+      },
+      "fromStationID": "940GZZDLBPK",
+      "id": "dlr:940GZZDLBPK:940GZZDLCYP",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.12",
+      "toPort": {
+        "x": 3627.875,
+        "y": 2065.953
+      },
+      "toStationID": "940GZZDLCYP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3627.875,
+        "y": 1963.011
+      },
+      "fromStationID": "940GZZDLRAL",
+      "id": "dlr:940GZZDLBPK:940GZZDLRAL",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.11",
+      "toPort": {
+        "x": 3627.875,
+        "y": 2014.896
+      },
+      "toStationID": "940GZZDLBPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.29,
+        "y": 1903.547
+      },
+      "fromStationID": "940GZZDLCAN",
+      "id": "dlr:940GZZDLCAN:940GZZDLHEQ",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.8",
+      "toPort": {
+        "x": 3027.289,
+        "y": 1999.582
+      },
+      "toStationID": "940GZZDLHEQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2909.011,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLWFE",
+      "id": "dlr:940GZZDLCAN:940GZZDLWFE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.westferry-canary.official.v1.0",
+      "toPort": {
+        "x": 3027.29,
+        "y": 1903.547
+      },
+      "toStationID": "940GZZDLCAN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.292,
+        "y": 1832.233
+      },
+      "fromStationID": "940GZZDLWIQ",
+      "id": "dlr:940GZZDLCAN:940GZZDLWIQ",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.7",
+      "toPort": {
+        "x": 3027.29,
+        "y": 1903.547
+      },
+      "toStationID": "940GZZDLCAN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3202.059,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLEIN",
+      "id": "dlr:940GZZDLCGT:940GZZDLEIN",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.6",
+      "toPort": {
+        "x": 3254.194,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLCGT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3254.194,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLCGT",
+      "id": "dlr:940GZZDLCGT:940GZZDLRVC",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.7",
+      "toPort": {
+        "x": 3454.95,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLRVC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3280.781,
+        "y": 1643.156
+      },
+      "fromStationID": "940GZZDLSTL",
+      "id": "dlr:940GZZDLCGT:940GZZDLSTL",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.0",
+      "toPort": {
+        "x": 3254.194,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLCGT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3254.194,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLCGT",
+      "id": "dlr:940GZZDLCGT:940GZZDLWSV",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.canning-woolwich.official.v1.0",
+      "toPort": {
+        "x": 3494.422,
+        "y": 1944.857
+      },
+      "toStationID": "940GZZDLWSV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.287,
+        "y": 2083.256
+      },
+      "fromStationID": "940GZZDLCLA",
+      "id": "dlr:940GZZDLCLA:940GZZDLMUD",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.11",
+      "toPort": {
+        "x": 3027.287,
+        "y": 2125.093
+      },
+      "toStationID": "940GZZDLMUD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.288,
+        "y": 2041.419
+      },
+      "fromStationID": "940GZZDLSOQ",
+      "id": "dlr:940GZZDLCLA:940GZZDLSOQ",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.10",
+      "toPort": {
+        "x": 3027.287,
+        "y": 2083.256
+      },
+      "toStationID": "940GZZDLCLA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3590.996,
+        "y": 1840.598
+      },
+      "fromStationID": "940GZZDLCUS",
+      "id": "dlr:940GZZDLCUS:940GZZDLPRE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.9",
+      "toPort": {
+        "x": 3627.875,
+        "y": 1911.954
+      },
+      "toStationID": "940GZZDLPRE",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3454.95,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLRVC",
+      "id": "dlr:940GZZDLCUS:940GZZDLRVC",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.8",
+      "toPort": {
+        "x": 3590.996,
+        "y": 1840.598
+      },
+      "toStationID": "940GZZDLCUS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.285,
+        "y": 2241.096
+      },
+      "fromStationID": "940GZZDLCUT",
+      "id": "dlr:940GZZDLCUT:940GZZDLGRE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.14",
+      "toPort": {
+        "x": 3027.284,
+        "y": 2318.114
+      },
+      "toStationID": "940GZZDLGRE",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.286,
+        "y": 2165.029
+      },
+      "fromStationID": "940GZZDLISL",
+      "id": "dlr:940GZZDLCUT:940GZZDLISL",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.13",
+      "toPort": {
+        "x": 3027.285,
+        "y": 2241.096
+      },
+      "toStationID": "940GZZDLCUT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3627.875,
+        "y": 2065.953
+      },
+      "fromStationID": "940GZZDLCYP",
+      "id": "dlr:940GZZDLCYP:940GZZDLGAL",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.13",
+      "toPort": {
+        "x": 3627.875,
+        "y": 2118.114
+      },
+      "toStationID": "940GZZDLGAL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.283,
+        "y": 2366.607
+      },
+      "fromStationID": "940GZZDLDEP",
+      "id": "dlr:940GZZDLDEP:940GZZDLELV",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.16",
+      "toPort": {
+        "x": 3027.282,
+        "y": 2413.199
+      },
+      "toStationID": "940GZZDLELV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.284,
+        "y": 2318.114
+      },
+      "fromStationID": "940GZZDLGRE",
+      "id": "dlr:940GZZDLDEP:940GZZDLGRE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.15",
+      "toPort": {
+        "x": 3027.283,
+        "y": 2366.607
+      },
+      "toStationID": "940GZZDLDEP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.295,
+        "y": 1613.539
+      },
+      "fromStationID": "940GZZDLDEV",
+      "id": "dlr:940GZZDLDEV:940GZZDLLDP",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.3",
+      "toPort": {
+        "x": 3027.294,
+        "y": 1662.032
+      },
+      "toStationID": "940GZZDLLDP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.282,
+        "y": 2413.199
+      },
+      "fromStationID": "940GZZDLELV",
+      "id": "dlr:940GZZDLELV:940GZZDLLEW",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.17",
+      "toPort": {
+        "x": 3027.281,
+        "y": 2456.937
+      },
+      "toStationID": "940GZZDLLEW",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.289,
+        "y": 1999.582
+      },
+      "fromStationID": "940GZZDLHEQ",
+      "id": "dlr:940GZZDLHEQ:940GZZDLSOQ",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.9",
+      "toPort": {
+        "x": 3027.288,
+        "y": 2041.419
+      },
+      "toStationID": "940GZZDLSOQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.287,
+        "y": 2125.093
+      },
+      "fromStationID": "940GZZDLMUD",
+      "id": "dlr:940GZZDLISL:940GZZDLMUD",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.12",
+      "toPort": {
+        "x": 3027.286,
+        "y": 2165.029
+      },
+      "toStationID": "940GZZDLISL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3494.422,
+        "y": 2084.913
+      },
+      "fromStationID": "940GZZDLLCA",
+      "id": "dlr:940GZZDLKGV:940GZZDLLCA",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.canning-woolwich.official.v1.3",
+      "toPort": {
+        "x": 3494.422,
+        "y": 2163.02
+      },
+      "toStationID": "940GZZDLKGV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3494.422,
+        "y": 2163.02
+      },
+      "fromStationID": "940GZZDLKGV",
+      "id": "dlr:940GZZDLKGV:940GZZDLWLA",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.canning-woolwich.official.v1.4",
+      "toPort": {
+        "x": 3494.422,
+        "y": 2245.168
+      },
+      "toStationID": "940GZZDLWLA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3494.422,
+        "y": 2015.895
+      },
+      "fromStationID": "940GZZDLPDK",
+      "id": "dlr:940GZZDLLCA:940GZZDLPDK",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.canning-woolwich.official.v1.2",
+      "toPort": {
+        "x": 3494.422,
+        "y": 2084.913
+      },
+      "toStationID": "940GZZDLLCA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2747.634,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLSHA",
+      "id": "dlr:940GZZDLLIM:940GZZDLSHA",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.1",
+      "toPort": {
+        "x": 2827.781,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLLIM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2827.781,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLLIM",
+      "id": "dlr:940GZZDLLIM:940GZZDLWFE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.2",
+      "toPort": {
+        "x": 2908.706,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLWFE",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3494.422,
+        "y": 1944.857
+      },
+      "fromStationID": "940GZZDLWSV",
+      "id": "dlr:940GZZDLPDK:940GZZDLWSV",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.canning-woolwich.official.v1.1",
+      "toPort": {
+        "x": 3494.422,
+        "y": 2015.895
+      },
+      "toStationID": "940GZZDLPDK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2908.706,
+        "y": 1758.203
+      },
+      "fromStationID": "940GZZDLWFE",
+      "id": "dlr:940GZZDLPOP:940GZZDLWFE",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.3",
+      "toPort": {
+        "x": 3026.981,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLPOP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3027.293,
+        "y": 1758.068
+      },
+      "fromStationID": "940GZZDLPOP",
+      "id": "dlr:940GZZDLPOP:940GZZDLWIQ",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.6",
+      "toPort": {
+        "x": 3027.292,
+        "y": 1832.233
+      },
+      "toStationID": "940GZZDLWIQ",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3627.875,
+        "y": 1911.954
+      },
+      "fromStationID": "940GZZDLPRE",
+      "id": "dlr:940GZZDLPRE:940GZZDLRAL",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.bank-beckton.official.v1.10",
+      "toPort": {
+        "x": 3627.875,
+        "y": 1963.011
+      },
+      "toStationID": "940GZZDLRAL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3252.75,
+        "y": 1271.032
+      },
+      "fromStationID": "940GZZDLSTD",
+      "id": "dlr:940GZZDLPUD:940GZZDLSTD",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.0",
+      "toPort": {
+        "x": 3130.004,
+        "y": 1392.074
+      },
+      "toStationID": "940GZZDLPUD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2573.0,
+        "y": 1733.031
+      },
+      "fromStationID": "940GZZDLTWG",
+      "id": "dlr:940GZZDLSHA:940GZZDLTWG",
+      "lineID": "dlr",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.dlr.tower-gateway-shadwell.official.v1.0",
+      "toPort": {
+        "x": 2747.703,
+        "y": 1758.203
+      },
+      "toStationID": "940GZZDLSHA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3253.847,
+        "y": 1270.019
+      },
+      "fromStationID": "940GZZDLSTD",
+      "id": "dlr:940GZZDLSHS:940GZZDLSTD",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.4",
+      "toPort": {
+        "x": 3280.781,
+        "y": 1360.112
+      },
+      "toStationID": "940GZZDLSHS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3070.859,
+        "y": 1161.188
+      },
+      "fromStationID": "940GZZDLSIT",
+      "id": "dlr:940GZZDLSIT:940GZZDLSTD",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.5",
+      "toPort": {
+        "x": 3253.847,
+        "y": 1270.019
+      },
+      "toStationID": "940GZZDLSTD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3280.781,
+        "y": 1545.945
+      },
+      "fromStationID": "940GZZDLWHM",
+      "id": "dlr:940GZZDLSTL:940GZZDLWHM",
+      "lineID": "dlr",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.dlr.canning-stratford-international.official.v1.1",
+      "toPort": {
+        "x": 3280.781,
+        "y": 1643.156
+      },
+      "toStationID": "940GZZDLSTL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3563.892,
+        "y": 2317.98
+      },
+      "fromStationID": "910GABWDXR",
+      "id": "elizabeth:910GABWDXR:910GWOLWXR",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.8",
+      "toPort": {
+        "x": 3563.904,
+        "y": 2246.013
+      },
+      "toStationID": "910GWOLWXR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 873.971,
+        "y": 1502.933
+      },
+      "fromStationID": "910GACTONML",
+      "id": "elizabeth:910GACTONML:910GEALINGB",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.6",
+      "toPort": {
+        "x": 597.033,
+        "y": 1657.203
+      },
+      "toStationID": "910GEALINGB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1458.781,
+        "y": 1474.985
+      },
+      "fromStationID": "910GPADTLL",
+      "id": "elizabeth:910GACTONML:910GPADTLL",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.7",
+      "toPort": {
+        "x": 873.971,
+        "y": 1502.933
+      },
+      "toStationID": "910GACTONML",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1458.781,
+        "y": 1474.985
+      },
+      "fromStationID": "910GPADTON",
+      "id": "elizabeth:910GACTONML:910GPADTON",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.paddington-mainline-acton.official.v1.0",
+      "toPort": {
+        "x": 873.971,
+        "y": 1502.933
+      },
+      "toStationID": "910GACTONML",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1320.866
+      },
+      "fromStationID": "910GSLOUGH",
+      "id": "elizabeth:910GBNHAM:910GSLOUGH",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.4",
+      "toPort": {
+        "x": 160.281,
+        "y": 1244.776
+      },
+      "toStationID": "910GBNHAM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1244.776
+      },
+      "fromStationID": "910GBNHAM",
+      "id": "elizabeth:910GBNHAM:910GTAPLOW",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.5",
+      "toPort": {
+        "x": 160.281,
+        "y": 1166.969
+      },
+      "toStationID": "910GTAPLOW",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1767.999,
+        "y": 1561.797
+      },
+      "fromStationID": "910GBONDST",
+      "id": "elizabeth:910GBONDST:910GPADTLL",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.0",
+      "toPort": {
+        "x": 1460.011,
+        "y": 1474.984
+      },
+      "toStationID": "910GPADTLL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1966.983,
+        "y": 1561.804
+      },
+      "fromStationID": "910GTOTCTRD",
+      "id": "elizabeth:910GBONDST:910GTOTCTRD",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.1",
+      "toPort": {
+        "x": 1767.999,
+        "y": 1561.797
+      },
+      "toStationID": "910GBONDST",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3943.764,
+        "y": 831.348
+      },
+      "fromStationID": "910GBRTWOOD",
+      "id": "elizabeth:910GBRTWOOD:910GHRLDWOD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.1",
+      "toPort": {
+        "x": 3863.779,
+        "y": 911.336
+      },
+      "toStationID": "910GHRLDWOD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 4008.964,
+        "y": 766.145
+      },
+      "fromStationID": "910GSHENFLD",
+      "id": "elizabeth:910GBRTWOOD:910GSHENFLD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.0",
+      "toPort": {
+        "x": 3943.764,
+        "y": 831.348
+      },
+      "toStationID": "910GBRTWOOD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3544.305,
+        "y": 1886.695
+      },
+      "fromStationID": "910GCUSTMHS",
+      "id": "elizabeth:910GCANWHRF:910GCUSTMHS",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.6",
+      "toPort": {
+        "x": 3063.096,
+        "y": 1867.937
+      },
+      "toStationID": "910GCANWHRF",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3063.096,
+        "y": 1867.937
+      },
+      "fromStationID": "910GCANWHRF",
+      "id": "elizabeth:910GCANWHRF:910GWCHAPXR",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.5",
+      "toPort": {
+        "x": 2735.05,
+        "y": 1516.281
+      },
+      "toStationID": "910GWCHAPXR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3715.561,
+        "y": 1059.56
+      },
+      "fromStationID": "910GCHDWLHT",
+      "id": "elizabeth:910GCHDWLHT:910GGODMAYS",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.5",
+      "toPort": {
+        "x": 3657.942,
+        "y": 1117.182
+      },
+      "toStationID": "910GGODMAYS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3773.56,
+        "y": 1001.559
+      },
+      "fromStationID": "910GROMFORD",
+      "id": "elizabeth:910GCHDWLHT:910GROMFORD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.4",
+      "toPort": {
+        "x": 3715.561,
+        "y": 1059.56
+      },
+      "toStationID": "910GCHDWLHT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3563.904,
+        "y": 2246.013
+      },
+      "fromStationID": "910GWOLWXR",
+      "id": "elizabeth:910GCUSTMHS:910GWOLWXR",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.7",
+      "toPort": {
+        "x": 3544.305,
+        "y": 1886.695
+      },
+      "toStationID": "910GCUSTMHS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 597.033,
+        "y": 1657.203
+      },
+      "fromStationID": "910GEALINGB",
+      "id": "elizabeth:910GEALINGB:910GWEALING",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.5",
+      "toPort": {
+        "x": 534.132,
+        "y": 1657.203
+      },
+      "toStationID": "910GWEALING",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2384.986,
+        "y": 1486.094
+      },
+      "fromStationID": "910GLIVSTLL",
+      "id": "elizabeth:910GFRNDXR:910GLIVSTLL",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.3",
+      "toPort": {
+        "x": 2169.964,
+        "y": 1486.141
+      },
+      "toStationID": "910GFRNDXR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2169.964,
+        "y": 1486.141
+      },
+      "fromStationID": "910GFRNDXR",
+      "id": "elizabeth:910GFRNDXR:910GTOTCTRD",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.2",
+      "toPort": {
+        "x": 1966.983,
+        "y": 1561.804
+      },
+      "toStationID": "910GTOTCTRD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3477.053,
+        "y": 1153.437
+      },
+      "fromStationID": "910GMANRPK",
+      "id": "elizabeth:910GFRSTGT:910GMANRPK",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.9",
+      "toPort": {
+        "x": 3375.951,
+        "y": 1153.437
+      },
+      "toStationID": "910GFRSTGT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3375.951,
+        "y": 1153.437
+      },
+      "fromStationID": "910GFRSTGT",
+      "id": "elizabeth:910GFRSTGT:910GMRYLAND",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.10",
+      "toPort": {
+        "x": 3287.07,
+        "y": 1202.953
+      },
+      "toStationID": "910GMRYLAND",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3863.779,
+        "y": 911.336
+      },
+      "fromStationID": "910GHRLDWOD",
+      "id": "elizabeth:910GGIDEAPK:910GHRLDWOD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.2",
+      "toPort": {
+        "x": 3817.911,
+        "y": 957.206
+      },
+      "toStationID": "910GGIDEAPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3817.911,
+        "y": 957.206
+      },
+      "fromStationID": "910GGIDEAPK",
+      "id": "elizabeth:910GGIDEAPK:910GROMFORD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.3",
+      "toPort": {
+        "x": 3773.56,
+        "y": 1001.559
+      },
+      "toStationID": "910GROMFORD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3657.942,
+        "y": 1117.182
+      },
+      "fromStationID": "910GGODMAYS",
+      "id": "elizabeth:910GGODMAYS:910GSVNKNGS",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.6",
+      "toPort": {
+        "x": 3594.918,
+        "y": 1153.437
+      },
+      "toStationID": "910GSVNKNGS",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 466.966,
+        "y": 1657.203
+      },
+      "fromStationID": "910GHANWELL",
+      "id": "elizabeth:910GHANWELL:910GSTHALL",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.3",
+      "toPort": {
+        "x": 421.123,
+        "y": 1657.203
+      },
+      "toStationID": "910GSTHALL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 534.132,
+        "y": 1657.203
+      },
+      "fromStationID": "910GWEALING",
+      "id": "elizabeth:910GHANWELL:910GWEALING",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.4",
+      "toPort": {
+        "x": 466.966,
+        "y": 1657.203
+      },
+      "toStationID": "910GHANWELL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 336.999,
+        "y": 1657.188
+      },
+      "fromStationID": "910GHAYESAH",
+      "id": "elizabeth:910GHAYESAH:910GHTRWAPT",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.1",
+      "toPort": {
+        "x": 292.026,
+        "y": 2089.008
+      },
+      "toStationID": "910GHTRWAPT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 421.123,
+        "y": 1657.203
+      },
+      "fromStationID": "910GSTHALL",
+      "id": "elizabeth:910GHAYESAH:910GSTHALL",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.2",
+      "toPort": {
+        "x": 336.999,
+        "y": 1657.188
+      },
+      "toStationID": "910GHAYESAH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 342.687,
+        "y": 1657.187
+      },
+      "fromStationID": "910GHAYESAH",
+      "id": "elizabeth:910GHAYESAH:910GWDRYTON",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.0",
+      "toPort": {
+        "x": 160.267,
+        "y": 1549.006
+      },
+      "toStationID": "910GWDRYTON",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 292.026,
+        "y": 2089.008
+      },
+      "fromStationID": "910GHTRWAPT",
+      "id": "elizabeth:910GHTRWAPT:910GHTRWTM4",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.0",
+      "toPort": {
+        "x": 292.0,
+        "y": 2257.891
+      },
+      "toStationID": "910GHTRWTM4",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 291.984,
+        "y": 2089.002
+      },
+      "fromStationID": "910GHTRWAPT",
+      "id": "elizabeth:910GHTRWAPT:910GHTRWTM5",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.heathrow-terminal-five.official.v1.0",
+      "toPort": {
+        "x": 176.813,
+        "y": 2286.98
+      },
+      "toStationID": "910GHTRWTM5",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3546.986,
+        "y": 1153.437
+      },
+      "fromStationID": "910GILFORD",
+      "id": "elizabeth:910GILFORD:910GMANRPK",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.8",
+      "toPort": {
+        "x": 3477.053,
+        "y": 1153.437
+      },
+      "toStationID": "910GMANRPK",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3594.918,
+        "y": 1153.437
+      },
+      "fromStationID": "910GSVNKNGS",
+      "id": "elizabeth:910GILFORD:910GSVNKNGS",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.7",
+      "toPort": {
+        "x": 3546.986,
+        "y": 1153.437
+      },
+      "toStationID": "910GILFORD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1466.754
+      },
+      "fromStationID": "910GIVER",
+      "id": "elizabeth:910GIVER:910GLANGLEY",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.2",
+      "toPort": {
+        "x": 160.281,
+        "y": 1395.241
+      },
+      "toStationID": "910GLANGLEY",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.267,
+        "y": 1549.006
+      },
+      "fromStationID": "910GWDRYTON",
+      "id": "elizabeth:910GIVER:910GWDRYTON",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.1",
+      "toPort": {
+        "x": 160.281,
+        "y": 1466.754
+      },
+      "toStationID": "910GIVER",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1395.241
+      },
+      "fromStationID": "910GLANGLEY",
+      "id": "elizabeth:910GLANGLEY:910GSLOUGH",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.3",
+      "toPort": {
+        "x": 160.281,
+        "y": 1320.866
+      },
+      "toStationID": "910GSLOUGH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3223.004,
+        "y": 1267.029
+      },
+      "fromStationID": "910GSTFD",
+      "id": "elizabeth:910GLIVST:910GSTFD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.stratford-liverpool-mainline.official.v1.0",
+      "toPort": {
+        "x": 2384.986,
+        "y": 1486.094
+      },
+      "toStationID": "910GLIVST",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2735.05,
+        "y": 1516.281
+      },
+      "fromStationID": "910GWCHAPXR",
+      "id": "elizabeth:910GLIVSTLL:910GWCHAPXR",
+      "lineID": "elizabeth",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.4",
+      "toPort": {
+        "x": 2384.986,
+        "y": 1486.094
+      },
+      "toStationID": "910GLIVSTLL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1166.969
+      },
+      "fromStationID": "910GTAPLOW",
+      "id": "elizabeth:910GMDNHEAD:910GTAPLOW",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.6",
+      "toPort": {
+        "x": 160.281,
+        "y": 1098.888
+      },
+      "toStationID": "910GMDNHEAD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1098.888
+      },
+      "fromStationID": "910GMDNHEAD",
+      "id": "elizabeth:910GMDNHEAD:910GTWYFORD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.7",
+      "toPort": {
+        "x": 160.281,
+        "y": 1030.807
+      },
+      "toStationID": "910GTWYFORD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3287.07,
+        "y": 1202.953
+      },
+      "fromStationID": "910GMRYLAND",
+      "id": "elizabeth:910GMRYLAND:910GSTFD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.11",
+      "toPort": {
+        "x": 3223.004,
+        "y": 1267.029
+      },
+      "toStationID": "910GSTFD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 160.281,
+        "y": 1030.807
+      },
+      "fromStationID": "910GTWYFORD",
+      "id": "elizabeth:910GRDNGSTN:910GTWYFORD",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.hayes-reading.official.v1.8",
+      "toPort": {
+        "x": 160.281,
+        "y": 962.726
+      },
+      "toStationID": "910GRDNGSTN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3223.004,
+        "y": 1267.029
+      },
+      "fromStationID": "910GSTFD",
+      "id": "elizabeth:910GSTFD:910GWCHAPXR",
+      "lineID": "elizabeth",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.elizabeth.stratford-whitechapel.official.v1.0",
+      "toPort": {
+        "x": 2735.05,
+        "y": 1516.281
+      },
+      "toStationID": "910GWCHAPXR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
         "x": 2385.385,
         "y": 1541.266
       },
@@ -19672,7 +25965,7 @@
     {
       "fromPort": {
         "x": 1168.656,
-        "y": 1789.903
+        "y": 1800.069
       },
       "fromStationID": "940GZZLUHSC",
       "id": "hammersmith-city:940GZZLUGHK:940GZZLUHSC",
@@ -19681,7 +25974,7 @@
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.0",
       "toPort": {
         "x": 1168.656,
-        "y": 1731.963
+        "y": 1744.045
       },
       "toStationID": "940GZZLUGHK",
       "translation": {
@@ -19692,7 +25985,7 @@
     {
       "fromPort": {
         "x": 1168.656,
-        "y": 1731.963
+        "y": 1744.045
       },
       "fromStationID": "940GZZLUGHK",
       "id": "hammersmith-city:940GZZLUGHK:940GZZLUSBM",
@@ -19701,7 +25994,7 @@
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.1",
       "toPort": {
         "x": 1168.656,
-        "y": 1691.942
+        "y": 1703.971
       },
       "toStationID": "940GZZLUSBM",
       "translation": {
@@ -19892,7 +26185,7 @@
     {
       "fromPort": {
         "x": 1168.656,
-        "y": 1691.942
+        "y": 1703.971
       },
       "fromStationID": "940GZZLUSBM",
       "id": "hammersmith-city:940GZZLUSBM:940GZZLUWLA",
@@ -23591,11 +29884,1111 @@
     }
   ],
   "source": {
-    "graphGeneratedAt": "2026-08-18T09:26:41.336750+00:00",
+    "graphGeneratedAt": "2026-08-20T00:24:45.613212+00:00",
     "graphSchemaVersion": 1,
-    "note": "Complete Underground artwork compiled offline from trace-verified slices and exact master paths extracted from the April 2026 TfL vector map. No runtime layout is used."
+    "note": "Complete London rail artwork compiled offline. Underground geometry uses trace-verified slices and exact master paths from the April 2026 TfL vector map, including the DLR and Elizabeth line branches and their distinct interchange ports. No runtime layout is used."
   },
   "stationMarkers": [
+    {
+      "anchor": {
+        "x": 3563.892,
+        "y": 2317.98
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Abbey Wood",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3563.892,
+              "y": 2317.98
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GABWDXR"
+    },
+    {
+      "anchor": {
+        "x": 873.971,
+        "y": 1502.933
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Acton Main Line",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 873.971,
+              "y": 1502.933
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GACTONML"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1244.776
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Burnham (Berks)",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1244.776
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GBNHAM"
+    },
+    {
+      "anchor": {
+        "x": 1767.999,
+        "y": 1561.797
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Bond Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1767.999,
+              "y": 1561.797
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GBONDST"
+    },
+    {
+      "anchor": {
+        "x": 3943.764,
+        "y": 831.348
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Brentwood",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3943.764,
+              "y": 831.348
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GBRTWOOD"
+    },
+    {
+      "anchor": {
+        "x": 3063.096,
+        "y": 1867.937
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Canary Wharf",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3063.096,
+              "y": 1867.937
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GCANWHRF"
+    },
+    {
+      "anchor": {
+        "x": 3715.561,
+        "y": 1059.56
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Chadwell Heath",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3715.561,
+              "y": 1059.56
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GCHDWLHT"
+    },
+    {
+      "anchor": {
+        "x": 3544.305,
+        "y": 1886.695
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Custom House",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3544.305,
+              "y": 1886.695
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GCUSTMHS"
+    },
+    {
+      "anchor": {
+        "x": 597.033,
+        "y": 1657.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Ealing Broadway",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 597.033,
+              "y": 1657.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GEALINGB"
+    },
+    {
+      "anchor": {
+        "x": 2169.964,
+        "y": 1486.141
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Farringdon",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2169.964,
+              "y": 1486.141
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GFRNDXR"
+    },
+    {
+      "anchor": {
+        "x": 3375.951,
+        "y": 1153.437
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Forest Gate",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3375.951,
+              "y": 1153.437
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GFRSTGT"
+    },
+    {
+      "anchor": {
+        "x": 3817.911,
+        "y": 957.206
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Gidea Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3817.911,
+              "y": 957.206
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GGIDEAPK"
+    },
+    {
+      "anchor": {
+        "x": 3657.942,
+        "y": 1117.182
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Goodmayes",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3657.942,
+              "y": 1117.182
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GGODMAYS"
+    },
+    {
+      "anchor": {
+        "x": 466.966,
+        "y": 1657.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Hanwell",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 466.966,
+              "y": 1657.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHANWELL"
+    },
+    {
+      "anchor": {
+        "x": 339.843,
+        "y": 1657.188
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Hayes & Harlington",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 336.999,
+              "y": 1657.188
+            },
+            "start": {
+              "x": 342.687,
+              "y": 1657.187
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 342.687,
+              "y": 1657.187
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 336.999,
+              "y": 1657.188
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHAYESAH"
+    },
+    {
+      "anchor": {
+        "x": 3863.779,
+        "y": 911.336
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Harold Wood",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3863.779,
+              "y": 911.336
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHRLDWOD"
+    },
+    {
+      "anchor": {
+        "x": 292.026,
+        "y": 2089.008
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Heathrow Terminals 2 & 3",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 292.026,
+              "y": 2089.008
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHTRWAPT"
+    },
+    {
+      "anchor": {
+        "x": 292.0,
+        "y": 2257.891
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Heathrow Terminal 4",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 292.0,
+              "y": 2257.891
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHTRWTM4"
+    },
+    {
+      "anchor": {
+        "x": 176.813,
+        "y": 2286.98
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Heathrow Terminal 5",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 176.813,
+              "y": 2286.98
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GHTRWTM5"
+    },
+    {
+      "anchor": {
+        "x": 3546.986,
+        "y": 1153.437
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Ilford",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3546.986,
+              "y": 1153.437
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GILFORD"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1466.754
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Iver",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1466.754
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GIVER"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1395.241
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Langley (Berks)",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1395.241
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GLANGLEY"
+    },
+    {
+      "anchor": {
+        "x": 2384.986,
+        "y": 1486.094
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "London Liverpool Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2384.986,
+              "y": 1486.094
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GLIVST"
+    },
+    {
+      "anchor": {
+        "x": 2384.986,
+        "y": 1486.094
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Liverpool Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2384.986,
+              "y": 1486.094
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GLIVSTLL"
+    },
+    {
+      "anchor": {
+        "x": 3477.053,
+        "y": 1153.437
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Manor Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3477.053,
+              "y": 1153.437
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GMANRPK"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1098.888
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Maidenhead",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1098.888
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GMDNHEAD"
+    },
+    {
+      "anchor": {
+        "x": 3287.07,
+        "y": 1202.953
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Maryland",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3287.07,
+              "y": 1202.953
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GMRYLAND"
+    },
+    {
+      "anchor": {
+        "x": 1458.781,
+        "y": 1474.985
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Paddington",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1458.781,
+              "y": 1474.985
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GPADTLL"
+    },
+    {
+      "anchor": {
+        "x": 1458.781,
+        "y": 1474.985
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "London Paddington",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1458.781,
+              "y": 1474.985
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GPADTON"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 962.726
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Reading",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 962.726
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GRDNGSTN"
+    },
+    {
+      "anchor": {
+        "x": 3773.56,
+        "y": 1001.559
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Romford",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3773.56,
+              "y": 1001.559
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GROMFORD"
+    },
+    {
+      "anchor": {
+        "x": 4008.964,
+        "y": 766.145
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Shenfield",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 4008.964,
+              "y": 766.145
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GSHENFLD"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1320.866
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Slough",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1320.866
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GSLOUGH"
+    },
+    {
+      "anchor": {
+        "x": 3223.004,
+        "y": 1267.029
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Stratford (London)",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3223.004,
+              "y": 1267.029
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GSTFD"
+    },
+    {
+      "anchor": {
+        "x": 421.123,
+        "y": 1657.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Southall",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 421.123,
+              "y": 1657.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GSTHALL"
+    },
+    {
+      "anchor": {
+        "x": 3594.918,
+        "y": 1153.437
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Seven Kings",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3594.918,
+              "y": 1153.437
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GSVNKNGS"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1166.969
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Taplow",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1166.969
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GTAPLOW"
+    },
+    {
+      "anchor": {
+        "x": 1966.983,
+        "y": 1561.804
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Tottenham Court Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1966.983,
+              "y": 1561.804
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GTOTCTRD"
+    },
+    {
+      "anchor": {
+        "x": 160.281,
+        "y": 1030.807
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Twyford",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.281,
+              "y": 1030.807
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GTWYFORD"
+    },
+    {
+      "anchor": {
+        "x": 2735.05,
+        "y": 1516.281
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Whitechapel",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2735.05,
+              "y": 1516.281
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GWCHAPXR"
+    },
+    {
+      "anchor": {
+        "x": 160.267,
+        "y": 1549.006
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "West Drayton",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 160.267,
+              "y": 1549.006
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GWDRYTON"
+    },
+    {
+      "anchor": {
+        "x": 534.132,
+        "y": 1657.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "West Ealing",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 534.132,
+              "y": 1657.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GWEALING"
+    },
+    {
+      "anchor": {
+        "x": 3563.904,
+        "y": 2246.013
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "elizabeth"
+      ],
+      "name": "Woolwich",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3563.904,
+              "y": 2246.013
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "910GWOLWXR"
+    },
     {
       "anchor": {
         "x": 1562.5,
@@ -23624,6 +31017,1131 @@
         }
       ],
       "stationID": "940GZZBPSUST"
+    },
+    {
+      "anchor": {
+        "x": 3280.781,
+        "y": 1442.878
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Abbey Road DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3280.781,
+              "y": 1442.878
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLABR"
+    },
+    {
+      "anchor": {
+        "x": 3027.294,
+        "y": 1703.869
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "All Saints DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.294,
+              "y": 1703.869
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLALL"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 2165.031
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Beckton DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 2165.031
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLBEC"
+    },
+    {
+      "anchor": {
+        "x": 3104.015,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Blackwall DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3104.015,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLBLA"
+    },
+    {
+      "anchor": {
+        "x": 2355.375,
+        "y": 1652.422
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Bank DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2355.375,
+              "y": 1652.422
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLBNK"
+    },
+    {
+      "anchor": {
+        "x": 3027.297,
+        "y": 1516.553
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Bow Church DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.297,
+              "y": 1516.553
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLBOW"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 2014.896
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Beckton Park DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 2014.896
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLBPK"
+    },
+    {
+      "anchor": {
+        "x": 3027.29,
+        "y": 1903.547
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Canary Wharf DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.29,
+              "y": 1903.547
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCAN"
+    },
+    {
+      "anchor": {
+        "x": 3254.194,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Canning Town DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3254.194,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCGT"
+    },
+    {
+      "anchor": {
+        "x": 3027.287,
+        "y": 2083.256
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Crossharbour DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.287,
+              "y": 2083.256
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCLA"
+    },
+    {
+      "anchor": {
+        "x": 3590.996,
+        "y": 1840.598
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Custom House (for ExCel) DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3590.996,
+              "y": 1840.598
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCUS"
+    },
+    {
+      "anchor": {
+        "x": 3027.285,
+        "y": 2241.096
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Cutty Sark (for Maritime Greenwich) DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.285,
+              "y": 2241.096
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCUT"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 2065.953
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Cyprus DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 2065.953
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLCYP"
+    },
+    {
+      "anchor": {
+        "x": 3027.283,
+        "y": 2366.607
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Deptford Bridge DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.283,
+              "y": 2366.607
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLDEP"
+    },
+    {
+      "anchor": {
+        "x": 3027.295,
+        "y": 1613.539
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Devons Road DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.295,
+              "y": 1613.539
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLDEV"
+    },
+    {
+      "anchor": {
+        "x": 3202.059,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "East India DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3202.059,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLEIN"
+    },
+    {
+      "anchor": {
+        "x": 3027.282,
+        "y": 2413.199
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Elverson Road DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.282,
+              "y": 2413.199
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLELV"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 2118.114
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Gallions Reach DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 2118.114
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLGAL"
+    },
+    {
+      "anchor": {
+        "x": 3027.284,
+        "y": 2318.114
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Greenwich DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.284,
+              "y": 2318.114
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLGRE"
+    },
+    {
+      "anchor": {
+        "x": 3027.289,
+        "y": 1999.582
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Heron Quays DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.289,
+              "y": 1999.582
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLHEQ"
+    },
+    {
+      "anchor": {
+        "x": 3027.286,
+        "y": 2165.029
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Island Gardens DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.286,
+              "y": 2165.029
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLISL"
+    },
+    {
+      "anchor": {
+        "x": 3494.422,
+        "y": 2163.02
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "King George V DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3494.422,
+              "y": 2163.02
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLKGV"
+    },
+    {
+      "anchor": {
+        "x": 3494.422,
+        "y": 2084.913
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "London City Airport DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3494.422,
+              "y": 2084.913
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLLCA"
+    },
+    {
+      "anchor": {
+        "x": 3027.294,
+        "y": 1662.032
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Langdon Park DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.294,
+              "y": 1662.032
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLLDP"
+    },
+    {
+      "anchor": {
+        "x": 3027.281,
+        "y": 2456.937
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Lewisham DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.281,
+              "y": 2456.937
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLLEW"
+    },
+    {
+      "anchor": {
+        "x": 2827.781,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Limehouse DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2827.781,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLLIM"
+    },
+    {
+      "anchor": {
+        "x": 3027.287,
+        "y": 2125.093
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Mudchute DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.287,
+              "y": 2125.093
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLMUD"
+    },
+    {
+      "anchor": {
+        "x": 3494.422,
+        "y": 2015.895
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Pontoon Dock DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3494.422,
+              "y": 2015.895
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLPDK"
+    },
+    {
+      "anchor": {
+        "x": 3026.981,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Poplar DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3026.981,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLPOP"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 1911.954
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Prince Regent DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 1911.954
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLPRE"
+    },
+    {
+      "anchor": {
+        "x": 3130.004,
+        "y": 1392.074
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Pudding Mill Lane DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3130.004,
+              "y": 1392.074
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLPUD"
+    },
+    {
+      "anchor": {
+        "x": 3627.875,
+        "y": 1963.011
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Royal Albert DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3627.875,
+              "y": 1963.011
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLRAL"
+    },
+    {
+      "anchor": {
+        "x": 3454.95,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Royal Victoria DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3454.95,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLRVC"
+    },
+    {
+      "anchor": {
+        "x": 2747.634,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Shadwell DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2747.634,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSHA"
+    },
+    {
+      "anchor": {
+        "x": 3280.781,
+        "y": 1360.112
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Stratford High Street DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3280.781,
+              "y": 1360.112
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSHS"
+    },
+    {
+      "anchor": {
+        "x": 3070.859,
+        "y": 1161.188
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Stratford International DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3070.859,
+              "y": 1161.188
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSIT"
+    },
+    {
+      "anchor": {
+        "x": 3027.288,
+        "y": 2041.419
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "South Quay DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.288,
+              "y": 2041.419
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSOQ"
+    },
+    {
+      "anchor": {
+        "x": 3252.75,
+        "y": 1271.032
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Stratford DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3252.75,
+              "y": 1271.032
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSTD"
+    },
+    {
+      "anchor": {
+        "x": 3280.781,
+        "y": 1643.156
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Star Lane DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3280.781,
+              "y": 1643.156
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLSTL"
+    },
+    {
+      "anchor": {
+        "x": 2573.0,
+        "y": 1733.031
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Tower Gateway DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2573.0,
+              "y": 1733.031
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLTWG"
+    },
+    {
+      "anchor": {
+        "x": 2908.706,
+        "y": 1758.203
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Westferry DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2908.706,
+              "y": 1758.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLWFE"
+    },
+    {
+      "anchor": {
+        "x": 3280.781,
+        "y": 1545.945
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "West Ham DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3280.781,
+              "y": 1545.945
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLWHM"
+    },
+    {
+      "anchor": {
+        "x": 3027.292,
+        "y": 1832.233
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "West India Quay DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3027.292,
+              "y": 1832.233
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLWIQ"
+    },
+    {
+      "anchor": {
+        "x": 3494.422,
+        "y": 2245.168
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "Woolwich Arsenal DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3494.422,
+              "y": 2245.168
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLWLA"
+    },
+    {
+      "anchor": {
+        "x": 3494.422,
+        "y": 1944.857
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "dlr"
+      ],
+      "name": "West Silvertown DLR Station",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3494.422,
+              "y": 1944.857
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZDLWSV"
     },
     {
       "anchor": {
@@ -26887,40 +35405,34 @@
       "name": "Gloucester Road",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1450.106,
-              "y": 1868.887
+              "x": 1443.238,
+              "y": 1864.734
             },
+            "lineID": "circle",
             "start": {
-              "x": 1450.196,
-              "y": 1843.188
+              "x": 1457.238,
+              "y": 1864.734
             },
-            "width": 7.5
-          },
-          "kind": "connector"
+            "width": 3.2
+          }
         },
         {
-          "circle": {
-            "centre": {
-              "x": 1450.196,
-              "y": 1843.188
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1442.973,
+              "y": 1873.04
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1450.106,
-              "y": 1868.887
+            "lineID": "district",
+            "start": {
+              "x": 1456.973,
+              "y": 1873.04
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUGTR"
@@ -27519,8 +36031,8 @@
     },
     {
       "anchor": {
-        "x": 1410.266,
-        "y": 1724.201
+        "x": 1414.422,
+        "y": 1732.189
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -27530,40 +36042,34 @@
       "name": "High Street Kensington",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1418.578,
+              "x": 1411.578,
               "y": 1740.177
             },
+            "lineID": "circle",
             "start": {
-              "x": 1410.266,
-              "y": 1724.201
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1410.266,
-              "y": 1724.201
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1418.578,
+              "x": 1425.578,
               "y": 1740.177
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
+        },
+        {
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1403.266,
+              "y": 1724.201
+            },
+            "lineID": "district",
+            "start": {
+              "x": 1417.266,
+              "y": 1724.201
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUHSK"
@@ -32887,5 +41393,20 @@
     "primaryLabelFontSize": 18,
     "routeStrokeWidth": 8.3,
     "secondaryLabelFontSize": 16
-  }
+  },
+  "supportedLineIDs": [
+    "bakerloo",
+    "central",
+    "circle",
+    "district",
+    "hammersmith-city",
+    "jubilee",
+    "metropolitan",
+    "northern",
+    "piccadilly",
+    "victoria",
+    "waterloo-city",
+    "dlr",
+    "elizabeth"
+  ]
 }

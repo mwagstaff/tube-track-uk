@@ -2,7 +2,9 @@
 
 `build_graph.py` combines current TfL station/line topology with an original
 octilinear schematic layout. When passed `--osm-pbf`, it also routes every
-station pair over London Underground railway ways from OpenStreetMap.
+station pair over Underground, DLR and Elizabeth line railway ways from
+OpenStreetMap. API-only refreshes retain the reviewed OSM geometry already in
+the output asset.
 
 The OSM input should be generated from a reproducible regional `.osm.pbf`
 snapshot with `osmium-tool`:

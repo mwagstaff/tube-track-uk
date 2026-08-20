@@ -22,18 +22,20 @@ struct BeckMapRepositoryTests {
         ])
     }
 
-    @Test func bundledFullUndergroundMapIsCompleteAndStrictlyValidated() throws {
+    @Test func bundledFullLondonRailMapIsCompleteAndStrictlyValidated() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
 
         #expect(document.identifier == "tube-track-uk.beck.full-underground.v1")
         #expect(document.artworkSize == BeckMapSize(width: 4_764, height: 3_632))
-        #expect(document.paths.count == 379)
-        #expect(document.segments.count == 379)
+        #expect(document.segments.count == graph.segments.count + 1)
         #expect(document.stationMarkers.count == graph.stations.count)
-        #expect(document.labels.count == graph.stations.count)
-        #expect(Set(document.segments.map(\.lineID)) == Set(TubeLineID.allCases))
+        #expect(document.labels.count >= 330)
+        #expect(document.lineCoverage == Set(TubeLineID.allCases))
         #expect(Set(graph.segments.map(\.id)).isSubset(of: Set(document.segments.map(\.id))))
+        #expect(Set(document.segments.map(\.pathID)).isSubset(of: Set(document.paths.map(\.id))))
+        #expect(document.segments.filter { $0.lineID == .dlr }.count == 46)
+        #expect(document.segments.filter { $0.lineID == .elizabeth }.count == 42)
         #expect(document.segments.contains {
             $0.id == BeckMapRepository.supplementalHeathrowSegmentID
         })
@@ -57,6 +59,101 @@ struct BeckMapRepositoryTests {
         #expect(document.paths.filter { seamPathIDs.contains($0.id) }.contains {
             $0.commands.contains { if case .cubic = $0 { return true }; return false }
         })
+    }
+
+    @Test func fullUndergroundMapCoversEveryDLRAndElizabethSemanticSegment() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let railLineIDs: Set<TubeLineID> = [.dlr, .elizabeth]
+        let graphSegmentIDs = Set(graph.segments.filter {
+            railLineIDs.contains($0.lineID)
+        }.map(\.id))
+        let authoredSegments = document.segments.filter {
+            railLineIDs.contains($0.lineID)
+        }
+        let authoredSegmentIDs = Set(authoredSegments.map(\.id))
+        let pathIDs = Set(document.paths.map(\.id))
+
+        #expect(authoredSegmentIDs == graphSegmentIDs)
+        #expect(authoredSegments.allSatisfy {
+            $0.fromPort != nil && $0.toPort != nil && pathIDs.contains($0.pathID)
+        })
+        #expect(document.routes.filter {
+            railLineIDs.contains($0.lineID)
+        }.allSatisfy { route in
+            Set(route.segmentIDs).isSubset(of: authoredSegmentIDs)
+                && route.stationIDs.count == route.segmentIDs.count + 1
+        })
+    }
+
+    @Test func dlrAndElizabethPathsRetainTheOfficialCubicContours() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let pathsByID = Dictionary(uniqueKeysWithValues: document.paths.map { ($0.id, $0) })
+
+        for lineID in [TubeLineID.dlr, .elizabeth] {
+            let referencedPathIDs = Set(document.segments.filter {
+                $0.lineID == lineID
+            }.map(\.pathID))
+            let cubicCommandCount = referencedPathIDs.reduce(into: 0) { count, pathID in
+                count += pathsByID[pathID]?.commands.count {
+                    if case .cubic = $0 { return true }
+                    return false
+                } ?? 0
+            }
+
+            // The TfL masters contain rounded joins and branch contours. A
+            // straight station-to-station interpolation has no cubic commands.
+            #expect(cubicCommandCount >= 10)
+        }
+    }
+
+    @Test func railExtensionTerminiStayOnTheirOfficialTfLPorts() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        func stationPorts(_ stationID: String, on lineID: TubeLineID) -> [BeckMapPoint] {
+            document.segments.compactMap { segment in
+                guard segment.lineID == lineID else { return nil }
+                if segment.fromStationID == stationID { return segment.fromPort }
+                if segment.toStationID == stationID { return segment.toPort }
+                return nil
+            }
+        }
+
+        let officialTermini: [(TubeLineID, String, BeckMapPoint)] = [
+            (.dlr, "940GZZDLBEC", BeckMapPoint(x: 3_627.9, y: 2_165.0)),
+            (.dlr, "940GZZDLLEW", BeckMapPoint(x: 3_027.3, y: 2_456.9)),
+            (.elizabeth, "910GRDNGSTN", BeckMapPoint(x: 160.3, y: 960.4)),
+            (.elizabeth, "910GSHENFLD", BeckMapPoint(x: 4_009.3, y: 765.8)),
+            (.elizabeth, "910GABWDXR", BeckMapPoint(x: 3_563.9, y: 2_319.3)),
+        ]
+
+        for (lineID, stationID, expected) in officialTermini {
+            let ports = stationPorts(stationID, on: lineID)
+            #expect(!ports.isEmpty)
+            #expect(ports.contains { port in
+                hypot(port.x - expected.x, port.y - expected.y) < 8
+            })
+        }
+    }
+
+    @Test func dlrBankKeepsItsOwnOfficialInterchangeAnchor() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let dlrBank = try #require(document.stationMarkers.first {
+            $0.stationID == "940GZZDLBNK"
+        })
+        let undergroundBank = try #require(document.stationMarkers.first {
+            $0.stationID == "940GZZLUBNK"
+        })
+
+        // These are separate nodes in the official interchange artwork. The
+        // rail trace must not be collapsed onto the Underground marker centre.
+        #expect(hypot(
+            dlrBank.anchor.x - undergroundBank.anchor.x,
+            dlrBank.anchor.y - undergroundBank.anchor.y
+        ) > 40)
     }
 
     @Test func fullUndergroundMapUsesExplicitSpecialStationMarkerTemplates() throws {
@@ -456,6 +553,8 @@ struct BeckMapRepositoryTests {
             ("940GZZLUTMP", 2),
             ("940GZZLUMSH", 2),
             ("940GZZLUBBN", 3),
+            ("940GZZLUHSK", 2),
+            ("940GZZLUGTR", 2),
         ] {
             let ordinarySharedMarker = try marker(stationID)
             #expect(circleCount(ordinarySharedMarker) == 0)
@@ -463,10 +562,14 @@ struct BeckMapRepositoryTests {
             #expect(tickCount(ordinarySharedMarker) == expectedTicks)
         }
 
-        for stationID in ["940GZZLUGTR", "940GZZLUSKS"] {
-            let subSurfacePiccadillyInterchange = try marker(stationID)
-            #expect(circleCount(subSurfacePiccadillyInterchange) == 2)
-            #expect(connectorCount(subSurfacePiccadillyInterchange) == 1)
+        let southKensington = try marker("940GZZLUSKS")
+        #expect(circleCount(southKensington) == 2)
+        #expect(connectorCount(southKensington) == 1)
+
+        for stationID in ["940GZZLUSBM", "940GZZLUGHK", "940GZZLUHSC"] {
+            let circlePort = stationLinePort(stationID, .circle)
+            let hammersmithCityPort = stationLinePort(stationID, .hammersmithCity)
+            #expect(abs(circlePort.y - hammersmithCityPort.y) < 0.001)
         }
 
         let victoria = try marker("940GZZLUVIC")

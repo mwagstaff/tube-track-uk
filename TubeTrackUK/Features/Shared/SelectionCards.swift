@@ -11,7 +11,7 @@ struct StationDetailCard: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(station.name)
                             .font(.headline)
-                        Text(station.interchange ? "Interchange station" : "Underground station")
+                        Text(station.interchange ? "Interchange station" : station.lineIDs.first?.modeName == "tube" ? "Underground station" : "Rail station")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -24,7 +24,7 @@ struct StationDetailCard: View {
                 }
                 ScrollView(.horizontal) {
                     HStack(spacing: 6) {
-                        ForEach(station.lineIDs) { lineID in
+                        ForEach(appState.graph?.lineIDs(at: station) ?? station.lineIDs) { lineID in
                             Button {
                                 withAnimation(.easeInOut(duration: 0.35)) {
                                     appState.selectedLineID = lineID
@@ -117,7 +117,7 @@ struct TrainFilterBar: View {
                 }
                 .buttonStyle(.plain)
 
-                ForEach(TubeLineID.allCases) { lineID in
+                ForEach(TubeLineID.allCases.filter(\.supportsEstimatedTrains)) { lineID in
                     Button {
                         appState.setTrainFilter(lineID)
                     } label: {

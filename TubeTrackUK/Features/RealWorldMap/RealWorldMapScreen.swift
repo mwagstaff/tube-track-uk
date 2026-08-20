@@ -1,10 +1,13 @@
 import MapKit
+import Observation
 import SwiftUI
 
 struct RealWorldMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
+    @State private var renderData: RealWorldMapRenderData?
+    @State private var viewport = RealWorldMapViewport()
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
 
     private static let centralLondon = MKCoordinateRegion(
@@ -14,24 +17,37 @@ struct RealWorldMapScreen: View {
 
     var body: some View {
         ZStack {
-            if let graph = appState.graph {
-                TimelineView(.periodic(from: .now, by: appState.showLiveTrains ? 1.0 : 60)) { timeline in
-                    Map(position: $position, selection: $mapSelection) {
-                        tubeOverlays(graph: graph)
-                        stationAnnotations(graph: graph)
-                        if appState.showLiveTrains {
-                            trainAnnotations(graph: graph, date: timeline.date)
+            if let graph = appState.graph,
+               let renderData,
+               renderData.graphID == graph.generatedAt {
+                MapReader { proxy in
+                    ZStack {
+                        Map(position: $position, selection: $mapSelection) {
+                            tubeOverlays(renderData: renderData)
+                            stationAnnotations(graph: graph)
                         }
-                    }
-                    .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
-                    .mapControls {
-                        MapCompass()
-                        MapScaleView()
-                    }
-                    .onChange(of: mapSelection) { _, stationID in
-                        guard let stationID, let station = graph.stations.first(where: { $0.id == stationID }) else { return }
-                        withAnimation(.spring(duration: 0.35)) {
-                            appState.select(station: station)
+                        .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
+                        .mapControls {
+                            MapCompass()
+                            MapScaleView()
+                        }
+                        .onChange(of: mapSelection) { _, stationID in
+                            guard let stationID,
+                                  let station = graph.stations.first(where: { $0.id == stationID }) else { return }
+                            withAnimation(.spring(duration: 0.35)) {
+                                appState.select(station: station)
+                            }
+                        }
+                        .onMapCameraChange(frequency: .continuous) { context in
+                            viewport.mapDidMove(to: context.region)
+                        }
+
+                        if appState.showLiveTrains, appState.selectedTab == .realWorld {
+                            RealWorldTrainCanvas(
+                                proxy: proxy,
+                                pathsBySegmentID: renderData.pathsBySegmentID,
+                                viewport: viewport
+                            )
                         }
                     }
                 }
@@ -75,26 +91,36 @@ struct RealWorldMapScreen: View {
                 focus(on: appState.activeAffectedStationIDs)
             }
         }
+        .task(id: appState.graph?.generatedAt) {
+            guard let graph = appState.graph else {
+                renderData = nil
+                return
+            }
+            renderData = RealWorldMapRenderData(graph: graph)
+        }
     }
 
     @MapContentBuilder
-    private func tubeOverlays(graph: TubeGraph) -> some MapContent {
-        ForEach(graph.segments) { segment in
-            let affected = appState.activeAffectedSegmentIDs.contains(segment.id)
-            let issuesMode = appState.disruptionDisplayMode == .issues && !appState.activeAffectedSegmentIDs.isEmpty
+    private func tubeOverlays(renderData: RealWorldMapRenderData) -> some MapContent {
+        let affectedSegmentIDs = appState.activeAffectedSegmentIDs
+        let issuesMode = appState.disruptionDisplayMode == .issues && !affectedSegmentIDs.isEmpty
+        let selectedLineID = appState.selectedLineID
+        ForEach(renderData.segments) { segment in
+            let affected = affectedSegmentIDs.contains(segment.id)
             let muted = (issuesMode && !affected)
-                || (appState.selectedLineID != nil && appState.selectedLineID != segment.lineID)
-            MapPolyline(coordinates: displayCoordinates(for: segment))
+                || (selectedLineID != nil && selectedLineID != segment.lineID)
+            MapPolyline(coordinates: segment.path.coordinates)
                 .stroke(
                     muted ? Color.secondary.opacity(0.24) : (affected && issuesMode ? .red : .tubeLine(segment.lineID)),
                     style: StrokeStyle(lineWidth: affected ? 7 : 4, lineCap: .round, lineJoin: .round)
                 )
+                .mapOverlayLevel(level: .aboveLabels)
         }
     }
 
     @MapContentBuilder
     private func stationAnnotations(graph: TubeGraph) -> some MapContent {
-        ForEach(graph.stations.filter { $0.interchange || $0.id == appState.selectedStationID }) { station in
+        ForEach(displayStations(graph: graph)) { station in
             Annotation(station.name, coordinate: station.coordinate, anchor: .center) {
                 Button {
                     mapSelection = station.id
@@ -112,21 +138,11 @@ struct RealWorldMapScreen: View {
         }
     }
 
-    @MapContentBuilder
-    private func trainAnnotations(graph: TubeGraph, date: Date) -> some MapContent {
-        ForEach(appState.liveTrains) { train in
-            if let coordinate = trainCoordinate(train, graph: graph, date: date) {
-                Annotation("\(train.lineID.displayName) line train", coordinate: coordinate) {
-                    Image(systemName: "tram.fill")
-                        .font(.caption2.weight(.bold))
-                        .foregroundStyle(.white)
-                        .padding(5)
-                        .background(Color.tubeLine(train.lineID), in: .rect(cornerRadius: 6))
-                        .overlay { RoundedRectangle(cornerRadius: 6).stroke(.white, lineWidth: 1.5) }
-                        .shadow(radius: 2)
-                }
-            }
-        }
+    private func displayStations(graph: TubeGraph) -> [TubeStation] {
+        RealWorldStationDisplay.stations(
+            in: graph,
+            selectedStationID: appState.selectedStationID
+        )
     }
 
     private var bottomOverlay: some View {
@@ -175,44 +191,162 @@ struct RealWorldMapScreen: View {
         withAnimation(.smooth(duration: 0.6)) { position = .region(region) }
     }
 
-    private func trainCoordinate(_ train: LiveTubeTrain, graph: TubeGraph, date: Date) -> CLLocationCoordinate2D? {
-        guard let segment = graph.segmentsByID[train.segmentID] else { return nil }
-        let points = displayCoordinates(for: segment)
-        guard let first = points.first else { return nil }
-        let progress = train.projectedProgress(at: date)
-        guard points.count > 1 else { return first }
-        let lengths = zip(points, points.dropFirst()).map {
-            hypot(($1.longitude - $0.longitude) * 0.62, $1.latitude - $0.latitude)
-        }
-        let target = lengths.reduce(0, +) * min(1, max(0, progress))
-        var travelled = 0.0
-        for (index, length) in lengths.enumerated() {
-            if travelled + length >= target, length > 0 {
-                let fraction = (target - travelled) / length
-                let start = points[index]
-                let end = points[index + 1]
-                return CLLocationCoordinate2D(
-                    latitude: start.latitude + (end.latitude - start.latitude) * fraction,
-                    longitude: start.longitude + (end.longitude - start.longitude) * fraction
-                )
+}
+
+@Observable
+private final class RealWorldMapViewport {
+    private(set) var region: MKCoordinateRegion?
+
+    func mapDidMove(to region: MKCoordinateRegion) {
+        self.region = region
+    }
+}
+
+private struct RealWorldTrainCanvas: View {
+    @Environment(TubeAppState.self) private var appState
+
+    let proxy: MapProxy
+    let pathsBySegmentID: [String: RealWorldRenderPath]
+    let viewport: RealWorldMapViewport
+
+    var body: some View {
+        let trains = appState.liveTrains
+        let visibleRegion = viewport.region
+
+        TimelineView(.periodic(from: .now, by: 1)) { timeline in
+            Canvas { context, size in
+                let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
+                var trainIcon = context.resolve(Image(systemName: "tram.fill"))
+                trainIcon.shading = .color(.white)
+
+                for train in trains {
+                    guard let path = pathsBySegmentID[train.segmentID],
+                          let coordinate = path.coordinate(at: train.projectedProgress(at: timeline.date)),
+                          visibleRegion?.containsExpanded(coordinate) != false,
+                          let point = proxy.convert(coordinate, to: .local),
+                          visibleBounds.contains(point) else { continue }
+
+                    let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
+                    let marker = Path(roundedRect: markerRect, cornerRadius: 6)
+                    context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
+                    context.stroke(marker, with: .color(.white), lineWidth: 1.5)
+                    context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
+                }
             }
-            travelled += length
         }
-        return points.last
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Estimated live train positions")
+        .accessibilityValue("\(trains.count) trains")
+    }
+}
+
+private extension MKCoordinateRegion {
+    func containsExpanded(_ coordinate: CLLocationCoordinate2D) -> Bool {
+        let latitudeRadius = span.latitudeDelta * 0.6
+        let longitudeRadius = span.longitudeDelta * 0.6
+        let rawLongitudeDelta = abs(coordinate.longitude - center.longitude)
+        let wrappedLongitudeDelta = min(rawLongitudeDelta, 360 - rawLongitudeDelta)
+        return abs(coordinate.latitude - center.latitude) <= latitudeRadius
+            && wrappedLongitudeDelta <= longitudeRadius
+    }
+}
+
+private struct RealWorldMapRenderData {
+    let graphID: String
+    let segments: [RealWorldRenderedSegment]
+    let pathsBySegmentID: [String: RealWorldRenderPath]
+
+    init(graph: TubeGraph) {
+        let stationsByID = graph.stationsByID
+        let renderedSegments = graph.segments.map { segment in
+            RealWorldRenderedSegment(
+                id: segment.id,
+                lineID: segment.lineID,
+                path: RealWorldRenderPath(segment: segment, stationsByID: stationsByID)
+            )
+        }
+        graphID = graph.generatedAt
+        segments = renderedSegments
+        pathsBySegmentID = Dictionary(uniqueKeysWithValues: renderedSegments.map { ($0.id, $0.path) })
+    }
+}
+
+private struct RealWorldRenderedSegment: Identifiable {
+    let id: String
+    let lineID: TubeLineID
+    let path: RealWorldRenderPath
+}
+
+struct RealWorldRenderPath {
+    let coordinates: [CLLocationCoordinate2D]
+    private let cumulativeLengths: [Double]
+    private let totalLength: Double
+
+    init(segment: TubeSegment, stationsByID: [String: TubeStation]) {
+        let coordinates = Self.displayCoordinates(for: segment, stationsByID: stationsByID)
+        var cumulativeLengths = [Double]()
+        cumulativeLengths.reserveCapacity(coordinates.count)
+        cumulativeLengths.append(0)
+        for (start, end) in zip(coordinates, coordinates.dropFirst()) {
+            cumulativeLengths.append(
+                cumulativeLengths[cumulativeLengths.endIndex - 1]
+                    + hypot((end.longitude - start.longitude) * 0.62, end.latitude - start.latitude)
+            )
+        }
+
+        self.coordinates = coordinates
+        self.cumulativeLengths = cumulativeLengths
+        totalLength = cumulativeLengths.last ?? 0
     }
 
-    private func displayCoordinates(for segment: TubeSegment) -> [CLLocationCoordinate2D] {
-        let coordinates = segment.geographicPoints.map(\.coordinate)
+    func coordinate(at progress: Double) -> CLLocationCoordinate2D? {
+        guard let first = coordinates.first else { return nil }
+        guard coordinates.count > 1, totalLength > 0 else { return first }
+
+        let clampedProgress = min(1, max(0, progress))
+        if clampedProgress <= 0 { return first }
+        if clampedProgress >= 1 { return coordinates.last }
+
+        let target = totalLength * clampedProgress
+        var lowerBound = 1
+        var upperBound = cumulativeLengths.count - 1
+        while lowerBound < upperBound {
+            let midpoint = (lowerBound + upperBound) / 2
+            if cumulativeLengths[midpoint] < target {
+                lowerBound = midpoint + 1
+            } else {
+                upperBound = midpoint
+            }
+        }
+
+        let endIndex = lowerBound
+        let startIndex = endIndex - 1
+        let segmentLength = cumulativeLengths[endIndex] - cumulativeLengths[startIndex]
+        guard segmentLength > 0 else { return coordinates[endIndex] }
+        let fraction = (target - cumulativeLengths[startIndex]) / segmentLength
+        let start = coordinates[startIndex]
+        let end = coordinates[endIndex]
+        return CLLocationCoordinate2D(
+            latitude: start.latitude + (end.latitude - start.latitude) * fraction,
+            longitude: start.longitude + (end.longitude - start.longitude) * fraction
+        )
+    }
+
+    private static func displayCoordinates(
+        for segment: TubeSegment,
+        stationsByID: [String: TubeStation]
+    ) -> [CLLocationCoordinate2D] {
+        let coordinates = RealWorldRouteGeometry.anchoredCoordinates(
+            for: segment,
+            stationsByID: stationsByID
+        )
         guard coordinates.count >= 2 else { return coordinates }
-        let laneMetres: [TubeLineID: Double] = [
-            .bakerloo: -8, .central: 0, .circle: -6, .district: 6,
-            .hammersmithCity: 10, .jubilee: -4, .metropolitan: -10,
-            .northern: 0, .piccadilly: 4, .victoria: 8, .waterlooCity: -4,
-        ]
-        let offset = laneMetres[segment.lineID, default: 0]
+        let offset = laneOffset(for: segment.lineID)
         guard offset != 0 else { return coordinates }
 
-        return coordinates.indices.map { index in
+        var offsetCoordinates = coordinates.indices.map { index in
             let before = coordinates[index == coordinates.startIndex ? index : index - 1]
             let after = coordinates[index == coordinates.index(before: coordinates.endIndex) ? index : index + 1]
             let latitude = coordinates[index].latitude
@@ -227,5 +361,114 @@ struct RealWorldMapScreen: View {
                 longitude: coordinates[index].longitude + normalX / metresPerLongitude
             )
         }
+
+        // Shared station endpoints remain exact even when adjacent track
+        // segments have different tangents and lane offsets.
+        offsetCoordinates[offsetCoordinates.startIndex] = coordinates[coordinates.startIndex]
+        offsetCoordinates[offsetCoordinates.index(before: offsetCoordinates.endIndex)] = coordinates[
+            coordinates.index(before: coordinates.endIndex)
+        ]
+        return offsetCoordinates
+    }
+
+    private static func laneOffset(for lineID: TubeLineID) -> Double {
+        switch lineID {
+        case .bakerloo: -8
+        case .circle: -6
+        case .district: 6
+        case .hammersmithCity: 10
+        case .jubilee: -4
+        case .metropolitan: -10
+        case .piccadilly: 4
+        case .victoria: 8
+        case .waterlooCity: -4
+        case .central, .northern, .dlr, .elizabeth: 0
+        }
+    }
+}
+
+enum RealWorldStationDisplay {
+    static func stations(
+        in graph: TubeGraph,
+        selectedStationID: String?
+    ) -> [TubeStation] {
+        Dictionary(grouping: graph.stations) { $0.hubID ?? $0.id }
+            .values
+            .compactMap { group in
+                group.first(where: { $0.id == selectedStationID })
+                    ?? group.sorted {
+                        if $0.lineIDs.count != $1.lineIDs.count {
+                            return $0.lineIDs.count > $1.lineIDs.count
+                        }
+                        return $0.id < $1.id
+                    }.first
+            }
+            .sorted { $0.name < $1.name }
+    }
+}
+
+enum RealWorldRouteGeometry {
+    static func anchoredCoordinates(
+        for segment: TubeSegment,
+        stationsByID: [String: TubeStation]
+    ) -> [CLLocationCoordinate2D] {
+        var track = segment.geographicPoints.map(\.coordinate)
+        guard let from = stationsByID[segment.fromStationID]?.coordinate,
+              let to = stationsByID[segment.toStationID]?.coordinate else {
+            return track
+        }
+        guard let first = track.first, let last = track.last else {
+            return [from, to]
+        }
+
+        let forwardDistance = distance(from, first) + distance(last, to)
+        let reverseDistance = distance(to, first) + distance(last, from)
+        if reverseDistance < forwardDistance {
+            track.reverse()
+        }
+
+        anchor(from, atStartOf: &track)
+        anchor(to, atEndOf: &track)
+        return track
+    }
+
+    private static func anchor(
+        _ station: CLLocationCoordinate2D,
+        atStartOf track: inout [CLLocationCoordinate2D]
+    ) {
+        guard let first = track.first else {
+            track = [station]
+            return
+        }
+        if distance(station, first) <= 2 {
+            track[0] = station
+        } else {
+            track.insert(station, at: 0)
+        }
+    }
+
+    private static func anchor(
+        _ station: CLLocationCoordinate2D,
+        atEndOf track: inout [CLLocationCoordinate2D]
+    ) {
+        guard let lastIndex = track.indices.last else {
+            track = [station]
+            return
+        }
+        if distance(track[lastIndex], station) <= 2 {
+            track[lastIndex] = station
+        } else {
+            track.append(station)
+        }
+    }
+
+    private static func distance(
+        _ first: CLLocationCoordinate2D,
+        _ second: CLLocationCoordinate2D
+    ) -> CLLocationDistance {
+        let meanLatitude = (first.latitude + second.latitude) * .pi / 360
+        let longitudeMetres = (second.longitude - first.longitude) * 111_320 * cos(meanLatitude)
+        let latitudeMetres = (second.latitude - first.latitude) * 110_574
+        return hypot(longitudeMetres, latitudeMetres)
     }
 }

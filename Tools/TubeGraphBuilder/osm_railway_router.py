@@ -37,6 +37,10 @@ LINE_REFS = {
     "victoria": "victoria",
     "waterloo & city": "waterloo-city",
     "waterloo and city": "waterloo-city",
+    "dlr": "dlr",
+    "docklands light railway": "dlr",
+    "elizabeth line": "elizabeth",
+    "elizabeth": "elizabeth",
 }
 
 Coordinate = tuple[float, float]  # longitude, latitude
@@ -75,16 +79,25 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
 
     def relation(self, relation: Any) -> None:
         tags = dict(relation.tags)
-        if tags.get("type") != "route" or tags.get("route") != "subway":
+        if tags.get("type") != "route" or tags.get("route") not in {"subway", "light_rail", "train"}:
             return
         network = tags.get("network", "").lower()
-        if "london underground" not in network:
-            return
+        name = tags.get("name", "").lower()
         reference = (tags.get("ref") or tags.get("line") or "").strip().lower()
+        is_tfl_rail = (
+            "london underground" in network
+            or "docklands light railway" in network
+            or "elizabeth" in network
+            or "dlr" in reference
+            or "elizabeth" in reference
+            or "dlr" in name
+            or "elizabeth line" in name
+        )
+        if not is_tfl_rail:
+            return
         line_id = LINE_REFS.get(reference)
         if line_id is None:
-            name = tags.get("name", "").lower()
-            line_id = next((value for key, value in LINE_REFS.items() if name.startswith(key)), None)
+            line_id = next((value for key, value in LINE_REFS.items() if key in name), None)
         if line_id is None:
             return
         self.line_way_ids[line_id].update(
@@ -117,7 +130,7 @@ class OSMTubeRailwayRouter:
 
         missing = sorted(set(LINE_REFS.values()) - set(self.adjacency_by_line))
         if missing:
-            raise RuntimeError(f"OSM snapshot has no London Underground route geometry for: {', '.join(missing)}")
+            raise RuntimeError(f"OSM snapshot has no TfL rail route geometry for: {', '.join(missing)}")
 
     def path(
         self,
@@ -131,11 +144,60 @@ class OSMTubeRailwayRouter:
             return None
 
         direct = distance_metres(start, end)
-        start_candidates = self._nearest_nodes(node_ids, start, count=16)
-        end_candidates = self._nearest_nodes(node_ids, end, count=16)
+        route = self._route_node_ids(
+            adjacency,
+            node_ids,
+            start,
+            end,
+            direct,
+            candidate_count=16,
+        )
+        if route is None:
+            # Interchange coordinates can sit closer to another branch than to
+            # their own platform (notably DLR Stratford). Widen the snap search
+            # only after the normal search fails so established routes remain
+            # unchanged. Limit that retry to plausible nearby rails and make a
+            # distant endpoint snap more expensive than following the track.
+            route = self._route_node_ids(
+                adjacency,
+                node_ids,
+                start,
+                end,
+                direct,
+                candidate_count=64,
+                maximum_extra_snap=100.0,
+                snap_weight=5.0,
+            )
+        if route is None:
+            return None
+
+        coordinates = [self.coordinates[node_id] for node_id in route]
+        return [
+            {"latitude": round(latitude, 6), "longitude": round(longitude, 6)}
+            for longitude, latitude in coordinates
+        ]
+
+    def _route_node_ids(
+        self,
+        adjacency: dict[int, list[tuple[int, float]]],
+        node_ids: tuple[int, ...],
+        start: Coordinate,
+        end: Coordinate,
+        direct: float,
+        candidate_count: int,
+        maximum_extra_snap: float | None = None,
+        snap_weight: float = 1.0,
+    ) -> list[int] | None:
+        start_candidates = self._nearest_nodes(node_ids, start, count=candidate_count)
+        end_candidates = self._nearest_nodes(node_ids, end, count=candidate_count)
+        if maximum_extra_snap is not None:
+            start_limit = start_candidates[0][1] + maximum_extra_snap
+            end_limit = end_candidates[0][1] + maximum_extra_snap
+            start_candidates = [candidate for candidate in start_candidates if candidate[1] <= start_limit]
+            end_candidates = [candidate for candidate in end_candidates if candidate[1] <= end_limit]
         start_nodes = {node_id for node_id, _ in start_candidates}
         targets = {
-            node_id: snap
+            node_id: snap * snap_weight
             for node_id, snap in end_candidates
             if direct < 100 or node_id not in start_nodes
         }
@@ -145,8 +207,9 @@ class OSMTubeRailwayRouter:
         previous: dict[int, int] = {}
         queue: list[tuple[float, int]] = []
         for node_id, snap in start_candidates:
-            distances[node_id] = snap
-            heapq.heappush(queue, (snap, node_id))
+            weighted_snap = snap * snap_weight
+            distances[node_id] = weighted_snap
+            heapq.heappush(queue, (weighted_snap, node_id))
 
         best_target: int | None = None
         best_score = math.inf
@@ -173,12 +236,7 @@ class OSMTubeRailwayRouter:
         route.reverse()
         if len(route) < 2:
             return None
-
-        coordinates = [self.coordinates[node_id] for node_id in route]
-        return [
-            {"latitude": round(latitude, 6), "longitude": round(longitude, 6)}
-            for longitude, latitude in coordinates
-        ]
+        return route
 
     def _nearest_nodes(
         self,

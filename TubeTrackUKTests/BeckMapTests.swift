@@ -3,6 +3,21 @@ import Testing
 @testable import TubeTrackUK
 
 struct BeckMapTests {
+    @Test func parallelRouteStrokeWidthsMatchOfficialArtworkProportions() {
+        let styles = BeckMapStyleRecord(
+            routeStrokeWidth: 9,
+            affectedOuterStrokeWidth: 19,
+            affectedKnockoutStrokeWidth: 15,
+            affectedRouteStrokeWidth: 10,
+            primaryLabelFontSize: 18,
+            secondaryLabelFontSize: 16,
+            labelPadding: 2
+        )
+
+        #expect(styles.parallelRouteOuterStrokeWidth == 9)
+        #expect(styles.parallelRouteInnerStrokeWidth == 3)
+    }
+
     @Test func artworkPrimitivesUseStableTaggedJSON() throws {
         let commands: [BeckMapPathCommand] = [
             .move(to: .init(x: 10, y: 20)),
@@ -489,7 +504,7 @@ struct BeckMapTests {
         ).count == 1)
     }
 
-    @Test func publishedAuthoredRegionsCoverEveryTubeGraphSegment() throws {
+    @Test func publishedAuthoredRegionsCoverEveryRailGraphSegment() throws {
         let graph = try TubeGraph.bundled()
         let repository = BeckMapRepository()
         let authoredSegmentIDs = try Set(BeckMapRegion.allCases.flatMap { region in

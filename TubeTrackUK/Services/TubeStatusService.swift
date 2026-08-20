@@ -21,7 +21,7 @@ actor TubeStatusService {
     func fetch() async throws -> TubeStatusSnapshot {
         do {
             let statuses: [TfLLineStatus] = try await client.get(
-                "/Line/Mode/tube/Status",
+                "/Line/Mode/tube,dlr,elizabeth-line/Status",
                 queryItems: [URLQueryItem(name: "detail", value: "true")]
             )
             let resolver = DisruptionResolver(repository: repository)

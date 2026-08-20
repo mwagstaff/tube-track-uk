@@ -2,4 +2,4 @@
 w/railway=subway,rail,light_rail
 nwr/railway=station,halt,stop,platform
 nwr/public_transport=station,platform,stop_position,stop_area
-r/route=subway
+r/route=subway,light_rail,train

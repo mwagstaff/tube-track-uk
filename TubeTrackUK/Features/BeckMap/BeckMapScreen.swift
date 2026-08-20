@@ -13,6 +13,7 @@ struct BeckMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
     @State private var document: BeckMapDocument?
+    @State private var renderCache: BeckMapCanvas.RenderCache?
     @State private var documentLoadError: String?
     @State private var loadedGraphGeneratedAt: String?
     @State private var isLoadingDocument = false
@@ -28,9 +29,11 @@ struct BeckMapScreen: View {
 
             if let graph = appState.graph,
                let document,
+               let renderCache,
                loadedGraphGeneratedAt == graph.generatedAt {
                 BeckMapCanvas(
                     document: document,
+                    renderCache: renderCache,
                     presentation: presentation(document: document, graph: graph),
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
@@ -51,9 +54,9 @@ struct BeckMapScreen: View {
                     description: Text(documentLoadError)
                 )
             } else if appState.graph != nil || isLoadingDocument {
-                ProgressView("Loading Underground map…")
+                ProgressView("Loading London rail map…")
             } else if appState.isLoadingGraph {
-                ProgressView("Loading Underground map…")
+                ProgressView("Loading London rail map…")
             } else {
                 ContentUnavailableView(
                     "Map unavailable",
@@ -132,6 +135,7 @@ struct BeckMapScreen: View {
         }
         .task(id: documentTaskID) {
             document = nil
+            renderCache = nil
             documentLoadError = nil
             loadedGraphGeneratedAt = nil
             guard let graph = appState.graph else {
@@ -141,7 +145,12 @@ struct BeckMapScreen: View {
             isLoadingDocument = true
             defer { isLoadingDocument = false }
             do {
-                document = try BeckMapRepository().load(region: selectedRegion, graph: graph)
+                let loadedDocument = try BeckMapRepository().load(
+                    region: selectedRegion,
+                    graph: graph
+                )
+                renderCache = BeckMapCanvas.RenderCache(document: loadedDocument)
+                document = loadedDocument
                 loadedGraphGeneratedAt = graph.generatedAt
             } catch {
                 documentLoadError = error.localizedDescription
@@ -175,7 +184,7 @@ struct BeckMapScreen: View {
 
     private var regionStatusTitle: String {
         selectedRegion == .fullUnderground
-            ? "Full Underground map"
+            ? "Full London rail map"
             : "\(selectedRegion.title) · authored slice"
     }
 
@@ -248,15 +257,18 @@ struct BeckMapScreen: View {
 
 private struct BeckMapCanvas: View {
     let document: BeckMapDocument
+    let renderCache: RenderCache
     let presentation: BeckMapPresentationSnapshot
     let referenceOverlayVisible: Bool
     let resetToken: Int
     let onStationTap: (String) -> Void
     let onBackgroundTap: () -> Void
 
-    private let renderedSegments: [RenderedSegment]
-    private let artworkBounds: CGRect
-    private let debugReferenceImage: UIImage?
+    private var renderedSegments: [RenderedSegment] { renderCache.renderedSegments }
+    private var renderedLineGroups: [RenderedLineGroup] { renderCache.renderedLineGroups }
+    private var renderedLabels: [RenderedLabel] { renderCache.renderedLabels }
+    private var artworkBounds: CGRect { renderCache.artworkBounds }
+    private var debugReferenceImage: UIImage? { renderCache.debugReferenceImage }
 
     @State private var cameraScale: CGFloat = 0.35
     @State private var cameraOffset = CGSize.zero
@@ -265,9 +277,12 @@ private struct BeckMapCanvas: View {
     @State private var panStartOffset: CGSize?
     @State private var pinchStartScale: CGFloat?
     @State private var pinchMapPoint: CGPoint?
+    @State private var isPanning = false
+    @State private var isPinching = false
 
     init(
         document: BeckMapDocument,
+        renderCache: RenderCache,
         presentation: BeckMapPresentationSnapshot,
         referenceOverlayVisible: Bool,
         resetToken: Int,
@@ -275,37 +290,18 @@ private struct BeckMapCanvas: View {
         onBackgroundTap: @escaping () -> Void
     ) {
         self.document = document
+        self.renderCache = renderCache
         self.presentation = presentation
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
         self.onStationTap = onStationTap
         self.onBackgroundTap = onBackgroundTap
-
-        let paths = Dictionary(uniqueKeysWithValues: document.paths.map { ($0.id, $0.commands) })
-        let renderedSegments: [RenderedSegment] = document.segments.compactMap { segment -> RenderedSegment? in
-            guard let commands = paths[segment.pathID] else { return nil }
-            return RenderedSegment(
-                id: segment.id,
-                lineID: segment.lineID,
-                path: Self.makePath(commands: commands, translation: segment.translation),
-                collisionEdges: Self.makeCollisionEdges(
-                    commands: commands,
-                    translation: segment.translation
-                )
-            )
-        }
-        self.renderedSegments = renderedSegments
-        self.artworkBounds = Self.makeArtworkBounds(
-            document: document,
-            renderedSegments: renderedSegments
-        )
-        self.debugReferenceImage = Self.loadDebugReference(for: document)
     }
 
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Canvas { context, size in
+                Canvas(opaque: true, rendersAsynchronously: true) { context, size in
                     context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white))
                     drawArtwork(context: &context, size: size)
                 }
@@ -363,7 +359,7 @@ private struct BeckMapCanvas: View {
                 }
             }
         }
-        .accessibilityLabel("Interactive London Underground map")
+        .accessibilityLabel("Interactive London rail map")
     }
 
     private var isReferenceOverlayActive: Bool {
@@ -410,19 +406,45 @@ private struct BeckMapCanvas: View {
         let issuesActive = !traceMode
             && presentation.emphasizesIssues
             && !presentation.affectedSegmentIDs.isEmpty
-        for segment in renderedSegments {
-            let affected = presentation.affectedSegmentIDs.contains(segment.id)
-            let selected = presentation.selectedLineID == nil || presentation.selectedLineID == segment.lineID
-            let muted = !traceMode && (!selected || (issuesActive && !affected))
-            mapContext.stroke(
-                segment.path,
-                with: .color(muted ? Color(white: 0.72).opacity(0.48) : .tubeLine(segment.lineID)),
-                style: StrokeStyle(
-                    lineWidth: document.styles.routeStrokeWidth,
-                    lineCap: .round,
-                    lineJoin: .round
+        // Preserve the document's line-layer order, but render each parallel
+        // rail line in two passes. Drawing every coloured outer before any
+        // white inset keeps branch joins open instead of allowing a later
+        // segment's outer stroke to plug an earlier segment's white centre.
+        for lineGroup in renderedLineGroups {
+            for segment in lineGroup.segments {
+                let affected = presentation.affectedSegmentIDs.contains(segment.id)
+                let selected = presentation.selectedLineID == nil
+                    || presentation.selectedLineID == segment.lineID
+                let muted = !traceMode && (!selected || (issuesActive && !affected))
+                mapContext.stroke(
+                    segment.path,
+                    with: .color(
+                        muted
+                            ? Color(white: 0.72).opacity(0.48)
+                            : .tubeLine(segment.lineID)
+                    ),
+                    style: StrokeStyle(
+                        lineWidth: lineGroup.lineID.usesParallelSchematicStroke
+                            ? document.styles.parallelRouteOuterStrokeWidth
+                            : document.styles.routeStrokeWidth,
+                        lineCap: .round,
+                        lineJoin: .round
+                    )
                 )
-            )
+            }
+            if lineGroup.lineID.usesParallelSchematicStroke {
+                for segment in lineGroup.segments {
+                    mapContext.stroke(
+                        segment.path,
+                        with: .color(.white),
+                        style: StrokeStyle(
+                            lineWidth: document.styles.parallelRouteInnerStrokeWidth,
+                            lineCap: .round,
+                            lineJoin: .round
+                        )
+                    )
+                }
+            }
         }
 
         // State overlays are a separate topmost pass. Authored routes can share
@@ -464,7 +486,9 @@ private struct BeckMapCanvas: View {
             // Labels are screen-space UI, so they remain readable instead of
             // growing with the artwork. Station markers are drawn last to
             // guarantee that a label background can never conceal a station.
-            drawLabels(context: &context, viewport: size)
+            if !isPanning, !isPinching {
+                drawLabels(context: &context, viewport: size)
+            }
             drawStationMarkers(context: &mapContext)
         }
     }
@@ -543,71 +567,53 @@ private struct BeckMapCanvas: View {
             ? cameraScale >= 0.72
             : zoomRatio >= 2.15
         let selectedStationID = presentation.selectedStationID
-        let labels = document.labels
-            .filter { label in
-                label.priority >= 10
-                    || showsSecondaryLabels
-                    || label.stationID == selectedStationID
-            }
-            .sorted { lhs, rhs in
-                let lhsSelected = lhs.stationID == selectedStationID
-                let rhsSelected = rhs.stationID == selectedStationID
-                if lhsSelected != rhsSelected { return lhsSelected }
-                if lhs.priority != rhs.priority { return lhs.priority > rhs.priority }
-                return lhs.id < rhs.id
-            }
+        let visibleLabels = renderedLabels.filter { renderedLabel in
+            let label = renderedLabel.label
+            return label.priority >= 10
+                || showsSecondaryLabels
+                || label.stationID == selectedStationID
+        }
+        let labels: [RenderedLabel]
+        if let selectedStationID {
+            labels = visibleLabels.filter { $0.label.stationID == selectedStationID }
+                + visibleLabels.filter { $0.label.stationID != selectedStationID }
+        } else {
+            labels = visibleLabels
+        }
         let markerFrames = markerExclusionFrames()
         let lineBlockers = lineExclusionBlockers(in: viewportRect)
-        let stationAnchors = Dictionary(uniqueKeysWithValues: document.stationMarkers.map {
-            ($0.stationID, CGPoint($0.anchor))
-        })
-        var occupiedLabelFrames: [CGRect] = []
+        let markerIndex = BeckMapSpatialIndex(markerFrames, bounds: \.frame)
+        let lineIndex = BeckMapSpatialIndex(lineBlockers, bounds: \.bounds)
+        var occupiedIndex = BeckMapSpatialIndex<CGRect>()
 
-        for label in labels {
-            let artworkPosition = CGPoint(label.position)
-            let candidates: [BeckMapLabelPlacementCandidate]
-            if let stationAnchor = stationAnchors[label.stationID] {
-                candidates = BeckMapLabelPlacementResolver.candidates(
-                    stationScreenPosition: screenPoint(BeckMapPoint(
-                        x: stationAnchor.x,
-                        y: stationAnchor.y
-                    )),
-                    artworkOffset: CGVector(
-                        dx: artworkPosition.x - stationAnchor.x,
-                        dy: artworkPosition.y - stationAnchor.y
-                    )
-                )
-            } else {
-                candidates = [.init(
-                    position: screenPoint(label.position),
-                    alignment: label.alignment
-                )]
-            }
-            let screenFontSize: CGFloat = label.priority >= 10 ? 16 : 14
-            let rotation = CGAffineTransform(rotationAngle: label.rotationDegrees * .pi / 180)
+        for renderedLabel in labels {
+            let label = renderedLabel.label
+            let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
             var placement: (
                 candidate: BeckMapLabelPlacementCandidate,
                 metrics: LabelMetrics,
                 frame: CGRect
             )?
-            for candidate in candidates {
-                let metrics = Self.labelMetrics(
-                    for: label,
-                    styles: document.styles,
-                    fontSizeOverride: screenFontSize,
-                    alignmentOverride: candidate.alignment
+            for candidateOffset in renderedLabel.candidateOffsets {
+                let candidate = BeckMapLabelPlacementCandidate(
+                    position: CGPoint(
+                        x: screenAnchor.x + candidateOffset.position.x,
+                        y: screenAnchor.y + candidateOffset.position.y
+                    ),
+                    alignment: candidateOffset.alignment
                 )
+                let metrics = renderedLabel.metrics[candidate.alignment]
                 let labelFrame = metrics.bounds
-                    .applying(rotation)
+                    .applying(renderedLabel.rotation)
                     .standardized
                     .offsetBy(dx: candidate.position.x, dy: candidate.position.y)
                 guard viewportRect.intersects(labelFrame) else { continue }
                 let collisionFrame = labelFrame.insetBy(dx: -3, dy: -2)
                 guard BeckMapLabelCollisionResolver.accepts(
                     collisionFrame,
-                    markerBlockers: markerFrames,
-                    lineBlockers: lineBlockers,
-                    occupied: occupiedLabelFrames
+                    markerIndex: markerIndex,
+                    lineIndex: lineIndex,
+                    occupiedIndex: occupiedIndex
                 ) else { continue }
                 placement = (candidate, metrics, collisionFrame)
                 break
@@ -632,18 +638,17 @@ private struct BeckMapCanvas: View {
 
             var labelContext = context
             labelContext.concatenate(
-                CGAffineTransform(
+                renderedLabel.rotation.concatenating(CGAffineTransform(
                     translationX: placement.candidate.position.x,
                     y: placement.candidate.position.y
-                )
-                    .rotated(by: label.rotationDegrees * .pi / 180)
+                ))
             )
             labelContext.fill(
                 Path(roundedRect: placement.metrics.bounds, cornerRadius: 2),
                 with: .color(.white.opacity(0.86))
             )
             labelContext.draw(text, at: .zero, anchor: anchor)
-            occupiedLabelFrames.append(placement.frame)
+            occupiedIndex.insert(placement.frame, bounds: placement.frame)
         }
     }
 
@@ -774,12 +779,15 @@ private struct BeckMapCanvas: View {
     private func handlePan(translation: CGSize, phase: BeckMapGesturePhase) {
         switch phase {
         case .began:
+            isPanning = true
             panStartOffset = cameraOffset
         case .changed:
+            isPanning = true
             let start = panStartOffset ?? cameraOffset
             panStartOffset = start
             cameraOffset = CGSize(width: start.width + translation.width, height: start.height + translation.height)
         case .ended:
+            isPanning = false
             panStartOffset = nil
         }
     }
@@ -787,12 +795,14 @@ private struct BeckMapCanvas: View {
     private func handlePinch(magnification: CGFloat, location: CGPoint, phase: BeckMapGesturePhase) {
         switch phase {
         case .began:
+            isPinching = true
             pinchStartScale = cameraScale
             pinchMapPoint = CGPoint(
                 x: (location.x - cameraOffset.width) / cameraScale,
                 y: (location.y - cameraOffset.height) / cameraScale
             )
         case .changed:
+            isPinching = true
             guard let startScale = pinchStartScale, let mapPoint = pinchMapPoint else { return }
             let nextScale = min(maximumCameraScale, max(minimumCameraScale, startScale * magnification))
             cameraScale = nextScale
@@ -801,6 +811,7 @@ private struct BeckMapCanvas: View {
                 height: location.y - mapPoint.y * nextScale
             )
         case .ended:
+            isPinching = false
             pinchStartScale = nil
             pinchMapPoint = nil
             panStartOffset = nil
@@ -1064,14 +1075,149 @@ private struct BeckMapCanvas: View {
         )
     }
 
-    private struct RenderedSegment {
+    @MainActor
+    struct RenderCache {
+        let renderedSegments: [RenderedSegment]
+        let renderedLineGroups: [RenderedLineGroup]
+        let renderedLabels: [RenderedLabel]
+        let artworkBounds: CGRect
+        let debugReferenceImage: UIImage?
+
+        init(document: BeckMapDocument) {
+            let paths = Dictionary(uniqueKeysWithValues: document.paths.map {
+                ($0.id, $0.commands)
+            })
+            let renderedSegments = document.segments.compactMap {
+                segment -> RenderedSegment? in
+                guard let commands = paths[segment.pathID] else { return nil }
+                return RenderedSegment(
+                    id: segment.id,
+                    lineID: segment.lineID,
+                    path: BeckMapCanvas.makePath(
+                        commands: commands,
+                        translation: segment.translation
+                    ),
+                    collisionEdges: BeckMapCanvas.makeCollisionEdges(
+                        commands: commands,
+                        translation: segment.translation
+                    )
+                )
+            }
+            self.renderedSegments = renderedSegments
+
+            var seenLineIDs: Set<TubeLineID> = []
+            let orderedLineIDs = renderedSegments.compactMap { segment in
+                seenLineIDs.insert(segment.lineID).inserted ? segment.lineID : nil
+            }
+            let segmentsByLineID = Dictionary(grouping: renderedSegments, by: \.lineID)
+            self.renderedLineGroups = orderedLineIDs.map { lineID in
+                RenderedLineGroup(
+                    lineID: lineID,
+                    segments: segmentsByLineID[lineID, default: []]
+                )
+            }
+
+            let stationAnchors = Dictionary(
+                uniqueKeysWithValues: document.stationMarkers.map {
+                    ($0.stationID, CGPoint($0.anchor))
+                }
+            )
+            self.renderedLabels = document.labels.map { label in
+                let artworkPosition = CGPoint(label.position)
+                let artworkAnchor = stationAnchors[label.stationID] ?? artworkPosition
+                let candidateOffsets: [BeckMapLabelPlacementCandidate]
+                if let stationAnchor = stationAnchors[label.stationID] {
+                    candidateOffsets = BeckMapLabelPlacementResolver.candidates(
+                        stationScreenPosition: .zero,
+                        artworkOffset: CGVector(
+                            dx: artworkPosition.x - stationAnchor.x,
+                            dy: artworkPosition.y - stationAnchor.y
+                        )
+                    )
+                } else {
+                    candidateOffsets = [
+                        .init(position: .zero, alignment: label.alignment),
+                    ]
+                }
+                let fontSize: CGFloat = label.priority >= 10 ? 16 : 14
+                return RenderedLabel(
+                    label: label,
+                    artworkAnchor: artworkAnchor,
+                    candidateOffsets: candidateOffsets,
+                    rotation: CGAffineTransform(
+                        rotationAngle: label.rotationDegrees * .pi / 180
+                    ),
+                    metrics: LabelMetricsByAlignment(
+                        leading: BeckMapCanvas.labelMetrics(
+                            for: label,
+                            styles: document.styles,
+                            fontSizeOverride: fontSize,
+                            alignmentOverride: .leading
+                        ),
+                        centre: BeckMapCanvas.labelMetrics(
+                            for: label,
+                            styles: document.styles,
+                            fontSizeOverride: fontSize,
+                            alignmentOverride: .centre
+                        ),
+                        trailing: BeckMapCanvas.labelMetrics(
+                            for: label,
+                            styles: document.styles,
+                            fontSizeOverride: fontSize,
+                            alignmentOverride: .trailing
+                        )
+                    )
+                )
+            }
+            .sorted { lhs, rhs in
+                if lhs.label.priority != rhs.label.priority {
+                    return lhs.label.priority > rhs.label.priority
+                }
+                return lhs.label.id < rhs.label.id
+            }
+            self.artworkBounds = BeckMapCanvas.makeArtworkBounds(
+                document: document,
+                renderedSegments: renderedSegments
+            )
+            self.debugReferenceImage = BeckMapCanvas.loadDebugReference(for: document)
+        }
+    }
+
+    struct RenderedSegment {
         let id: String
         let lineID: TubeLineID
         let path: Path
         let collisionEdges: [BeckMapCollisionEdge]
     }
 
-    private struct LabelMetrics {
+    struct RenderedLineGroup {
+        let lineID: TubeLineID
+        let segments: [RenderedSegment]
+    }
+
+    struct RenderedLabel {
+        let label: BeckMapLabelRecord
+        let artworkAnchor: CGPoint
+        let candidateOffsets: [BeckMapLabelPlacementCandidate]
+        let rotation: CGAffineTransform
+        let metrics: LabelMetricsByAlignment
+    }
+
+    struct LabelMetricsByAlignment {
+        let leading: LabelMetrics
+        let centre: LabelMetrics
+        let trailing: LabelMetrics
+
+        subscript(alignment: BeckMapLabelAlignment) -> LabelMetrics {
+            switch alignment {
+            case .leading: leading
+            case .centre: centre
+            case .trailing: trailing
+            }
+        }
+    }
+
+    struct LabelMetrics {
         let fontSize: CGFloat
         let bounds: CGRect
     }
@@ -1141,6 +1287,76 @@ struct BeckMapLineBlocker: Equatable {
     }
 }
 
+fileprivate struct BeckMapSpatialIndex<Element> {
+    private struct Cell: Hashable {
+        let column: Int
+        let row: Int
+    }
+
+    private let cellSize: CGFloat
+    private var elements: [Element] = []
+    private var elementIndicesByCell: [Cell: [Int]] = [:]
+
+    init(cellSize: CGFloat = 96) {
+        self.cellSize = max(1, cellSize)
+    }
+
+    init(
+        _ elements: [Element],
+        cellSize: CGFloat = 96,
+        bounds: (Element) -> CGRect
+    ) {
+        self.init(cellSize: cellSize)
+        for element in elements {
+            insert(element, bounds: bounds(element))
+        }
+    }
+
+    mutating func insert(_ element: Element, bounds: CGRect) {
+        guard let cellRange = cellRange(for: bounds) else { return }
+        let elementIndex = elements.endIndex
+        elements.append(element)
+        for column in cellRange.columns {
+            for row in cellRange.rows {
+                elementIndicesByCell[Cell(column: column, row: row), default: []]
+                    .append(elementIndex)
+            }
+        }
+    }
+
+    func containsIntersecting(
+        _ frame: CGRect,
+        where predicate: (Element) -> Bool
+    ) -> Bool {
+        guard let cellRange = cellRange(for: frame) else { return false }
+        for column in cellRange.columns {
+            for row in cellRange.rows {
+                let cell = Cell(column: column, row: row)
+                for elementIndex in elementIndicesByCell[cell, default: []]
+                where predicate(elements[elementIndex]) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
+    private func cellRange(
+        for rawRect: CGRect
+    ) -> (columns: ClosedRange<Int>, rows: ClosedRange<Int>)? {
+        let rect = rawRect.standardized
+        guard rect.minX.isFinite, rect.maxX.isFinite,
+              rect.minY.isFinite, rect.maxY.isFinite else {
+            return nil
+        }
+        let minimumColumn = Int(floor(rect.minX / cellSize))
+        let maximumColumn = Int(floor(rect.maxX / cellSize))
+        let minimumRow = Int(floor(rect.minY / cellSize))
+        let maximumRow = Int(floor(rect.maxY / cellSize))
+        return (minimumColumn ... maximumColumn, minimumRow ... maximumRow)
+    }
+}
+
 enum BeckMapLabelCollisionResolver {
     static func accepts(
         _ frame: CGRect,
@@ -1151,6 +1367,17 @@ enum BeckMapLabelCollisionResolver {
         !markerBlockers.contains(where: { $0.frame.intersects(frame) })
             && !lineBlockers.contains(where: { $0.intersects(frame) })
             && !occupied.contains(where: { $0.intersects(frame) })
+    }
+
+    fileprivate static func accepts(
+        _ frame: CGRect,
+        markerIndex: BeckMapSpatialIndex<BeckMapLabelBlocker>,
+        lineIndex: BeckMapSpatialIndex<BeckMapLineBlocker>,
+        occupiedIndex: BeckMapSpatialIndex<CGRect>
+    ) -> Bool {
+        !markerIndex.containsIntersecting(frame) { $0.frame.intersects(frame) }
+            && !lineIndex.containsIntersecting(frame) { $0.intersects(frame) }
+            && !occupiedIndex.containsIntersecting(frame) { $0.intersects(frame) }
     }
 }
 

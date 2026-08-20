@@ -18,13 +18,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import build_central_core_join as vector
+import build_rail_extensions as rail
 
 
 ARTWORK_WIDTH = 4764.0
 ARTWORK_HEIGHT = 3632.0
 SUPPLEMENTAL_HEATHROW_SEGMENT_ID = "piccadilly:940GZZLUHNX:940GZZLUHR4"
-
-
+UNDERGROUND_LINE_IDS = {
+    "bakerloo", "central", "circle", "district", "hammersmith-city",
+    "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
+    "waterloo-city",
+}
 @dataclass(frozen=True)
 class Slice:
     name: str
@@ -199,6 +203,7 @@ HEATHROW_LABEL_TEXT: dict[str, str] = {
 # memberships must not promote them to interchange roundels.
 ORDINARY_SHARED_STATION_TANGENTS: dict[str, vector.Point] = {
     "Bayswater": (0, 1),
+    "High Street Kensington": (0, 1),
     "Sloane Square": (1, 0),
     "St. James's Park": (1, 0),
     "Temple": (1, 0),
@@ -356,7 +361,13 @@ def shared_line_port(
 
 def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     graph = json.loads(graph_path.read_text())
-    stations_by_name = {station["name"]: station for station in graph["stations"]}
+    stations_by_name: dict[str, dict] = {}
+    for station in graph["stations"]:
+        is_underground = any(
+            line_id in UNDERGROUND_LINE_IDS for line_id in station["lineIDs"]
+        )
+        if station["name"] not in stations_by_name or is_underground:
+            stations_by_name[station["name"]] = station
     stations_by_id = {station["id"]: station for station in graph["stations"]}
     graph_segments = {segment["id"]: segment for segment in graph["segments"]}
 
@@ -436,7 +447,10 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "segmentIDs": route_segment_ids,
         }
 
-    expected_segments = set(graph_segments)
+    expected_segments = {
+        segment["id"] for segment in graph["segments"]
+        if segment["lineID"] in UNDERGROUND_LINE_IDS
+    }
     actual_graph_segments = set(selected_segments) - {SUPPLEMENTAL_HEATHROW_SEGMENT_ID}
     if actual_graph_segments != expected_segments:
         missing = sorted(expected_segments - actual_graph_segments)
@@ -533,6 +547,20 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                 target[0] - current["x"],
                 target[1] - current["y"],
             )
+
+    # The Hammersmith & City and Circle lines share this vertical corridor.
+    # Keep each H&C station port on the same horizontal row as its Circle peer
+    # while preserving the authored side-by-side lane spacing.
+    for station_id in ("940GZZLUSBM", "940GZZLUGHK", "940GZZLUHSC"):
+        circle_port = line_port(selected_segments, station_id, "circle")
+        hammersmith_city_port = line_port(
+            selected_segments, station_id, "hammersmith-city"
+        )
+        set_line_port(
+            station_id,
+            "hammersmith-city",
+            (hammersmith_city_port[0], circle_port[1]),
+        )
 
     # Stepney Green is an ordinary paired stop. Move both authored corridor
     # ports west as one unit, giving the station and label clear separation
@@ -962,6 +990,8 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     markers: list[dict] = []
     labels: list[dict] = []
     for station_id, station in stations_by_id.items():
+        if not any(line_id in UNDERGROUND_LINE_IDS for line_id in station["lineIDs"]):
+            continue
         candidates = marker_candidates.get(station_id, [])
         if candidates:
             _, marker = max(
@@ -1335,7 +1365,24 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                     for line_id, port in line_ports
                 ],
             }
-        elif station["name"] in {"Gloucester Road", "South Kensington"}:
+        elif station["name"] == "Gloucester Road":
+            line_ports = [
+                (line_id, line_port(selected_segments, station_id, line_id))
+                for line_id in ("circle", "district")
+            ]
+            anchor = average_point([port for _, port in line_ports])
+            marker = {
+                "stationID": station_id,
+                "name": station["name"],
+                "lineIDs": line_ids,
+                "anchor": vector.rounded(anchor),
+                "hitRadius": 24,
+                "primitives": [
+                    tick_at(line_id, port, (0, 1))
+                    for line_id, port in line_ports
+                ],
+            }
+        elif station["name"] == "South Kensington":
             shared_port = shared_line_port(
                 selected_segments, station_id, ("circle", "district")
             )
@@ -1569,6 +1616,10 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     for marker in markers:
         marker["lineIDs"] = list(stations_by_id[marker["stationID"]]["lineIDs"])
 
+    rail.append_rail_artwork(
+        root, graph, selected_paths, selected_segments, markers, labels, routes
+    )
+
     return {
         "schemaVersion": {"major": 1, "minor": 2},
         "identifier": "tube-track-uk.beck.full-underground.v1",
@@ -1577,8 +1628,10 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "graphSchemaVersion": graph["schemaVersion"],
             "graphGeneratedAt": graph["generatedAt"],
             "note": (
-                "Complete Underground artwork compiled offline from trace-verified slices and exact "
-                "master paths extracted from the April 2026 TfL vector map. No runtime layout is used."
+                "Complete London rail artwork compiled offline. Underground geometry uses trace-verified "
+                "slices and exact master paths from the April 2026 TfL vector map, including the DLR "
+                "and Elizabeth line branches and their distinct interchange ports. "
+                "No runtime layout is used."
             ),
         },
         "artworkSize": {"width": ARTWORK_WIDTH, "height": ARTWORK_HEIGHT},
@@ -1601,6 +1654,11 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         "stationMarkers": sorted(markers, key=lambda value: value["stationID"]),
         "labels": sorted(labels, key=lambda value: value["id"]),
         "routes": sorted(routes.values(), key=lambda value: value["id"]),
+        "supportedLineIDs": [
+            "bakerloo", "central", "circle", "district", "hammersmith-city",
+            "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
+            "waterloo-city", "dlr", "elizabeth",
+        ],
     }
 
 

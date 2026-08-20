@@ -7,7 +7,7 @@ struct LiveStatusDock: View {
 
     private var summary: (symbol: String, color: Color, title: String, detail: String) {
         if appState.isRefreshingStatus && appState.statuses.isEmpty {
-            return ("arrow.trianglehead.2.clockwise.rotate.90", .blue, "Updating Tube status", "Fetching live TfL data")
+            return ("arrow.trianglehead.2.clockwise.rotate.90", .blue, "Updating network status", "Fetching live TfL data")
         }
         if let error = appState.statusError, appState.statuses.isEmpty {
             return ("wifi.slash", .orange, "Live status unavailable", error)
@@ -20,9 +20,9 @@ struct LiveStatusDock: View {
             $0.lineStatuses.allSatisfy(\.isOvernightClosure)
         }
         if overnight {
-            return ("moon.zzz.fill", .indigo, "Tube service closed", "Service resumes later this morning")
+            return ("moon.zzz.fill", .indigo, "Rail services closed", "Service resumes later this morning")
         }
-        return ("checkmark.circle.fill", .green, "Good service", "\(appState.goodServiceLineCount) of 11 lines reporting normally")
+        return ("checkmark.circle.fill", .green, "Good service", "\(appState.goodServiceLineCount) of \(TubeLineID.allCases.count) lines reporting normally")
     }
 
     var body: some View {
@@ -171,7 +171,7 @@ struct LiveStatusPanel: View {
             ContentUnavailableView(
                 "Good service",
                 systemImage: "checkmark.circle.fill",
-                description: Text("No live Tube disruptions are currently reported.")
+                description: Text("No live rail disruptions are currently reported.")
             )
             .frame(height: 160)
         }

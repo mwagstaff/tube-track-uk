@@ -35,7 +35,7 @@ enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
 
     var accessibilityDescription: String {
         switch self {
-        case .fullUnderground: "Complete Underground map composed from trace-verified official TfL vector artwork"
+        case .fullUnderground: "Complete Tube, DLR, and Elizabeth line map in one authored TfL design space"
         case .easternFan: "Eastern Underground branches traced from the official TfL vector map"
         case .centralCompletion: "Final central Underground joins traced from the official TfL vector map"
         case .centralCoreJoin: "Central core join traced from the official TfL vector map"

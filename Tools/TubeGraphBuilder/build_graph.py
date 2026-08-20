@@ -35,6 +35,8 @@ LINE_IDS = (
     "piccadilly",
     "victoria",
     "waterloo-city",
+    "dlr",
+    "elizabeth",
 )
 OUTPUT = Path(__file__).resolve().parents[2] / "TubeTrackUK" / "Resources" / "TubeGraph.json"
 
@@ -383,6 +385,10 @@ def geographic_line_strings(payload: dict[str, Any]) -> list[list[tuple[float, f
             continue
 
         def visit(node: Any) -> None:
+            if isinstance(node, dict):
+                if "coordinates" in node:
+                    visit(node["coordinates"])
+                return
             if isinstance(node, list) and node and all(
                 isinstance(item, list)
                 and len(item) >= 2
@@ -446,6 +452,16 @@ def routed_geographic_path(
 
 def main() -> int:
     args = parse_args()
+    existing_geography: dict[str, list[dict[str, float]]] = {}
+    if args.output.is_file():
+        try:
+            existing_graph = json.loads(args.output.read_text(encoding="utf-8"))
+            existing_geography = {
+                segment["id"]: segment.get("geographicPoints", [])
+                for segment in existing_graph.get("segments", [])
+            }
+        except (OSError, json.JSONDecodeError, KeyError):
+            pass
     osm_router = None
     if args.osm_pbf is not None:
         if not args.osm_pbf.is_file():
@@ -478,12 +494,17 @@ def main() -> int:
                     "name": clean_station_name(point.get("name", station_id)),
                     "latitude": latitude,
                     "longitude": longitude,
+                    "hubID": point.get("topMostParentId") or point.get("parentId"),
                 }
                 station_lines[station_id].add(line_id)
 
         for route in payload.get("orderedLineRoutes", []):
             for station_id in route.get("naptanIds", []):
                 station_lines[station_id].add(line_id)
+
+    hub_lines: defaultdict[str, set[str]] = defaultdict(set)
+    for station_id, station in station_records.items():
+        hub_lines[station.get("hubID") or station_id].update(station_lines[station_id])
 
     stations: list[dict[str, Any]] = []
     station_points = topology_schematic_points(station_records, line_payloads)
@@ -496,7 +517,7 @@ def main() -> int:
                 "schematicX": x,
                 "schematicY": y,
                 "lineIDs": lines,
-                "interchange": len(lines) > 1,
+                "interchange": len(hub_lines[station.get("hubID") or station_id]) > 1,
                 "searchAliases": [
                     station["name"].lower(),
                     station["name"].lower().replace("&", "and"),
@@ -528,17 +549,26 @@ def main() -> int:
                 segment_ids.append(segment_id)
                 from_station = station_records[from_id]
                 to_station = station_records[to_id]
-                geographic_points = None
+                # Keep the last reviewed OSM track geometry during API-only
+                # topology refreshes. TfL's route sequence geometry is often
+                # only station-to-station for DLR and Elizabeth line, so
+                # discarding these points would turn the map back into chords.
+                geographic_points = existing_geography.get(segment_id)
                 if osm_router is not None:
-                    geographic_points = osm_router.path(
+                    osm_geographic_points = osm_router.path(
                         line_id,
                         (float(from_station["longitude"]), float(from_station["latitude"])),
                         (float(to_station["longitude"]), float(to_station["latitude"])),
                     )
-                    if geographic_points is None:
+                    if osm_geographic_points is not None:
+                        geographic_points = osm_geographic_points
+                    else:
+                        fallback_name = (
+                            "existing OSM geometry" if geographic_points else "TfL fallback"
+                        )
                         print(
                             f"WARNING: OSM route unavailable for {line_id} "
-                            f"{from_station['name']} -> {to_station['name']}; using TfL fallback",
+                            f"{from_station['name']} -> {to_station['name']}; using {fallback_name}",
                             file=sys.stderr,
                         )
                 if geographic_points is None:
@@ -576,13 +606,14 @@ def main() -> int:
     segments.sort(key=lambda segment: segment["id"])
     lines.sort(key=lambda line: LINE_IDS.index(line["id"]))
 
+    uses_osm_geometry = osm_router is not None or bool(existing_geography)
     graph = {
         "schemaVersion": 1,
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "source": {
-            "name": "TfL topology with OpenStreetMap railway geometry" if osm_router else "Transport for London Unified API",
-            "url": "https://www.openstreetmap.org/copyright" if osm_router else f"{API_BASE}/Line/{{lineId}}/Route/Sequence/outbound",
-            "attribution": "Data provided by Transport for London; © OpenStreetMap contributors" if osm_router else "Data provided by Transport for London",
+            "name": "TfL topology with OpenStreetMap railway geometry" if uses_osm_geometry else "Transport for London Unified API",
+            "url": "https://www.openstreetmap.org/copyright" if uses_osm_geometry else f"{API_BASE}/Line/{{lineId}}/Route/Sequence/outbound",
+            "attribution": "Data provided by Transport for London; © OpenStreetMap contributors" if uses_osm_geometry else "Data provided by Transport for London",
         },
         "schematicSize": {"width": 1400.0, "height": 1000.0},
         "stations": stations,

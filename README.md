@@ -1,8 +1,8 @@
 # TubeTrack UK
 
-TubeTrack UK is a native, iPhone-only iOS 26 app for exploring the London
-Underground on an authored network map or on an Apple map. It combines a bundled
-offline Tube graph with live Transport for London status, planned work and
+TubeTrack UK is a native, iPhone-only iOS 26 app for exploring London
+Underground, DLR and Elizabeth line services on an authored network map or on an Apple map. It combines a bundled
+offline rail graph with live Transport for London status, planned work and
 arrival-prediction data.
 
 ## Run the app
@@ -20,7 +20,7 @@ ignored by Git and is included conditionally by `Shared.xcconfig`.
 
 - authored Underground map with pan, pinch zoom and map hit testing;
 - MapKit view using the same station, segment, disruption and train state;
-- 11 centrally defined Tube line styles and a 272-station bundled network;
+- 13 centrally defined rail line styles and a 360-stop bundled network;
 - 30-second live status refresh with section-aware disruption resolution;
 - Normal/Issues highlighting, collapsible status panel and cached fallback;
 - estimated moving trains from TfL predictions, with a 20-second refresh and
@@ -51,7 +51,7 @@ fallback, TfL date decoding, train interpolation and works deduplication.
 
 ## Refreshing the bundled graph
 
-`Tools/TubeGraphBuilder/build_graph.py` compiles the current topology and TfL
+`Tools/TubeGraphBuilder/build_graph.py` compiles the current Tube, DLR and Elizabeth topology and TfL
 route geometry into `TubeTrackUK/Resources/TubeGraph.json`. The iOS app never
 runs this script at launch.
 
@@ -60,6 +60,11 @@ python3 Tools/TubeGraphBuilder/build_graph.py
 ```
 
 Review the generated asset and rerun the tests after any network update.
+
+For detailed geographic geometry, pass a reproducible OSM PBF containing
+`route=subway`, `route=light_rail`, and `route=train` relations. Existing
+Underground OSM geometry is retained during API-only refreshes; DLR and
+Elizabeth use TfL route geometry as the fallback.
 
 ## Attribution
 

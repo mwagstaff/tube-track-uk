@@ -2,9 +2,22 @@ import Foundation
 
 struct TubeNetworkRepository: Sendable {
     let graph: TubeGraph
+    private let segmentsByConnection: [SegmentConnection: TubeSegment]
 
     init(graph: TubeGraph) {
         self.graph = graph
+        self.segmentsByConnection = graph.segments.reduce(into: [:]) { result, segment in
+            let connection = SegmentConnection(
+                lineID: segment.lineID,
+                firstStationID: segment.fromStationID,
+                secondStationID: segment.toStationID
+            )
+            // Match the previous linear lookup's first-segment-wins behavior if
+            // malformed source data ever contains the same connection twice.
+            if result[connection] == nil {
+                result[connection] = segment
+            }
+        }
     }
 
     func station(named rawName: String, on lineID: TubeLineID? = nil) -> TubeStation? {
@@ -55,17 +68,36 @@ struct TubeNetworkRepository: Sendable {
     }
 
     func segment(between firstID: String, and secondID: String, on lineID: TubeLineID) -> TubeSegment? {
-        graph.segments.first {
-            $0.lineID == lineID
-                && Set([$0.fromStationID, $0.toStationID]) == Set([firstID, secondID])
-        }
+        segmentsByConnection[
+            SegmentConnection(
+                lineID: lineID,
+                firstStationID: firstID,
+                secondStationID: secondID
+            )
+        ]
     }
 
-    func neighboringStation(for stationID: String, on lineID: TubeLineID, direction: String?) -> String? {
+    func neighboringStation(
+        for stationID: String,
+        on lineID: TubeLineID,
+        direction: String?,
+        destinationStationID: String? = nil
+    ) -> String? {
         guard let line = graph.line(lineID) else { return nil }
         let isInbound = direction?.lowercased() == "inbound"
-        for route in line.routes {
+        let routes = line.routes.sorted { left, right in
+            let leftMatches = destinationStationID.map(left.contains) ?? false
+            let rightMatches = destinationStationID.map(right.contains) ?? false
+            return leftMatches && !rightMatches
+        }
+        for route in routes {
             guard let index = route.firstIndex(of: stationID) else { continue }
+            if let destinationStationID,
+               let destinationIndex = route.firstIndex(of: destinationStationID),
+               destinationIndex != index {
+                if destinationIndex > index, index > 0 { return route[index - 1] }
+                if destinationIndex < index, index + 1 < route.count { return route[index + 1] }
+            }
             if isInbound, index + 1 < route.count { return route[index + 1] }
             if !isInbound, index > 0 { return route[index - 1] }
             if index > 0 { return route[index - 1] }
@@ -80,5 +112,22 @@ struct TubeNetworkRepository: Sendable {
             .replacingOccurrences(of: "&", with: "and")
             .replacingOccurrences(of: ".", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}
+
+private struct SegmentConnection: Hashable, Sendable {
+    let lineID: TubeLineID
+    let firstStationID: String
+    let secondStationID: String
+
+    init(lineID: TubeLineID, firstStationID: String, secondStationID: String) {
+        self.lineID = lineID
+        if firstStationID <= secondStationID {
+            self.firstStationID = firstStationID
+            self.secondStationID = secondStationID
+        } else {
+            self.firstStationID = secondStationID
+            self.secondStationID = firstStationID
+        }
     }
 }

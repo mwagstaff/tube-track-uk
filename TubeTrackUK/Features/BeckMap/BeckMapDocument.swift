@@ -18,6 +18,11 @@ struct BeckMapDocument: Codable, Hashable, Sendable {
     let stationMarkers: [BeckMapStationMarkerRecord]
     let labels: [BeckMapLabelRecord]
     let routes: [BeckMapRouteRecord]
+    var supportedLineIDs: [TubeLineID]? = nil
+
+    var lineCoverage: Set<TubeLineID> {
+        Set(supportedLineIDs ?? segments.map(\.lineID))
+    }
 }
 
 struct BeckMapSchemaVersion: Codable, Hashable, Sendable {
@@ -52,6 +57,9 @@ struct BeckMapStyleRecord: Codable, Hashable, Sendable {
     let primaryLabelFontSize: Double
     let secondaryLabelFontSize: Double
     let labelPadding: Double
+
+    var parallelRouteOuterStrokeWidth: Double { routeStrokeWidth }
+    var parallelRouteInnerStrokeWidth: Double { routeStrokeWidth / 3 }
 }
 
 struct BeckMapDebugReferenceRecord: Codable, Hashable, Sendable {
