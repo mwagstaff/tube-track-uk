@@ -6,7 +6,11 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let selectedStationID: String?
     let affectedSegmentIDs: Set<String>
     let affectedStationIDs: Set<String>
-    let emphasizesIssues: Bool
+    let disruptionDisplayMode: DisruptionDisplayMode
+
+    var emphasizesIssues: Bool {
+        disruptionDisplayMode == .issues
+    }
 }
 
 struct BeckMapScreen: View {
@@ -44,6 +48,7 @@ struct BeckMapScreen: View {
                         : [],
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
+                    stationSelectionGeneration: appState.stationSelectionGeneration,
                     onStationTap: { stationID in
                         guard let station = graph.stationsByID[stationID] else { return }
                         withAnimation(.smooth(duration: 0.35)) {
@@ -170,7 +175,7 @@ struct BeckMapScreen: View {
             selectedStationID: appState.selectedStationID,
             affectedSegmentIDs: affectedSegmentIDs,
             affectedStationIDs: appState.activeAffectedStationIDs,
-            emphasizesIssues: appState.disruptionDisplayMode == .issues
+            disruptionDisplayMode: appState.disruptionDisplayMode
         )
     }
 
@@ -228,6 +233,8 @@ struct BeckMapScreen: View {
 }
 
 private struct BeckMapCanvas: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let document: BeckMapDocument
     let renderCache: RenderCache
     let presentation: BeckMapPresentationSnapshot
@@ -235,6 +242,7 @@ private struct BeckMapCanvas: View {
     let liveTrains: [LiveTubeTrain]
     let referenceOverlayVisible: Bool
     let resetToken: Int
+    let stationSelectionGeneration: Int
     let onStationTap: (String) -> Void
     let onDisruptionTap: (String) -> Void
     let onBackgroundTap: () -> Void
@@ -254,6 +262,7 @@ private struct BeckMapCanvas: View {
     @State private var pinchMapPoint: CGPoint?
     @State private var isPanning = false
     @State private var isPinching = false
+    @State private var cameraTransitionTask: Task<Void, Never>?
 
     init(
         document: BeckMapDocument,
@@ -263,6 +272,7 @@ private struct BeckMapCanvas: View {
         liveTrains: [LiveTubeTrain],
         referenceOverlayVisible: Bool,
         resetToken: Int,
+        stationSelectionGeneration: Int,
         onStationTap: @escaping (String) -> Void,
         onDisruptionTap: @escaping (String) -> Void,
         onBackgroundTap: @escaping () -> Void
@@ -274,6 +284,7 @@ private struct BeckMapCanvas: View {
         self.liveTrains = liveTrains
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
+        self.stationSelectionGeneration = stationSelectionGeneration
         self.onStationTap = onStationTap
         self.onDisruptionTap = onDisruptionTap
         self.onBackgroundTap = onBackgroundTap
@@ -283,7 +294,10 @@ private struct BeckMapCanvas: View {
         GeometryReader { proxy in
             ZStack {
                 Canvas(opaque: true, rendersAsynchronously: true) { context, size in
-                    context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.white))
+                    context.fill(
+                        Path(CGRect(origin: .zero, size: size)),
+                        with: .color(palette.background)
+                    )
                     drawArtwork(context: &context, size: size)
                 }
                 .allowsHitTesting(false)
@@ -318,7 +332,9 @@ private struct BeckMapCanvas: View {
                 guard proxy.size.width > 0, proxy.size.height > 0 else { return }
                 await Task.yield()
                 resetCamera(in: proxy.size)
-                if presentation.emphasizesIssues {
+                if let selectedStationID = presentation.selectedStationID {
+                    focus(on: [selectedStationID], in: proxy.size)
+                } else if presentation.emphasizesIssues {
                     focus(on: presentation.affectedStationIDs, in: proxy.size)
                 }
             }
@@ -337,6 +353,13 @@ private struct BeckMapCanvas: View {
                     focus(on: presentation.affectedStationIDs, in: proxy.size)
                 }
             }
+            .onChange(of: stationSelectionGeneration) { _, _ in
+                guard let stationID = presentation.selectedStationID else { return }
+                focus(on: [stationID], in: proxy.size)
+            }
+        }
+        .onDisappear {
+            cameraTransitionTask?.cancel()
         }
     }
 
@@ -355,6 +378,13 @@ private struct BeckMapCanvas: View {
 
     private var isReferenceOverlayActive: Bool {
         referenceOverlayVisible && debugReferenceImage != nil
+    }
+
+    private var palette: BeckMapPalette {
+        BeckMapPalette.resolve(
+            for: colorScheme,
+            preservesReferenceAppearance: isReferenceOverlayActive
+        )
     }
 
     private func drawArtwork(context: inout GraphicsContext, size: CGSize) {
@@ -394,26 +424,49 @@ private struct BeckMapCanvas: View {
             mapContext.opacity = document.debugReference.geometryOpacity
         }
 
-        let issuesActive = !traceMode
-            && presentation.emphasizesIssues
-            && !presentation.affectedSegmentIDs.isEmpty
+        let issuesActive = !traceMode && presentation.emphasizesIssues
         // Preserve the document's line-layer order, but render each parallel
         // rail line in two passes. Drawing every coloured outer before any
-        // white inset keeps branch joins open instead of allowing a later
-        // segment's outer stroke to plug an earlier segment's white centre.
+        // paper inset keeps branch joins open instead of allowing a later
+        // segment's outer stroke to plug an earlier segment's paper centre.
         for lineGroup in renderedLineGroups {
+            if let casing = palette.northernLineCasing,
+               let casingWidth = palette.casingWidth(
+                   for: lineGroup.lineID,
+                   routeWidth: document.styles.routeStrokeWidth
+               ) {
+                for segment in lineGroup.segments {
+                    let affected = presentation.affectedSegmentIDs.contains(segment.id)
+                    let selected = presentation.selectedLineID == nil
+                        || presentation.selectedLineID == segment.lineID
+                    let muted = !traceMode && (
+                        !selected
+                            || presentation.disruptionDisplayMode.mutesSegment(isAffected: affected)
+                    )
+                    guard !muted else { continue }
+                    mapContext.stroke(
+                        segment.path,
+                        with: .color(casing),
+                        style: StrokeStyle(
+                            lineWidth: casingWidth,
+                            lineCap: .round,
+                            lineJoin: .round
+                        )
+                    )
+                }
+            }
+
             for segment in lineGroup.segments {
                 let affected = presentation.affectedSegmentIDs.contains(segment.id)
                 let selected = presentation.selectedLineID == nil
                     || presentation.selectedLineID == segment.lineID
-                let muted = !traceMode && (!selected || (issuesActive && !affected))
+                let muted = !traceMode && (
+                    !selected
+                        || presentation.disruptionDisplayMode.mutesSegment(isAffected: affected)
+                )
                 mapContext.stroke(
                     segment.path,
-                    with: .color(
-                        muted
-                            ? Color(white: 0.72).opacity(0.48)
-                            : .tubeLine(segment.lineID)
-                    ),
+                    with: .color(palette.routeColor(for: segment.lineID, muted: muted)),
                     style: StrokeStyle(
                         lineWidth: lineGroup.lineID.usesParallelSchematicStroke
                             ? document.styles.parallelRouteOuterStrokeWidth
@@ -427,7 +480,7 @@ private struct BeckMapCanvas: View {
                 for segment in lineGroup.segments {
                     mapContext.stroke(
                         segment.path,
-                        with: .color(.white),
+                        with: .color(palette.paper),
                         style: StrokeStyle(
                             lineWidth: document.styles.parallelRouteInnerStrokeWidth,
                             lineCap: .round,
@@ -454,7 +507,7 @@ private struct BeckMapCanvas: View {
                 )
                 mapContext.stroke(
                     segment.path,
-                    with: .color(.white),
+                    with: .color(palette.paper),
                     style: StrokeStyle(
                         lineWidth: document.styles.affectedKnockoutStrokeWidth,
                         lineCap: .round,
@@ -516,7 +569,24 @@ private struct BeckMapCanvas: View {
         for marker in document.stationMarkers {
             let affected = issuesActive && presentation.affectedStationIDs.contains(marker.stationID)
             let selected = presentation.selectedStationID == marker.stationID
-            let outline = affected ? Color.red : selected ? Color.blue : Color(red: 0.08, green: 0.09, blue: 0.10)
+            let outline = affected ? Color.red : selected ? Color.blue : palette.stationOutline
+
+            if selected {
+                let haloRadius = 19 / max(cameraScale, 0.01)
+                let haloRect = CGRect(
+                    x: marker.anchor.x - haloRadius,
+                    y: marker.anchor.y - haloRadius,
+                    width: haloRadius * 2,
+                    height: haloRadius * 2
+                )
+                let halo = Path(ellipseIn: haloRect)
+                context.fill(halo, with: .color(Color.blue.opacity(0.16)))
+                context.stroke(
+                    halo,
+                    with: .color(Color.blue.opacity(0.9)),
+                    lineWidth: 2.5 / max(cameraScale, 0.01)
+                )
+            }
 
             for primitive in marker.primitives {
                 switch primitive {
@@ -531,7 +601,7 @@ private struct BeckMapCanvas: View {
                     )
                     context.stroke(
                         path,
-                        with: .color(.white),
+                        with: .color(palette.paper),
                         style: StrokeStyle(lineWidth: connector.width - 2.2, lineCap: .round)
                     )
                 case let .walkingConnector(connector):
@@ -555,7 +625,10 @@ private struct BeckMapCanvas: View {
                         height: circle.radius * 2
                     )
                     let path = Path(ellipseIn: rect)
-                    context.fill(path, with: .color(affected ? Color.red.opacity(0.16) : .white))
+                    context.fill(
+                        path,
+                        with: .color(affected ? Color.red.opacity(0.16) : palette.paper)
+                    )
                     context.stroke(
                         path,
                         with: .color(outline),
@@ -607,21 +680,38 @@ private struct BeckMapCanvas: View {
         for renderedLabel in labels {
             let label = renderedLabel.label
             let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
+            let weight: Font.Weight = label.priority >= 10 ? .semibold : .medium
+            let fontSize = renderedLabel.metrics[label.alignment].fontSize
+            var text = context.resolve(Text(label.text).font(.system(
+                size: fontSize,
+                weight: weight
+            )))
+            text.shading = .color(palette.ink)
+            let measuredTextSize = text.measure(in: CGSize(
+                width: CGFloat.infinity,
+                height: CGFloat.infinity
+            ))
+            let documentPadding = CGFloat(document.styles.labelPadding)
             var placement: (
                 candidate: BeckMapLabelPlacementCandidate,
-                metrics: LabelMetrics,
+                backgroundBounds: CGRect,
                 frame: CGRect
             )?
             for candidateOffset in renderedLabel.candidateOffsets {
                 let candidate = BeckMapLabelPlacementCandidate(
                     position: CGPoint(
                         x: screenAnchor.x + candidateOffset.position.x,
-                        y: screenAnchor.y + candidateOffset.position.y
+                    y: screenAnchor.y + candidateOffset.position.y
                     ),
                     alignment: candidateOffset.alignment
                 )
-                let metrics = renderedLabel.metrics[candidate.alignment]
-                let labelFrame = metrics.bounds
+                let backgroundBounds = BeckMapLabelBounds.backgroundBounds(
+                    textSize: measuredTextSize,
+                    alignment: candidate.alignment,
+                    horizontalPadding: documentPadding + palette.labelHorizontalPadding,
+                    verticalPadding: documentPadding + palette.labelVerticalPadding
+                )
+                let labelFrame = backgroundBounds
                     .applying(renderedLabel.rotation)
                     .standardized
                     .offsetBy(dx: candidate.position.x, dy: candidate.position.y)
@@ -633,17 +723,11 @@ private struct BeckMapCanvas: View {
                     lineIndex: lineIndex,
                     occupiedIndex: occupiedIndex
                 ) else { continue }
-                placement = (candidate, metrics, collisionFrame)
+                placement = (candidate, backgroundBounds, collisionFrame)
                 break
             }
             guard let placement else { continue }
 
-            let weight: Font.Weight = label.priority >= 10 ? .semibold : .medium
-            var text = context.resolve(Text(label.text).font(.system(
-                size: placement.metrics.fontSize,
-                weight: weight
-            )))
-            text.shading = .color(Color(red: 0.04, green: 0.12, blue: 0.25))
             let anchor: UnitPoint
             switch placement.candidate.alignment {
             case .leading:
@@ -661,17 +745,28 @@ private struct BeckMapCanvas: View {
                     y: placement.candidate.position.y
                 ))
             )
-            labelContext.fill(
-                Path(roundedRect: placement.metrics.bounds, cornerRadius: 2),
-                with: .color(.white.opacity(0.86))
+            let backgroundPath = Path(
+                roundedRect: placement.backgroundBounds,
+                cornerRadius: min(
+                    palette.labelCornerRadius,
+                    placement.backgroundBounds.height / 2
+                )
             )
+            labelContext.fill(backgroundPath, with: .color(palette.labelSurface))
+            if palette.labelBorderWidth > 0 {
+                labelContext.stroke(
+                    backgroundPath,
+                    with: .color(palette.labelBorder),
+                    lineWidth: palette.labelBorderWidth
+                )
+            }
             labelContext.draw(text, at: .zero, anchor: anchor)
             occupiedIndex.insert(placement.frame, bounds: placement.frame)
         }
     }
 
     private func markerExclusionFrames() -> [BeckMapLabelBlocker] {
-        document.stationMarkers.flatMap { marker in
+        return document.stationMarkers.flatMap { marker in
             marker.primitives.compactMap { primitive -> BeckMapLabelBlocker? in
                 switch primitive {
                 case let .circle(circle):
@@ -754,6 +849,7 @@ private struct BeckMapCanvas: View {
     }
 
     private func resetCamera(in size: CGSize) {
+        cameraTransitionTask?.cancel()
         let fittingBounds = isReferenceOverlayActive
             ? CGRect(
                 x: 0,
@@ -785,18 +881,54 @@ private struct BeckMapCanvas: View {
         let width = max(120, maxX - minX)
         let height = max(120, maxY - minY)
         let nextScale = min(1.65, max(minimumCameraScale, min((size.width - 70) / width, (size.height - 270) / height)))
-        withAnimation(.smooth(duration: 0.55)) {
-            cameraScale = nextScale
-            cameraOffset = CGSize(
+        animateCamera(
+            toScale: nextScale,
+            offset: CGSize(
                 width: size.width / 2 - CGFloat((minX + maxX) / 2) * nextScale,
                 height: size.height / 2 - CGFloat((minY + maxY) / 2) * nextScale - 28
             )
+        )
+    }
+
+    private func animateCamera(
+        toScale targetScale: CGFloat,
+        offset targetOffset: CGSize,
+        duration: TimeInterval = 2
+    ) {
+        cameraTransitionTask?.cancel()
+
+        let startScale = cameraScale
+        let startOffset = cameraOffset
+        let startTime = ProcessInfo.processInfo.systemUptime
+
+        cameraTransitionTask = Task { @MainActor in
+            while !Task.isCancelled {
+                let elapsed = ProcessInfo.processInfo.systemUptime - startTime
+                let progress = min(1, max(0, elapsed / duration))
+                let easedProgress = progress * progress * (3 - 2 * progress)
+
+                cameraScale = startScale + (targetScale - startScale) * CGFloat(easedProgress)
+                cameraOffset = CGSize(
+                    width: startOffset.width
+                        + (targetOffset.width - startOffset.width) * CGFloat(easedProgress),
+                    height: startOffset.height
+                        + (targetOffset.height - startOffset.height) * CGFloat(easedProgress)
+                )
+
+                guard progress < 1 else { return }
+                do {
+                    try await Task.sleep(for: .milliseconds(16))
+                } catch {
+                    return
+                }
+            }
         }
     }
 
     private func handlePan(translation: CGSize, phase: BeckMapGesturePhase) {
         switch phase {
         case .began:
+            cameraTransitionTask?.cancel()
             isPanning = true
             panStartOffset = cameraOffset
         case .changed:
@@ -813,6 +945,7 @@ private struct BeckMapCanvas: View {
     private func handlePinch(magnification: CGFloat, location: CGPoint, phase: BeckMapGesturePhase) {
         switch phase {
         case .began:
+            cameraTransitionTask?.cancel()
             isPinching = true
             pinchStartScale = cameraScale
             pinchMapPoint = CGPoint(
@@ -1590,6 +1723,35 @@ enum BeckMapLabelCollisionResolver {
         !markerIndex.containsIntersecting(frame) { $0.frame.intersects(frame) }
             && !lineIndex.containsIntersecting(frame) { $0.intersects(frame) }
             && !occupiedIndex.containsIntersecting(frame) { $0.intersects(frame) }
+    }
+}
+
+enum BeckMapLabelBounds {
+    static func backgroundBounds(
+        textSize: CGSize,
+        alignment: BeckMapLabelAlignment,
+        horizontalPadding: CGFloat,
+        verticalPadding: CGFloat
+    ) -> CGRect {
+        let originX: CGFloat
+        switch alignment {
+        case .leading:
+            originX = 0
+        case .centre:
+            originX = -textSize.width / 2
+        case .trailing:
+            originX = -textSize.width
+        }
+        let textBounds = CGRect(
+            x: originX,
+            y: -textSize.height / 2,
+            width: textSize.width,
+            height: textSize.height
+        )
+        return textBounds.insetBy(
+            dx: -horizontalPadding,
+            dy: -verticalPadding
+        )
     }
 }
 

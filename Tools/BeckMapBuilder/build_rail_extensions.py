@@ -303,7 +303,11 @@ ELIZABETH_TRACES = (
 )
 
 
-def _path_candidates(root: ET.Element, colour_fragment: str) -> list[list[vector.Curve]]:
+def _path_candidates(
+    root: ET.Element,
+    colour_fragment: str,
+    expected_count: int = 9,
+) -> list[list[vector.Curve]]:
     elements = [
         element for element in root.iter()
         if element.tag.endswith("path")
@@ -315,9 +319,9 @@ def _path_candidates(root: ET.Element, colour_fragment: str) -> list[list[vector
             abs_tol=0.0001,
         )
     ]
-    if len(elements) != 9:
+    if len(elements) != expected_count:
         raise ValueError(
-            f"Expected 9 official {colour_fragment} rail paths; found {len(elements)}"
+            f"Expected {expected_count} official {colour_fragment} rail paths; found {len(elements)}"
         )
     return [
         vector.parse_path(
@@ -333,7 +337,7 @@ def _master_paths(
     colour_fragment: str,
     fingerprints: tuple[Fingerprint, ...],
 ) -> dict[int, list[vector.Curve]]:
-    candidates = _path_candidates(root, colour_fragment)
+    candidates = _path_candidates(root, colour_fragment, len(fingerprints))
     result: dict[int, list[vector.Curve]] = {}
     used: set[int] = set()
     for fingerprint in fingerprints:
@@ -618,4 +622,3 @@ def append_rail_artwork(
         raise ValueError(f"Official rail compilation is missing graph segments: {missing}")
     _append_graph_routes(graph, routes)
     _append_markers_and_labels(graph, ports_by_station, markers, labels)
-

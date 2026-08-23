@@ -94,10 +94,16 @@ struct RealWorldMapScreen: View {
         }
         .onChange(of: appState.selectedStationID) { _, stationID in
             mapSelection = stationID
-            if let stationID { focus(on: [stationID]) }
+        }
+        .onChange(of: appState.stationSelectionGeneration) { _, _ in
+            guard let stationID = appState.selectedStationID else { return }
+            focus(on: [stationID])
         }
         .onAppear {
-            if appState.hasFocusedMapSection || appState.selectedDisruption != nil {
+            if let stationID = appState.selectedStationID {
+                mapSelection = stationID
+                focus(on: [stationID])
+            } else if appState.hasFocusedMapSection || appState.selectedDisruption != nil {
                 focus(on: appState.activeAffectedStationIDs)
             }
         }
@@ -113,14 +119,15 @@ struct RealWorldMapScreen: View {
     @MapContentBuilder
     private func tubeOverlays(renderData: RealWorldMapRenderData) -> some MapContent {
         let affectedSegmentIDs = appState.activeAffectedSegmentIDs
-        let issuesMode = appState.disruptionDisplayMode == .issues && !affectedSegmentIDs.isEmpty
+        let displayMode = appState.disruptionDisplayMode
         let selectedLineID = appState.selectedLineID
-        let affectedPolylines = issuesMode
-            ? renderData.polylines(covering: affectedSegmentIDs)
-            : []
+        let unaffectedSegmentIDs = Set(renderData.segments.map(\.id))
+            .subtracting(affectedSegmentIDs)
+        let unaffectedPolylines = renderData.polylines(covering: unaffectedSegmentIDs)
+        let affectedPolylines = renderData.polylines(covering: affectedSegmentIDs)
 
-        ForEach(renderData.polylines) { polyline in
-            let muted = issuesMode
+        ForEach(unaffectedPolylines) { polyline in
+            let muted = displayMode.mutesSegment(isAffected: false)
                 || (selectedLineID != nil && selectedLineID != polyline.lineID)
             MapPolyline(polyline.overlay)
                 .stroke(
@@ -130,7 +137,17 @@ struct RealWorldMapScreen: View {
                 .mapOverlayLevel(level: .aboveLabels)
         }
 
-        if issuesMode {
+        ForEach(affectedPolylines) { polyline in
+            let muted = displayMode.mutesSegment(isAffected: true)
+            MapPolyline(polyline.overlay)
+                .stroke(
+                    muted ? Color.secondary.opacity(0.24) : .tubeLine(polyline.lineID),
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                )
+                .mapOverlayLevel(level: .aboveLabels)
+        }
+
+        if displayMode == .issues {
             ForEach(affectedPolylines) { polyline in
                 MapPolyline(polyline.overlay)
                     .stroke(
@@ -162,10 +179,22 @@ struct RealWorldMapScreen: View {
     private func stationAnnotations(graph: TubeGraph) -> some MapContent {
         ForEach(displayStations(graph: graph)) { station in
             Annotation(station.name, coordinate: station.coordinate, anchor: .center) {
-                Circle()
-                    .fill(.background)
-                    .stroke(appState.selectedStationID == station.id ? Color.blue : Color.primary, lineWidth: 2)
-                    .frame(width: appState.selectedStationID == station.id ? 18 : 11)
+                let selected = appState.selectedStationID == station.id
+                ZStack {
+                    if selected {
+                        Circle()
+                            .fill(Color.blue.opacity(0.16))
+                            .stroke(Color.blue.opacity(0.9), lineWidth: 2.5)
+                            .frame(width: 32, height: 32)
+                            .shadow(color: Color.blue.opacity(0.35), radius: 6)
+                    }
+
+                    Circle()
+                        .fill(.background)
+                        .stroke(selected ? Color.blue : Color.primary, lineWidth: selected ? 3 : 2)
+                        .frame(width: selected ? 18 : 11, height: selected ? 18 : 11)
+                }
+                    .animation(.smooth(duration: 0.3), value: selected)
                     .accessibilityLabel(station.name)
             }
             .tag(station.id)
@@ -271,11 +300,11 @@ struct RealWorldMapScreen: View {
         let region = MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: (minLat + maxLat) / 2, longitude: (minLon + maxLon) / 2),
             span: MKCoordinateSpan(
-                latitudeDelta: max(0.025, (maxLat - minLat) * 1.55),
-                longitudeDelta: max(0.04, (maxLon - minLon) * 1.55)
+                latitudeDelta: max(stations.count == 1 ? 0.012 : 0.025, (maxLat - minLat) * 1.55),
+                longitudeDelta: max(stations.count == 1 ? 0.02 : 0.04, (maxLon - minLon) * 1.55)
             )
         )
-        withAnimation(.smooth(duration: 0.6)) { position = .region(region) }
+        withAnimation(.easeInOut(duration: 2.0)) { position = .region(region) }
     }
 
 }
@@ -639,7 +668,8 @@ struct RealWorldRenderPath {
         case .piccadilly: 4
         case .victoria: 8
         case .waterlooCity: -4
-        case .central, .northern, .dlr, .elizabeth: 0
+        case .central, .northern, .dlr, .elizabeth, .liberty, .lioness, .mildmay,
+             .suffragette, .weaver, .windrush: 0
         }
     }
 }

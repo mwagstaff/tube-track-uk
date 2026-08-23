@@ -21,8 +21,10 @@ struct PerformanceRegressionTests {
         #expect(batches == [
             [.bakerloo, .central, .circle],
             [.district, .elizabeth, .hammersmithCity],
-            [.jubilee, .metropolitan, .northern],
-            [.piccadilly, .victoria, .waterlooCity],
+            [.jubilee, .liberty, .lioness],
+            [.metropolitan, .mildmay, .northern],
+            [.piccadilly, .suffragette, .victoria],
+            [.waterlooCity, .weaver, .windrush],
         ])
     }
 

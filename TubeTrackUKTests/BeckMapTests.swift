@@ -1,8 +1,70 @@
 import Foundation
+import SwiftUI
 import Testing
 @testable import TubeTrackUK
 
 struct BeckMapTests {
+    @Test func darkPalettePreservesEveryCanonicalRouteColour() {
+        for lineID in TubeLineID.allCases {
+            #expect(
+                BeckMapPalette.dark.routeColor(for: lineID, muted: false)
+                    == Color.tubeLine(lineID)
+            )
+        }
+        #expect(BeckMapPalette.dark.routeColor(for: .northern, muted: false) == .black)
+    }
+
+    @Test func darkPaletteAddsOnlyAFineNorthernLineCasing() {
+        let routeWidth: CGFloat = 8.3
+
+        #expect(BeckMapPalette.light.casingWidth(for: .northern, routeWidth: routeWidth) == nil)
+        #expect(BeckMapPalette.dark.casingWidth(for: .central, routeWidth: routeWidth) == nil)
+        #expect(BeckMapPalette.dark.casingWidth(for: .northern, routeWidth: routeWidth) == 9.8)
+        #expect(BeckMapPalette.resolve(
+            for: .dark,
+            preservesReferenceAppearance: true
+        ).casingWidth(for: .northern, routeWidth: routeWidth) == nil)
+    }
+
+    @Test func darkPaletteUsesHighContrastCapsuleLabels() {
+        #expect(BeckMapPalette.light.labelHorizontalPadding == 0)
+        #expect(BeckMapPalette.dark.labelHorizontalPadding > 0)
+        #expect(BeckMapPalette.dark.labelVerticalPadding > 0)
+        #expect(BeckMapPalette.dark.labelBorderWidth > 0)
+    }
+
+    @Test func measuredLabelBoundsKeepEqualPaddingForEveryAlignment() {
+        let textSize = CGSize(width: 103, height: 19)
+        let horizontalPadding: CGFloat = 9
+        let verticalPadding: CGFloat = 6
+
+        let leading = BeckMapLabelBounds.backgroundBounds(
+            textSize: textSize,
+            alignment: .leading,
+            horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding
+        )
+        let centre = BeckMapLabelBounds.backgroundBounds(
+            textSize: textSize,
+            alignment: .centre,
+            horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding
+        )
+        let trailing = BeckMapLabelBounds.backgroundBounds(
+            textSize: textSize,
+            alignment: .trailing,
+            horizontalPadding: horizontalPadding,
+            verticalPadding: verticalPadding
+        )
+
+        #expect(leading.size == CGSize(width: 121, height: 31))
+        #expect(leading.minX == -9)
+        #expect(centre.midX == 0)
+        #expect(trailing.maxX == 9)
+        #expect(leading.minY == -15.5)
+        #expect(leading.maxY == 15.5)
+    }
+
     @Test func parallelRouteStrokeWidthsMatchOfficialArtworkProportions() {
         let styles = BeckMapStyleRecord(
             routeStrokeWidth: 9,

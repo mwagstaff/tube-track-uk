@@ -4,21 +4,43 @@ import Testing
 @testable import TubeTrackUK
 
 struct TubeTrackUKTests {
+    @Test @MainActor func appearanceDefaultsToSystemAndPersistsOverrides() throws {
+        let suiteName = "TubeTrackUKTests.Appearance.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+
+        let initialState = TubeAppState(defaults: defaults)
+        #expect(initialState.appearanceMode == .system)
+        #expect(initialState.preferredColorScheme == nil)
+
+        initialState.appearanceMode = .dark
+        let restoredDarkState = TubeAppState(defaults: defaults)
+        #expect(restoredDarkState.appearanceMode == .dark)
+        #expect(restoredDarkState.preferredColorScheme == .dark)
+
+        restoredDarkState.appearanceMode = .light
+        let restoredLightState = TubeAppState(defaults: defaults)
+        #expect(restoredLightState.appearanceMode == .light)
+        #expect(restoredLightState.preferredColorScheme == .light)
+    }
+
     @Test func allTubeLinesHaveDisplayNames() {
-        #expect(TubeLineID.allCases.count == 13)
+        #expect(TubeLineID.allCases.count == 19)
         #expect(TubeLineID.undergroundCases.count == 11)
         #expect(TubeLineID.allCases.allSatisfy { !$0.displayName.isEmpty })
         #expect(TubeLineID.dlr.modeName == "dlr")
         #expect(TubeLineID.elizabeth.modeName == "elizabeth-line")
+        #expect(TubeLineID.liberty.modeName == "overground")
+        #expect(TubeLineID.windrush.modeName == "overground")
         #expect(!TubeLineID.dlr.supportsEstimatedTrains)
         #expect(TubeLineID.elizabeth.supportsEstimatedTrains)
     }
 
     @Test func bundledGraphHasCompleteConnectedData() throws {
         let graph = try TubeGraph.bundled()
-        #expect(graph.lines.count == 13)
-        #expect(graph.stations.count > 250)
-        #expect(graph.segments.count > 350)
+        #expect(graph.lines.count == 19)
+        #expect(graph.stations.count == 470)
+        #expect(graph.segments.count == 577)
         #expect(graph.segments.allSatisfy { $0.geographicPoints.count >= 2 })
         #expect(graph.segments.filter { $0.geographicPoints.count > 2 }.count > 340)
         #expect(graph.source.attribution.contains("OpenStreetMap contributors"))
@@ -29,6 +51,12 @@ struct TubeTrackUKTests {
         #expect(graph.line(.elizabeth)?.routes.count == 9)
         #expect(graph.segments(for: .dlr).count == 46)
         #expect(graph.segments(for: .elizabeth).count == 42)
+        #expect(graph.segments(for: .liberty).count == 2)
+        #expect(graph.segments(for: .lioness).count == 18)
+        #expect(graph.segments(for: .mildmay).count == 27)
+        #expect(graph.segments(for: .suffragette).count == 12)
+        #expect(graph.segments(for: .weaver).count == 24)
+        #expect(graph.segments(for: .windrush).count == 28)
         let bankStops = graph.stations.filter { $0.hubID == "HUBBAN" }
         #expect(bankStops.contains { $0.lineIDs.contains(.dlr) })
         #expect(bankStops.contains { $0.lineIDs.contains(.central) })
@@ -50,6 +78,21 @@ struct TubeTrackUKTests {
             // supplies intermediate railway nodes and genuine off-chord contours.
             #expect(!segments.isEmpty)
             #expect(detailedSegments.count * 10 >= segments.count * 9)
+            #expect(contouredSegments.count * 4 >= segments.count * 3)
+            #expect(segments.reduce(0) { $0 + $1.geographicPoints.count } >= segments.count * 5)
+        }
+
+        for lineID in [
+            TubeLineID.liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush,
+        ] {
+            let segments = graph.segments(for: lineID)
+            let detailedSegments = segments.filter { $0.geographicPoints.count > 2 }
+            let contouredSegments = segments.filter {
+                maximumTrackDeviation(from: $0.geographicPoints) >= 3
+            }
+
+            #expect(!segments.isEmpty)
+            #expect(detailedSegments.count * 5 >= segments.count * 4)
             #expect(contouredSegments.count * 4 >= segments.count * 3)
             #expect(segments.reduce(0) { $0 + $1.geographicPoints.count } >= segments.count * 5)
         }
@@ -137,14 +180,14 @@ struct TubeTrackUKTests {
         #expect(disruption(severity: 19).category == .other)
     }
 
-    @Test @MainActor func defaultDisruptionHighlightsPrioritizeClosuresAndSevereDelays() {
+    @Test @MainActor func defaultMapMutesClosuresAndSevereDelays() {
         let appState = TubeAppState()
         let closure = disruption(id: "closure", severity: 5, segmentID: "closure-segment")
         let severe = disruption(id: "severe", severity: 6, segmentID: "severe-segment")
         let minor = disruption(id: "minor", severity: 9, segmentID: "minor-segment")
         appState.disruptions = [closure, severe, minor]
 
-        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.disruptionDisplayMode == .normal)
         #expect(appState.highlightedDisruptionCategories == [.closures, .severeDelays])
         #expect(appState.highlightedDisruptions.map(\.id) == ["closure", "severe"])
         #expect(appState.activeAffectedSegmentIDs == ["closure-segment", "severe-segment"])
@@ -156,6 +199,13 @@ struct TubeTrackUKTests {
         appState.setDisruptionCategory(.minorDelays, highlighted: false)
         #expect(appState.selectedDisruptionID == nil)
         #expect(appState.selectedLineID == nil)
+    }
+
+    @Test func disruptionDisplayModesReverseSectionEmphasis() {
+        #expect(DisruptionDisplayMode.normal.mutesSegment(isAffected: true))
+        #expect(!DisruptionDisplayMode.normal.mutesSegment(isAffected: false))
+        #expect(!DisruptionDisplayMode.issues.mutesSegment(isAffected: true))
+        #expect(DisruptionDisplayMode.issues.mutesSegment(isAffected: false))
     }
 
     @Test @MainActor func enablingDisruptionHighlightsPreservesAnExistingCategoryChoice() {

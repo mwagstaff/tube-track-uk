@@ -19,6 +19,7 @@ from pathlib import Path
 
 import build_central_core_join as vector
 import build_rail_extensions as rail
+import build_overground_extensions as overground
 
 
 ARTWORK_WIDTH = 4764.0
@@ -152,7 +153,10 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
     # Waterloo close to its interchange rather than inheriting the historic
     # wide-left placement from the early south prototype.
     "Waterloo": (-34, 25, "trailing"),
-    "Edgware Road (Circle Line)": (22, 18, "leading"),
+    # Both names sit in deliberately open areas so their high-priority labels
+    # remain placeable before the user reaches maximum zoom.
+    "Edgware Road (Circle Line)": (0, 48, "centre"),
+    "Bond Street": (-36, -24, "trailing"),
     # Both semantic Paddington records share one visible station name. Their
     # preferred label directions converge on the same southeast label area.
     "Paddington": (108, 70, "leading"),
@@ -167,20 +171,30 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
     # Metropolitan crossing, so its name remains attached to the relocated
     # tick without suggesting an interchange with either shared-corridor line.
     "Ruislip Gardens": (-18, 12, "trailing"),
-    # Keep the name attached to the west-shifted paired stop, with the same
-    # below-corridor treatment used by the official diagram.
-    "Stepney Green": (0, 22, "centre"),
+    # Stepney Green uses the open lower-right area, while Mile End moves above
+    # its interchange to keep the two high-priority labels independently
+    # placeable at compact zoom levels.
+    "Stepney Green": (20, 28, "leading"),
+    "Mile End": (0, -64, "centre"),
     "Barking": (0, -22, "centre"),
     # Keep both labels attached to the west-shifted Jubilee stations. These
     # offsets reproduce the trace-verified label relationship while the
     # authored ports move left to broaden the Canning Town sweep.
     "Canary Wharf": (-10, -56, "trailing"),
     "North Greenwich": (-18, 5, "trailing"),
-    "Canning Town": (18, 5, "leading"),
+    # Prefer the open lower-right quadrant, beyond the Jubilee line, so the
+    # name cannot be mistaken for nearby East India at compact zoom levels.
+    "Canning Town": (28, 48, "leading"),
     "Stratford": (20, 16, "leading"),
     # Match the official map's grouping: the name belongs to the elevated
     # Jubilee node, left of the District / H&C corridor node.
     "West Ham": (-18, 0, "trailing"),
+}
+
+
+LABEL_TEXT_OVERRIDES: dict[str, str] = {
+    "Edgware Road (Circle Line)": "Edgware Road\n(Circle Line)",
+    "Bond Street": "Bond\nStreet",
 }
 
 
@@ -562,16 +576,9 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             (hammersmith_city_port[0], circle_port[1]),
         )
 
-    # Stepney Green is an ordinary paired stop. Move both authored corridor
-    # ports west as one unit, giving the station and label clear separation
-    # from Mile End without introducing a runtime layout exception.
-    for line_id in ("district", "hammersmith-city"):
-        stepney_port = line_port(selected_segments, "940GZZLUSGN", line_id)
-        move_line_port(
-            "940GZZLUSGN",
-            line_id,
-            (stepney_port[0] - 32, stepney_port[1]),
-        )
+    # Retain Stepney Green's traced shared-corridor ports. An earlier builder
+    # offset moved both lanes 32 units west into the southeast Elizabeth branch;
+    # the authored position remains clear of that crossing and of Mile End.
 
     # Aldgate is a shared Circle / Metropolitan terminus. Keep the two paths
     # parallel around the eastern corner rather than pulling the Metropolitan
@@ -1130,6 +1137,34 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             # corridor. The terminating lower paths were extended above, so
             # their computed port already is the relocated roundel centre.
             upper_port = (upper_port[0] + 32, upper_port[1])
+            # The two route corridors differ by a tiny source-trace offset.
+            # Use one display x-coordinate so the stacked roundels read as a
+            # precise vertical interchange rather than a slightly bent one.
+            roundel_x = lower_port[0]
+            upper_port = (roundel_x, upper_port[1])
+            lower_port = (roundel_x, lower_port[1])
+            marker = {
+                "stationID": station_id,
+                "name": station["name"],
+                "lineIDs": line_ids,
+                "anchor": vector.rounded(upper_port),
+                "hitRadius": 24,
+                "primitives": [
+                    connector(upper_port, lower_port),
+                    circle(upper_port),
+                    circle(lower_port),
+                ],
+            }
+        elif station["name"] == "Kennington":
+            # Keep the northern roundel at the Charing Cross / Battersea node,
+            # then align the two-node interchange at 45 degrees with the
+            # Victoria line immediately below it.
+            upper_port = (marker["anchor"]["x"], marker["anchor"]["y"])
+            roundel_spacing = 24.3
+            lower_port = (
+                upper_port[0] + roundel_spacing,
+                upper_port[1] + roundel_spacing,
+            )
             marker = {
                 "stationID": station_id,
                 "name": station["name"],
@@ -1245,7 +1280,7 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                 "lineIDs": line_ids,
                 "anchor": vector.rounded(jubilee_port),
                 "hitRadius": 24,
-                "primitives": [tick_at("jubilee", jubilee_port, (1, 1))],
+                "primitives": [circle(jubilee_port)],
             }
         elif station["name"] == "North Greenwich":
             jubilee_port = line_port(selected_segments, station_id, "jubilee")
@@ -1602,6 +1637,8 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             }
         if station["name"] in HEATHROW_LABEL_TEXT:
             label["text"] = HEATHROW_LABEL_TEXT[station["name"]]
+        if station["name"] in LABEL_TEXT_OVERRIDES:
+            label["text"] = LABEL_TEXT_OVERRIDES[station["name"]]
         if station["name"] == "Paddington (H&C Line)-Underground":
             label["text"] = "Paddington"
         if station["name"] in LABEL_OVERRIDES:
@@ -1619,6 +1656,610 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     rail.append_rail_artwork(
         root, graph, selected_paths, selected_segments, markers, labels, routes
     )
+    overground.append_overground_artwork(
+        root, graph, selected_paths, selected_segments, markers, labels, routes
+    )
+
+    markers_by_id = {marker["stationID"]: marker for marker in markers}
+    labels_by_station_id = {label["stationID"]: label for label in labels}
+
+    def replace_marker(
+        station_id: str,
+        anchor: vector.Point,
+        primitives: list[dict],
+    ) -> None:
+        marker = markers_by_id[station_id]
+        marker["anchor"] = vector.rounded(anchor)
+        marker["primitives"] = primitives
+
+    def place_label(
+        station_id: str,
+        anchor: vector.Point,
+        offset: vector.Point,
+        alignment: str,
+    ) -> None:
+        label = labels_by_station_id.get(station_id)
+        if label is None:
+            return
+        label["position"] = vector.rounded(
+            (anchor[0] + offset[0], anchor[1] + offset[1])
+        )
+        label["alignment"] = alignment
+
+    def replace_segment_commands(
+        segment_id: str,
+        commands: list[dict],
+    ) -> None:
+        """Replace one station-to-station slice without moving stale controls."""
+        segment = selected_segments[segment_id]
+        selected_paths[segment["pathID"]]["commands"] = commands
+
+    # ------------------------------------------------------------------
+    # Compact Overground / Underground interchanges
+    # ------------------------------------------------------------------
+
+    # Barking's Suffragette platform sits just above the District/H&C node on
+    # the official artwork. Lift the authored endpoint slightly so the short
+    # connector clears both route strokes rather than grazing the roundel.
+    barking_underground = line_port(selected_segments, "940GZZLUBKG", "district")
+    barking_overground = line_port(selected_segments, "910GBARKING", "suffragette")
+    barking_overground = (barking_overground[0], barking_overground[1] - 8)
+    move_line_port("910GBARKING", "suffragette", barking_overground)
+    replace_marker(
+        "910GBARKING",
+        barking_overground,
+        [connector(barking_underground, barking_overground), circle(barking_overground)],
+    )
+
+    # The two Weaver source fragments overlap at Cambridge Heath/London
+    # Fields. Retaining both sides of that overlap makes the line overshoot to
+    # the east and double back before turning north. Author the same official
+    # rounded corner as one monotone station-to-station slice.
+    replace_segment_commands(
+        "weaver:910GCAMHTH:910GLONFLDS",
+        [
+            {"op": "move", "to": vector.rounded((2789.872, 1379.344))},
+            {"op": "line", "to": vector.rounded((2805.114, 1379.344))},
+            {
+                "op": "cubic",
+                "control1": vector.rounded((2819.473, 1379.344)),
+                "control2": vector.rounded((2831.114, 1367.703)),
+                "to": vector.rounded((2831.114, 1353.344)),
+            },
+            {"op": "line", "to": vector.rounded((2831.114, 1297.101))},
+        ],
+    )
+
+    # Hackney Downs is the shared Weaver branch node. The Chingford fragment
+    # used to begin east and *below* that node, producing a tiny hook before
+    # turning back towards Clapton. Join the shared port with a single smooth,
+    # northeast-only contour.
+    replace_segment_commands(
+        "weaver:910GCLAPTON:910GHAKNYNM",
+        [
+            {"op": "move", "to": vector.rounded((2831.172, 1175.422))},
+            {"op": "line", "to": vector.rounded((2840.500, 1175.422))},
+            {
+                "op": "cubic",
+                "control1": vector.rounded((2848.500, 1175.422)),
+                "control2": vector.rounded((2856.200, 1172.200)),
+                "to": vector.rounded((2862.000, 1166.400)),
+            },
+            {"op": "line", "to": vector.rounded((2889.311, 1137.033))},
+        ],
+    )
+
+    # Seven Sisters uses two distinct nodes on the official map. Keep the
+    # Weaver station on its vertical route and put the Victoria roundel just
+    # to the right, joined by a short diagonal link.
+    seven_weaver = line_port(selected_segments, "910GSEVNSIS", "weaver")
+    victoria_north_y = line_port(
+        selected_segments, "940GZZLUSVS", "victoria"
+    )[1]
+    seven_victoria = (seven_weaver[0] + 26, victoria_north_y)
+    move_line_port("940GZZLUSVS", "victoria", seven_victoria)
+    replace_marker("940GZZLUSVS", seven_victoria, [circle(seven_victoria)])
+    replace_marker(
+        "910GSEVNSIS",
+        seven_weaver,
+        [connector(seven_victoria, seven_weaver), circle(seven_weaver)],
+    )
+    place_label("940GZZLUSVS", seven_victoria, (-20, -18), "trailing")
+
+    # Re-space the remaining northeast Victoria stops in their geographic
+    # order, then replace every affected slice. Endpoint-only movement leaves
+    # the old Seven Sisters point inside the first path and creates the large
+    # backtrack visible in the app.
+    tottenham_victoria = (2806.000, victoria_north_y)
+    blackhorse_victoria = (2868.000, victoria_north_y)
+    walthamstow_victoria = line_port(
+        selected_segments, "940GZZLUWWL", "victoria"
+    )
+    move_line_port("940GZZLUTMH", "victoria", tottenham_victoria)
+    move_line_port("940GZZLUBLR", "victoria", blackhorse_victoria)
+
+    for segment_id in (
+        "victoria:940GZZLUSVS:940GZZLUTMH",
+        "victoria:940GZZLUBLR:940GZZLUTMH",
+        "victoria:940GZZLUBLR:940GZZLUWWL",
+    ):
+        segment = selected_segments[segment_id]
+        start = (segment["fromPort"]["x"], segment["fromPort"]["y"])
+        end = (segment["toPort"]["x"], segment["toPort"]["y"])
+        replace_segment_commands(
+            segment_id,
+            [
+                {"op": "move", "to": vector.rounded(start)},
+                {"op": "line", "to": vector.rounded(end)},
+            ],
+        )
+
+    replace_marker(
+        "940GZZLUTMH",
+        tottenham_victoria,
+        [tick_at("victoria", tottenham_victoria, (1, 0))],
+    )
+    place_label("940GZZLUTMH", tottenham_victoria, (0, -20), "centre")
+
+    blackhorse_overground = line_port(
+        selected_segments, "910GBLCHSRD", "suffragette"
+    )
+    replace_marker(
+        "940GZZLUBLR",
+        blackhorse_victoria,
+        [circle(blackhorse_victoria)],
+    )
+    replace_marker(
+        "910GBLCHSRD",
+        blackhorse_overground,
+        [
+            connector(blackhorse_victoria, blackhorse_overground),
+            circle(blackhorse_overground),
+        ],
+    )
+    place_label("940GZZLUBLR", blackhorse_victoria, (-18, 34), "trailing")
+
+    walthamstow_overground = line_port(
+        selected_segments, "910GWLTWCEN", "weaver"
+    )
+    replace_marker(
+        "940GZZLUWWL",
+        walthamstow_victoria,
+        [circle(walthamstow_victoria)],
+    )
+    replace_marker(
+        "910GWLTWCEN",
+        walthamstow_overground,
+        [
+            connector(walthamstow_victoria, walthamstow_overground),
+            circle(walthamstow_overground),
+        ],
+    )
+    place_label("940GZZLUWWL", walthamstow_victoria, (18, 8), "leading")
+
+    # Highbury's Victoria line is vertical in the official artwork. Pulling
+    # its station east onto the imported Overground port created two opposing
+    # diagonals beneath Finsbury Park. Restore the Victoria x-axis and move the
+    # two straight Overground endpoints west to their compact reference stack.
+    highbury_mildmay = (2424.000, 1174.976)
+    highbury_windrush = (2424.000, 1205.469)
+    move_line_port("910GHGHI", "mildmay", highbury_mildmay)
+    move_line_port("910GHGHI", "windrush", highbury_windrush)
+    highbury_victoria = (2406.132, 1156.976)
+    move_line_port("940GZZLUHAI", "victoria", highbury_victoria)
+    replace_marker("940GZZLUHAI", highbury_victoria, [circle(highbury_victoria)])
+    replace_marker(
+        "910GHGHI",
+        highbury_mildmay,
+        [
+            connector(highbury_victoria, highbury_mildmay),
+            connector(highbury_mildmay, highbury_windrush),
+            circle(highbury_mildmay),
+            circle(highbury_windrush),
+        ],
+    )
+    place_label("940GZZLUHAI", highbury_victoria, (-18, -14), "trailing")
+
+    # Caledonian Road must remain between King's Cross and Holloway Road on the
+    # Piccadilly line's x+y=3437.578 diagonal. The former target sat beyond
+    # Holloway Road and forced both adjacent segments into a triangular
+    # reversal. Move it northeast only as far as topology permits, keeping the
+    # complete station chain collinear while shortening the interchange link.
+    caledonian_overground = line_port(
+        selected_segments, "910GCLDNNRB", "mildmay"
+    )
+    caledonian_piccadilly = (2234.781, 1202.797)
+    move_line_port("940GZZLUCAR", "piccadilly", caledonian_piccadilly)
+    caledonian_from_kings_cross = selected_segments[
+        "piccadilly:940GZZLUCAR:940GZZLUKSX"
+    ]
+    kings_cross_piccadilly = (
+        caledonian_from_kings_cross["fromPort"]["x"],
+        caledonian_from_kings_cross["fromPort"]["y"],
+    )
+    replace_segment_commands(
+        caledonian_from_kings_cross["id"],
+        [
+            {"op": "move", "to": vector.rounded(kings_cross_piccadilly)},
+            {"op": "line", "to": vector.rounded((2137.593, 1311.594))},
+            {
+                "op": "cubic",
+                "control1": vector.rounded((2137.593, 1305.203)),
+                "control2": vector.rounded((2141.296, 1296.297)),
+                "to": vector.rounded((2145.796, 1291.782)),
+            },
+            {"op": "line", "to": vector.rounded(caledonian_piccadilly)},
+        ],
+    )
+    caledonian_to_holloway = selected_segments[
+        "piccadilly:940GZZLUCAR:940GZZLUHWY"
+    ]
+    holloway_piccadilly = (
+        caledonian_to_holloway["toPort"]["x"],
+        caledonian_to_holloway["toPort"]["y"],
+    )
+    replace_segment_commands(
+        caledonian_to_holloway["id"],
+        [
+            {"op": "move", "to": vector.rounded(caledonian_piccadilly)},
+            {"op": "line", "to": vector.rounded(holloway_piccadilly)},
+        ],
+    )
+    replace_marker(
+        "940GZZLUCAR", caledonian_piccadilly, [circle(caledonian_piccadilly)]
+    )
+    replace_marker(
+        "910GCLDNNRB",
+        caledonian_overground,
+        [
+            connector(caledonian_piccadilly, caledonian_overground),
+            circle(caledonian_overground),
+        ],
+    )
+    place_label("940GZZLUCAR", caledonian_piccadilly, (-18, 12), "trailing")
+
+    # West Hampstead's Jubilee node is a roundel just above the Mildmay line,
+    # joined by the short diagonal link visible on the standard TfL map.
+    west_hampstead_overground = line_port(
+        selected_segments, "910GWHMDSTD", "mildmay"
+    )
+    old_west_hampstead_jubilee = line_port(
+        selected_segments, "940GZZLUWHP", "jubilee"
+    )
+    west_hampstead_jubilee = (
+        old_west_hampstead_jubilee[0],
+        old_west_hampstead_jubilee[1] - 9,
+    )
+    move_line_port("940GZZLUWHP", "jubilee", west_hampstead_jubilee)
+    replace_marker(
+        "940GZZLUWHP", west_hampstead_jubilee, [circle(west_hampstead_jubilee)]
+    )
+    replace_marker(
+        "910GWHMDSTD",
+        west_hampstead_overground,
+        [
+            connector(west_hampstead_jubilee, west_hampstead_overground),
+            circle(west_hampstead_overground),
+        ],
+    )
+    place_label(
+        "940GZZLUWHP", west_hampstead_jubilee, (18, -14), "leading"
+    )
+
+    # The Lioness and Bakerloo lines run as a close pair from Kensal Green to
+    # Harrow & Wealdstone. Align their station rows so the interchanges use
+    # short horizontal links, not the alternating diagonal ladder produced by
+    # independent station interpolation.
+    lioness_bakerloo_pairs = (
+        ("910GKENSLG", "940GZZLUKSL"),
+        ("910GWLSDJHL", "940GZZLUWJN"),
+        ("910GHARLSDN", "940GZZLUHSN"),
+        ("910GSTNBGPK", "940GZZLUSGP"),
+        ("910GWMBY", "940GZZLUWYC"),
+        ("910GNWEMBLY", "940GZZLUNWY"),
+        ("910GSKENTON", "940GZZLUSKT"),
+        ("910GKTON", "940GZZLUKEN"),
+        ("910GHROW", "940GZZLUHAW"),
+    )
+    for overground_id, underground_id in lioness_bakerloo_pairs:
+        bakerloo_port = line_port(selected_segments, underground_id, "bakerloo")
+        lioness_port = line_port(selected_segments, overground_id, "lioness")
+        aligned_lioness = (1155.547, bakerloo_port[1])
+        move_line_port(overground_id, "lioness", aligned_lioness)
+        replace_marker(
+            overground_id,
+            aligned_lioness,
+            [connector(bakerloo_port, aligned_lioness), circle(aligned_lioness)],
+        )
+
+    # Kensal Green and Willesden Junction were both moved onto the parallel
+    # north-south corridor, but the old source curve still swept southeast to
+    # the former Kensal port before doubling back. That orphaned interior
+    # geometry is the apparent "Queen's Park kink". The official corridor is
+    # straight here, like every Lioness segment above it.
+    kensal_willesden = selected_segments[
+        "lioness:910GKENSLG:910GWLSDJHL"
+    ]
+    kensal_willesden_start = (
+        kensal_willesden["fromPort"]["x"],
+        kensal_willesden["fromPort"]["y"],
+    )
+    kensal_willesden_end = (
+        kensal_willesden["toPort"]["x"],
+        kensal_willesden["toPort"]["y"],
+    )
+    replace_segment_commands(
+        kensal_willesden["id"],
+        [
+            {"op": "move", "to": vector.rounded(kensal_willesden_start)},
+            {"op": "line", "to": vector.rounded(kensal_willesden_end)},
+        ],
+    )
+
+    # Queen's Park is the branch elbow shared by the two services. Keep the
+    # established Bakerloo bend and bring the misplaced Lioness station onto
+    # it; moving Bakerloo to the old rail port would pull its two adjacent
+    # authored curves into a large triangular detour.
+    queens_bakerloo = line_port(selected_segments, "940GZZLUQPS", "bakerloo")
+    move_line_port("910GQPRK", "lioness", queens_bakerloo)
+    queens_overground = queens_bakerloo
+    # The source Lioness slices still contain the former distant station point
+    # as interior geometry after an endpoint translation. Replace only the two
+    # adjacent semantic slices with clean, gentle curves into the shared elbow
+    # so no retraced loop or triangular spur survives the relocation.
+    queens_inbound = selected_segments["lioness:910GKLBRNHR:910GQPRK"]
+    queens_outbound = selected_segments["lioness:910GKENSLG:910GQPRK"]
+    inbound_start = (
+        queens_inbound["fromPort"]["x"],
+        queens_inbound["fromPort"]["y"],
+    )
+    outbound_end = (
+        queens_outbound["toPort"]["x"],
+        queens_outbound["toPort"]["y"],
+    )
+    selected_paths[queens_inbound["pathID"]]["commands"] = [
+        {"op": "move", "to": vector.rounded(inbound_start)},
+        {
+            "op": "cubic",
+            "control1": vector.rounded(
+                (inbound_start[0] - 150, inbound_start[1])
+            ),
+            "control2": vector.rounded(
+                (queens_overground[0] + 50, queens_overground[1])
+            ),
+            "to": vector.rounded(queens_overground),
+        },
+    ]
+    selected_paths[queens_outbound["pathID"]]["commands"] = [
+        {"op": "move", "to": vector.rounded(queens_overground)},
+        {
+            "op": "cubic",
+            "control1": vector.rounded(
+                (queens_overground[0] - 8, queens_overground[1] - 8)
+            ),
+            "control2": vector.rounded(
+                (outbound_end[0], outbound_end[1] + 14)
+            ),
+            "to": vector.rounded(outbound_end),
+        },
+    ]
+    # Both semantic records remain independently tappable. Their circles are
+    # exactly coincident, so they render as one shared roundel.
+    replace_marker("940GZZLUQPS", queens_overground, [circle(queens_overground)])
+    replace_marker("910GQPRK", queens_overground, [circle(queens_overground)])
+    place_label("910GQPRK", queens_overground, (-18, -18), "trailing")
+    place_label("940GZZLUQPS", queens_overground, (-18, 28), "trailing")
+
+    # Willesden Junction owns a second Mildmay port west of the paired
+    # Bakerloo/Lioness node. Keep that relationship explicit but compact.
+    willesden_bakerloo = line_port(
+        selected_segments, "940GZZLUWJN", "bakerloo"
+    )
+    willesden_lioness = line_port(selected_segments, "910GWLSDJHL", "lioness")
+    willesden_mildmay = (willesden_lioness[0] - 42, willesden_lioness[1])
+    move_line_port("910GWLSDJHL", "mildmay", willesden_mildmay)
+    replace_marker(
+        "910GWLSDJHL",
+        willesden_lioness,
+        [
+            connector(willesden_bakerloo, willesden_lioness),
+            connector(willesden_lioness, willesden_mildmay),
+            circle(willesden_lioness),
+            circle(willesden_mildmay),
+        ],
+    )
+
+    # Stratford has four real service ports but Jubilee and Elizabeth resolve
+    # to the same central node. Coalesce those near-overlapping circles and
+    # arrange the Central, Mildmay, shared and DLR nodes as a compact cross.
+    stratford_central = line_port(selected_segments, "940GZZLUSTD", "central")
+    stratford_shared = line_port(selected_segments, "940GZZLUSTD", "jubilee")
+    # Keep Jubilee on the established West Ham–Stratford vertical and bring
+    # the Elizabeth endpoint the six artwork units onto that same roundel.
+    move_line_port("910GSTFD", "elizabeth", stratford_shared)
+    stratford_mildmay = line_port(selected_segments, "910GSTFD", "mildmay")
+    stratford_dlr = line_port(selected_segments, "940GZZDLSTD", "dlr")
+    replace_marker(
+        "940GZZLUSTD",
+        stratford_central,
+        [
+            connector(stratford_central, stratford_shared),
+            circle(stratford_central),
+            circle(stratford_shared),
+        ],
+    )
+    replace_marker(
+        "910GSTFD",
+        stratford_shared,
+        [connector(stratford_mildmay, stratford_shared), circle(stratford_mildmay)],
+    )
+    replace_marker(
+        "940GZZDLSTD",
+        stratford_dlr,
+        [connector(stratford_shared, stratford_dlr), circle(stratford_dlr)],
+    )
+
+    # Canary Wharf's three services retain their distinct authored ports. Join
+    # them as one legible interchange chain, then add the documented pedestrian
+    # link from West India Quay to the Elizabeth line. Redrawing every endpoint
+    # circle after the connectors keeps the roundel rings visually unbroken.
+    canary_jubilee = line_port(selected_segments, "940GZZLUCYF", "jubilee")
+    canary_dlr = line_port(selected_segments, "940GZZDLCAN", "dlr")
+    canary_elizabeth = line_port(
+        selected_segments, "910GCANWHRF", "elizabeth"
+    )
+    west_india_quay = line_port(selected_segments, "940GZZDLWIQ", "dlr")
+    canary_marker = markers_by_id["940GZZLUCYF"]
+    canary_marker["primitives"] = [
+        connector(canary_jubilee, canary_dlr),
+        connector(canary_dlr, canary_elizabeth),
+        connector(west_india_quay, canary_elizabeth),
+        circle(canary_jubilee),
+        circle(canary_dlr),
+        circle(canary_elizabeth),
+        circle(west_india_quay),
+    ]
+
+    # Whitechapel's Elizabeth line has a separate physical node northeast of
+    # the shared District / H&C roundel. Draw their interchange link beneath
+    # both circles so the linework terminates cleanly at each roundel ring.
+    whitechapel_marker = markers_by_id["940GZZLUWPL"]
+    whitechapel_underground = (
+        whitechapel_marker["anchor"]["x"],
+        whitechapel_marker["anchor"]["y"],
+    )
+    whitechapel_elizabeth = line_port(
+        selected_segments, "910GWCHAPXR", "elizabeth"
+    )
+    whitechapel_marker["primitives"].insert(
+        1,
+        connector(whitechapel_underground, whitechapel_elizabeth),
+    )
+    whitechapel_marker["primitives"].append(circle(whitechapel_elizabeth))
+
+    # The Circle, H&C, and Metropolitan lanes through Farringdon form one
+    # compact shared corridor. One centred roundel spans all three lanes and a
+    # short pedestrian link joins it to the separate Elizabeth line roundel.
+    farringdon_shared = shared_line_port(
+        selected_segments,
+        "940GZZLUFCN",
+        ("circle", "hammersmith-city", "metropolitan"),
+    )
+    farringdon_elizabeth = line_port(
+        selected_segments, "910GFRNDXR", "elizabeth"
+    )
+    farringdon_marker = markers_by_id["940GZZLUFCN"]
+    farringdon_marker["anchor"] = vector.rounded(farringdon_shared)
+    farringdon_marker["primitives"] = [
+        connector(farringdon_shared, farringdon_elizabeth),
+        circle(farringdon_shared),
+        circle(farringdon_elizabeth),
+    ]
+
+    # Tottenham Court Road uses one shared Northern / Elizabeth node. Move the
+    # Central split west along its own route and connect that distinct roundel
+    # diagonally to the shared node, removing the false Central/Northern overlap.
+    tottenham_elizabeth = line_port(
+        selected_segments, "910GTOTCTRD", "elizabeth"
+    )
+    move_line_port("940GZZLUTCR", "northern", tottenham_elizabeth)
+    original_tottenham_central = line_port(
+        selected_segments, "940GZZLUTCR", "central"
+    )
+    tottenham_central = (
+        original_tottenham_central[0] - 24,
+        original_tottenham_central[1],
+    )
+    move_line_port("940GZZLUTCR", "central", tottenham_central)
+    tottenham_marker = markers_by_id["940GZZLUTCR"]
+    tottenham_marker["anchor"] = vector.rounded(tottenham_central)
+    tottenham_marker["primitives"] = [
+        connector(tottenham_central, tottenham_elizabeth),
+        circle(tottenham_central),
+        circle(tottenham_elizabeth),
+    ]
+
+    # Bond Street's Elizabeth node is a third physical roundel. Join it to the
+    # Central node and redraw that destination circle after the connector so
+    # the ring stays visually intact across marker ownership boundaries.
+    bond_marker = markers_by_id["940GZZLUBND"]
+    bond_central = line_port(selected_segments, "940GZZLUBND", "central")
+    bond_elizabeth = line_port(selected_segments, "910GBONDST", "elizabeth")
+    bond_marker["primitives"].insert(1, connector(bond_central, bond_elizabeth))
+    bond_marker["primitives"].append(circle(bond_elizabeth))
+
+    # Make the Elizabeth roundel the actual elbow at Liverpool Street so both
+    # internal links terminate on it instead of stopping just below it.
+    liverpool_marker = markers_by_id["940GZZLULVT"]
+    liverpool_central = line_port(selected_segments, "940GZZLULVT", "central")
+    liverpool_shared = shared_line_port(
+        selected_segments,
+        "940GZZLULVT",
+        ("circle", "hammersmith-city", "metropolitan"),
+    )
+    liverpool_elizabeth = line_port(
+        selected_segments, "910GLIVSTLL", "elizabeth"
+    )
+    liverpool_marker["primitives"] = [
+        connector(liverpool_central, liverpool_elizabeth),
+        connector(liverpool_elizabeth, liverpool_shared),
+        circle(liverpool_central),
+        circle(liverpool_elizabeth),
+        circle(liverpool_shared),
+    ]
+
+    # Move the DLR terminus clear of the Northern line, then explicitly show
+    # both parts of the Bank / Monument pedestrian interchange.
+    bank_northern = line_port(selected_segments, "940GZZLUBNK", "northern")
+    monument_marker = markers_by_id["940GZZLUMMT"]
+    monument_roundel = primitive_points(monument_marker)[0]
+    original_dlr_bank = line_port(selected_segments, "940GZZDLBNK", "dlr")
+    dlr_bank = (monument_roundel[0], original_dlr_bank[1])
+    move_line_port("940GZZDLBNK", "dlr", dlr_bank)
+    dlr_bank_marker = markers_by_id["940GZZDLBNK"]
+    dlr_bank_marker["anchor"] = vector.rounded(dlr_bank)
+    dlr_bank_marker["primitives"] = [
+        connector(bank_northern, dlr_bank),
+        connector(dlr_bank, monument_roundel),
+        circle(dlr_bank),
+    ]
+
+    # Shift East India west as one authored unit: both adjoining DLR path
+    # endpoints, the roundel, and its label retain their original relationship.
+    east_india_station_id = "940GZZDLEIN"
+    original_east_india = line_port(
+        selected_segments, east_india_station_id, "dlr"
+    )
+    east_india = (original_east_india[0] - 18, original_east_india[1])
+    move_line_port(east_india_station_id, "dlr", east_india)
+    east_india_marker = markers_by_id[east_india_station_id]
+    east_india_marker["anchor"] = vector.rounded(east_india)
+    east_india_marker["primitives"] = [circle(east_india)]
+    east_india_label = labels_by_station_id[east_india_station_id]
+    east_india_label["position"] = translated_point(
+        east_india_label["position"],
+        east_india[0] - original_east_india[0],
+        east_india[1] - original_east_india[1],
+    )
+
+    # Canning Town has one common node where Jubilee crosses the East India
+    # DLR corridor and a second node on the Star Lane branch. The official
+    # branch knee is an exact point on that DLR path.
+    dlr_canning = line_port(selected_segments, "940GZZDLCGT", "dlr")
+    jubilee_canning = line_port(selected_segments, "940GZZLUCGT", "jubilee")
+    common_canning = (jubilee_canning[0], dlr_canning[1])
+    move_line_port("940GZZLUCGT", "jubilee", common_canning)
+    underground_canning_marker = markers_by_id["940GZZLUCGT"]
+    underground_canning_marker["anchor"] = vector.rounded(common_canning)
+    underground_canning_marker["primitives"] = [circle(common_canning)]
+
+    star_lane_branch_roundel = (3289.016, 1726.297)
+    dlr_canning_marker = markers_by_id["940GZZDLCGT"]
+    dlr_canning_marker["anchor"] = vector.rounded(star_lane_branch_roundel)
+    dlr_canning_marker["primitives"] = [
+        connector(common_canning, star_lane_branch_roundel),
+        circle(star_lane_branch_roundel),
+    ]
 
     return {
         "schemaVersion": {"major": 1, "minor": 2},
@@ -1630,7 +2271,7 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "note": (
                 "Complete London rail artwork compiled offline. Underground geometry uses trace-verified "
                 "slices and exact master paths from the April 2026 TfL vector map, including the DLR "
-                "and Elizabeth line branches and their distinct interchange ports. "
+                "Elizabeth line and six named London Overground routes, with distinct interchange ports. "
                 "No runtime layout is used."
             ),
         },
@@ -1657,7 +2298,8 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         "supportedLineIDs": [
             "bakerloo", "central", "circle", "district", "hammersmith-city",
             "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
-            "waterloo-city", "dlr", "elizabeth",
+            "waterloo-city", "dlr", "elizabeth", "liberty", "lioness",
+            "mildmay", "suffragette", "weaver", "windrush",
         ],
     }
 

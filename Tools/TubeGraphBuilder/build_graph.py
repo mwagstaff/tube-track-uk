@@ -37,6 +37,12 @@ LINE_IDS = (
     "waterloo-city",
     "dlr",
     "elizabeth",
+    "liberty",
+    "lioness",
+    "mildmay",
+    "suffragette",
+    "weaver",
+    "windrush",
 )
 OUTPUT = Path(__file__).resolve().parents[2] / "TubeTrackUK" / "Resources" / "TubeGraph.json"
 
@@ -184,7 +190,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--osm-pbf",
         type=Path,
-        help="Filtered OSM PBF containing London Underground route relations and railway ways.",
+        help="Filtered OSM PBF containing TfL rail route relations and railway ways.",
     )
     parser.add_argument("--output", type=Path, default=OUTPUT)
     return parser.parse_args()

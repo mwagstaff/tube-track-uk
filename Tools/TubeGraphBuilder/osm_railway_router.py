@@ -41,7 +41,21 @@ LINE_REFS = {
     "docklands light railway": "dlr",
     "elizabeth line": "elizabeth",
     "elizabeth": "elizabeth",
+    "liberty": "liberty",
+    "liberty line": "liberty",
+    "lioness": "lioness",
+    "lioness line": "lioness",
+    "mildmay": "mildmay",
+    "mildmay line": "mildmay",
+    "suffragette": "suffragette",
+    "suffragette line": "suffragette",
+    "weaver": "weaver",
+    "weaver line": "weaver",
+    "windrush": "windrush",
+    "windrush line": "windrush",
 }
+
+OVERGROUND_LINE_IDS = {"liberty", "lioness", "mildmay", "suffragette", "weaver", "windrush"}
 
 Coordinate = tuple[float, float]  # longitude, latitude
 
@@ -82,12 +96,15 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
         if tags.get("type") != "route" or tags.get("route") not in {"subway", "light_rail", "train"}:
             return
         network = tags.get("network", "").lower()
+        metro_network = tags.get("network:metro", "").lower()
         name = tags.get("name", "").lower()
         reference = (tags.get("ref") or tags.get("line") or "").strip().lower()
         is_tfl_rail = (
             "london underground" in network
             or "docklands light railway" in network
             or "elizabeth" in network
+            or "london overground" in network
+            or "london overground" in metro_network
             or "dlr" in reference
             or "elizabeth" in reference
             or "dlr" in name
@@ -99,6 +116,10 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
         if line_id is None:
             line_id = next((value for key, value in LINE_REFS.items() if key in name), None)
         if line_id is None:
+            return
+        if line_id in OVERGROUND_LINE_IDS and not (
+            "london overground" in network or "london overground" in metro_network
+        ):
             return
         self.line_way_ids[line_id].update(
             member.ref for member in relation.members if member.type == "w"

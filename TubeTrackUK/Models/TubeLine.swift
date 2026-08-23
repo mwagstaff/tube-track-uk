@@ -14,6 +14,12 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case waterlooCity = "waterloo-city"
     case dlr
     case elizabeth
+    case liberty
+    case lioness
+    case mildmay
+    case suffragette
+    case weaver
+    case windrush
 
     var id: String { rawValue }
 
@@ -32,17 +38,33 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .waterlooCity: "Waterloo & City"
         case .dlr: "DLR"
         case .elizabeth: "Elizabeth line"
+        case .liberty: "Liberty line"
+        case .lioness: "Lioness line"
+        case .mildmay: "Mildmay line"
+        case .suffragette: "Suffragette line"
+        case .weaver: "Weaver line"
+        case .windrush: "Windrush line"
         }
     }
 
     static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
 
-    var isUnderground: Bool { self != .dlr && self != .elizabeth }
+    var isUnderground: Bool {
+        switch self {
+        case .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
+             .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity:
+            true
+        case .dlr, .elizabeth, .liberty, .lioness, .mildmay, .suffragette,
+             .weaver, .windrush:
+            false
+        }
+    }
 
     var modeName: String {
         switch self {
         case .dlr: "dlr"
         case .elizabeth: "elizabeth-line"
+        case .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush: "overground"
         default: "tube"
         }
     }
@@ -75,6 +97,12 @@ extension Color {
         case .waterlooCity: Color(red: 0.46, green: 0.82, blue: 0.75)
         case .dlr: Color(red: 0.00, green: 0.686, blue: 0.678)
         case .elizabeth: Color(red: 0.376, green: 0.224, blue: 0.620)
+        case .liberty: Color(red: 0.310_699, green: 0.366_104, blue: 0.385_895)
+        case .lioness: Color(red: 0.971_756, green: 0.613_312, blue: 0.056_473)
+        case .mildmay: Color(red: 0.139_847, green: 0.524_109, blue: 0.794_968)
+        case .suffragette: Color(red: 0.350_006, green: 0.764_206, blue: 0.392_731)
+        case .weaver: Color(red: 0.690_094, green: 0.135_376, blue: 0.496_674)
+        case .windrush: Color(red: 0.929_001, green: 0.098_816, blue: 0.181_976)
         }
     }
 }

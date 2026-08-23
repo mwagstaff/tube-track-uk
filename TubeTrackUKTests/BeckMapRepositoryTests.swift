@@ -36,6 +36,9 @@ struct BeckMapRepositoryTests {
         #expect(Set(document.segments.map(\.pathID)).isSubset(of: Set(document.paths.map(\.id))))
         #expect(document.segments.filter { $0.lineID == .dlr }.count == 46)
         #expect(document.segments.filter { $0.lineID == .elizabeth }.count == 42)
+        #expect(document.segments.filter {
+            [.liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush].contains($0.lineID)
+        }.count == 111)
         #expect(document.segments.contains {
             $0.id == BeckMapRepository.supplementalHeathrowSegmentID
         })
@@ -108,6 +111,259 @@ struct BeckMapRepositoryTests {
         }
     }
 
+    @Test func fullMapCoversEveryNamedOvergroundSemanticSegment() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let lineIDs: Set<TubeLineID> = [
+            .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush,
+        ]
+        let graphSegmentIDs = Set(graph.segments.filter {
+            lineIDs.contains($0.lineID)
+        }.map(\.id))
+        let authoredSegments = document.segments.filter {
+            lineIDs.contains($0.lineID)
+        }
+        let authoredSegmentIDs = Set(authoredSegments.map(\.id))
+        let pathsByID = Dictionary(uniqueKeysWithValues: document.paths.map { ($0.id, $0) })
+
+        #expect(authoredSegmentIDs == graphSegmentIDs)
+        #expect(authoredSegments.allSatisfy {
+            $0.fromPort != nil
+                && $0.toPort != nil
+                && pathsByID[$0.pathID] != nil
+                && $0.pathID.contains(".official.v1.")
+        })
+        for lineID in lineIDs.subtracting([.liberty]) {
+            let pathIDs = Set(authoredSegments.filter { $0.lineID == lineID }.map(\.pathID))
+            #expect(pathIDs.contains { pathID in
+                pathsByID[pathID]?.commands.contains {
+                    if case .cubic = $0 { return true }
+                    return false
+                } == true
+            })
+        }
+    }
+
+    @Test func overgroundInterchangesUseCompactOfficialMarkerLayouts() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        func marker(_ stationID: String) throws -> BeckMapStationMarkerRecord {
+            try #require(document.stationMarkers.first { $0.stationID == stationID })
+        }
+
+        func circles(_ marker: BeckMapStationMarkerRecord) -> [BeckMapPoint] {
+            marker.primitives.compactMap {
+                if case let .circle(circle) = $0 { return circle.centre }
+                return nil
+            }
+        }
+
+        func connectors(_ marker: BeckMapStationMarkerRecord) -> [BeckMapLinePrimitive] {
+            marker.primitives.compactMap {
+                if case let .connector(connector) = $0 { return connector }
+                return nil
+            }
+        }
+
+        func tickCount(_ marker: BeckMapStationMarkerRecord) -> Int {
+            marker.primitives.count { if case .tick = $0 { return true }; return false }
+        }
+
+        func port(_ stationID: String, _ lineID: TubeLineID) throws -> BeckMapPoint {
+            try #require(document.segments.compactMap { segment -> BeckMapPoint? in
+                guard segment.lineID == lineID else { return nil }
+                if segment.fromStationID == stationID { return segment.fromPort }
+                if segment.toStationID == stationID { return segment.toPort }
+                return nil
+            }.first)
+        }
+
+        func length(_ connector: BeckMapLinePrimitive) -> Double {
+            hypot(
+                connector.end.x - connector.start.x,
+                connector.end.y - connector.start.y
+            )
+        }
+
+        // Shared rail records resolve to a single physical roundel.
+        #expect(circles(try marker("910GROMFORD")).count == 1)
+        let hackneyDowns = try marker("910GHAKNYNM")
+        #expect(circles(hackneyDowns).count == 1)
+        #expect(connectors(hackneyDowns).isEmpty)
+
+        // These Underground interchanges use roundels, not ordinary ticks.
+        for stationID in [
+            "940GZZLUSVS", "940GZZLUBLR", "940GZZLUWWL",
+            "940GZZLUHAI", "940GZZLUCAR", "940GZZLUWHP",
+        ] {
+            let stationMarker = try marker(stationID)
+            #expect(circles(stationMarker).count == 1)
+            #expect(tickCount(stationMarker) == 0)
+        }
+
+        let compactInterchanges: [(String, Double)] = [
+            ("910GSEVNSIS", 40),
+            ("910GBLCHSRD", 30),
+            ("910GWLTWCEN", 25),
+            ("910GHGHI", 32),
+            ("910GCLDNNRB", 110),
+            ("910GWHMDSTD", 50),
+            ("910GBARKING", 60),
+        ]
+        for (stationID, maximumLength) in compactInterchanges {
+            let links = connectors(try marker(stationID))
+            #expect(!links.isEmpty)
+            #expect(links.allSatisfy { length($0) <= maximumLength })
+        }
+
+        // Queen's Park is one shared elbow, rather than two disconnected
+        // stations hundreds of artwork units apart.
+        let queensBakerloo = try port("940GZZLUQPS", .bakerloo)
+        let queensLioness = try port("910GQPRK", .lioness)
+        #expect(hypot(
+            queensBakerloo.x - queensLioness.x,
+            queensBakerloo.y - queensLioness.y
+        ) < 0.1)
+        #expect(circles(try marker("940GZZLUQPS")).count == 1)
+        #expect(circles(try marker("910GQPRK")).count == 1)
+        #expect(circles(try marker("940GZZLUQPS")) == circles(try marker("910GQPRK")))
+        for segmentID in [
+            "lioness:910GKLBRNHR:910GQPRK",
+            "lioness:910GKENSLG:910GQPRK",
+        ] {
+            let segment = try #require(document.segments.first { $0.id == segmentID })
+            let path = try #require(document.paths.first { $0.id == segment.pathID })
+            #expect(path.commands.count == 2)
+            #expect(path.commands.count {
+                if case .cubic = $0 { return true }
+                return false
+            } == 1)
+        }
+
+        let kensalToWillesden = try #require(document.segments.first {
+            $0.id == "lioness:910GKENSLG:910GWLSDJHL"
+        })
+        let kensalToWillesdenPath = try #require(document.paths.first {
+            $0.id == kensalToWillesden.pathID
+        })
+        let kensalPort = try #require(kensalToWillesden.fromPort)
+        let willesdenPort = try #require(kensalToWillesden.toPort)
+        #expect(kensalToWillesdenPath.commands == [
+            .move(to: kensalPort),
+            .line(to: willesdenPort),
+        ])
+        #expect(abs(kensalPort.x - willesdenPort.x) < 0.001)
+
+        // The parallel Bakerloo/Lioness corridor uses short horizontal links.
+        for (overgroundID, undergroundID) in [
+            ("910GKENSLG", "940GZZLUKSL"),
+            ("910GHARLSDN", "940GZZLUHSN"),
+            ("910GSTNBGPK", "940GZZLUSGP"),
+            ("910GWMBY", "940GZZLUWYC"),
+            ("910GNWEMBLY", "940GZZLUNWY"),
+            ("910GSKENTON", "940GZZLUSKT"),
+            ("910GKTON", "940GZZLUKEN"),
+            ("910GHROW", "940GZZLUHAW"),
+        ] {
+            let lioness = try port(overgroundID, .lioness)
+            let bakerloo = try port(undergroundID, .bakerloo)
+            #expect(abs(lioness.y - bakerloo.y) < 0.1)
+            #expect(abs(lioness.x - bakerloo.x) < 15)
+        }
+
+        // Stratford's four displayed nodes are distinct, with no duplicated
+        // Jubilee/Elizabeth ring at the shared centre.
+        let stratfordCentres = try ["940GZZLUSTD", "910GSTFD", "940GZZDLSTD"]
+            .flatMap { circles(try marker($0)) }
+        #expect(stratfordCentres.count == 4)
+        for (index, centre) in stratfordCentres.enumerated() {
+            for other in stratfordCentres.dropFirst(index + 1) {
+                #expect(hypot(centre.x - other.x, centre.y - other.y) > 10)
+            }
+        }
+    }
+
+    @Test func correctedNorthLondonPathsStayMonotoneAndKinkFree() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        func segmentAndPath(_ segmentID: String) throws -> (
+            BeckMapSegmentRecord, BeckMapPathRecord
+        ) {
+            let segment = try #require(document.segments.first { $0.id == segmentID })
+            let path = try #require(document.paths.first { $0.id == segment.pathID })
+            return (segment, path)
+        }
+
+        func commandPoints(_ path: BeckMapPathRecord) -> [BeckMapPoint] {
+            path.commands.flatMap { command in
+                switch command {
+                case let .move(to), let .line(to):
+                    return [to]
+                case let .cubic(control1, control2, to):
+                    return [control1, control2, to]
+                case .close:
+                    return []
+                }
+            }
+        }
+
+        // The two Weaver joins previously retained overlapping source
+        // fragments, briefly travelling east/south before doubling back.
+        for segmentID in [
+            "weaver:910GCAMHTH:910GLONFLDS",
+            "weaver:910GCLAPTON:910GHAKNYNM",
+        ] {
+            let (segment, path) = try segmentAndPath(segmentID)
+            let from = try #require(segment.fromPort)
+            let to = try #require(segment.toPort)
+            let xRange = min(from.x, to.x)...max(from.x, to.x)
+            let yRange = min(from.y, to.y)...max(from.y, to.y)
+            #expect(commandPoints(path).allSatisfy { point in
+                xRange.contains(point.x) && yRange.contains(point.y)
+            })
+            #expect(path.commands.count {
+                if case .cubic = $0 { return true }
+                return false
+            } == 1)
+        }
+
+        // Every rebuilt northeast Victoria slice is a single horizontal line,
+        // ordered Seven Sisters → Tottenham Hale → Blackhorse → Walthamstow.
+        for segmentID in [
+            "victoria:940GZZLUSVS:940GZZLUTMH",
+            "victoria:940GZZLUBLR:940GZZLUTMH",
+            "victoria:940GZZLUBLR:940GZZLUWWL",
+        ] {
+            let (segment, path) = try segmentAndPath(segmentID)
+            let from = try #require(segment.fromPort)
+            let to = try #require(segment.toPort)
+            #expect(path.commands == [.move(to: from), .line(to: to)])
+            #expect(abs(from.y - to.y) < 0.001)
+            #expect(from.x < to.x)
+        }
+
+        let (_, highburyToFinsbury) = try segmentAndPath(
+            "victoria:940GZZLUFPK:940GZZLUHAI"
+        )
+        let highburyXs = commandPoints(highburyToFinsbury).map(\.x)
+        #expect((highburyXs.max() ?? 0) - (highburyXs.min() ?? 0) < 0.05)
+
+        let (caledonianToHolloway, caledonianPath) = try segmentAndPath(
+            "piccadilly:940GZZLUCAR:940GZZLUHWY"
+        )
+        let caledonian = try #require(caledonianToHolloway.fromPort)
+        let holloway = try #require(caledonianToHolloway.toPort)
+        #expect(caledonianPath.commands == [
+            .move(to: caledonian),
+            .line(to: holloway),
+        ])
+        #expect(caledonian.x < holloway.x)
+        #expect(caledonian.y > holloway.y)
+        #expect(abs(caledonian.x + caledonian.y - 3_437.578) < 0.01)
+    }
+
     @Test func railExtensionTerminiStayOnTheirOfficialTfLPorts() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
@@ -138,7 +394,7 @@ struct BeckMapRepositoryTests {
         }
     }
 
-    @Test func dlrBankKeepsItsOwnOfficialInterchangeAnchor() throws {
+    @Test func dlrBankKeepsItsOwnSeparateInterchangeAnchor() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
         let dlrBank = try #require(document.stationMarkers.first {
@@ -148,8 +404,8 @@ struct BeckMapRepositoryTests {
             $0.stationID == "940GZZLUBNK"
         })
 
-        // These are separate nodes in the official interchange artwork. The
-        // rail trace must not be collapsed onto the Underground marker centre.
+        // The DLR node is deliberately moved right of the Northern line and
+        // must not collapse back onto the Underground marker centre.
         #expect(hypot(
             dlrBank.anchor.x - undergroundBank.anchor.x,
             dlrBank.anchor.y - undergroundBank.anchor.y
@@ -261,8 +517,8 @@ struct BeckMapRepositoryTests {
         #expect(aldgateMetropolitanDestinations.last == aldgateMetropolitanPort)
 
         let bondStreet = try marker("940GZZLUBND")
-        #expect(circleCount(bondStreet) == 2)
-        #expect(connectorCount(bondStreet) == 1)
+        #expect(circleCount(bondStreet) == 3)
+        #expect(connectorCount(bondStreet) == 2)
         let bondCentralPort = stationLinePort("940GZZLUBND", .central)
         let bondJubileePort = stationLinePort("940GZZLUBND", .jubilee)
         let bondCentres = circleCentres(bondStreet)
@@ -433,8 +689,9 @@ struct BeckMapRepositoryTests {
 
         let canaryWharf = try marker("940GZZLUCYF")
         let northGreenwichMarker = try marker("940GZZLUNGW")
-        #expect(circleCount(canaryWharf) == 0)
-        #expect(tickCount(canaryWharf) == 1)
+        #expect(circleCount(canaryWharf) == 4)
+        #expect(tickCount(canaryWharf) == 0)
+        #expect(connectorCount(canaryWharf) == 3)
         #expect(circleCount(northGreenwichMarker) == 0)
         #expect(tickCount(northGreenwichMarker) == 1)
         let canaryWharfPort = stationLinePort("940GZZLUCYF", .jubilee)
@@ -601,7 +858,7 @@ struct BeckMapRepositoryTests {
         #expect(circleCount(stepneyGreen) == 0)
         #expect(connectorCount(stepneyGreen) == 0)
         #expect(tickCount(stepneyGreen) == 2)
-        #expect(mileEnd.anchor.x - stepneyGreen.anchor.x > 70)
+        #expect(mileEnd.anchor.x - stepneyGreen.anchor.x > 50)
 
         let finsburyPark = try marker("940GZZLUFPK")
         #expect(circleCount(finsburyPark) == 2)
@@ -619,7 +876,7 @@ struct BeckMapRepositoryTests {
         #expect(connectorCount(londonBridge) == 0)
 
         let liverpoolStreet = try marker("940GZZLULVT")
-        #expect(circleCount(liverpoolStreet) == 2)
+        #expect(circleCount(liverpoolStreet) == 3)
         #expect(connectorCount(liverpoolStreet) == 2)
 
         for stationID in ["940GZZLUHR5", "940GZZLUHRC", "940GZZLUHNX", "940GZZLUHR4"] {
@@ -640,6 +897,181 @@ struct BeckMapRepositoryTests {
             $0.id == "northern:940GZZLUBOR:940GZZLULNB"
         })
         #expect(bank.toPort == borough.toPort)
+    }
+
+    @Test func fullUndergroundInterchangeTweaksStayConnectedAndAligned() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        func marker(_ stationID: String) throws -> BeckMapStationMarkerRecord {
+            try #require(document.stationMarkers.first { $0.stationID == stationID })
+        }
+
+        func circles(_ marker: BeckMapStationMarkerRecord) -> [BeckMapPoint] {
+            marker.primitives.compactMap {
+                if case let .circle(circle) = $0 { return circle.centre }
+                return nil
+            }
+        }
+
+        func connectors(_ marker: BeckMapStationMarkerRecord) -> [BeckMapLinePrimitive] {
+            marker.primitives.compactMap {
+                if case let .connector(connector) = $0 { return connector }
+                return nil
+            }
+        }
+
+        func hasConnector(
+            _ marker: BeckMapStationMarkerRecord,
+            between first: BeckMapPoint,
+            and second: BeckMapPoint
+        ) -> Bool {
+            connectors(marker).contains { connector in
+                (connector.start == first && connector.end == second)
+                    || (connector.start == second && connector.end == first)
+            }
+        }
+
+        let edgwareRoad = try marker("940GZZLUERC")
+        let edgwareCircles = circles(edgwareRoad)
+        #expect(edgwareCircles.count == 2)
+        #expect(abs(edgwareCircles[0].x - edgwareCircles[1].x) < 0.001)
+        let edgwareLabel = try #require(document.labels.first {
+            $0.stationID == edgwareRoad.stationID
+        })
+        #expect(edgwareLabel.position.y > (edgwareCircles.map(\.y).max() ?? 0))
+
+        let kennington = try marker("940GZZLUKNG")
+        let kenningtonConnector = try #require(connectors(kennington).first)
+        #expect(abs(
+            abs(kenningtonConnector.end.x - kenningtonConnector.start.x)
+                - abs(kenningtonConnector.end.y - kenningtonConnector.start.y)
+        ) < 0.001)
+
+        let bond = try marker("940GZZLUBND")
+        let bondElizabeth = try marker("910GBONDST").anchor
+        #expect(circles(bond).contains(bondElizabeth))
+        #expect(connectors(bond).contains {
+            $0.start == bondElizabeth || $0.end == bondElizabeth
+        })
+        let bondLabel = try #require(document.labels.first {
+            $0.stationID == bond.stationID
+        })
+        #expect(bondLabel.position.x < bond.anchor.x)
+        #expect(bondLabel.position.y < bond.anchor.y)
+
+        let liverpool = try marker("940GZZLULVT")
+        let liverpoolElizabeth = try marker("910GLIVSTLL").anchor
+        #expect(circles(liverpool).contains(liverpoolElizabeth))
+        #expect(connectors(liverpool).filter {
+            $0.start == liverpoolElizabeth || $0.end == liverpoolElizabeth
+        }.count == 2)
+
+        let bank = try marker("940GZZLUBNK")
+        let dlrBank = try marker("940GZZDLBNK")
+        let monument = try marker("940GZZLUMMT")
+        let bankNorthern = try #require(circles(bank).max { $0.x < $1.x })
+        let monumentRoundel = try #require(circles(monument).first)
+        #expect(dlrBank.anchor.x > bankNorthern.x + 20)
+        #expect(hasConnector(dlrBank, between: dlrBank.anchor, and: monumentRoundel))
+        #expect(connectors(dlrBank).contains {
+            $0.start == bankNorthern || $0.end == bankNorthern
+        })
+
+        let canningTown = try marker("940GZZLUCGT")
+        let dlrCanningTown = try marker("940GZZDLCGT")
+        let eastIndia = try marker("940GZZDLEIN")
+        #expect(dlrCanningTown.anchor.x > canningTown.anchor.x)
+        #expect(dlrCanningTown.anchor.y < canningTown.anchor.y)
+        #expect(canningTown.anchor.x - eastIndia.anchor.x > 40)
+        #expect(hasConnector(
+            dlrCanningTown,
+            between: canningTown.anchor,
+            and: dlrCanningTown.anchor
+        ))
+        let canningTownLabel = try #require(document.labels.first {
+            $0.stationID == canningTown.stationID
+        })
+        #expect(canningTownLabel.position.x > canningTown.anchor.x)
+        #expect(canningTownLabel.position.y > canningTown.anchor.y)
+
+        let canaryJubilee = try marker("940GZZLUCYF")
+        let canaryDLR = try marker("940GZZDLCAN")
+        let canaryElizabeth = try marker("910GCANWHRF")
+        let westIndiaQuay = try marker("940GZZDLWIQ")
+        let canaryRoundels = circles(canaryJubilee)
+        #expect(canaryRoundels.contains(canaryJubilee.anchor))
+        #expect(canaryRoundels.contains(canaryDLR.anchor))
+        #expect(canaryRoundels.contains(canaryElizabeth.anchor))
+        #expect(canaryRoundels.contains(westIndiaQuay.anchor))
+        #expect(hasConnector(
+            canaryJubilee,
+            between: canaryJubilee.anchor,
+            and: canaryDLR.anchor
+        ))
+        #expect(hasConnector(
+            canaryJubilee,
+            between: canaryDLR.anchor,
+            and: canaryElizabeth.anchor
+        ))
+        #expect(hasConnector(
+            canaryJubilee,
+            between: westIndiaQuay.anchor,
+            and: canaryElizabeth.anchor
+        ))
+
+        let whitechapel = try marker("940GZZLUWPL")
+        let whitechapelElizabeth = try marker("910GWCHAPXR")
+        #expect(circles(whitechapel).contains(whitechapelElizabeth.anchor))
+        #expect(hasConnector(
+            whitechapel,
+            between: whitechapel.anchor,
+            and: whitechapelElizabeth.anchor
+        ))
+
+        let stepneyGreen = try marker("940GZZLUSGN")
+        let mileEnd = try marker("940GZZLUMED")
+        #expect(stepneyGreen.anchor.x > 2_850)
+        #expect(mileEnd.anchor.x - stepneyGreen.anchor.x > 50)
+        let stepneyGreenLabel = try #require(document.labels.first {
+            $0.stationID == stepneyGreen.stationID
+        })
+        #expect(stepneyGreenLabel.position.x > stepneyGreen.anchor.x)
+        #expect(stepneyGreenLabel.position.y > stepneyGreen.anchor.y)
+        let mileEndLabel = try #require(document.labels.first {
+            $0.stationID == mileEnd.stationID
+        })
+        let mileEndTopRoundel = try #require(circles(mileEnd).map(\.y).min())
+        #expect(mileEndLabel.position.y < mileEndTopRoundel - 20)
+
+        let farringdon = try marker("940GZZLUFCN")
+        let farringdonElizabeth = try marker("910GFRNDXR")
+        #expect(circles(farringdon).count == 2)
+        #expect(circles(farringdon).contains(farringdon.anchor))
+        #expect(circles(farringdon).contains(farringdonElizabeth.anchor))
+        #expect(hasConnector(
+            farringdon,
+            between: farringdon.anchor,
+            and: farringdonElizabeth.anchor
+        ))
+
+        let tottenhamCourtRoad = try marker("940GZZLUTCR")
+        let tottenhamElizabeth = try marker("910GTOTCTRD")
+        #expect(tottenhamElizabeth.anchor.x - tottenhamCourtRoad.anchor.x > 20)
+        #expect(circles(tottenhamCourtRoad).contains(tottenhamCourtRoad.anchor))
+        #expect(circles(tottenhamCourtRoad).contains(tottenhamElizabeth.anchor))
+        #expect(hasConnector(
+            tottenhamCourtRoad,
+            between: tottenhamCourtRoad.anchor,
+            and: tottenhamElizabeth.anchor
+        ))
+        let tottenhamNorthernPorts = document.segments.compactMap { segment -> BeckMapPoint? in
+            guard segment.lineID == .northern else { return nil }
+            if segment.fromStationID == tottenhamCourtRoad.stationID { return segment.fromPort }
+            if segment.toStationID == tottenhamCourtRoad.stationID { return segment.toPort }
+            return nil
+        }
+        #expect(tottenhamNorthernPorts.allSatisfy { $0 == tottenhamElizabeth.anchor })
     }
 
     @Test func fullUndergroundWaterlooLabelStaysNearItsMarker() throws {

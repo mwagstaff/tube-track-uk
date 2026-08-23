@@ -1,3 +1,4 @@
+import Foundation
 import Observation
 import SwiftUI
 
@@ -28,16 +29,59 @@ enum AppTab: String, CaseIterable, Identifiable {
     }
 }
 
-enum DisruptionDisplayMode: String, CaseIterable {
+enum DisruptionDisplayMode: String, CaseIterable, Sendable {
     case normal
     case issues
+
+    func mutesSegment(isAffected: Bool) -> Bool {
+        switch self {
+        case .normal:
+            isAffected
+        case .issues:
+            !isAffected
+        }
+    }
+}
+
+enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
+    case system
+    case light
+    case dark
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .system: "System"
+        case .light: "Light"
+        case .dark: "Dark"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .system: "circle.lefthalf.filled"
+        case .light: "sun.max.fill"
+        case .dark: "moon.fill"
+        }
+    }
+
+    var colorScheme: ColorScheme? {
+        switch self {
+        case .system: nil
+        case .light: .light
+        case .dark: .dark
+        }
+    }
 }
 
 @MainActor
 @Observable
 final class TubeAppState {
+    private static let appearanceModeKey = "appearanceMode"
+
     var selectedTab: AppTab = .map
-    var disruptionDisplayMode: DisruptionDisplayMode = .issues
+    var disruptionDisplayMode: DisruptionDisplayMode = .normal
     var disruptionDateSelection: DisruptionDateSelection = .today
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
@@ -45,13 +89,22 @@ final class TubeAppState {
     var trainLineFilter: Set<TubeLineID> = []
     var selectedLineID: TubeLineID?
     var selectedStationID: String?
+    private(set) var stationSelectionGeneration = 0
     var selectedDisruptionID: String?
     var selectedEngineeringWorkID: String?
     var focusedSegmentIDs: Set<String> = []
     var focusedStationIDs: Set<String> = []
     var focusedLineIDs: Set<TubeLineID> = []
     var focusedResolutionConfidence: ResolutionConfidence?
-    var preferredColorScheme: ColorScheme?
+    var appearanceMode: AppAppearanceMode {
+        didSet {
+            defaults.set(appearanceMode.rawValue, forKey: Self.appearanceModeKey)
+        }
+    }
+
+    var preferredColorScheme: ColorScheme? {
+        appearanceMode.colorScheme
+    }
 
     var graph: TubeGraph?
     var statuses: [TfLLineStatus] = []
@@ -84,8 +137,13 @@ final class TubeAppState {
     @ObservationIgnored private var trainRefreshGeneration: UInt = 0
     @ObservationIgnored private var appIsActive = true
     @ObservationIgnored private var started = false
+    @ObservationIgnored private let defaults: UserDefaults
 
-    init() {
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
+            .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
+
         #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
         if let flag = arguments.firstIndex(of: "-DebugTab"), arguments.indices.contains(flag + 1),
@@ -350,6 +408,7 @@ final class TubeAppState {
     func select(station: TubeStation) {
         cancelStationArrivalsRefresh()
         selectedStationID = station.id
+        stationSelectionGeneration &+= 1
         selectedLineID = nil
         selectedDisruptionID = nil
         selectedEngineeringWorkID = nil

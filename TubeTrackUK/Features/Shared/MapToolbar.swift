@@ -2,12 +2,41 @@ import SwiftUI
 
 struct MapToolbar: View {
     @Environment(TubeAppState.self) private var appState
+    @State private var stationSearchPresented = false
+    @State private var pendingStationSelection: TubeStation?
     let onReset: () -> Void
 
     var body: some View {
+        @Bindable var state = appState
+
         GlassEffectContainer(spacing: 10) {
             HStack(spacing: 8) {
                 Spacer(minLength: 4)
+
+                Button {
+                    stationSearchPresented = true
+                } label: {
+                    Image(systemName: "magnifyingglass")
+                        .frame(width: 34, height: 34)
+                }
+                .buttonStyle(.glass)
+                .disabled(appState.graph == nil)
+                .accessibilityLabel("Search stations")
+
+                Menu {
+                    Picker("Appearance", selection: $state.appearanceMode) {
+                        ForEach(AppAppearanceMode.allCases) { mode in
+                            Label(mode.title, systemImage: mode.symbol)
+                                .tag(mode)
+                        }
+                    }
+                } label: {
+                    Image(systemName: appState.appearanceMode.symbol)
+                        .frame(width: 34, height: 34)
+                }
+                .buttonStyle(.glass)
+                .accessibilityLabel("Appearance")
+                .accessibilityValue(appState.appearanceMode.title)
 
                 Button {
                     appState.setLiveTrains(!appState.showLiveTrains)
@@ -29,6 +58,20 @@ struct MapToolbar: View {
         }
         .padding(.horizontal, 12)
         .padding(.top, 6)
+        .sheet(isPresented: $stationSearchPresented, onDismiss: {
+            guard let station = pendingStationSelection else { return }
+            pendingStationSelection = nil
+            appState.select(station: station)
+        }) {
+            StationSearchSheet(
+                stations: appState.graph?.stations ?? [],
+                selectedStationID: appState.selectedStationID
+            ) { station in
+                pendingStationSelection = station
+            }
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
