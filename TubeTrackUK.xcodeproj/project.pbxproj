@@ -255,6 +255,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
 				INFOPLIST_KEY_TfLAPIBaseURL = "$(TFL_API_BASE_URL)";
 				INFOPLIST_KEY_TfLAPIKey = "$(TFL_API_KEY)";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -298,6 +299,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
 				INFOPLIST_KEY_TfLAPIBaseURL = "$(TFL_API_BASE_URL)";
 				INFOPLIST_KEY_TfLAPIKey = "$(TFL_API_KEY)";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

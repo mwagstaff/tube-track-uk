@@ -4,6 +4,7 @@ struct StationDetailCard: View {
     @Environment(TubeAppState.self) private var appState
     @State private var presentedDisruption: ResolvedDisruption?
     let station: TubeStation
+    var onClose: (() -> Void)? = nil
 
     var body: some View {
         GlassPanel {
@@ -18,10 +19,19 @@ struct StationDetailCard: View {
                     }
                     Spacer()
                     Button("Close", systemImage: "xmark.circle.fill") {
-                        appState.clearStationSelection()
+                        if let onClose {
+                            onClose()
+                        } else {
+                            appState.clearStationSelection()
+                        }
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
+                    .font(.title2)
+                    .frame(width: 44, height: 44)
+                    .contentShape(.rect)
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Closes station details")
                 }
                 ScrollView(.horizontal) {
                     HStack(spacing: 6) {

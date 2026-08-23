@@ -260,7 +260,7 @@ struct RealWorldMapScreen: View {
         VStack(spacing: 9) {
             if appState.showLiveTrains { TrainFilterBar() }
             if let station = appState.selectedStation {
-                StationDetailCard(station: station)
+                StationDetailCard(station: station, onClose: closeStationCard)
                     .padding(.horizontal, 12)
             } else if let work = appState.selectedEngineeringWork {
                 PlannedWorkDetailCard(work: work)
@@ -287,6 +287,13 @@ struct RealWorldMapScreen: View {
     private func resetCamera() {
         position = .region(Self.centralLondon)
         appState.clearMapSelection()
+    }
+
+    private func closeStationCard() {
+        withAnimation(.spring(duration: 0.35)) {
+            mapSelection = nil
+            appState.clearStationSelection()
+        }
     }
 
     private func focus(on stationIDs: Set<String>) {

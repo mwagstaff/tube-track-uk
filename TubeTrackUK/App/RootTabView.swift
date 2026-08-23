@@ -30,6 +30,16 @@ struct RootTabView: View {
             .tabItem { Label(AppTab.realWorld.title, systemImage: AppTab.realWorld.symbol) }
             .tag(AppTab.realWorld)
 
+            Group {
+                if appState.selectedTab == .nearMe {
+                    NearMeScreen()
+                } else {
+                    Color.clear
+                }
+            }
+            .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
+            .tag(AppTab.nearMe)
+
             WorksScreen()
                 .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
                 .tag(AppTab.works)

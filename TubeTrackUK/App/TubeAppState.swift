@@ -5,6 +5,7 @@ import SwiftUI
 enum AppTab: String, CaseIterable, Identifiable {
     case map
     case realWorld
+    case nearMe
     case works
     case about
 
@@ -13,6 +14,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .map: "Map"
+        case .nearMe: "Near Me"
         case .realWorld: "Real World"
         case .works: "Works"
         case .about: "About"
@@ -22,6 +24,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .map: "map"
+        case .nearMe: "location.fill"
         case .realWorld: "globe.europe.africa"
         case .works: "wrench.and.screwdriver"
         case .about: "info.circle"
@@ -114,6 +117,9 @@ final class TubeAppState {
     var stationArrivals: [TfLArrivalPrediction] = []
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
+    var nearbyArrivalsByStationID: [String: [TfLArrivalPrediction]] = [:]
+    var nearbyArrivalsLoadingStationIDs: Set<String> = []
+    var nearbyArrivalsErrorsByStationID: [String: String] = [:]
     var statusUpdatedAt: Date?
     var worksUpdatedAt: Date?
     var isUsingCachedStatus = false
@@ -130,6 +136,7 @@ final class TubeAppState {
     @ObservationIgnored private var stationArrivalsService: StationArrivalsService?
     @ObservationIgnored private var stationArrivalsTask: Task<Void, Never>?
     @ObservationIgnored private var stationArrivalsGeneration: UInt = 0
+    @ObservationIgnored private var nearbyArrivalsGenerationByStationID: [String: UInt] = [:]
     @ObservationIgnored private var statusPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainRefreshTask: Task<Void, Never>?
@@ -430,6 +437,61 @@ final class TubeAppState {
         await refreshTask?.value
     }
 
+    func refreshNearbyArrivals(for stations: [TubeStation]) async {
+        guard let graph, let stationArrivalsService else { return }
+
+        let stationIDs = Set(stations.map(\.id))
+        nearbyArrivalsLoadingStationIDs.formUnion(stationIDs)
+
+        let requests = stations.map { station -> NearbyArrivalsRequest in
+            let generation = (nearbyArrivalsGenerationByStationID[station.id] ?? 0) &+ 1
+            nearbyArrivalsGenerationByStationID[station.id] = generation
+            nearbyArrivalsErrorsByStationID[station.id] = nil
+            return NearbyArrivalsRequest(
+                station: station,
+                stopIDs: graph.stations(inSamePlaceAs: station).map(\.id),
+                generation: generation
+            )
+        }
+
+        await withTaskGroup(of: NearbyArrivalsResult.self) { group in
+            for request in requests {
+                group.addTask {
+                    do {
+                        let arrivals = try await stationArrivalsService.fetch(
+                            stationIDs: request.stopIDs
+                        )
+                        return NearbyArrivalsResult(
+                            stationID: request.station.id,
+                            generation: request.generation,
+                            arrivals: arrivals,
+                            errorDescription: nil
+                        )
+                    } catch {
+                        return NearbyArrivalsResult(
+                            stationID: request.station.id,
+                            generation: request.generation,
+                            arrivals: [],
+                            errorDescription: error.localizedDescription
+                        )
+                    }
+                }
+            }
+
+            for await result in group {
+                guard nearbyArrivalsGenerationByStationID[result.stationID] == result.generation,
+                      !Task.isCancelled else { continue }
+                nearbyArrivalsLoadingStationIDs.remove(result.stationID)
+                if let errorDescription = result.errorDescription {
+                    nearbyArrivalsErrorsByStationID[result.stationID] = errorDescription
+                } else {
+                    nearbyArrivalsByStationID[result.stationID] = result.arrivals
+                    nearbyArrivalsErrorsByStationID[result.stationID] = nil
+                }
+            }
+        }
+    }
+
     func select(disruption: ResolvedDisruption) {
         selectedDisruptionID = disruption.id
         selectedEngineeringWorkID = engineeringWork(
@@ -511,6 +573,10 @@ final class TubeAppState {
         showLiveTrains = false
         liveTrains.removeAll(keepingCapacity: false)
         stationArrivals.removeAll(keepingCapacity: false)
+        nearbyArrivalsByStationID.removeAll(keepingCapacity: false)
+        nearbyArrivalsLoadingStationIDs.removeAll(keepingCapacity: false)
+        nearbyArrivalsErrorsByStationID.removeAll(keepingCapacity: false)
+        nearbyArrivalsGenerationByStationID.removeAll(keepingCapacity: false)
     }
 
     private func resolvedDisruptions(for work: EngineeringWork) -> [ResolvedDisruption] {
@@ -704,4 +770,17 @@ final class TubeAppState {
         stationArrivalsTask = nil
         isRefreshingStationArrivals = false
     }
+}
+
+private struct NearbyArrivalsResult: Sendable {
+    let stationID: String
+    let generation: UInt
+    let arrivals: [TfLArrivalPrediction]
+    let errorDescription: String?
+}
+
+private struct NearbyArrivalsRequest: Sendable {
+    let station: TubeStation
+    let stopIDs: [String]
+    let generation: UInt
 }
