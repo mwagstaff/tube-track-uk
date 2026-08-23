@@ -1368,6 +1368,450 @@
       "text": "Battersea\nPower Station"
     },
     {
+      "alignment": "leading",
+      "id": "label.940GZZCRADD",
+      "position": {
+        "x": 3255.695,
+        "y": 2716.755
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRADD",
+      "text": "Addiscombe"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRADV",
+      "position": {
+        "x": 3299.621,
+        "y": 2888.965
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRADV",
+      "text": "Addington Village"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRAMP",
+      "position": {
+        "x": 2301.572,
+        "y": 2780.649
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRAMP",
+      "text": "Ampere\nWay"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZCRARA",
+      "position": {
+        "x": 3368.43,
+        "y": 2604.013
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRARA",
+      "text": "Arena"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRAVE",
+      "position": {
+        "x": 3625.336,
+        "y": 2536.875
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRAVE",
+      "text": "Avenue\nRoad"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRBED",
+      "position": {
+        "x": 2126.887,
+        "y": 2780.631
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBED",
+      "text": "Beddington\nLane"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRBEK",
+      "position": {
+        "x": 3804.578,
+        "y": 2536.875
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBEK",
+      "text": "Beckenham\nJunction"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRBGV",
+      "position": {
+        "x": 1795.839,
+        "y": 2780.597
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBGV",
+      "text": "Belgrave\nWalk"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRBIR",
+      "position": {
+        "x": 3551.488,
+        "y": 2536.875
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBIR",
+      "text": "Birkbeck"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZCRBLA",
+      "position": {
+        "x": 3298.055,
+        "y": 2674.393
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBLA",
+      "text": "Blackhorse Lane"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRBRD",
+      "position": {
+        "x": 3709.221,
+        "y": 2536.875
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRBRD",
+      "text": "Beckenham\nRoad"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRCEN",
+      "position": {
+        "x": 2748.67,
+        "y": 2780.694
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRCEN",
+      "text": "George\nStreet"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRCHR",
+      "position": {
+        "x": 2641.171,
+        "y": 2780.683
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRCHR",
+      "text": "Church Street"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRCOO",
+      "position": {
+        "x": 3239.328,
+        "y": 2828.747
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRCOO",
+      "text": "Coombe Lane"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRCTR",
+      "position": {
+        "x": 2615.963,
+        "y": 2690.516
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRCTR",
+      "text": "Centrale"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZCRDDR",
+      "position": {
+        "x": 1405.281,
+        "y": 2480.502
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRDDR",
+      "text": "Dundonald\nRoad"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRECR",
+      "position": {
+        "x": 2935.571,
+        "y": 2734.714
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRECR",
+      "text": "East\nCroydon"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRELM",
+      "position": {
+        "x": 3434.876,
+        "y": 2597.515
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRELM",
+      "text": "Elmers End"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRFLD",
+      "position": {
+        "x": 3330.611,
+        "y": 2919.917
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRFLD",
+      "text": "Fieldway"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRGRA",
+      "position": {
+        "x": 3268.948,
+        "y": 2858.33
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRGRA",
+      "text": "Gravel Hill"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRHAR",
+      "position": {
+        "x": 3466.169,
+        "y": 2536.875
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRHAR",
+      "text": "Harrington\nRoad"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRKGH",
+      "position": {
+        "x": 3363.848,
+        "y": 2953.112
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRKGH",
+      "text": "King Henry's Drive"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRLEB",
+      "position": {
+        "x": 3039.713,
+        "y": 2780.719
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRLEB",
+      "text": "Lebanon\nRoad"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRLOY",
+      "position": {
+        "x": 3207.1,
+        "y": 2796.558
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRLOY",
+      "text": "Lloyd Park"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRMCH",
+      "position": {
+        "x": 1889.901,
+        "y": 2780.607
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRMCH",
+      "text": "Mitcham"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRMDN",
+      "position": {
+        "x": 1604.717,
+        "y": 2780.578
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRMDN",
+      "text": "Morden\nRoad"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRMJT",
+      "position": {
+        "x": 2035.268,
+        "y": 2780.621
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRMJT",
+      "text": "Mitcham\nJunction"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZCRMTP",
+      "position": {
+        "x": 1405.281,
+        "y": 2565.602
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRMTP",
+      "text": "Merton\nPark"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRNWA",
+      "position": {
+        "x": 3399.859,
+        "y": 2989.078
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRNWA",
+      "text": "New Addington"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRPHI",
+      "position": {
+        "x": 1697.996,
+        "y": 2780.578
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRPHI",
+      "text": "Phipps\nBridge"
+    },
+    {
+      "alignment": "trailing",
+      "id": "label.940GZZCRRVC",
+      "position": {
+        "x": 2520.805,
+        "y": 2707.878
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRRVC",
+      "text": "Reeves\nCorner"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRSAN",
+      "position": {
+        "x": 3140.106,
+        "y": 2736.719
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRSAN",
+      "text": "Sandilands"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRTPA",
+      "position": {
+        "x": 2217.283,
+        "y": 2780.64
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRTPA",
+      "text": "Therapia\nLane"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRWAD",
+      "position": {
+        "x": 2383.418,
+        "y": 2780.657
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRWAD",
+      "text": "Waddon\nMarsh"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRWAN",
+      "position": {
+        "x": 2461.599,
+        "y": 2780.665
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRWAN",
+      "text": "Wandle\nPark"
+    },
+    {
+      "alignment": "centre",
+      "id": "label.940GZZCRWEL",
+      "position": {
+        "x": 2747.86,
+        "y": 2691.516
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRWEL",
+      "text": "Wellesley\nRoad"
+    },
+    {
+      "alignment": "leading",
+      "id": "label.940GZZCRWOD",
+      "position": {
+        "x": 3334.587,
+        "y": 2637.858
+      },
+      "priority": 5,
+      "rotationDegrees": 0,
+      "stationID": "940GZZCRWOD",
+      "text": "Woodside"
+    },
+    {
       "alignment": "trailing",
       "id": "label.940GZZDLABR",
       "position": {
@@ -20887,6 +21331,1134 @@
         {
           "op": "move",
           "to": {
+            "x": 3804.578,
+            "y": 2514.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3709.221,
+            "y": 2514.875
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3709.221,
+            "y": 2514.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3625.336,
+            "y": 2514.875
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3625.336,
+            "y": 2514.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3551.488,
+            "y": 2514.875
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3551.488,
+            "y": 2514.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3466.169,
+            "y": 2514.875
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3466.169,
+            "y": 2514.875
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3446.094,
+            "y": 2514.875
+          }
+        },
+        {
+          "control1": {
+            "x": 3437.75,
+            "y": 2514.875
+          },
+          "control2": {
+            "x": 3430.203,
+            "y": 2518.25
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3424.719,
+            "y": 2523.719
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3351.43,
+            "y": 2597.013
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3351.43,
+            "y": 2597.013
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3317.587,
+            "y": 2630.858
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3317.587,
+            "y": 2630.858
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3281.055,
+            "y": 2667.393
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3281.055,
+            "y": 2667.393
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3238.695,
+            "y": 2709.755
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3238.695,
+            "y": 2709.755
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3200.594,
+            "y": 2747.859
+          }
+        },
+        {
+          "control1": {
+            "x": 3194.688,
+            "y": 2753.766
+          },
+          "control2": {
+            "x": 3186.953,
+            "y": 2756.719
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3179.219,
+            "y": 2756.719
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.beckenham-sandilands.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2900.563,
+            "y": 2756.703
+          }
+        },
+        {
+          "control1": {
+            "x": 2887.359,
+            "y": 2756.703
+          },
+          "control2": {
+            "x": 2875.406,
+            "y": 2751.359
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2866.75,
+            "y": 2742.703
+          }
+        },
+        {
+          "control1": {
+            "x": 2857.813,
+            "y": 2733.75
+          },
+          "control2": {
+            "x": 2804.5,
+            "y": 2680.438
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2804.5,
+            "y": 2680.438
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2803.75,
+            "y": 2679.672
+          }
+        },
+        {
+          "control1": {
+            "x": 2796.203,
+            "y": 2673.328
+          },
+          "control2": {
+            "x": 2786.469,
+            "y": 2669.516
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2775.828,
+            "y": 2669.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2747.86,
+            "y": 2669.516
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2747.86,
+            "y": 2669.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2670.517,
+            "y": 2669.516
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2670.517,
+            "y": 2669.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2615.963,
+            "y": 2669.516
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2615.963,
+            "y": 2669.516
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2603.188,
+            "y": 2669.516
+          }
+        },
+        {
+          "control1": {
+            "x": 2591.156,
+            "y": 2669.516
+          },
+          "control2": {
+            "x": 2580.281,
+            "y": 2674.391
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2572.422,
+            "y": 2682.281
+          }
+        },
+        {
+          "control1": {
+            "x": 2564.531,
+            "y": 2690.141
+          },
+          "control2": {
+            "x": 2559.656,
+            "y": 2701.031
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2559.656,
+            "y": 2713.047
+          }
+        },
+        {
+          "control1": {
+            "x": 2559.656,
+            "y": 2725.063
+          },
+          "control2": {
+            "x": 2564.531,
+            "y": 2735.953
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2572.422,
+            "y": 2743.828
+          }
+        },
+        {
+          "control1": {
+            "x": 2580.281,
+            "y": 2751.719
+          },
+          "control2": {
+            "x": 2591.156,
+            "y": 2756.672
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2603.188,
+            "y": 2756.672
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3434.876,
+            "y": 2575.515
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3385.469,
+            "y": 2575.5
+          }
+        },
+        {
+          "control1": {
+            "x": 3377.125,
+            "y": 2575.5
+          },
+          "control2": {
+            "x": 3369.563,
+            "y": 2578.891
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3364.094,
+            "y": 2584.359
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.elmers-end-arena.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2478.203,
+            "y": 2756.656
+          }
+        },
+        {
+          "control1": {
+            "x": 2491.406,
+            "y": 2756.656
+          },
+          "control2": {
+            "x": 2503.359,
+            "y": 2751.313
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2512.016,
+            "y": 2742.656
+          }
+        },
+        {
+          "control1": {
+            "x": 2515.555,
+            "y": 2739.117
+          },
+          "control2": {
+            "x": 2525.764,
+            "y": 2728.913
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2536.805,
+            "y": 2717.878
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wandle-centrale.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2536.805,
+            "y": 2717.878
+          }
+        },
+        {
+          "control1": {
+            "x": 2553.645,
+            "y": 2701.046
+          },
+          "control2": {
+            "x": 2572.422,
+            "y": 2682.281
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2572.422,
+            "y": 2682.281
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wandle-centrale.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1387.281,
+            "y": 2406.609
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1387.281,
+            "y": 2480.502
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1387.281,
+            "y": 2480.502
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1387.281,
+            "y": 2565.602
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.1"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2301.572,
+            "y": 2756.649
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2383.418,
+            "y": 2756.657
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.10"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2383.418,
+            "y": 2756.657
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2461.599,
+            "y": 2756.665
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2461.599,
+            "y": 2756.665
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2641.171,
+            "y": 2756.683
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.12"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2641.171,
+            "y": 2756.683
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2748.67,
+            "y": 2756.694
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.13"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2748.67,
+            "y": 2756.694
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2935.571,
+            "y": 2756.714
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.14"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2935.571,
+            "y": 2756.714
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2985.656,
+            "y": 2756.719
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3039.713,
+            "y": 2756.719
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.15"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3039.713,
+            "y": 2756.719
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3140.106,
+            "y": 2756.719
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.16"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3140.106,
+            "y": 2756.719
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3178.718,
+            "y": 2756.719
+          }
+        },
+        {
+          "control1": {
+            "x": 3187.062,
+            "y": 2756.719
+          },
+          "control2": {
+            "x": 3194.625,
+            "y": 2760.109
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3200.093,
+            "y": 2765.578
+          }
+        },
+        {
+          "control1": {
+            "x": 3201.171,
+            "y": 2766.655
+          },
+          "control2": {
+            "x": 3210.236,
+            "y": 2775.71
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3224.1,
+            "y": 2789.558
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.17"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3224.1,
+            "y": 2789.558
+          }
+        },
+        {
+          "control1": {
+            "x": 3233.108,
+            "y": 2798.556
+          },
+          "control2": {
+            "x": 3244.143,
+            "y": 2809.576
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3256.328,
+            "y": 2821.747
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.18"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3256.328,
+            "y": 2821.747
+          }
+        },
+        {
+          "control1": {
+            "x": 3265.657,
+            "y": 2831.065
+          },
+          "control2": {
+            "x": 3275.662,
+            "y": 2841.057
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3285.948,
+            "y": 2851.33
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.19"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1387.281,
+            "y": 2565.602
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1387.281,
+            "y": 2614.172
+          }
+        },
+        {
+          "control1": {
+            "x": 1387.281,
+            "y": 2620.562
+          },
+          "control2": {
+            "x": 1390.969,
+            "y": 2629.469
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1395.484,
+            "y": 2633.969
+          }
+        },
+        {
+          "control1": {
+            "x": 1395.484,
+            "y": 2633.969
+          },
+          "control2": {
+            "x": 1439.547,
+            "y": 2678.031
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1447.078,
+            "y": 2685.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1458.937,
+            "y": 2697.422
+          }
+        },
+        {
+          "control1": {
+            "x": 1498.062,
+            "y": 2736.547
+          },
+          "control2": {
+            "x": 1507.0,
+            "y": 2745.484
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1509.891,
+            "y": 2748.375
+          }
+        },
+        {
+          "control1": {
+            "x": 1514.406,
+            "y": 2752.891
+          },
+          "control2": {
+            "x": 1523.312,
+            "y": 2756.578
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1529.687,
+            "y": 2756.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1604.717,
+            "y": 2756.578
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.2"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3285.948,
+            "y": 2851.33
+          }
+        },
+        {
+          "control1": {
+            "x": 3296.025,
+            "y": 2861.394
+          },
+          "control2": {
+            "x": 3306.372,
+            "y": 2871.729
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3316.621,
+            "y": 2881.965
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.20"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3316.621,
+            "y": 2881.965
+          }
+        },
+        {
+          "control1": {
+            "x": 3327.19,
+            "y": 2892.522
+          },
+          "control2": {
+            "x": 3337.655,
+            "y": 2902.973
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3347.611,
+            "y": 2912.917
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.21"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3347.611,
+            "y": 2912.917
+          }
+        },
+        {
+          "control1": {
+            "x": 3359.678,
+            "y": 2924.969
+          },
+          "control2": {
+            "x": 3370.998,
+            "y": 2936.274
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3380.848,
+            "y": 2946.112
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.22"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 3380.848,
+            "y": 2946.112
+          }
+        },
+        {
+          "control1": {
+            "x": 3402.355,
+            "y": 2967.592
+          },
+          "control2": {
+            "x": 3416.859,
+            "y": 2982.078
+          },
+          "op": "cubic",
+          "to": {
+            "x": 3416.859,
+            "y": 2982.078
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.23"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1604.717,
+            "y": 2756.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1697.996,
+            "y": 2756.578
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.3"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1697.996,
+            "y": 2756.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1755.0,
+            "y": 2756.578
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1764.078,
+            "y": 2756.594
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1795.839,
+            "y": 2756.597
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1795.839,
+            "y": 2756.597
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1889.901,
+            "y": 2756.607
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1889.901,
+            "y": 2756.607
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2035.268,
+            "y": 2756.621
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.6"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2035.268,
+            "y": 2756.621
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2126.887,
+            "y": 2756.631
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.7"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2126.887,
+            "y": 2756.631
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2217.283,
+            "y": 2756.64
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.8"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 2217.283,
+            "y": 2756.64
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2301.572,
+            "y": 2756.649
+          }
+        }
+      ],
+      "id": "beck.v1.path.tram.wimbledon-new-addington.official.v1.9"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
             "x": 1729.021,
             "y": 1867.991
           }
@@ -25206,6 +26778,308 @@
         "910GWDGRNPK",
         "910GBARKING",
         "910GBARKRIV"
+      ]
+    },
+    {
+      "id": "tram.graph-route.0.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRBEK:940GZZCRBRD",
+        "tram:940GZZCRAVE:940GZZCRBRD",
+        "tram:940GZZCRAVE:940GZZCRBIR",
+        "tram:940GZZCRBIR:940GZZCRHAR",
+        "tram:940GZZCRARA:940GZZCRHAR",
+        "tram:940GZZCRARA:940GZZCRWOD",
+        "tram:940GZZCRBLA:940GZZCRWOD",
+        "tram:940GZZCRADD:940GZZCRBLA",
+        "tram:940GZZCRADD:940GZZCRSAN",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRCEN:940GZZCRECR",
+        "tram:940GZZCRCEN:940GZZCRCHR",
+        "tram:940GZZCRCHR:940GZZCRWAN",
+        "tram:940GZZCRWAD:940GZZCRWAN",
+        "tram:940GZZCRAMP:940GZZCRWAD",
+        "tram:940GZZCRAMP:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRMJT",
+        "tram:940GZZCRMCH:940GZZCRMJT",
+        "tram:940GZZCRBGV:940GZZCRMCH",
+        "tram:940GZZCRBGV:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRWMB"
+      ],
+      "stationIDs": [
+        "940GZZCRBEK",
+        "940GZZCRBRD",
+        "940GZZCRAVE",
+        "940GZZCRBIR",
+        "940GZZCRHAR",
+        "940GZZCRARA",
+        "940GZZCRWOD",
+        "940GZZCRBLA",
+        "940GZZCRADD",
+        "940GZZCRSAN",
+        "940GZZCRLEB",
+        "940GZZCRECR",
+        "940GZZCRCEN",
+        "940GZZCRCHR",
+        "940GZZCRWAN",
+        "940GZZCRWAD",
+        "940GZZCRAMP",
+        "940GZZCRTPA",
+        "940GZZCRBED",
+        "940GZZCRMJT",
+        "940GZZCRMCH",
+        "940GZZCRBGV",
+        "940GZZCRPHI",
+        "940GZZCRMDN",
+        "940GZZCRMTP",
+        "940GZZCRDDR",
+        "940GZZCRWMB"
+      ]
+    },
+    {
+      "id": "tram.graph-route.1.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRCHR:940GZZCRCTR",
+        "tram:940GZZCRCTR:940GZZCRWCR",
+        "tram:940GZZCRWCR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRLOY:940GZZCRSAN",
+        "tram:940GZZCRCOO:940GZZCRLOY",
+        "tram:940GZZCRCOO:940GZZCRGRA",
+        "tram:940GZZCRADV:940GZZCRGRA",
+        "tram:940GZZCRADV:940GZZCRFLD",
+        "tram:940GZZCRFLD:940GZZCRKGH",
+        "tram:940GZZCRKGH:940GZZCRNWA"
+      ],
+      "stationIDs": [
+        "940GZZCRCHR",
+        "940GZZCRCTR",
+        "940GZZCRWCR",
+        "940GZZCRWEL",
+        "940GZZCRECR",
+        "940GZZCRLEB",
+        "940GZZCRSAN",
+        "940GZZCRLOY",
+        "940GZZCRCOO",
+        "940GZZCRGRA",
+        "940GZZCRADV",
+        "940GZZCRFLD",
+        "940GZZCRKGH",
+        "940GZZCRNWA"
+      ]
+    },
+    {
+      "id": "tram.graph-route.2.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRARA:940GZZCRELM",
+        "tram:940GZZCRARA:940GZZCRWOD",
+        "tram:940GZZCRBLA:940GZZCRWOD",
+        "tram:940GZZCRADD:940GZZCRBLA",
+        "tram:940GZZCRADD:940GZZCRSAN",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRCEN:940GZZCRECR",
+        "tram:940GZZCRCEN:940GZZCRCHR",
+        "tram:940GZZCRCHR:940GZZCRWAN",
+        "tram:940GZZCRWAD:940GZZCRWAN",
+        "tram:940GZZCRAMP:940GZZCRWAD",
+        "tram:940GZZCRAMP:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRMJT",
+        "tram:940GZZCRMCH:940GZZCRMJT",
+        "tram:940GZZCRBGV:940GZZCRMCH",
+        "tram:940GZZCRBGV:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRWMB"
+      ],
+      "stationIDs": [
+        "940GZZCRELM",
+        "940GZZCRARA",
+        "940GZZCRWOD",
+        "940GZZCRBLA",
+        "940GZZCRADD",
+        "940GZZCRSAN",
+        "940GZZCRLEB",
+        "940GZZCRECR",
+        "940GZZCRCEN",
+        "940GZZCRCHR",
+        "940GZZCRWAN",
+        "940GZZCRWAD",
+        "940GZZCRAMP",
+        "940GZZCRTPA",
+        "940GZZCRBED",
+        "940GZZCRMJT",
+        "940GZZCRMCH",
+        "940GZZCRBGV",
+        "940GZZCRPHI",
+        "940GZZCRMDN",
+        "940GZZCRMTP",
+        "940GZZCRDDR",
+        "940GZZCRWMB"
+      ]
+    },
+    {
+      "id": "tram.graph-route.3.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRKGH:940GZZCRNWA",
+        "tram:940GZZCRFLD:940GZZCRKGH",
+        "tram:940GZZCRADV:940GZZCRFLD",
+        "tram:940GZZCRADV:940GZZCRGRA",
+        "tram:940GZZCRCOO:940GZZCRGRA",
+        "tram:940GZZCRCOO:940GZZCRLOY",
+        "tram:940GZZCRLOY:940GZZCRSAN",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRCEN:940GZZCRECR",
+        "tram:940GZZCRCEN:940GZZCRCHR"
+      ],
+      "stationIDs": [
+        "940GZZCRNWA",
+        "940GZZCRKGH",
+        "940GZZCRFLD",
+        "940GZZCRADV",
+        "940GZZCRGRA",
+        "940GZZCRCOO",
+        "940GZZCRLOY",
+        "940GZZCRSAN",
+        "940GZZCRLEB",
+        "940GZZCRECR",
+        "940GZZCRCEN",
+        "940GZZCRCHR"
+      ]
+    },
+    {
+      "id": "tram.graph-route.4.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRDDR:940GZZCRWMB",
+        "tram:940GZZCRDDR:940GZZCRMTP",
+        "tram:940GZZCRMDN:940GZZCRMTP",
+        "tram:940GZZCRMDN:940GZZCRPHI",
+        "tram:940GZZCRBGV:940GZZCRPHI",
+        "tram:940GZZCRBGV:940GZZCRMCH",
+        "tram:940GZZCRMCH:940GZZCRMJT",
+        "tram:940GZZCRBED:940GZZCRMJT",
+        "tram:940GZZCRBED:940GZZCRTPA",
+        "tram:940GZZCRAMP:940GZZCRTPA",
+        "tram:940GZZCRAMP:940GZZCRWAD",
+        "tram:940GZZCRWAD:940GZZCRWAN",
+        "tram:940GZZCRRVC:940GZZCRWAN",
+        "tram:940GZZCRCTR:940GZZCRRVC",
+        "tram:940GZZCRCTR:940GZZCRWCR",
+        "tram:940GZZCRWCR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRADD:940GZZCRSAN",
+        "tram:940GZZCRADD:940GZZCRBLA",
+        "tram:940GZZCRBLA:940GZZCRWOD",
+        "tram:940GZZCRARA:940GZZCRWOD",
+        "tram:940GZZCRARA:940GZZCRELM"
+      ],
+      "stationIDs": [
+        "940GZZCRWMB",
+        "940GZZCRDDR",
+        "940GZZCRMTP",
+        "940GZZCRMDN",
+        "940GZZCRPHI",
+        "940GZZCRBGV",
+        "940GZZCRMCH",
+        "940GZZCRMJT",
+        "940GZZCRBED",
+        "940GZZCRTPA",
+        "940GZZCRAMP",
+        "940GZZCRWAD",
+        "940GZZCRWAN",
+        "940GZZCRRVC",
+        "940GZZCRCTR",
+        "940GZZCRWCR",
+        "940GZZCRWEL",
+        "940GZZCRECR",
+        "940GZZCRLEB",
+        "940GZZCRSAN",
+        "940GZZCRADD",
+        "940GZZCRBLA",
+        "940GZZCRWOD",
+        "940GZZCRARA",
+        "940GZZCRELM"
+      ]
+    },
+    {
+      "id": "tram.graph-route.5.v1",
+      "lineID": "tram",
+      "segmentIDs": [
+        "tram:940GZZCRDDR:940GZZCRWMB",
+        "tram:940GZZCRDDR:940GZZCRMTP",
+        "tram:940GZZCRMDN:940GZZCRMTP",
+        "tram:940GZZCRMDN:940GZZCRPHI",
+        "tram:940GZZCRBGV:940GZZCRPHI",
+        "tram:940GZZCRBGV:940GZZCRMCH",
+        "tram:940GZZCRMCH:940GZZCRMJT",
+        "tram:940GZZCRBED:940GZZCRMJT",
+        "tram:940GZZCRBED:940GZZCRTPA",
+        "tram:940GZZCRAMP:940GZZCRTPA",
+        "tram:940GZZCRAMP:940GZZCRWAD",
+        "tram:940GZZCRWAD:940GZZCRWAN",
+        "tram:940GZZCRRVC:940GZZCRWAN",
+        "tram:940GZZCRCTR:940GZZCRRVC",
+        "tram:940GZZCRCTR:940GZZCRWCR",
+        "tram:940GZZCRWCR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRADD:940GZZCRSAN",
+        "tram:940GZZCRADD:940GZZCRBLA",
+        "tram:940GZZCRBLA:940GZZCRWOD",
+        "tram:940GZZCRARA:940GZZCRWOD",
+        "tram:940GZZCRARA:940GZZCRHAR",
+        "tram:940GZZCRBIR:940GZZCRHAR",
+        "tram:940GZZCRAVE:940GZZCRBIR",
+        "tram:940GZZCRAVE:940GZZCRBRD",
+        "tram:940GZZCRBEK:940GZZCRBRD"
+      ],
+      "stationIDs": [
+        "940GZZCRWMB",
+        "940GZZCRDDR",
+        "940GZZCRMTP",
+        "940GZZCRMDN",
+        "940GZZCRPHI",
+        "940GZZCRBGV",
+        "940GZZCRMCH",
+        "940GZZCRMJT",
+        "940GZZCRBED",
+        "940GZZCRTPA",
+        "940GZZCRAMP",
+        "940GZZCRWAD",
+        "940GZZCRWAN",
+        "940GZZCRRVC",
+        "940GZZCRCTR",
+        "940GZZCRWCR",
+        "940GZZCRWEL",
+        "940GZZCRECR",
+        "940GZZCRLEB",
+        "940GZZCRSAN",
+        "940GZZCRADD",
+        "940GZZCRBLA",
+        "940GZZCRWOD",
+        "940GZZCRARA",
+        "940GZZCRHAR",
+        "940GZZCRBIR",
+        "940GZZCRAVE",
+        "940GZZCRBRD",
+        "940GZZCRBEK"
       ]
     },
     {
@@ -35768,6 +37642,806 @@
     },
     {
       "fromPort": {
+        "x": 3281.055,
+        "y": 2667.393
+      },
+      "fromStationID": "940GZZCRBLA",
+      "id": "tram:940GZZCRADD:940GZZCRBLA",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.7",
+      "toPort": {
+        "x": 3238.695,
+        "y": 2709.755
+      },
+      "toStationID": "940GZZCRADD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3238.695,
+        "y": 2709.755
+      },
+      "fromStationID": "940GZZCRADD",
+      "id": "tram:940GZZCRADD:940GZZCRSAN",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.8",
+      "toPort": {
+        "x": 3179.219,
+        "y": 2756.719
+      },
+      "toStationID": "940GZZCRSAN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3316.621,
+        "y": 2881.965
+      },
+      "fromStationID": "940GZZCRADV",
+      "id": "tram:940GZZCRADV:940GZZCRFLD",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.21",
+      "toPort": {
+        "x": 3347.611,
+        "y": 2912.917
+      },
+      "toStationID": "940GZZCRFLD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3285.948,
+        "y": 2851.33
+      },
+      "fromStationID": "940GZZCRGRA",
+      "id": "tram:940GZZCRADV:940GZZCRGRA",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.20",
+      "toPort": {
+        "x": 3316.621,
+        "y": 2881.965
+      },
+      "toStationID": "940GZZCRADV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2301.572,
+        "y": 2756.649
+      },
+      "fromStationID": "940GZZCRAMP",
+      "id": "tram:940GZZCRAMP:940GZZCRTPA",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.9",
+      "toPort": {
+        "x": 2217.283,
+        "y": 2756.64
+      },
+      "toStationID": "940GZZCRTPA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2383.418,
+        "y": 2756.657
+      },
+      "fromStationID": "940GZZCRWAD",
+      "id": "tram:940GZZCRAMP:940GZZCRWAD",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.10",
+      "toPort": {
+        "x": 2301.572,
+        "y": 2756.649
+      },
+      "toStationID": "940GZZCRAMP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3434.876,
+        "y": 2575.515
+      },
+      "fromStationID": "940GZZCRELM",
+      "id": "tram:940GZZCRARA:940GZZCRELM",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.elmers-end-arena.official.v1.0",
+      "toPort": {
+        "x": 3364.094,
+        "y": 2584.359
+      },
+      "toStationID": "940GZZCRARA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3466.169,
+        "y": 2514.875
+      },
+      "fromStationID": "940GZZCRHAR",
+      "id": "tram:940GZZCRARA:940GZZCRHAR",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.4",
+      "toPort": {
+        "x": 3351.43,
+        "y": 2597.013
+      },
+      "toStationID": "940GZZCRARA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3351.43,
+        "y": 2597.013
+      },
+      "fromStationID": "940GZZCRARA",
+      "id": "tram:940GZZCRARA:940GZZCRWOD",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.5",
+      "toPort": {
+        "x": 3317.587,
+        "y": 2630.858
+      },
+      "toStationID": "940GZZCRWOD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3625.336,
+        "y": 2514.875
+      },
+      "fromStationID": "940GZZCRAVE",
+      "id": "tram:940GZZCRAVE:940GZZCRBIR",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.2",
+      "toPort": {
+        "x": 3551.488,
+        "y": 2514.875
+      },
+      "toStationID": "940GZZCRBIR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3709.221,
+        "y": 2514.875
+      },
+      "fromStationID": "940GZZCRBRD",
+      "id": "tram:940GZZCRAVE:940GZZCRBRD",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.1",
+      "toPort": {
+        "x": 3625.336,
+        "y": 2514.875
+      },
+      "toStationID": "940GZZCRAVE",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2126.887,
+        "y": 2756.631
+      },
+      "fromStationID": "940GZZCRBED",
+      "id": "tram:940GZZCRBED:940GZZCRMJT",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.7",
+      "toPort": {
+        "x": 2035.268,
+        "y": 2756.621
+      },
+      "toStationID": "940GZZCRMJT",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2217.283,
+        "y": 2756.64
+      },
+      "fromStationID": "940GZZCRTPA",
+      "id": "tram:940GZZCRBED:940GZZCRTPA",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.8",
+      "toPort": {
+        "x": 2126.887,
+        "y": 2756.631
+      },
+      "toStationID": "940GZZCRBED",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3804.578,
+        "y": 2514.875
+      },
+      "fromStationID": "940GZZCRBEK",
+      "id": "tram:940GZZCRBEK:940GZZCRBRD",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.0",
+      "toPort": {
+        "x": 3709.221,
+        "y": 2514.875
+      },
+      "toStationID": "940GZZCRBRD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1889.901,
+        "y": 2756.607
+      },
+      "fromStationID": "940GZZCRMCH",
+      "id": "tram:940GZZCRBGV:940GZZCRMCH",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.5",
+      "toPort": {
+        "x": 1795.839,
+        "y": 2756.597
+      },
+      "toStationID": "940GZZCRBGV",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1795.839,
+        "y": 2756.597
+      },
+      "fromStationID": "940GZZCRBGV",
+      "id": "tram:940GZZCRBGV:940GZZCRPHI",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.4",
+      "toPort": {
+        "x": 1697.996,
+        "y": 2756.578
+      },
+      "toStationID": "940GZZCRPHI",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3551.488,
+        "y": 2514.875
+      },
+      "fromStationID": "940GZZCRBIR",
+      "id": "tram:940GZZCRBIR:940GZZCRHAR",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.3",
+      "toPort": {
+        "x": 3466.169,
+        "y": 2514.875
+      },
+      "toStationID": "940GZZCRHAR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3317.587,
+        "y": 2630.858
+      },
+      "fromStationID": "940GZZCRWOD",
+      "id": "tram:940GZZCRBLA:940GZZCRWOD",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.beckenham-sandilands.official.v1.6",
+      "toPort": {
+        "x": 3281.055,
+        "y": 2667.393
+      },
+      "toStationID": "940GZZCRBLA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2748.67,
+        "y": 2756.694
+      },
+      "fromStationID": "940GZZCRCEN",
+      "id": "tram:940GZZCRCEN:940GZZCRCHR",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.13",
+      "toPort": {
+        "x": 2641.171,
+        "y": 2756.683
+      },
+      "toStationID": "940GZZCRCHR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2935.571,
+        "y": 2756.714
+      },
+      "fromStationID": "940GZZCRECR",
+      "id": "tram:940GZZCRCEN:940GZZCRECR",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.14",
+      "toPort": {
+        "x": 2748.67,
+        "y": 2756.694
+      },
+      "toStationID": "940GZZCRCEN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2603.188,
+        "y": 2756.672
+      },
+      "fromStationID": "940GZZCRCHR",
+      "id": "tram:940GZZCRCHR:940GZZCRCTR",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.3",
+      "toPort": {
+        "x": 2615.963,
+        "y": 2669.516
+      },
+      "toStationID": "940GZZCRCTR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2641.171,
+        "y": 2756.683
+      },
+      "fromStationID": "940GZZCRCHR",
+      "id": "tram:940GZZCRCHR:940GZZCRWAN",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.12",
+      "toPort": {
+        "x": 2461.599,
+        "y": 2756.665
+      },
+      "toStationID": "940GZZCRWAN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3256.328,
+        "y": 2821.747
+      },
+      "fromStationID": "940GZZCRCOO",
+      "id": "tram:940GZZCRCOO:940GZZCRGRA",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.19",
+      "toPort": {
+        "x": 3285.948,
+        "y": 2851.33
+      },
+      "toStationID": "940GZZCRGRA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3224.1,
+        "y": 2789.558
+      },
+      "fromStationID": "940GZZCRLOY",
+      "id": "tram:940GZZCRCOO:940GZZCRLOY",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.18",
+      "toPort": {
+        "x": 3256.328,
+        "y": 2821.747
+      },
+      "toStationID": "940GZZCRCOO",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2536.805,
+        "y": 2717.878
+      },
+      "fromStationID": "940GZZCRRVC",
+      "id": "tram:940GZZCRCTR:940GZZCRRVC",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wandle-centrale.official.v1.1",
+      "toPort": {
+        "x": 2572.422,
+        "y": 2682.281
+      },
+      "toStationID": "940GZZCRCTR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2615.963,
+        "y": 2669.516
+      },
+      "fromStationID": "940GZZCRCTR",
+      "id": "tram:940GZZCRCTR:940GZZCRWCR",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.2",
+      "toPort": {
+        "x": 2670.517,
+        "y": 2669.516
+      },
+      "toStationID": "940GZZCRWCR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1387.281,
+        "y": 2565.602
+      },
+      "fromStationID": "940GZZCRMTP",
+      "id": "tram:940GZZCRDDR:940GZZCRMTP",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.1",
+      "toPort": {
+        "x": 1387.281,
+        "y": 2480.502
+      },
+      "toStationID": "940GZZCRDDR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1387.281,
+        "y": 2480.502
+      },
+      "fromStationID": "940GZZCRDDR",
+      "id": "tram:940GZZCRDDR:940GZZCRWMB",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.0",
+      "toPort": {
+        "x": 1387.281,
+        "y": 2406.609
+      },
+      "toStationID": "940GZZCRWMB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3039.713,
+        "y": 2756.719
+      },
+      "fromStationID": "940GZZCRLEB",
+      "id": "tram:940GZZCRECR:940GZZCRLEB",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.15",
+      "toPort": {
+        "x": 2935.571,
+        "y": 2756.714
+      },
+      "toStationID": "940GZZCRECR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2747.86,
+        "y": 2669.516
+      },
+      "fromStationID": "940GZZCRWEL",
+      "id": "tram:940GZZCRECR:940GZZCRWEL",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.0",
+      "toPort": {
+        "x": 2900.563,
+        "y": 2756.703
+      },
+      "toStationID": "940GZZCRECR",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3347.611,
+        "y": 2912.917
+      },
+      "fromStationID": "940GZZCRFLD",
+      "id": "tram:940GZZCRFLD:940GZZCRKGH",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.22",
+      "toPort": {
+        "x": 3380.848,
+        "y": 2946.112
+      },
+      "toStationID": "940GZZCRKGH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3380.848,
+        "y": 2946.112
+      },
+      "fromStationID": "940GZZCRKGH",
+      "id": "tram:940GZZCRKGH:940GZZCRNWA",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.23",
+      "toPort": {
+        "x": 3416.859,
+        "y": 2982.078
+      },
+      "toStationID": "940GZZCRNWA",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3140.106,
+        "y": 2756.719
+      },
+      "fromStationID": "940GZZCRSAN",
+      "id": "tram:940GZZCRLEB:940GZZCRSAN",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.16",
+      "toPort": {
+        "x": 3039.713,
+        "y": 2756.719
+      },
+      "toStationID": "940GZZCRLEB",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 3140.106,
+        "y": 2756.719
+      },
+      "fromStationID": "940GZZCRSAN",
+      "id": "tram:940GZZCRLOY:940GZZCRSAN",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.17",
+      "toPort": {
+        "x": 3224.1,
+        "y": 2789.558
+      },
+      "toStationID": "940GZZCRLOY",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2035.268,
+        "y": 2756.621
+      },
+      "fromStationID": "940GZZCRMJT",
+      "id": "tram:940GZZCRMCH:940GZZCRMJT",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.6",
+      "toPort": {
+        "x": 1889.901,
+        "y": 2756.607
+      },
+      "toStationID": "940GZZCRMCH",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1604.717,
+        "y": 2756.578
+      },
+      "fromStationID": "940GZZCRMDN",
+      "id": "tram:940GZZCRMDN:940GZZCRMTP",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.2",
+      "toPort": {
+        "x": 1387.281,
+        "y": 2565.602
+      },
+      "toStationID": "940GZZCRMTP",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 1697.996,
+        "y": 2756.578
+      },
+      "fromStationID": "940GZZCRPHI",
+      "id": "tram:940GZZCRMDN:940GZZCRPHI",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.3",
+      "toPort": {
+        "x": 1604.717,
+        "y": 2756.578
+      },
+      "toStationID": "940GZZCRMDN",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2478.203,
+        "y": 2756.656
+      },
+      "fromStationID": "940GZZCRWAN",
+      "id": "tram:940GZZCRRVC:940GZZCRWAN",
+      "lineID": "tram",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.tram.wandle-centrale.official.v1.0",
+      "toPort": {
+        "x": 2536.805,
+        "y": 2717.878
+      },
+      "toStationID": "940GZZCRRVC",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2461.599,
+        "y": 2756.665
+      },
+      "fromStationID": "940GZZCRWAN",
+      "id": "tram:940GZZCRWAD:940GZZCRWAN",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.wimbledon-new-addington.official.v1.11",
+      "toPort": {
+        "x": 2383.418,
+        "y": 2756.657
+      },
+      "toStationID": "940GZZCRWAD",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
+        "x": 2670.517,
+        "y": 2669.516
+      },
+      "fromStationID": "940GZZCRWCR",
+      "id": "tram:940GZZCRWCR:940GZZCRWEL",
+      "lineID": "tram",
+      "pathDirection": "reverse",
+      "pathID": "beck.v1.path.tram.east-croydon-church-via-loop.official.v1.1",
+      "toPort": {
+        "x": 2747.86,
+        "y": 2669.516
+      },
+      "toStationID": "940GZZCRWEL",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
         "x": 2806.0,
         "y": 959.782
       },
@@ -37128,9 +39802,9 @@
     }
   ],
   "source": {
-    "graphGeneratedAt": "2026-08-23T16:34:03.107021+00:00",
+    "graphGeneratedAt": "2026-08-23T20:26:26.921154+00:00",
     "graphSchemaVersion": 1,
-    "note": "Complete London rail artwork compiled offline. Underground geometry uses trace-verified slices and exact master paths from the April 2026 TfL vector map, including the DLR Elizabeth line and six named London Overground routes, with distinct interchange ports. No runtime layout is used."
+    "note": "Complete London rail artwork compiled offline. Underground geometry uses trace-verified slices and exact master paths from the April 2026 TfL vector map, including the DLR, Elizabeth line, six named London Overground routes and London Trams, with distinct interchange ports. No runtime layout is used."
   },
   "stationMarkers": [
     {
@@ -41535,6 +44209,1020 @@
         }
       ],
       "stationID": "940GZZBPSUST"
+    },
+    {
+      "anchor": {
+        "x": 3238.695,
+        "y": 2709.755
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Addiscombe",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3238.695,
+              "y": 2709.755
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRADD"
+    },
+    {
+      "anchor": {
+        "x": 3316.621,
+        "y": 2881.965
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Addington Village",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3316.621,
+              "y": 2881.965
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRADV"
+    },
+    {
+      "anchor": {
+        "x": 2301.572,
+        "y": 2756.649
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Ampere Way",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2301.572,
+              "y": 2756.649
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRAMP"
+    },
+    {
+      "anchor": {
+        "x": 3351.43,
+        "y": 2597.013
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Arena",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3351.43,
+              "y": 2597.013
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRARA"
+    },
+    {
+      "anchor": {
+        "x": 3625.336,
+        "y": 2514.875
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Avenue Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3625.336,
+              "y": 2514.875
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRAVE"
+    },
+    {
+      "anchor": {
+        "x": 2126.887,
+        "y": 2756.631
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Beddington Lane",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2126.887,
+              "y": 2756.631
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBED"
+    },
+    {
+      "anchor": {
+        "x": 3804.578,
+        "y": 2514.875
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Beckenham Junction",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3804.578,
+              "y": 2514.875
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBEK"
+    },
+    {
+      "anchor": {
+        "x": 1795.839,
+        "y": 2756.597
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Belgrave Walk",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1795.839,
+              "y": 2756.597
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBGV"
+    },
+    {
+      "anchor": {
+        "x": 3551.488,
+        "y": 2514.875
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Birkbeck",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3551.488,
+              "y": 2514.875
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBIR"
+    },
+    {
+      "anchor": {
+        "x": 3281.055,
+        "y": 2667.393
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Blackhorse Lane",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3281.055,
+              "y": 2667.393
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBLA"
+    },
+    {
+      "anchor": {
+        "x": 3709.221,
+        "y": 2514.875
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Beckenham Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3709.221,
+              "y": 2514.875
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRBRD"
+    },
+    {
+      "anchor": {
+        "x": 2748.67,
+        "y": 2756.694
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "George Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2748.67,
+              "y": 2756.694
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRCEN"
+    },
+    {
+      "anchor": {
+        "x": 2641.171,
+        "y": 2756.683
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Church Street",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2641.171,
+              "y": 2756.683
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRCHR"
+    },
+    {
+      "anchor": {
+        "x": 3256.328,
+        "y": 2821.747
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Coombe Lane",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3256.328,
+              "y": 2821.747
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRCOO"
+    },
+    {
+      "anchor": {
+        "x": 2615.963,
+        "y": 2669.516
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Centrale",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2615.963,
+              "y": 2669.516
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRCTR"
+    },
+    {
+      "anchor": {
+        "x": 1387.281,
+        "y": 2480.502
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Dundonald Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1387.281,
+              "y": 2480.502
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRDDR"
+    },
+    {
+      "anchor": {
+        "x": 2935.571,
+        "y": 2756.714
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "East Croydon",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2935.571,
+              "y": 2756.714
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRECR"
+    },
+    {
+      "anchor": {
+        "x": 3434.876,
+        "y": 2575.515
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Elmers End",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3434.876,
+              "y": 2575.515
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRELM"
+    },
+    {
+      "anchor": {
+        "x": 3347.611,
+        "y": 2912.917
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Fieldway",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3347.611,
+              "y": 2912.917
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRFLD"
+    },
+    {
+      "anchor": {
+        "x": 3285.948,
+        "y": 2851.33
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Gravel Hill",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3285.948,
+              "y": 2851.33
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRGRA"
+    },
+    {
+      "anchor": {
+        "x": 3466.169,
+        "y": 2514.875
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Harrington Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3466.169,
+              "y": 2514.875
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRHAR"
+    },
+    {
+      "anchor": {
+        "x": 3380.848,
+        "y": 2946.112
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "King Henry's Drive",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3380.848,
+              "y": 2946.112
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRKGH"
+    },
+    {
+      "anchor": {
+        "x": 3039.713,
+        "y": 2756.719
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Lebanon Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3039.713,
+              "y": 2756.719
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRLEB"
+    },
+    {
+      "anchor": {
+        "x": 3224.1,
+        "y": 2789.558
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Lloyd Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3224.1,
+              "y": 2789.558
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRLOY"
+    },
+    {
+      "anchor": {
+        "x": 1889.901,
+        "y": 2756.607
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Mitcham",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1889.901,
+              "y": 2756.607
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRMCH"
+    },
+    {
+      "anchor": {
+        "x": 1604.717,
+        "y": 2756.578
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Morden Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1604.717,
+              "y": 2756.578
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRMDN"
+    },
+    {
+      "anchor": {
+        "x": 2035.268,
+        "y": 2756.621
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Mitcham Junction",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2035.268,
+              "y": 2756.621
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRMJT"
+    },
+    {
+      "anchor": {
+        "x": 1387.281,
+        "y": 2565.602
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Merton Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1387.281,
+              "y": 2565.602
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRMTP"
+    },
+    {
+      "anchor": {
+        "x": 3416.859,
+        "y": 2982.078
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "New Addington",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3416.859,
+              "y": 2982.078
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRNWA"
+    },
+    {
+      "anchor": {
+        "x": 1697.996,
+        "y": 2756.578
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Phipps Bridge",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 1697.996,
+              "y": 2756.578
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRPHI"
+    },
+    {
+      "anchor": {
+        "x": 2536.805,
+        "y": 2717.878
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Reeves Corner",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2536.805,
+              "y": 2717.878
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRRVC"
+    },
+    {
+      "anchor": {
+        "x": 3140.106,
+        "y": 2756.719
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Sandilands",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3140.106,
+              "y": 2756.719
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRSAN"
+    },
+    {
+      "anchor": {
+        "x": 2217.283,
+        "y": 2756.64
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Therapia Lane",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2217.283,
+              "y": 2756.64
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRTPA"
+    },
+    {
+      "anchor": {
+        "x": 2383.418,
+        "y": 2756.657
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Waddon Marsh",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2383.418,
+              "y": 2756.657
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWAD"
+    },
+    {
+      "anchor": {
+        "x": 2461.599,
+        "y": 2756.665
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Wandle Park",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2461.599,
+              "y": 2756.665
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWAN"
+    },
+    {
+      "anchor": {
+        "x": 2670.517,
+        "y": 2669.516
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "West Croydon",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 2670.517,
+              "y": 2669.516
+            },
+            "start": {
+              "x": 2704.938,
+              "y": 2624.24
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 2704.938,
+              "y": 2624.24
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 2670.517,
+              "y": 2669.516
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWCR"
+    },
+    {
+      "anchor": {
+        "x": 2747.86,
+        "y": 2669.516
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Wellesley Road",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 2747.86,
+              "y": 2669.516
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWEL"
+    },
+    {
+      "anchor": {
+        "x": 1387.281,
+        "y": 2406.609
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Wimbledon",
+      "primitives": [
+        {
+          "connector": {
+            "end": {
+              "x": 1387.281,
+              "y": 2406.609
+            },
+            "start": {
+              "x": 1335.781,
+              "y": 2346.125
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1387.281,
+              "y": 2406.609
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWMB"
+    },
+    {
+      "anchor": {
+        "x": 3317.587,
+        "y": 2630.858
+      },
+      "hitRadius": 14,
+      "lineIDs": [
+        "tram"
+      ],
+      "name": "Woodside",
+      "primitives": [
+        {
+          "circle": {
+            "centre": {
+              "x": 3317.587,
+              "y": 2630.858
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        }
+      ],
+      "stationID": "940GZZCRWOD"
     },
     {
       "anchor": {
@@ -51322,26 +55010,22 @@
         "x": 1335.781,
         "y": 2346.125
       },
-      "hitRadius": 24,
+      "hitRadius": 14,
       "lineIDs": [
         "district"
       ],
       "name": "Wimbledon",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 1328.781,
+          "circle": {
+            "centre": {
+              "x": 1335.781,
               "y": 2346.125
             },
-            "lineID": "district",
-            "start": {
-              "x": 1342.781,
-              "y": 2346.125
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUWIM"
@@ -52119,6 +55803,7 @@
     "mildmay",
     "suffragette",
     "weaver",
-    "windrush"
+    "windrush",
+    "tram"
   ]
 }

@@ -307,6 +307,7 @@ def _path_candidates(
     root: ET.Element,
     colour_fragment: str,
     expected_count: int = 9,
+    outer_stroke_width: float = OFFICIAL_OUTER_STROKE_WIDTH,
 ) -> list[list[vector.Curve]]:
     elements = [
         element for element in root.iter()
@@ -315,7 +316,7 @@ def _path_candidates(
         and element.get("d")
         and math.isclose(
             float(element.get("stroke-width", "nan")),
-            OFFICIAL_OUTER_STROKE_WIDTH,
+            outer_stroke_width,
             abs_tol=0.0001,
         )
     ]
@@ -336,8 +337,14 @@ def _master_paths(
     root: ET.Element,
     colour_fragment: str,
     fingerprints: tuple[Fingerprint, ...],
+    outer_stroke_width: float = OFFICIAL_OUTER_STROKE_WIDTH,
 ) -> dict[int, list[vector.Curve]]:
-    candidates = _path_candidates(root, colour_fragment, len(fingerprints))
+    candidates = _path_candidates(
+        root,
+        colour_fragment,
+        len(fingerprints),
+        outer_stroke_width,
+    )
     result: dict[int, list[vector.Curve]] = {}
     used: set[int] = set()
     for fingerprint in fingerprints:

@@ -20,6 +20,7 @@ from pathlib import Path
 import build_central_core_join as vector
 import build_rail_extensions as rail
 import build_overground_extensions as overground
+import build_tram_extensions as tram
 
 
 ARTWORK_WIDTH = 4764.0
@@ -1659,6 +1660,9 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     overground.append_overground_artwork(
         root, graph, selected_paths, selected_segments, markers, labels, routes
     )
+    tram.append_tram_artwork(
+        root, graph, selected_paths, selected_segments, markers, labels, routes
+    )
 
     markers_by_id = {marker["stationID"]: marker for marker in markers}
     labels_by_station_id = {label["stationID"]: label for label in labels}
@@ -2270,9 +2274,9 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "graphGeneratedAt": graph["generatedAt"],
             "note": (
                 "Complete London rail artwork compiled offline. Underground geometry uses trace-verified "
-                "slices and exact master paths from the April 2026 TfL vector map, including the DLR "
-                "Elizabeth line and six named London Overground routes, with distinct interchange ports. "
-                "No runtime layout is used."
+                "slices and exact master paths from the April 2026 TfL vector map, including the DLR, "
+                "Elizabeth line, six named London Overground routes and London Trams, with distinct "
+                "interchange ports. No runtime layout is used."
             ),
         },
         "artworkSize": {"width": ARTWORK_WIDTH, "height": ARTWORK_HEIGHT},
@@ -2299,7 +2303,7 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "bakerloo", "central", "circle", "district", "hammersmith-city",
             "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
             "waterloo-city", "dlr", "elizabeth", "liberty", "lioness",
-            "mildmay", "suffragette", "weaver", "windrush",
+            "mildmay", "suffragette", "weaver", "windrush", "tram",
         ],
     }
 

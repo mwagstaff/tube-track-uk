@@ -96,6 +96,7 @@ struct TfLLiveTrainPrediction: Decodable, Sendable {
     let towards: String?
     let timeToStation: Int?
     let currentLocation: String?
+    let platformName: String?
 }
 
 extension JSONDecoder {

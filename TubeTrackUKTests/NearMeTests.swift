@@ -37,6 +37,7 @@ struct NearMeTests {
             arrival(id: "soon", line: .district, platform: "Eastbound - Platform 2", seconds: 60),
             arrival(id: "west", line: .district, platform: "Westbound - Platform 1", seconds: 120),
             arrival(id: "piccadilly", line: .piccadilly, platform: nil, direction: "inbound", seconds: 90),
+            arrival(id: "tram", line: .tram, platform: nil, direction: "outbound", seconds: 45),
         ]
 
         let groups = NearbyDepartureGroup.groups(from: arrivals)
@@ -44,10 +45,11 @@ struct NearMeTests {
             $0.lineID == .district && $0.direction == "Eastbound"
         })
 
-        #expect(groups.count == 3)
+        #expect(groups.count == 4)
         #expect(eastbound.arrivals.map(\.id) == ["soon", "later"])
         #expect(groups.contains { $0.lineID == .district && $0.direction == "Westbound" })
         #expect(groups.contains { $0.lineID == .piccadilly && $0.direction == "Inbound" })
+        #expect(groups.contains { $0.lineID == .tram && $0.direction == "Outbound" })
     }
 
     private func station(

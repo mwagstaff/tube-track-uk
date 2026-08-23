@@ -56,6 +56,8 @@ LINE_REFS = {
 }
 
 OVERGROUND_LINE_IDS = {"liberty", "lioness", "mildmay", "suffragette", "weaver", "windrush"}
+TRAM_LINE_ID = "tram"
+REQUIRED_LINE_IDS = set(LINE_REFS.values()) | {TRAM_LINE_ID}
 
 Coordinate = tuple[float, float]  # longitude, latitude
 
@@ -85,7 +87,7 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
 
     def way(self, way: Any) -> None:
         tags = dict(way.tags)
-        if tags.get("railway") not in {"subway", "rail", "light_rail"}:
+        if tags.get("railway") not in {"subway", "rail", "light_rail", "tram"}:
             return
         node_ids = tuple(reference.ref for reference in way.nodes)
         if len(node_ids) >= 2:
@@ -93,12 +95,29 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
 
     def relation(self, relation: Any) -> None:
         tags = dict(relation.tags)
-        if tags.get("type") != "route" or tags.get("route") not in {"subway", "light_rail", "train"}:
+        route_type = tags.get("route")
+        if tags.get("type") != "route" or route_type not in {
+            "subway",
+            "light_rail",
+            "train",
+            "tram",
+        }:
             return
         network = tags.get("network", "").lower()
         metro_network = tags.get("network:metro", "").lower()
         name = tags.get("name", "").lower()
         reference = (tags.get("ref") or tags.get("line") or "").strip().lower()
+
+        # London Trams route relations use numeric service refs (currently 2,
+        # 3 and 4), which are neither stable line identifiers nor unique across
+        # transport networks. Identify them by their explicit TfL network tag
+        # and reject every other route=tram relation in the regional snapshot.
+        if route_type == "tram":
+            if network != "london trams":
+                return
+            line_id = TRAM_LINE_ID
+        else:
+            line_id = None
         is_tfl_rail = (
             "london underground" in network
             or "docklands light railway" in network
@@ -110,9 +129,10 @@ class _TubeRailwayHandler(osmium.SimpleHandler):
             or "dlr" in name
             or "elizabeth line" in name
         )
-        if not is_tfl_rail:
+        if line_id is None and not is_tfl_rail:
             return
-        line_id = LINE_REFS.get(reference)
+        if line_id is None:
+            line_id = LINE_REFS.get(reference)
         if line_id is None:
             line_id = next((value for key, value in LINE_REFS.items() if key in name), None)
         if line_id is None:
@@ -149,7 +169,7 @@ class OSMTubeRailwayRouter:
             self.adjacency_by_line[line_id] = dict(adjacency)
             self.nodes_by_line[line_id] = tuple(adjacency)
 
-        missing = sorted(set(LINE_REFS.values()) - set(self.adjacency_by_line))
+        missing = sorted(REQUIRED_LINE_IDS - set(self.adjacency_by_line))
         if missing:
             raise RuntimeError(f"OSM snapshot has no TfL rail route geometry for: {', '.join(missing)}")
 
@@ -172,6 +192,11 @@ class OSMTubeRailwayRouter:
             end,
             direct,
             candidate_count=16,
+            # Dense street-running tram nodes can make a distant inner snap
+            # tie with the nearest platform-adjacent node when snap distance
+            # and rail distance have equal weight. Prefer the nearby rail so
+            # the renderer does not have to draw long straight anchor chords.
+            snap_weight=5.0 if line_id == TRAM_LINE_ID else 1.0,
         )
         if route is None:
             # Interchange coordinates can sit closer to another branch than to

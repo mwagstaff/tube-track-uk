@@ -63,11 +63,21 @@ struct MapToolbar: View {
             pendingStationSelection = nil
             appState.select(station: station)
         }) {
-            StationSearchSheet(
-                stations: appState.graph?.stations ?? [],
-                selectedStationID: appState.selectedStationID
-            ) { station in
-                pendingStationSelection = station
+            Group {
+                if let graph = appState.graph {
+                    StationSearchSheet(
+                        graph: graph,
+                        selectedStationID: appState.selectedStationID
+                    ) { station in
+                        pendingStationSelection = station
+                    }
+                } else {
+                    ContentUnavailableView(
+                        "Network unavailable",
+                        systemImage: "tram.fill",
+                        description: Text("The London rail network is still loading.")
+                    )
+                }
             }
             .presentationDetents([.medium, .large])
             .presentationDragIndicator(.visible)

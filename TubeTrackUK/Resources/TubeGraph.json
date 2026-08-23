@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-23T16:34:03.107021+00:00",
+  "generatedAt": "2026-08-23T20:26:26.921154+00:00",
   "source": {
     "name": "TfL topology with OpenStreetMap railway geometry",
     "url": "https://www.openstreetmap.org/copyright",
@@ -98,6 +98,40 @@
       ]
     },
     {
+      "id": "940GZZCRADV",
+      "name": "Addington Village",
+      "latitude": 51.356241,
+      "longitude": -0.032694,
+      "hubID": "940GZZCRADV",
+      "schematicX": 850.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "addington village",
+        "addington village"
+      ]
+    },
+    {
+      "id": "940GZZCRADD",
+      "name": "Addiscombe",
+      "latitude": 51.37981,
+      "longitude": -0.073242,
+      "hubID": "940GZZCRADD",
+      "schematicX": 735.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "addiscombe",
+        "addiscombe"
+      ]
+    },
+    {
       "id": "940GZZLUALD",
       "name": "Aldgate",
       "latitude": 51.514246,
@@ -185,6 +219,23 @@
       ]
     },
     {
+      "id": "940GZZCRAMP",
+      "name": "Ampere Way",
+      "latitude": 51.382238,
+      "longitude": -0.123654,
+      "hubID": "940GZZCRAMP",
+      "schematicX": 595.0,
+      "schematicY": 950.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "ampere way",
+        "ampere way"
+      ]
+    },
+    {
       "id": "910GANERLEY",
       "name": "Anerley",
       "latitude": 51.412153,
@@ -236,6 +287,23 @@
       ]
     },
     {
+      "id": "940GZZCRARA",
+      "name": "Arena",
+      "latitude": 51.391525,
+      "longitude": -0.058347,
+      "hubID": "940GZZCRARA",
+      "schematicX": 780.0,
+      "schematicY": 930.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "arena",
+        "arena"
+      ]
+    },
+    {
       "id": "940GZZLUASG",
       "name": "Arnos Grove",
       "latitude": 51.616446,
@@ -267,6 +335,23 @@
       "searchAliases": [
         "arsenal",
         "arsenal"
+      ]
+    },
+    {
+      "id": "940GZZCRAVE",
+      "name": "Avenue Road",
+      "latitude": 51.4068,
+      "longitude": -0.049476,
+      "hubID": "940GZZCRAVE",
+      "schematicX": 805.0,
+      "schematicY": 900.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "avenue road",
+        "avenue road"
       ]
     },
     {
@@ -485,6 +570,40 @@
       ]
     },
     {
+      "id": "940GZZCRBEK",
+      "name": "Beckenham Junction",
+      "latitude": 51.41073,
+      "longitude": -0.026401,
+      "hubID": "HUBBEK",
+      "schematicX": 870.0,
+      "schematicY": 895.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "beckenham junction",
+        "beckenham junction"
+      ]
+    },
+    {
+      "id": "940GZZCRBRD",
+      "name": "Beckenham Road",
+      "latitude": 51.409532,
+      "longitude": -0.043421,
+      "hubID": "940GZZCRBRD",
+      "schematicX": 820.0,
+      "schematicY": 895.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "beckenham road",
+        "beckenham road"
+      ]
+    },
+    {
       "id": "940GZZDLBEC",
       "name": "Beckton DLR Station",
       "latitude": 51.514362,
@@ -533,6 +652,40 @@
       "searchAliases": [
         "becontree",
         "becontree"
+      ]
+    },
+    {
+      "id": "940GZZCRBED",
+      "name": "Beddington Lane",
+      "latitude": 51.389242,
+      "longitude": -0.142167,
+      "hubID": "940GZZCRBED",
+      "schematicX": 540.0,
+      "schematicY": 935.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "beddington lane",
+        "beddington lane"
+      ]
+    },
+    {
+      "id": "940GZZCRBGV",
+      "name": "Belgrave Walk",
+      "latitude": 51.4011,
+      "longitude": -0.17774,
+      "hubID": "940GZZCRBGV",
+      "schematicX": 440.0,
+      "schematicY": 915.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "belgrave walk",
+        "belgrave walk"
       ]
     },
     {
@@ -604,6 +757,23 @@
       ]
     },
     {
+      "id": "940GZZCRBIR",
+      "name": "Birkbeck",
+      "latitude": 51.403767,
+      "longitude": -0.055787,
+      "hubID": "HUBBIR",
+      "schematicX": 785.0,
+      "schematicY": 905.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "birkbeck",
+        "birkbeck"
+      ]
+    },
+    {
       "id": "940GZZLUBKF",
       "name": "Blackfriars",
       "latitude": 51.511581,
@@ -619,6 +789,23 @@
       "searchAliases": [
         "blackfriars",
         "blackfriars"
+      ]
+    },
+    {
+      "id": "940GZZCRBLA",
+      "name": "Blackhorse Lane",
+      "latitude": 51.384757,
+      "longitude": -0.070562,
+      "hubID": "940GZZCRBLA",
+      "schematicX": 745.0,
+      "schematicY": 945.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "blackhorse lane",
+        "blackhorse lane"
       ]
     },
     {
@@ -1290,6 +1477,23 @@
       ]
     },
     {
+      "id": "940GZZCRCTR",
+      "name": "Centrale",
+      "latitude": 51.375769,
+      "longitude": -0.103917,
+      "hubID": "940GZZCRCTR",
+      "schematicX": 650.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "centrale",
+        "centrale"
+      ]
+    },
+    {
       "id": "910GCHDWLHT",
       "name": "Chadwell Heath",
       "latitude": 51.568039,
@@ -1478,6 +1682,23 @@
       ]
     },
     {
+      "id": "940GZZCRCHR",
+      "name": "Church Street",
+      "latitude": 51.373708,
+      "longitude": -0.104361,
+      "hubID": "940GZZCRCHR",
+      "schematicX": 650.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "church street",
+        "church street"
+      ]
+    },
+    {
       "id": "940GZZLUCPC",
       "name": "Clapham Common",
       "latitude": 51.461742,
@@ -1645,6 +1866,23 @@
       "searchAliases": [
         "colliers wood",
         "colliers wood"
+      ]
+    },
+    {
+      "id": "940GZZCRCOO",
+      "name": "Coombe Lane",
+      "latitude": 51.359791,
+      "longitude": -0.05956,
+      "hubID": "940GZZCRCOO",
+      "schematicX": 775.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "coombe lane",
+        "coombe lane"
       ]
     },
     {
@@ -1954,6 +2192,23 @@
       ]
     },
     {
+      "id": "940GZZCRDDR",
+      "name": "Dundonald Road",
+      "latitude": 51.417555,
+      "longitude": -0.207679,
+      "hubID": "940GZZCRDDR",
+      "schematicX": 355.0,
+      "schematicY": 880.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "dundonald road",
+        "dundonald road"
+      ]
+    },
+    {
       "id": "940GZZLUEBY",
       "name": "Ealing Broadway",
       "latitude": 51.515017,
@@ -2039,6 +2294,23 @@
       "searchAliases": [
         "east acton",
         "east acton"
+      ]
+    },
+    {
+      "id": "940GZZCRECR",
+      "name": "East Croydon",
+      "latitude": 51.374863,
+      "longitude": -0.092416,
+      "hubID": "HUBECY",
+      "schematicX": 680.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "east croydon",
+        "east croydon"
       ]
     },
     {
@@ -2234,6 +2506,23 @@
       ]
     },
     {
+      "id": "940GZZCRELM",
+      "name": "Elmers End",
+      "latitude": 51.398474,
+      "longitude": -0.049557,
+      "hubID": "HUBELM",
+      "schematicX": 805.0,
+      "schematicY": 920.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "elmers end",
+        "elmers end"
+      ]
+    },
+    {
       "id": "940GZZDLELV",
       "name": "Elverson Road DLR Station",
       "latitude": 51.469074,
@@ -2412,6 +2701,23 @@
       ]
     },
     {
+      "id": "940GZZCRFLD",
+      "name": "Fieldway",
+      "latitude": 51.351305,
+      "longitude": -0.024245,
+      "hubID": "940GZZCRFLD",
+      "schematicX": 875.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "fieldway",
+        "fieldway"
+      ]
+    },
+    {
       "id": "940GZZLUFYC",
       "name": "Finchley Central",
       "latitude": 51.600921,
@@ -2567,6 +2873,23 @@
       ]
     },
     {
+      "id": "940GZZCRCEN",
+      "name": "George Street",
+      "latitude": 51.373977,
+      "longitude": -0.098746,
+      "hubID": "940GZZCRCEN",
+      "schematicX": 665.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "george street",
+        "george street"
+      ]
+    },
+    {
       "id": "910GGIDEAPK",
       "name": "Gidea Park",
       "latitude": 51.581904,
@@ -2704,6 +3027,23 @@
       "searchAliases": [
         "grange hill",
         "grange hill"
+      ]
+    },
+    {
+      "id": "940GZZCRGRA",
+      "name": "Gravel Hill",
+      "latitude": 51.354545,
+      "longitude": -0.04315,
+      "hubID": "940GZZCRGRA",
+      "schematicX": 820.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "gravel hill",
+        "gravel hill"
       ]
     },
     {
@@ -3067,6 +3407,23 @@
       "searchAliases": [
         "harringay green lanes",
         "harringay green lanes"
+      ]
+    },
+    {
+      "id": "940GZZCRHAR",
+      "name": "Harrington Road",
+      "latitude": 51.399793,
+      "longitude": -0.060729,
+      "hubID": "940GZZCRHAR",
+      "schematicX": 770.0,
+      "schematicY": 915.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "harrington road",
+        "harrington road"
       ]
     },
     {
@@ -3993,6 +4350,23 @@
       ]
     },
     {
+      "id": "940GZZCRKGH",
+      "name": "King Henry's Drive",
+      "latitude": 51.34614,
+      "longitude": -0.020849,
+      "hubID": "940GZZCRKGH",
+      "schematicX": 885.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "king henry's drive",
+        "king henry's drive"
+      ]
+    },
+    {
       "id": "940GZZLUKSX",
       "name": "King's Cross St. Pancras",
       "latitude": 51.530663,
@@ -4153,6 +4527,23 @@
       ]
     },
     {
+      "id": "940GZZCRLEB",
+      "name": "Lebanon Road",
+      "latitude": 51.375201,
+      "longitude": -0.085002,
+      "hubID": "940GZZCRLEB",
+      "schematicX": 700.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "lebanon road",
+        "lebanon road"
+      ]
+    },
+    {
       "id": "940GZZLULSQ",
       "name": "Leicester Square",
       "latitude": 51.511386,
@@ -4307,6 +4698,23 @@
       "searchAliases": [
         "liverpool street",
         "liverpool street"
+      ]
+    },
+    {
+      "id": "940GZZCRLOY",
+      "name": "Lloyd Park",
+      "latitude": 51.364278,
+      "longitude": -0.080775,
+      "hubID": "940GZZCRLOY",
+      "schematicX": 715.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "lloyd park",
+        "lloyd park"
       ]
     },
     {
@@ -4568,6 +4976,23 @@
       ]
     },
     {
+      "id": "940GZZCRMTP",
+      "name": "Merton Park",
+      "latitude": 51.413589,
+      "longitude": -0.201219,
+      "hubID": "940GZZCRMTP",
+      "schematicX": 375.0,
+      "schematicY": 890.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "merton park",
+        "merton park"
+      ]
+    },
+    {
       "id": "940GZZLUMED",
       "name": "Mile End",
       "latitude": 51.525122,
@@ -4601,6 +5026,40 @@
       "searchAliases": [
         "mill hill east",
         "mill hill east"
+      ]
+    },
+    {
+      "id": "940GZZCRMCH",
+      "name": "Mitcham",
+      "latitude": 51.39749,
+      "longitude": -0.1709,
+      "hubID": "940GZZCRMCH",
+      "schematicX": 460.0,
+      "schematicY": 920.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "mitcham",
+        "mitcham"
+      ]
+    },
+    {
+      "id": "940GZZCRMJT",
+      "name": "Mitcham Junction",
+      "latitude": 51.392868,
+      "longitude": -0.158263,
+      "hubID": "HUBMJT",
+      "schematicX": 495.0,
+      "schematicY": 930.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "mitcham junction",
+        "mitcham junction"
       ]
     },
     {
@@ -4676,6 +5135,23 @@
       ]
     },
     {
+      "id": "940GZZCRMDN",
+      "name": "Morden Road",
+      "latitude": 51.408874,
+      "longitude": -0.192834,
+      "hubID": "940GZZCRMDN",
+      "schematicX": 395.0,
+      "schematicY": 895.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "morden road",
+        "morden road"
+      ]
+    },
+    {
       "id": "940GZZLUMTC",
       "name": "Mornington Crescent",
       "latitude": 51.534679,
@@ -4724,6 +5200,23 @@
       "searchAliases": [
         "neasden",
         "neasden"
+      ]
+    },
+    {
+      "id": "940GZZCRNWA",
+      "name": "New Addington",
+      "latitude": 51.342593,
+      "longitude": -0.017412,
+      "hubID": "940GZZCRNWA",
+      "schematicX": 895.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "new addington",
+        "new addington"
       ]
     },
     {
@@ -5244,6 +5737,23 @@
       ]
     },
     {
+      "id": "940GZZCRPHI",
+      "name": "Phipps Bridge",
+      "latitude": 51.403378,
+      "longitude": -0.182311,
+      "hubID": "940GZZCRPHI",
+      "schematicX": 425.0,
+      "schematicY": 910.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "phipps bridge",
+        "phipps bridge"
+      ]
+    },
+    {
       "id": "940GZZLUPCC",
       "name": "Piccadilly Circus",
       "latitude": 51.51005,
@@ -5587,6 +6097,23 @@
       ]
     },
     {
+      "id": "940GZZCRRVC",
+      "name": "Reeves Corner",
+      "latitude": 51.375279,
+      "longitude": -0.106408,
+      "hubID": "940GZZCRRVC",
+      "schematicX": 640.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "reeves corner",
+        "reeves corner"
+      ]
+    },
+    {
       "id": "940GZZLURGP",
       "name": "Regent's Park",
       "latitude": 51.523344,
@@ -5826,6 +6353,23 @@
       "searchAliases": [
         "russell square",
         "russell square"
+      ]
+    },
+    {
+      "id": "940GZZCRSAN",
+      "name": "Sandilands",
+      "latitude": 51.375024,
+      "longitude": -0.078041,
+      "hubID": "940GZZCRSAN",
+      "schematicX": 720.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "sandilands",
+        "sandilands"
       ]
     },
     {
@@ -6808,6 +7352,23 @@
       ]
     },
     {
+      "id": "940GZZCRTPA",
+      "name": "Therapia Lane",
+      "latitude": 51.385697,
+      "longitude": -0.129045,
+      "hubID": "940GZZCRTPA",
+      "schematicX": 580.0,
+      "schematicY": 945.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "therapia lane",
+        "therapia lane"
+      ]
+    },
+    {
       "id": "940GZZLUTHB",
       "name": "Theydon Bois",
       "latitude": 51.671759,
@@ -7206,6 +7767,23 @@
       ]
     },
     {
+      "id": "940GZZCRWAD",
+      "name": "Waddon Marsh",
+      "latitude": 51.377076,
+      "longitude": -0.118016,
+      "hubID": "940GZZCRWAD",
+      "schematicX": 610.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "waddon marsh",
+        "waddon marsh"
+      ]
+    },
+    {
       "id": "940GZZLUWWL",
       "name": "Walthamstow Central",
       "latitude": 51.582965,
@@ -7254,6 +7832,23 @@
       "searchAliases": [
         "walthamstow queens road",
         "walthamstow queens road"
+      ]
+    },
+    {
+      "id": "940GZZCRWAN",
+      "name": "Wandle Park",
+      "latitude": 51.373403,
+      "longitude": -0.113282,
+      "hubID": "940GZZCRWAN",
+      "schematicX": 620.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "wandle park",
+        "wandle park"
       ]
     },
     {
@@ -7431,6 +8026,23 @@
       ]
     },
     {
+      "id": "940GZZCRWEL",
+      "name": "Wellesley Road",
+      "latitude": 51.37537,
+      "longitude": -0.097554,
+      "hubID": "940GZZCRWEL",
+      "schematicX": 665.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "wellesley road",
+        "wellesley road"
+      ]
+    },
+    {
       "id": "940GZZLUWYC",
       "name": "Wembley Central",
       "latitude": 51.552304,
@@ -7534,6 +8146,23 @@
       ]
     },
     {
+      "id": "940GZZCRWCR",
+      "name": "West Croydon",
+      "latitude": 51.378971,
+      "longitude": -0.101701,
+      "hubID": "HUBWCY",
+      "schematicX": 655.0,
+      "schematicY": 955.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": true,
+      "searchAliases": [
+        "west croydon",
+        "west croydon"
+      ]
+    },
+    {
       "id": "910GWCROYDN",
       "name": "West Croydon",
       "latitude": 51.378428,
@@ -7544,7 +8173,7 @@
       "lineIDs": [
         "windrush"
       ],
-      "interchange": false,
+      "interchange": true,
       "searchAliases": [
         "west croydon",
         "west croydon"
@@ -7960,7 +8589,24 @@
       "lineIDs": [
         "district"
       ],
-      "interchange": false,
+      "interchange": true,
+      "searchAliases": [
+        "wimbledon",
+        "wimbledon"
+      ]
+    },
+    {
+      "id": "940GZZCRWMB",
+      "name": "Wimbledon",
+      "latitude": 51.421051,
+      "longitude": -0.205816,
+      "hubID": "HUBWIM",
+      "schematicX": 360.0,
+      "schematicY": 875.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": true,
       "searchAliases": [
         "wimbledon",
         "wimbledon"
@@ -8067,6 +8713,23 @@
       "searchAliases": [
         "woodgrange park",
         "woodgrange park"
+      ]
+    },
+    {
+      "id": "940GZZCRWOD",
+      "name": "Woodside",
+      "latitude": 51.3871,
+      "longitude": -0.065361,
+      "hubID": "940GZZCRWOD",
+      "schematicX": 760.0,
+      "schematicY": 940.0,
+      "lineIDs": [
+        "tram"
+      ],
+      "interchange": false,
+      "searchAliases": [
+        "woodside",
+        "woodside"
       ]
     },
     {
@@ -69681,6 +70344,5770 @@
       ]
     },
     {
+      "id": "tram:940GZZCRADD:940GZZCRBLA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBLA",
+      "toStationID": "940GZZCRADD",
+      "schematicPoints": [
+        {
+          "x": 745.0,
+          "y": 945.0
+        },
+        {
+          "x": 735.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.384767,
+          "longitude": -0.070491
+        },
+        {
+          "latitude": 51.384609,
+          "longitude": -0.070711
+        },
+        {
+          "latitude": 51.384527,
+          "longitude": -0.070837
+        },
+        {
+          "latitude": 51.384344,
+          "longitude": -0.071104
+        },
+        {
+          "latitude": 51.384188,
+          "longitude": -0.071287
+        },
+        {
+          "latitude": 51.384018,
+          "longitude": -0.071479
+        },
+        {
+          "latitude": 51.383833,
+          "longitude": -0.071672
+        },
+        {
+          "latitude": 51.383613,
+          "longitude": -0.071884
+        },
+        {
+          "latitude": 51.383405,
+          "longitude": -0.072061
+        },
+        {
+          "latitude": 51.383186,
+          "longitude": -0.072233
+        },
+        {
+          "latitude": 51.383049,
+          "longitude": -0.072334
+        },
+        {
+          "latitude": 51.382848,
+          "longitude": -0.072466
+        },
+        {
+          "latitude": 51.382634,
+          "longitude": -0.072598
+        },
+        {
+          "latitude": 51.382438,
+          "longitude": -0.072697
+        },
+        {
+          "latitude": 51.382229,
+          "longitude": -0.072792
+        },
+        {
+          "latitude": 51.382034,
+          "longitude": -0.072874
+        },
+        {
+          "latitude": 51.381848,
+          "longitude": -0.072933
+        },
+        {
+          "latitude": 51.381648,
+          "longitude": -0.072994
+        },
+        {
+          "latitude": 51.381418,
+          "longitude": -0.073052
+        },
+        {
+          "latitude": 51.381181,
+          "longitude": -0.073084
+        },
+        {
+          "latitude": 51.380778,
+          "longitude": -0.073135
+        },
+        {
+          "latitude": 51.380286,
+          "longitude": -0.073164
+        },
+        {
+          "latitude": 51.379821,
+          "longitude": -0.073207
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRADD:940GZZCRSAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRADD",
+      "toStationID": "940GZZCRSAN",
+      "schematicPoints": [
+        {
+          "x": 735.0,
+          "y": 955.0
+        },
+        {
+          "x": 720.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.379821,
+          "longitude": -0.073207
+        },
+        {
+          "latitude": 51.379481,
+          "longitude": -0.073238
+        },
+        {
+          "latitude": 51.379264,
+          "longitude": -0.073254
+        },
+        {
+          "latitude": 51.378803,
+          "longitude": -0.073281
+        },
+        {
+          "latitude": 51.378262,
+          "longitude": -0.073315
+        },
+        {
+          "latitude": 51.37791,
+          "longitude": -0.073344
+        },
+        {
+          "latitude": 51.377618,
+          "longitude": -0.073369
+        },
+        {
+          "latitude": 51.377306,
+          "longitude": -0.073426
+        },
+        {
+          "latitude": 51.376974,
+          "longitude": -0.073503
+        },
+        {
+          "latitude": 51.37671,
+          "longitude": -0.073583
+        },
+        {
+          "latitude": 51.376382,
+          "longitude": -0.073707
+        },
+        {
+          "latitude": 51.376038,
+          "longitude": -0.07385
+        },
+        {
+          "latitude": 51.375653,
+          "longitude": -0.074071
+        },
+        {
+          "latitude": 51.375248,
+          "longitude": -0.074341
+        },
+        {
+          "latitude": 51.375016,
+          "longitude": -0.074524
+        },
+        {
+          "latitude": 51.374815,
+          "longitude": -0.074684
+        },
+        {
+          "latitude": 51.37459,
+          "longitude": -0.074861
+        },
+        {
+          "latitude": 51.374531,
+          "longitude": -0.074922
+        },
+        {
+          "latitude": 51.374439,
+          "longitude": -0.075027
+        },
+        {
+          "latitude": 51.374383,
+          "longitude": -0.075147
+        },
+        {
+          "latitude": 51.374354,
+          "longitude": -0.075256
+        },
+        {
+          "latitude": 51.374346,
+          "longitude": -0.075392
+        },
+        {
+          "latitude": 51.374355,
+          "longitude": -0.0755
+        },
+        {
+          "latitude": 51.374419,
+          "longitude": -0.075787
+        },
+        {
+          "latitude": 51.374548,
+          "longitude": -0.076152
+        },
+        {
+          "latitude": 51.374681,
+          "longitude": -0.076547
+        },
+        {
+          "latitude": 51.374766,
+          "longitude": -0.076806
+        },
+        {
+          "latitude": 51.374832,
+          "longitude": -0.077048
+        },
+        {
+          "latitude": 51.374881,
+          "longitude": -0.07726
+        },
+        {
+          "latitude": 51.374906,
+          "longitude": -0.077418
+        },
+        {
+          "latitude": 51.374965,
+          "longitude": -0.077747
+        },
+        {
+          "latitude": 51.375027,
+          "longitude": -0.078092
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRADV:940GZZCRFLD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRADV",
+      "toStationID": "940GZZCRFLD",
+      "schematicPoints": [
+        {
+          "x": 850.0,
+          "y": 955.0
+        },
+        {
+          "x": 875.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.356253,
+          "longitude": -0.032568
+        },
+        {
+          "latitude": 51.356252,
+          "longitude": -0.032541
+        },
+        {
+          "latitude": 51.356238,
+          "longitude": -0.032294
+        },
+        {
+          "latitude": 51.356226,
+          "longitude": -0.032156
+        },
+        {
+          "latitude": 51.356205,
+          "longitude": -0.032029
+        },
+        {
+          "latitude": 51.356173,
+          "longitude": -0.03189
+        },
+        {
+          "latitude": 51.356127,
+          "longitude": -0.031747
+        },
+        {
+          "latitude": 51.356072,
+          "longitude": -0.031612
+        },
+        {
+          "latitude": 51.355992,
+          "longitude": -0.031466
+        },
+        {
+          "latitude": 51.355765,
+          "longitude": -0.031069
+        },
+        {
+          "latitude": 51.355569,
+          "longitude": -0.03072
+        },
+        {
+          "latitude": 51.355412,
+          "longitude": -0.030437
+        },
+        {
+          "latitude": 51.355181,
+          "longitude": -0.030023
+        },
+        {
+          "latitude": 51.354937,
+          "longitude": -0.029596
+        },
+        {
+          "latitude": 51.354637,
+          "longitude": -0.029065
+        },
+        {
+          "latitude": 51.354379,
+          "longitude": -0.028617
+        },
+        {
+          "latitude": 51.354196,
+          "longitude": -0.028306
+        },
+        {
+          "latitude": 51.353759,
+          "longitude": -0.027542
+        },
+        {
+          "latitude": 51.353506,
+          "longitude": -0.027099
+        },
+        {
+          "latitude": 51.353266,
+          "longitude": -0.026683
+        },
+        {
+          "latitude": 51.353007,
+          "longitude": -0.026231
+        },
+        {
+          "latitude": 51.352756,
+          "longitude": -0.02579
+        },
+        {
+          "latitude": 51.352615,
+          "longitude": -0.025581
+        },
+        {
+          "latitude": 51.352489,
+          "longitude": -0.025408
+        },
+        {
+          "latitude": 51.352385,
+          "longitude": -0.025251
+        },
+        {
+          "latitude": 51.352255,
+          "longitude": -0.025101
+        },
+        {
+          "latitude": 51.352134,
+          "longitude": -0.024965
+        },
+        {
+          "latitude": 51.351966,
+          "longitude": -0.024802
+        },
+        {
+          "latitude": 51.351816,
+          "longitude": -0.024674
+        },
+        {
+          "latitude": 51.351723,
+          "longitude": -0.024598
+        },
+        {
+          "latitude": 51.351607,
+          "longitude": -0.024521
+        },
+        {
+          "latitude": 51.351421,
+          "longitude": -0.024413
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRADV:940GZZCRGRA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRGRA",
+      "toStationID": "940GZZCRADV",
+      "schematicPoints": [
+        {
+          "x": 820.0,
+          "y": 955.0
+        },
+        {
+          "x": 850.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.354508,
+          "longitude": -0.043182
+        },
+        {
+          "latitude": 51.354529,
+          "longitude": -0.042861
+        },
+        {
+          "latitude": 51.354557,
+          "longitude": -0.04252
+        },
+        {
+          "latitude": 51.354574,
+          "longitude": -0.042281
+        },
+        {
+          "latitude": 51.354587,
+          "longitude": -0.042224
+        },
+        {
+          "latitude": 51.354619,
+          "longitude": -0.042077
+        },
+        {
+          "latitude": 51.354694,
+          "longitude": -0.041802
+        },
+        {
+          "latitude": 51.354737,
+          "longitude": -0.041642
+        },
+        {
+          "latitude": 51.354776,
+          "longitude": -0.041491
+        },
+        {
+          "latitude": 51.354807,
+          "longitude": -0.041305
+        },
+        {
+          "latitude": 51.35482,
+          "longitude": -0.041126
+        },
+        {
+          "latitude": 51.354821,
+          "longitude": -0.040929
+        },
+        {
+          "latitude": 51.354802,
+          "longitude": -0.040714
+        },
+        {
+          "latitude": 51.354763,
+          "longitude": -0.040523
+        },
+        {
+          "latitude": 51.354715,
+          "longitude": -0.040341
+        },
+        {
+          "latitude": 51.354534,
+          "longitude": -0.039642
+        },
+        {
+          "latitude": 51.35431,
+          "longitude": -0.038823
+        },
+        {
+          "latitude": 51.354089,
+          "longitude": -0.038018
+        },
+        {
+          "latitude": 51.354041,
+          "longitude": -0.03781
+        },
+        {
+          "latitude": 51.354024,
+          "longitude": -0.037655
+        },
+        {
+          "latitude": 51.35403,
+          "longitude": -0.037509
+        },
+        {
+          "latitude": 51.354051,
+          "longitude": -0.037385
+        },
+        {
+          "latitude": 51.354086,
+          "longitude": -0.037273
+        },
+        {
+          "latitude": 51.354132,
+          "longitude": -0.037184
+        },
+        {
+          "latitude": 51.354179,
+          "longitude": -0.037121
+        },
+        {
+          "latitude": 51.354241,
+          "longitude": -0.037058
+        },
+        {
+          "latitude": 51.354314,
+          "longitude": -0.037013
+        },
+        {
+          "latitude": 51.354483,
+          "longitude": -0.036892
+        },
+        {
+          "latitude": 51.35451,
+          "longitude": -0.036872
+        },
+        {
+          "latitude": 51.354575,
+          "longitude": -0.036821
+        },
+        {
+          "latitude": 51.354646,
+          "longitude": -0.036744
+        },
+        {
+          "latitude": 51.354752,
+          "longitude": -0.036627
+        },
+        {
+          "latitude": 51.354922,
+          "longitude": -0.036397
+        },
+        {
+          "latitude": 51.355268,
+          "longitude": -0.035923
+        },
+        {
+          "latitude": 51.355504,
+          "longitude": -0.035591
+        },
+        {
+          "latitude": 51.355748,
+          "longitude": -0.035232
+        },
+        {
+          "latitude": 51.355928,
+          "longitude": -0.034958
+        },
+        {
+          "latitude": 51.356053,
+          "longitude": -0.034718
+        },
+        {
+          "latitude": 51.356115,
+          "longitude": -0.034528
+        },
+        {
+          "latitude": 51.356157,
+          "longitude": -0.034374
+        },
+        {
+          "latitude": 51.356213,
+          "longitude": -0.034084
+        },
+        {
+          "latitude": 51.356236,
+          "longitude": -0.033887
+        },
+        {
+          "latitude": 51.356245,
+          "longitude": -0.03374
+        },
+        {
+          "latitude": 51.356252,
+          "longitude": -0.033556
+        },
+        {
+          "latitude": 51.356244,
+          "longitude": -0.033335
+        },
+        {
+          "latitude": 51.356224,
+          "longitude": -0.032885
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRAMP:940GZZCRTPA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRAMP",
+      "toStationID": "940GZZCRTPA",
+      "schematicPoints": [
+        {
+          "x": 595.0,
+          "y": 950.0
+        },
+        {
+          "x": 590.0,
+          "y": 945.0
+        },
+        {
+          "x": 580.0,
+          "y": 945.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.382359,
+          "longitude": -0.123687
+        },
+        {
+          "latitude": 51.382552,
+          "longitude": -0.12397
+        },
+        {
+          "latitude": 51.383009,
+          "longitude": -0.124637
+        },
+        {
+          "latitude": 51.383672,
+          "longitude": -0.125598
+        },
+        {
+          "latitude": 51.384234,
+          "longitude": -0.126402
+        },
+        {
+          "latitude": 51.384555,
+          "longitude": -0.126869
+        },
+        {
+          "latitude": 51.384791,
+          "longitude": -0.127216
+        },
+        {
+          "latitude": 51.384928,
+          "longitude": -0.12742
+        },
+        {
+          "latitude": 51.385073,
+          "longitude": -0.127646
+        },
+        {
+          "latitude": 51.385209,
+          "longitude": -0.127893
+        },
+        {
+          "latitude": 51.385291,
+          "longitude": -0.128055
+        },
+        {
+          "latitude": 51.385357,
+          "longitude": -0.12819
+        },
+        {
+          "latitude": 51.385443,
+          "longitude": -0.128395
+        },
+        {
+          "latitude": 51.385539,
+          "longitude": -0.128637
+        },
+        {
+          "latitude": 51.385592,
+          "longitude": -0.128798
+        },
+        {
+          "latitude": 51.3856,
+          "longitude": -0.12882
+        },
+        {
+          "latitude": 51.385697,
+          "longitude": -0.129091
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRAMP:940GZZCRWAD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWAD",
+      "toStationID": "940GZZCRAMP",
+      "schematicPoints": [
+        {
+          "x": 610.0,
+          "y": 955.0
+        },
+        {
+          "x": 605.0,
+          "y": 950.0
+        },
+        {
+          "x": 595.0,
+          "y": 950.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.377162,
+          "longitude": -0.118078
+        },
+        {
+          "latitude": 51.377305,
+          "longitude": -0.118248
+        },
+        {
+          "latitude": 51.377599,
+          "longitude": -0.118607
+        },
+        {
+          "latitude": 51.377965,
+          "longitude": -0.119041
+        },
+        {
+          "latitude": 51.378245,
+          "longitude": -0.119369
+        },
+        {
+          "latitude": 51.378604,
+          "longitude": -0.119812
+        },
+        {
+          "latitude": 51.379008,
+          "longitude": -0.120273
+        },
+        {
+          "latitude": 51.379345,
+          "longitude": -0.120636
+        },
+        {
+          "latitude": 51.379365,
+          "longitude": -0.120657
+        },
+        {
+          "latitude": 51.379667,
+          "longitude": -0.120978
+        },
+        {
+          "latitude": 51.379688,
+          "longitude": -0.121
+        },
+        {
+          "latitude": 51.380039,
+          "longitude": -0.121353
+        },
+        {
+          "latitude": 51.380308,
+          "longitude": -0.121591
+        },
+        {
+          "latitude": 51.38064,
+          "longitude": -0.121907
+        },
+        {
+          "latitude": 51.380725,
+          "longitude": -0.122002
+        },
+        {
+          "latitude": 51.381731,
+          "longitude": -0.123001
+        },
+        {
+          "latitude": 51.381866,
+          "longitude": -0.123139
+        },
+        {
+          "latitude": 51.382016,
+          "longitude": -0.123307
+        },
+        {
+          "latitude": 51.382133,
+          "longitude": -0.123442
+        },
+        {
+          "latitude": 51.382205,
+          "longitude": -0.123546
+        },
+        {
+          "latitude": 51.382245,
+          "longitude": -0.123598
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRARA:940GZZCRELM",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRELM",
+      "toStationID": "940GZZCRARA",
+      "schematicPoints": [
+        {
+          "x": 805.0,
+          "y": 920.0
+        },
+        {
+          "x": 795.0,
+          "y": 930.0
+        },
+        {
+          "x": 780.0,
+          "y": 930.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.39835,
+          "longitude": -0.049526
+        },
+        {
+          "latitude": 51.397994,
+          "longitude": -0.049935
+        },
+        {
+          "latitude": 51.397739,
+          "longitude": -0.050215
+        },
+        {
+          "latitude": 51.397518,
+          "longitude": -0.050451
+        },
+        {
+          "latitude": 51.397295,
+          "longitude": -0.050651
+        },
+        {
+          "latitude": 51.397038,
+          "longitude": -0.050887
+        },
+        {
+          "latitude": 51.39684,
+          "longitude": -0.051075
+        },
+        {
+          "latitude": 51.396703,
+          "longitude": -0.051205
+        },
+        {
+          "latitude": 51.396674,
+          "longitude": -0.051238
+        },
+        {
+          "latitude": 51.396427,
+          "longitude": -0.05152
+        },
+        {
+          "latitude": 51.396089,
+          "longitude": -0.051934
+        },
+        {
+          "latitude": 51.395765,
+          "longitude": -0.052348
+        },
+        {
+          "latitude": 51.395234,
+          "longitude": -0.053003
+        },
+        {
+          "latitude": 51.394571,
+          "longitude": -0.053895
+        },
+        {
+          "latitude": 51.393944,
+          "longitude": -0.054768
+        },
+        {
+          "latitude": 51.393318,
+          "longitude": -0.055671
+        },
+        {
+          "latitude": 51.393106,
+          "longitude": -0.056002
+        },
+        {
+          "latitude": 51.392901,
+          "longitude": -0.056296
+        },
+        {
+          "latitude": 51.392638,
+          "longitude": -0.05668
+        },
+        {
+          "latitude": 51.392327,
+          "longitude": -0.057132
+        },
+        {
+          "latitude": 51.392134,
+          "longitude": -0.057426
+        },
+        {
+          "latitude": 51.39194,
+          "longitude": -0.057705
+        },
+        {
+          "latitude": 51.39173,
+          "longitude": -0.058004
+        },
+        {
+          "latitude": 51.391583,
+          "longitude": -0.058222
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRARA:940GZZCRHAR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRHAR",
+      "toStationID": "940GZZCRARA",
+      "schematicPoints": [
+        {
+          "x": 770.0,
+          "y": 915.0
+        },
+        {
+          "x": 780.0,
+          "y": 925.0
+        },
+        {
+          "x": 780.0,
+          "y": 930.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.399819,
+          "longitude": -0.06063
+        },
+        {
+          "latitude": 51.399682,
+          "longitude": -0.060426
+        },
+        {
+          "latitude": 51.399487,
+          "longitude": -0.060132
+        },
+        {
+          "latitude": 51.399395,
+          "longitude": -0.060005
+        },
+        {
+          "latitude": 51.3993,
+          "longitude": -0.05989
+        },
+        {
+          "latitude": 51.399226,
+          "longitude": -0.059811
+        },
+        {
+          "latitude": 51.399153,
+          "longitude": -0.059756
+        },
+        {
+          "latitude": 51.399071,
+          "longitude": -0.059713
+        },
+        {
+          "latitude": 51.398981,
+          "longitude": -0.059681
+        },
+        {
+          "latitude": 51.398909,
+          "longitude": -0.059661
+        },
+        {
+          "latitude": 51.398824,
+          "longitude": -0.059655
+        },
+        {
+          "latitude": 51.398716,
+          "longitude": -0.059676
+        },
+        {
+          "latitude": 51.398629,
+          "longitude": -0.059718
+        },
+        {
+          "latitude": 51.398519,
+          "longitude": -0.05979
+        },
+        {
+          "latitude": 51.398415,
+          "longitude": -0.059892
+        },
+        {
+          "latitude": 51.398355,
+          "longitude": -0.059972
+        },
+        {
+          "latitude": 51.3983,
+          "longitude": -0.060091
+        },
+        {
+          "latitude": 51.398257,
+          "longitude": -0.060213
+        },
+        {
+          "latitude": 51.398193,
+          "longitude": -0.06039
+        },
+        {
+          "latitude": 51.398046,
+          "longitude": -0.060777
+        },
+        {
+          "latitude": 51.397966,
+          "longitude": -0.060994
+        },
+        {
+          "latitude": 51.397883,
+          "longitude": -0.061202
+        },
+        {
+          "latitude": 51.397814,
+          "longitude": -0.061327
+        },
+        {
+          "latitude": 51.397756,
+          "longitude": -0.061417
+        },
+        {
+          "latitude": 51.397678,
+          "longitude": -0.061513
+        },
+        {
+          "latitude": 51.397612,
+          "longitude": -0.061593
+        },
+        {
+          "latitude": 51.397538,
+          "longitude": -0.061653
+        },
+        {
+          "latitude": 51.397472,
+          "longitude": -0.061698
+        },
+        {
+          "latitude": 51.397401,
+          "longitude": -0.061727
+        },
+        {
+          "latitude": 51.397335,
+          "longitude": -0.061749
+        },
+        {
+          "latitude": 51.397233,
+          "longitude": -0.06177
+        },
+        {
+          "latitude": 51.39715,
+          "longitude": -0.061766
+        },
+        {
+          "latitude": 51.397078,
+          "longitude": -0.061765
+        },
+        {
+          "latitude": 51.396989,
+          "longitude": -0.061741
+        },
+        {
+          "latitude": 51.396896,
+          "longitude": -0.061718
+        },
+        {
+          "latitude": 51.396719,
+          "longitude": -0.06166
+        },
+        {
+          "latitude": 51.395915,
+          "longitude": -0.061349
+        },
+        {
+          "latitude": 51.395416,
+          "longitude": -0.061148
+        },
+        {
+          "latitude": 51.395315,
+          "longitude": -0.061095
+        },
+        {
+          "latitude": 51.395188,
+          "longitude": -0.061011
+        },
+        {
+          "latitude": 51.39507,
+          "longitude": -0.060936
+        },
+        {
+          "latitude": 51.395008,
+          "longitude": -0.060887
+        },
+        {
+          "latitude": 51.394964,
+          "longitude": -0.060852
+        },
+        {
+          "latitude": 51.394915,
+          "longitude": -0.060804
+        },
+        {
+          "latitude": 51.394775,
+          "longitude": -0.060666
+        },
+        {
+          "latitude": 51.394645,
+          "longitude": -0.060521
+        },
+        {
+          "latitude": 51.394496,
+          "longitude": -0.060329
+        },
+        {
+          "latitude": 51.394345,
+          "longitude": -0.060064
+        },
+        {
+          "latitude": 51.394149,
+          "longitude": -0.059678
+        },
+        {
+          "latitude": 51.393911,
+          "longitude": -0.059172
+        },
+        {
+          "latitude": 51.393604,
+          "longitude": -0.058537
+        },
+        {
+          "latitude": 51.393427,
+          "longitude": -0.058146
+        },
+        {
+          "latitude": 51.393326,
+          "longitude": -0.057962
+        },
+        {
+          "latitude": 51.393229,
+          "longitude": -0.057799
+        },
+        {
+          "latitude": 51.393107,
+          "longitude": -0.057635
+        },
+        {
+          "latitude": 51.392981,
+          "longitude": -0.057519
+        },
+        {
+          "latitude": 51.392891,
+          "longitude": -0.057452
+        },
+        {
+          "latitude": 51.392749,
+          "longitude": -0.057346
+        },
+        {
+          "latitude": 51.392614,
+          "longitude": -0.057318
+        },
+        {
+          "latitude": 51.39253,
+          "longitude": -0.057315
+        },
+        {
+          "latitude": 51.392466,
+          "longitude": -0.057323
+        },
+        {
+          "latitude": 51.392398,
+          "longitude": -0.05734
+        },
+        {
+          "latitude": 51.39231,
+          "longitude": -0.057367
+        },
+        {
+          "latitude": 51.392159,
+          "longitude": -0.057457
+        },
+        {
+          "latitude": 51.392044,
+          "longitude": -0.057582
+        },
+        {
+          "latitude": 51.39194,
+          "longitude": -0.057705
+        },
+        {
+          "latitude": 51.39173,
+          "longitude": -0.058004
+        },
+        {
+          "latitude": 51.391583,
+          "longitude": -0.058222
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRARA:940GZZCRWOD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRARA",
+      "toStationID": "940GZZCRWOD",
+      "schematicPoints": [
+        {
+          "x": 780.0,
+          "y": 930.0
+        },
+        {
+          "x": 770.0,
+          "y": 940.0
+        },
+        {
+          "x": 760.0,
+          "y": 940.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.391429,
+          "longitude": -0.058508
+        },
+        {
+          "latitude": 51.391069,
+          "longitude": -0.059058
+        },
+        {
+          "latitude": 51.390773,
+          "longitude": -0.059485
+        },
+        {
+          "latitude": 51.39048,
+          "longitude": -0.059905
+        },
+        {
+          "latitude": 51.390154,
+          "longitude": -0.060394
+        },
+        {
+          "latitude": 51.389835,
+          "longitude": -0.060873
+        },
+        {
+          "latitude": 51.389668,
+          "longitude": -0.061126
+        },
+        {
+          "latitude": 51.389346,
+          "longitude": -0.061597
+        },
+        {
+          "latitude": 51.38905,
+          "longitude": -0.062036
+        },
+        {
+          "latitude": 51.38869,
+          "longitude": -0.062568
+        },
+        {
+          "latitude": 51.388428,
+          "longitude": -0.062973
+        },
+        {
+          "latitude": 51.388145,
+          "longitude": -0.063407
+        },
+        {
+          "latitude": 51.387894,
+          "longitude": -0.063851
+        },
+        {
+          "latitude": 51.387651,
+          "longitude": -0.064279
+        },
+        {
+          "latitude": 51.387372,
+          "longitude": -0.064786
+        },
+        {
+          "latitude": 51.387116,
+          "longitude": -0.065274
+        },
+        {
+          "latitude": 51.387085,
+          "longitude": -0.065341
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRAVE:940GZZCRBIR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRAVE",
+      "toStationID": "940GZZCRBIR",
+      "schematicPoints": [
+        {
+          "x": 805.0,
+          "y": 900.0
+        },
+        {
+          "x": 800.0,
+          "y": 905.0
+        },
+        {
+          "x": 785.0,
+          "y": 905.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.406797,
+          "longitude": -0.049519
+        },
+        {
+          "latitude": 51.406549,
+          "longitude": -0.050017
+        },
+        {
+          "latitude": 51.406496,
+          "longitude": -0.050108
+        },
+        {
+          "latitude": 51.406225,
+          "longitude": -0.050619
+        },
+        {
+          "latitude": 51.40589,
+          "longitude": -0.051297
+        },
+        {
+          "latitude": 51.405426,
+          "longitude": -0.052288
+        },
+        {
+          "latitude": 51.404936,
+          "longitude": -0.053275
+        },
+        {
+          "latitude": 51.403995,
+          "longitude": -0.055232
+        },
+        {
+          "latitude": 51.40385,
+          "longitude": -0.055531
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRAVE:940GZZCRBRD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBRD",
+      "toStationID": "940GZZCRAVE",
+      "schematicPoints": [
+        {
+          "x": 820.0,
+          "y": 895.0
+        },
+        {
+          "x": 815.0,
+          "y": 900.0
+        },
+        {
+          "x": 805.0,
+          "y": 900.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.409489,
+          "longitude": -0.043575
+        },
+        {
+          "latitude": 51.409319,
+          "longitude": -0.04404
+        },
+        {
+          "latitude": 51.409114,
+          "longitude": -0.044555
+        },
+        {
+          "latitude": 51.408907,
+          "longitude": -0.045056
+        },
+        {
+          "latitude": 51.40872,
+          "longitude": -0.045483
+        },
+        {
+          "latitude": 51.408301,
+          "longitude": -0.046367
+        },
+        {
+          "latitude": 51.407755,
+          "longitude": -0.047512
+        },
+        {
+          "latitude": 51.407289,
+          "longitude": -0.048489
+        },
+        {
+          "latitude": 51.407045,
+          "longitude": -0.049
+        },
+        {
+          "latitude": 51.406831,
+          "longitude": -0.049448
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBED:940GZZCRMJT",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBED",
+      "toStationID": "940GZZCRMJT",
+      "schematicPoints": [
+        {
+          "x": 540.0,
+          "y": 935.0
+        },
+        {
+          "x": 535.0,
+          "y": 930.0
+        },
+        {
+          "x": 495.0,
+          "y": 930.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.389255,
+          "longitude": -0.14209
+        },
+        {
+          "latitude": 51.389357,
+          "longitude": -0.142528
+        },
+        {
+          "latitude": 51.389438,
+          "longitude": -0.14287
+        },
+        {
+          "latitude": 51.389514,
+          "longitude": -0.143206
+        },
+        {
+          "latitude": 51.389534,
+          "longitude": -0.143293
+        },
+        {
+          "latitude": 51.389661,
+          "longitude": -0.143822
+        },
+        {
+          "latitude": 51.391694,
+          "longitude": -0.152451
+        },
+        {
+          "latitude": 51.391706,
+          "longitude": -0.152496
+        },
+        {
+          "latitude": 51.391835,
+          "longitude": -0.153089
+        },
+        {
+          "latitude": 51.391888,
+          "longitude": -0.153345
+        },
+        {
+          "latitude": 51.391941,
+          "longitude": -0.153707
+        },
+        {
+          "latitude": 51.391981,
+          "longitude": -0.154283
+        },
+        {
+          "latitude": 51.39202,
+          "longitude": -0.154707
+        },
+        {
+          "latitude": 51.392036,
+          "longitude": -0.154911
+        },
+        {
+          "latitude": 51.392051,
+          "longitude": -0.155021
+        },
+        {
+          "latitude": 51.392098,
+          "longitude": -0.15529
+        },
+        {
+          "latitude": 51.392154,
+          "longitude": -0.15551
+        },
+        {
+          "latitude": 51.392263,
+          "longitude": -0.155878
+        },
+        {
+          "latitude": 51.392381,
+          "longitude": -0.156255
+        },
+        {
+          "latitude": 51.392464,
+          "longitude": -0.15652
+        },
+        {
+          "latitude": 51.392528,
+          "longitude": -0.156819
+        },
+        {
+          "latitude": 51.392642,
+          "longitude": -0.157297
+        },
+        {
+          "latitude": 51.392718,
+          "longitude": -0.157614
+        },
+        {
+          "latitude": 51.392731,
+          "longitude": -0.157675
+        },
+        {
+          "latitude": 51.392773,
+          "longitude": -0.157853
+        },
+        {
+          "latitude": 51.392797,
+          "longitude": -0.157962
+        },
+        {
+          "latitude": 51.392843,
+          "longitude": -0.158124
+        },
+        {
+          "latitude": 51.392916,
+          "longitude": -0.158321
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBED:940GZZCRTPA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRTPA",
+      "toStationID": "940GZZCRBED",
+      "schematicPoints": [
+        {
+          "x": 580.0,
+          "y": 945.0
+        },
+        {
+          "x": 570.0,
+          "y": 935.0
+        },
+        {
+          "x": 540.0,
+          "y": 935.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.38572,
+          "longitude": -0.129271
+        },
+        {
+          "latitude": 51.385775,
+          "longitude": -0.129427
+        },
+        {
+          "latitude": 51.385826,
+          "longitude": -0.129574
+        },
+        {
+          "latitude": 51.38596,
+          "longitude": -0.129983
+        },
+        {
+          "latitude": 51.386044,
+          "longitude": -0.130236
+        },
+        {
+          "latitude": 51.386123,
+          "longitude": -0.130481
+        },
+        {
+          "latitude": 51.386198,
+          "longitude": -0.130666
+        },
+        {
+          "latitude": 51.386265,
+          "longitude": -0.130804
+        },
+        {
+          "latitude": 51.386426,
+          "longitude": -0.131094
+        },
+        {
+          "latitude": 51.386631,
+          "longitude": -0.131442
+        },
+        {
+          "latitude": 51.386749,
+          "longitude": -0.13164
+        },
+        {
+          "latitude": 51.386815,
+          "longitude": -0.131761
+        },
+        {
+          "latitude": 51.386876,
+          "longitude": -0.131884
+        },
+        {
+          "latitude": 51.386942,
+          "longitude": -0.132049
+        },
+        {
+          "latitude": 51.387014,
+          "longitude": -0.132254
+        },
+        {
+          "latitude": 51.387157,
+          "longitude": -0.132691
+        },
+        {
+          "latitude": 51.387344,
+          "longitude": -0.133262
+        },
+        {
+          "latitude": 51.387491,
+          "longitude": -0.133713
+        },
+        {
+          "latitude": 51.387622,
+          "longitude": -0.134124
+        },
+        {
+          "latitude": 51.387711,
+          "longitude": -0.134412
+        },
+        {
+          "latitude": 51.387795,
+          "longitude": -0.134685
+        },
+        {
+          "latitude": 51.387863,
+          "longitude": -0.134936
+        },
+        {
+          "latitude": 51.387913,
+          "longitude": -0.135145
+        },
+        {
+          "latitude": 51.387962,
+          "longitude": -0.13538
+        },
+        {
+          "latitude": 51.387993,
+          "longitude": -0.13559
+        },
+        {
+          "latitude": 51.388022,
+          "longitude": -0.135811
+        },
+        {
+          "latitude": 51.388042,
+          "longitude": -0.13602
+        },
+        {
+          "latitude": 51.388065,
+          "longitude": -0.136347
+        },
+        {
+          "latitude": 51.388094,
+          "longitude": -0.136779
+        },
+        {
+          "latitude": 51.388127,
+          "longitude": -0.137101
+        },
+        {
+          "latitude": 51.388158,
+          "longitude": -0.137323
+        },
+        {
+          "latitude": 51.388199,
+          "longitude": -0.137572
+        },
+        {
+          "latitude": 51.388286,
+          "longitude": -0.137971
+        },
+        {
+          "latitude": 51.388386,
+          "longitude": -0.138428
+        },
+        {
+          "latitude": 51.388473,
+          "longitude": -0.138791
+        },
+        {
+          "latitude": 51.38863,
+          "longitude": -0.139478
+        },
+        {
+          "latitude": 51.388785,
+          "longitude": -0.140127
+        },
+        {
+          "latitude": 51.388951,
+          "longitude": -0.140798
+        },
+        {
+          "latitude": 51.389059,
+          "longitude": -0.141236
+        },
+        {
+          "latitude": 51.389159,
+          "longitude": -0.141666
+        },
+        {
+          "latitude": 51.389255,
+          "longitude": -0.14209
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBEK:940GZZCRBRD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBEK",
+      "toStationID": "940GZZCRBRD",
+      "schematicPoints": [
+        {
+          "x": 870.0,
+          "y": 895.0
+        },
+        {
+          "x": 820.0,
+          "y": 895.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.410727,
+          "longitude": -0.026439
+        },
+        {
+          "latitude": 51.410806,
+          "longitude": -0.026782
+        },
+        {
+          "latitude": 51.410859,
+          "longitude": -0.026988
+        },
+        {
+          "latitude": 51.4109,
+          "longitude": -0.027156
+        },
+        {
+          "latitude": 51.410918,
+          "longitude": -0.027209
+        },
+        {
+          "latitude": 51.411082,
+          "longitude": -0.027825
+        },
+        {
+          "latitude": 51.411131,
+          "longitude": -0.028015
+        },
+        {
+          "latitude": 51.411166,
+          "longitude": -0.028249
+        },
+        {
+          "latitude": 51.411221,
+          "longitude": -0.02875
+        },
+        {
+          "latitude": 51.41128,
+          "longitude": -0.029227
+        },
+        {
+          "latitude": 51.41133,
+          "longitude": -0.029722
+        },
+        {
+          "latitude": 51.411384,
+          "longitude": -0.030347
+        },
+        {
+          "latitude": 51.411413,
+          "longitude": -0.030975
+        },
+        {
+          "latitude": 51.411435,
+          "longitude": -0.03184
+        },
+        {
+          "latitude": 51.41144,
+          "longitude": -0.032674
+        },
+        {
+          "latitude": 51.411426,
+          "longitude": -0.033228
+        },
+        {
+          "latitude": 51.411398,
+          "longitude": -0.033829
+        },
+        {
+          "latitude": 51.411379,
+          "longitude": -0.034165
+        },
+        {
+          "latitude": 51.411321,
+          "longitude": -0.035025
+        },
+        {
+          "latitude": 51.41129,
+          "longitude": -0.035364
+        },
+        {
+          "latitude": 51.411258,
+          "longitude": -0.03577
+        },
+        {
+          "latitude": 51.411105,
+          "longitude": -0.036994
+        },
+        {
+          "latitude": 51.411025,
+          "longitude": -0.037569
+        },
+        {
+          "latitude": 51.410925,
+          "longitude": -0.038144
+        },
+        {
+          "latitude": 51.410749,
+          "longitude": -0.039087
+        },
+        {
+          "latitude": 51.410581,
+          "longitude": -0.039857
+        },
+        {
+          "latitude": 51.410475,
+          "longitude": -0.04031
+        },
+        {
+          "latitude": 51.410362,
+          "longitude": -0.040727
+        },
+        {
+          "latitude": 51.410299,
+          "longitude": -0.040981
+        },
+        {
+          "latitude": 51.410162,
+          "longitude": -0.041492
+        },
+        {
+          "latitude": 51.409939,
+          "longitude": -0.042243
+        },
+        {
+          "latitude": 51.409782,
+          "longitude": -0.042728
+        },
+        {
+          "latitude": 51.409637,
+          "longitude": -0.043157
+        },
+        {
+          "latitude": 51.409489,
+          "longitude": -0.043575
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBGV:940GZZCRMCH",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRMCH",
+      "toStationID": "940GZZCRBGV",
+      "schematicPoints": [
+        {
+          "x": 460.0,
+          "y": 920.0
+        },
+        {
+          "x": 455.0,
+          "y": 915.0
+        },
+        {
+          "x": 440.0,
+          "y": 915.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.397543,
+          "longitude": -0.171053
+        },
+        {
+          "latitude": 51.397586,
+          "longitude": -0.171389
+        },
+        {
+          "latitude": 51.397649,
+          "longitude": -0.171892
+        },
+        {
+          "latitude": 51.397702,
+          "longitude": -0.172191
+        },
+        {
+          "latitude": 51.397768,
+          "longitude": -0.172554
+        },
+        {
+          "latitude": 51.397806,
+          "longitude": -0.1727
+        },
+        {
+          "latitude": 51.397879,
+          "longitude": -0.172928
+        },
+        {
+          "latitude": 51.397924,
+          "longitude": -0.173079
+        },
+        {
+          "latitude": 51.397964,
+          "longitude": -0.173198
+        },
+        {
+          "latitude": 51.398039,
+          "longitude": -0.173415
+        },
+        {
+          "latitude": 51.398158,
+          "longitude": -0.173754
+        },
+        {
+          "latitude": 51.398261,
+          "longitude": -0.173957
+        },
+        {
+          "latitude": 51.398319,
+          "longitude": -0.17405
+        },
+        {
+          "latitude": 51.398358,
+          "longitude": -0.174127
+        },
+        {
+          "latitude": 51.398489,
+          "longitude": -0.174416
+        },
+        {
+          "latitude": 51.398692,
+          "longitude": -0.174823
+        },
+        {
+          "latitude": 51.398736,
+          "longitude": -0.174905
+        },
+        {
+          "latitude": 51.398813,
+          "longitude": -0.175048
+        },
+        {
+          "latitude": 51.398949,
+          "longitude": -0.175279
+        },
+        {
+          "latitude": 51.399628,
+          "longitude": -0.176332
+        },
+        {
+          "latitude": 51.399982,
+          "longitude": -0.176885
+        },
+        {
+          "latitude": 51.400319,
+          "longitude": -0.177394
+        },
+        {
+          "latitude": 51.400548,
+          "longitude": -0.177704
+        },
+        {
+          "latitude": 51.400754,
+          "longitude": -0.178006
+        },
+        {
+          "latitude": 51.400835,
+          "longitude": -0.178119
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBGV:940GZZCRPHI",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBGV",
+      "toStationID": "940GZZCRPHI",
+      "schematicPoints": [
+        {
+          "x": 440.0,
+          "y": 915.0
+        },
+        {
+          "x": 435.0,
+          "y": 910.0
+        },
+        {
+          "x": 425.0,
+          "y": 910.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.400872,
+          "longitude": -0.178176
+        },
+        {
+          "latitude": 51.401147,
+          "longitude": -0.178598
+        },
+        {
+          "latitude": 51.402007,
+          "longitude": -0.179987
+        },
+        {
+          "latitude": 51.402646,
+          "longitude": -0.180982
+        },
+        {
+          "latitude": 51.40332,
+          "longitude": -0.182059
+        },
+        {
+          "latitude": 51.403351,
+          "longitude": -0.182114
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBIR:940GZZCRHAR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRBIR",
+      "toStationID": "940GZZCRHAR",
+      "schematicPoints": [
+        {
+          "x": 785.0,
+          "y": 905.0
+        },
+        {
+          "x": 775.0,
+          "y": 915.0
+        },
+        {
+          "x": 770.0,
+          "y": 915.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.40385,
+          "longitude": -0.055531
+        },
+        {
+          "latitude": 51.40356,
+          "longitude": -0.056135
+        },
+        {
+          "latitude": 51.403331,
+          "longitude": -0.056603
+        },
+        {
+          "latitude": 51.403104,
+          "longitude": -0.057077
+        },
+        {
+          "latitude": 51.402861,
+          "longitude": -0.057575
+        },
+        {
+          "latitude": 51.402419,
+          "longitude": -0.058524
+        },
+        {
+          "latitude": 51.402244,
+          "longitude": -0.058996
+        },
+        {
+          "latitude": 51.402099,
+          "longitude": -0.059496
+        },
+        {
+          "latitude": 51.401987,
+          "longitude": -0.059993
+        },
+        {
+          "latitude": 51.401905,
+          "longitude": -0.06043
+        },
+        {
+          "latitude": 51.401808,
+          "longitude": -0.060983
+        },
+        {
+          "latitude": 51.401734,
+          "longitude": -0.061348
+        },
+        {
+          "latitude": 51.401687,
+          "longitude": -0.061584
+        },
+        {
+          "latitude": 51.401626,
+          "longitude": -0.061871
+        },
+        {
+          "latitude": 51.401584,
+          "longitude": -0.06205
+        },
+        {
+          "latitude": 51.401542,
+          "longitude": -0.062173
+        },
+        {
+          "latitude": 51.401499,
+          "longitude": -0.062272
+        },
+        {
+          "latitude": 51.401445,
+          "longitude": -0.062348
+        },
+        {
+          "latitude": 51.401388,
+          "longitude": -0.062407
+        },
+        {
+          "latitude": 51.401309,
+          "longitude": -0.062456
+        },
+        {
+          "latitude": 51.401236,
+          "longitude": -0.06248
+        },
+        {
+          "latitude": 51.401156,
+          "longitude": -0.062477
+        },
+        {
+          "latitude": 51.401084,
+          "longitude": -0.062451
+        },
+        {
+          "latitude": 51.401017,
+          "longitude": -0.062418
+        },
+        {
+          "latitude": 51.400934,
+          "longitude": -0.062366
+        },
+        {
+          "latitude": 51.400875,
+          "longitude": -0.062298
+        },
+        {
+          "latitude": 51.400782,
+          "longitude": -0.062179
+        },
+        {
+          "latitude": 51.400674,
+          "longitude": -0.062009
+        },
+        {
+          "latitude": 51.400447,
+          "longitude": -0.061658
+        },
+        {
+          "latitude": 51.400345,
+          "longitude": -0.061449
+        },
+        {
+          "latitude": 51.400234,
+          "longitude": -0.06126
+        },
+        {
+          "latitude": 51.40007,
+          "longitude": -0.061011
+        },
+        {
+          "latitude": 51.399819,
+          "longitude": -0.06063
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRBLA:940GZZCRWOD",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWOD",
+      "toStationID": "940GZZCRBLA",
+      "schematicPoints": [
+        {
+          "x": 760.0,
+          "y": 940.0
+        },
+        {
+          "x": 755.0,
+          "y": 945.0
+        },
+        {
+          "x": 745.0,
+          "y": 945.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.387085,
+          "longitude": -0.065341
+        },
+        {
+          "latitude": 51.386807,
+          "longitude": -0.065951
+        },
+        {
+          "latitude": 51.386533,
+          "longitude": -0.066585
+        },
+        {
+          "latitude": 51.386299,
+          "longitude": -0.067186
+        },
+        {
+          "latitude": 51.386062,
+          "longitude": -0.067779
+        },
+        {
+          "latitude": 51.385869,
+          "longitude": -0.068323
+        },
+        {
+          "latitude": 51.385649,
+          "longitude": -0.068983
+        },
+        {
+          "latitude": 51.385576,
+          "longitude": -0.069191
+        },
+        {
+          "latitude": 51.385464,
+          "longitude": -0.06947
+        },
+        {
+          "latitude": 51.385353,
+          "longitude": -0.069685
+        },
+        {
+          "latitude": 51.385207,
+          "longitude": -0.069917
+        },
+        {
+          "latitude": 51.385105,
+          "longitude": -0.070063
+        },
+        {
+          "latitude": 51.384989,
+          "longitude": -0.070221
+        },
+        {
+          "latitude": 51.384783,
+          "longitude": -0.070519
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCEN:940GZZCRCHR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRCEN",
+      "toStationID": "940GZZCRCHR",
+      "schematicPoints": [
+        {
+          "x": 665.0,
+          "y": 955.0
+        },
+        {
+          "x": 650.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.373931,
+          "longitude": -0.09871
+        },
+        {
+          "latitude": 51.3739,
+          "longitude": -0.098912
+        },
+        {
+          "latitude": 51.373827,
+          "longitude": -0.099309
+        },
+        {
+          "latitude": 51.373762,
+          "longitude": -0.099669
+        },
+        {
+          "latitude": 51.373754,
+          "longitude": -0.099712
+        },
+        {
+          "latitude": 51.373701,
+          "longitude": -0.100041
+        },
+        {
+          "latitude": 51.373699,
+          "longitude": -0.100088
+        },
+        {
+          "latitude": 51.373699,
+          "longitude": -0.100109
+        },
+        {
+          "latitude": 51.373699,
+          "longitude": -0.100136
+        },
+        {
+          "latitude": 51.3737,
+          "longitude": -0.100158
+        },
+        {
+          "latitude": 51.373701,
+          "longitude": -0.10018
+        },
+        {
+          "latitude": 51.373703,
+          "longitude": -0.100199
+        },
+        {
+          "latitude": 51.373706,
+          "longitude": -0.10022
+        },
+        {
+          "latitude": 51.373715,
+          "longitude": -0.100325
+        },
+        {
+          "latitude": 51.373716,
+          "longitude": -0.100353
+        },
+        {
+          "latitude": 51.373718,
+          "longitude": -0.100405
+        },
+        {
+          "latitude": 51.373719,
+          "longitude": -0.100468
+        },
+        {
+          "latitude": 51.373718,
+          "longitude": -0.10055
+        },
+        {
+          "latitude": 51.373714,
+          "longitude": -0.100608
+        },
+        {
+          "latitude": 51.373707,
+          "longitude": -0.100663
+        },
+        {
+          "latitude": 51.3737,
+          "longitude": -0.100708
+        },
+        {
+          "latitude": 51.373648,
+          "longitude": -0.10103
+        },
+        {
+          "latitude": 51.373637,
+          "longitude": -0.101094
+        },
+        {
+          "latitude": 51.373614,
+          "longitude": -0.101227
+        },
+        {
+          "latitude": 51.373573,
+          "longitude": -0.101472
+        },
+        {
+          "latitude": 51.373542,
+          "longitude": -0.101717
+        },
+        {
+          "latitude": 51.373533,
+          "longitude": -0.101787
+        },
+        {
+          "latitude": 51.373501,
+          "longitude": -0.102041
+        },
+        {
+          "latitude": 51.373473,
+          "longitude": -0.102242
+        },
+        {
+          "latitude": 51.373393,
+          "longitude": -0.102662
+        },
+        {
+          "latitude": 51.373382,
+          "longitude": -0.102751
+        },
+        {
+          "latitude": 51.373372,
+          "longitude": -0.102867
+        },
+        {
+          "latitude": 51.373367,
+          "longitude": -0.103012
+        },
+        {
+          "latitude": 51.373375,
+          "longitude": -0.103173
+        },
+        {
+          "latitude": 51.37339,
+          "longitude": -0.10331
+        },
+        {
+          "latitude": 51.373409,
+          "longitude": -0.103418
+        },
+        {
+          "latitude": 51.373449,
+          "longitude": -0.103573
+        },
+        {
+          "latitude": 51.373596,
+          "longitude": -0.104012
+        },
+        {
+          "latitude": 51.373648,
+          "longitude": -0.10418
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCEN:940GZZCRECR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRECR",
+      "toStationID": "940GZZCRCEN",
+      "schematicPoints": [
+        {
+          "x": 680.0,
+          "y": 955.0
+        },
+        {
+          "x": 665.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.374879,
+          "longitude": -0.092367
+        },
+        {
+          "latitude": 51.374799,
+          "longitude": -0.092762
+        },
+        {
+          "latitude": 51.374716,
+          "longitude": -0.093183
+        },
+        {
+          "latitude": 51.374656,
+          "longitude": -0.093549
+        },
+        {
+          "latitude": 51.374608,
+          "longitude": -0.093831
+        },
+        {
+          "latitude": 51.374583,
+          "longitude": -0.093986
+        },
+        {
+          "latitude": 51.374422,
+          "longitude": -0.094933
+        },
+        {
+          "latitude": 51.374358,
+          "longitude": -0.095378
+        },
+        {
+          "latitude": 51.374219,
+          "longitude": -0.096587
+        },
+        {
+          "latitude": 51.374206,
+          "longitude": -0.096696
+        },
+        {
+          "latitude": 51.374186,
+          "longitude": -0.096852
+        },
+        {
+          "latitude": 51.374166,
+          "longitude": -0.097007
+        },
+        {
+          "latitude": 51.374152,
+          "longitude": -0.097113
+        },
+        {
+          "latitude": 51.374106,
+          "longitude": -0.09747
+        },
+        {
+          "latitude": 51.374036,
+          "longitude": -0.098048
+        },
+        {
+          "latitude": 51.373931,
+          "longitude": -0.09871
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCHR:940GZZCRCTR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRCHR",
+      "toStationID": "940GZZCRCTR",
+      "schematicPoints": [
+        {
+          "x": 650.0,
+          "y": 955.0
+        },
+        {
+          "x": 650.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.373757,
+          "longitude": -0.104511
+        },
+        {
+          "latitude": 51.373846,
+          "longitude": -0.10477
+        },
+        {
+          "latitude": 51.373901,
+          "longitude": -0.104947
+        },
+        {
+          "latitude": 51.373935,
+          "longitude": -0.105055
+        },
+        {
+          "latitude": 51.374015,
+          "longitude": -0.10531
+        },
+        {
+          "latitude": 51.374021,
+          "longitude": -0.105326
+        },
+        {
+          "latitude": 51.37403,
+          "longitude": -0.105347
+        },
+        {
+          "latitude": 51.374042,
+          "longitude": -0.105367
+        },
+        {
+          "latitude": 51.374057,
+          "longitude": -0.105389
+        },
+        {
+          "latitude": 51.374078,
+          "longitude": -0.105411
+        },
+        {
+          "latitude": 51.374108,
+          "longitude": -0.105436
+        },
+        {
+          "latitude": 51.37414,
+          "longitude": -0.105458
+        },
+        {
+          "latitude": 51.374169,
+          "longitude": -0.105472
+        },
+        {
+          "latitude": 51.374197,
+          "longitude": -0.105486
+        },
+        {
+          "latitude": 51.374219,
+          "longitude": -0.105489
+        },
+        {
+          "latitude": 51.37424,
+          "longitude": -0.10549
+        },
+        {
+          "latitude": 51.374262,
+          "longitude": -0.105485
+        },
+        {
+          "latitude": 51.37429,
+          "longitude": -0.105471
+        },
+        {
+          "latitude": 51.374314,
+          "longitude": -0.105455
+        },
+        {
+          "latitude": 51.374341,
+          "longitude": -0.105437
+        },
+        {
+          "latitude": 51.374471,
+          "longitude": -0.105303
+        },
+        {
+          "latitude": 51.374732,
+          "longitude": -0.105087
+        },
+        {
+          "latitude": 51.374865,
+          "longitude": -0.104977
+        },
+        {
+          "latitude": 51.374898,
+          "longitude": -0.104941
+        },
+        {
+          "latitude": 51.375086,
+          "longitude": -0.104733
+        },
+        {
+          "latitude": 51.375174,
+          "longitude": -0.104627
+        },
+        {
+          "latitude": 51.375388,
+          "longitude": -0.104387
+        },
+        {
+          "latitude": 51.375593,
+          "longitude": -0.104146
+        },
+        {
+          "latitude": 51.375867,
+          "longitude": -0.103784
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCHR:940GZZCRWAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRCHR",
+      "toStationID": "940GZZCRWAN",
+      "schematicPoints": [
+        {
+          "x": 650.0,
+          "y": 955.0
+        },
+        {
+          "x": 620.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.373757,
+          "longitude": -0.104511
+        },
+        {
+          "latitude": 51.373846,
+          "longitude": -0.10477
+        },
+        {
+          "latitude": 51.373933,
+          "longitude": -0.105057
+        },
+        {
+          "latitude": 51.37402,
+          "longitude": -0.105339
+        },
+        {
+          "latitude": 51.374088,
+          "longitude": -0.10557
+        },
+        {
+          "latitude": 51.374109,
+          "longitude": -0.105645
+        },
+        {
+          "latitude": 51.374175,
+          "longitude": -0.105848
+        },
+        {
+          "latitude": 51.37419,
+          "longitude": -0.105886
+        },
+        {
+          "latitude": 51.374213,
+          "longitude": -0.105951
+        },
+        {
+          "latitude": 51.374236,
+          "longitude": -0.106027
+        },
+        {
+          "latitude": 51.37426,
+          "longitude": -0.106078
+        },
+        {
+          "latitude": 51.374283,
+          "longitude": -0.106114
+        },
+        {
+          "latitude": 51.374322,
+          "longitude": -0.106159
+        },
+        {
+          "latitude": 51.374366,
+          "longitude": -0.1062
+        },
+        {
+          "latitude": 51.374405,
+          "longitude": -0.106228
+        },
+        {
+          "latitude": 51.374446,
+          "longitude": -0.106249
+        },
+        {
+          "latitude": 51.374477,
+          "longitude": -0.106258
+        },
+        {
+          "latitude": 51.374479,
+          "longitude": -0.106258
+        },
+        {
+          "latitude": 51.374517,
+          "longitude": -0.106266
+        },
+        {
+          "latitude": 51.374651,
+          "longitude": -0.10628
+        },
+        {
+          "latitude": 51.374696,
+          "longitude": -0.106285
+        },
+        {
+          "latitude": 51.37489,
+          "longitude": -0.106309
+        },
+        {
+          "latitude": 51.374994,
+          "longitude": -0.106331
+        },
+        {
+          "latitude": 51.375032,
+          "longitude": -0.106337
+        },
+        {
+          "latitude": 51.375066,
+          "longitude": -0.106342
+        },
+        {
+          "latitude": 51.375095,
+          "longitude": -0.106351
+        },
+        {
+          "latitude": 51.375125,
+          "longitude": -0.106363
+        },
+        {
+          "latitude": 51.375148,
+          "longitude": -0.106375
+        },
+        {
+          "latitude": 51.375167,
+          "longitude": -0.106387
+        },
+        {
+          "latitude": 51.375194,
+          "longitude": -0.10641
+        },
+        {
+          "latitude": 51.375215,
+          "longitude": -0.10643
+        },
+        {
+          "latitude": 51.375249,
+          "longitude": -0.106469
+        },
+        {
+          "latitude": 51.375264,
+          "longitude": -0.10649
+        },
+        {
+          "latitude": 51.37528,
+          "longitude": -0.106514
+        },
+        {
+          "latitude": 51.37529,
+          "longitude": -0.106539
+        },
+        {
+          "latitude": 51.375297,
+          "longitude": -0.106562
+        },
+        {
+          "latitude": 51.375307,
+          "longitude": -0.106603
+        },
+        {
+          "latitude": 51.375318,
+          "longitude": -0.106657
+        },
+        {
+          "latitude": 51.375323,
+          "longitude": -0.106707
+        },
+        {
+          "latitude": 51.375328,
+          "longitude": -0.10676
+        },
+        {
+          "latitude": 51.375327,
+          "longitude": -0.106808
+        },
+        {
+          "latitude": 51.375324,
+          "longitude": -0.106849
+        },
+        {
+          "latitude": 51.375319,
+          "longitude": -0.10689
+        },
+        {
+          "latitude": 51.375311,
+          "longitude": -0.106925
+        },
+        {
+          "latitude": 51.375299,
+          "longitude": -0.106973
+        },
+        {
+          "latitude": 51.375285,
+          "longitude": -0.107018
+        },
+        {
+          "latitude": 51.375267,
+          "longitude": -0.107063
+        },
+        {
+          "latitude": 51.375242,
+          "longitude": -0.107121
+        },
+        {
+          "latitude": 51.37517,
+          "longitude": -0.107242
+        },
+        {
+          "latitude": 51.3751,
+          "longitude": -0.107344
+        },
+        {
+          "latitude": 51.375035,
+          "longitude": -0.107437
+        },
+        {
+          "latitude": 51.374822,
+          "longitude": -0.107688
+        },
+        {
+          "latitude": 51.374782,
+          "longitude": -0.107739
+        },
+        {
+          "latitude": 51.374683,
+          "longitude": -0.107863
+        },
+        {
+          "latitude": 51.374611,
+          "longitude": -0.107953
+        },
+        {
+          "latitude": 51.374081,
+          "longitude": -0.108581
+        },
+        {
+          "latitude": 51.373861,
+          "longitude": -0.108832
+        },
+        {
+          "latitude": 51.373673,
+          "longitude": -0.109054
+        },
+        {
+          "latitude": 51.373622,
+          "longitude": -0.109134
+        },
+        {
+          "latitude": 51.373578,
+          "longitude": -0.109226
+        },
+        {
+          "latitude": 51.373542,
+          "longitude": -0.109353
+        },
+        {
+          "latitude": 51.373512,
+          "longitude": -0.109485
+        },
+        {
+          "latitude": 51.373427,
+          "longitude": -0.109931
+        },
+        {
+          "latitude": 51.37335,
+          "longitude": -0.110354
+        },
+        {
+          "latitude": 51.373285,
+          "longitude": -0.110718
+        },
+        {
+          "latitude": 51.373233,
+          "longitude": -0.111023
+        },
+        {
+          "latitude": 51.373211,
+          "longitude": -0.111208
+        },
+        {
+          "latitude": 51.373199,
+          "longitude": -0.111394
+        },
+        {
+          "latitude": 51.373191,
+          "longitude": -0.11166
+        },
+        {
+          "latitude": 51.373195,
+          "longitude": -0.111925
+        },
+        {
+          "latitude": 51.373213,
+          "longitude": -0.112287
+        },
+        {
+          "latitude": 51.373225,
+          "longitude": -0.112552
+        },
+        {
+          "latitude": 51.373252,
+          "longitude": -0.112751
+        },
+        {
+          "latitude": 51.373284,
+          "longitude": -0.112904
+        },
+        {
+          "latitude": 51.373336,
+          "longitude": -0.113064
+        },
+        {
+          "latitude": 51.373426,
+          "longitude": -0.113311
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCOO:940GZZCRGRA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRCOO",
+      "toStationID": "940GZZCRGRA",
+      "schematicPoints": [
+        {
+          "x": 775.0,
+          "y": 955.0
+        },
+        {
+          "x": 820.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.359748,
+          "longitude": -0.059518
+        },
+        {
+          "latitude": 51.359715,
+          "longitude": -0.059069
+        },
+        {
+          "latitude": 51.359686,
+          "longitude": -0.058715
+        },
+        {
+          "latitude": 51.359649,
+          "longitude": -0.058292
+        },
+        {
+          "latitude": 51.359602,
+          "longitude": -0.05795
+        },
+        {
+          "latitude": 51.359563,
+          "longitude": -0.057729
+        },
+        {
+          "latitude": 51.359536,
+          "longitude": -0.057588
+        },
+        {
+          "latitude": 51.359499,
+          "longitude": -0.05741
+        },
+        {
+          "latitude": 51.359444,
+          "longitude": -0.057214
+        },
+        {
+          "latitude": 51.359373,
+          "longitude": -0.056963
+        },
+        {
+          "latitude": 51.359304,
+          "longitude": -0.056752
+        },
+        {
+          "latitude": 51.35924,
+          "longitude": -0.056582
+        },
+        {
+          "latitude": 51.359171,
+          "longitude": -0.056437
+        },
+        {
+          "latitude": 51.35909,
+          "longitude": -0.056293
+        },
+        {
+          "latitude": 51.359052,
+          "longitude": -0.056235
+        },
+        {
+          "latitude": 51.359018,
+          "longitude": -0.056191
+        },
+        {
+          "latitude": 51.358903,
+          "longitude": -0.056085
+        },
+        {
+          "latitude": 51.358825,
+          "longitude": -0.056042
+        },
+        {
+          "latitude": 51.358713,
+          "longitude": -0.056015
+        },
+        {
+          "latitude": 51.358596,
+          "longitude": -0.055985
+        },
+        {
+          "latitude": 51.358508,
+          "longitude": -0.055944
+        },
+        {
+          "latitude": 51.358417,
+          "longitude": -0.05587
+        },
+        {
+          "latitude": 51.358345,
+          "longitude": -0.055795
+        },
+        {
+          "latitude": 51.35828,
+          "longitude": -0.05569
+        },
+        {
+          "latitude": 51.358221,
+          "longitude": -0.055546
+        },
+        {
+          "latitude": 51.358145,
+          "longitude": -0.055323
+        },
+        {
+          "latitude": 51.358004,
+          "longitude": -0.054893
+        },
+        {
+          "latitude": 51.357805,
+          "longitude": -0.05435
+        },
+        {
+          "latitude": 51.357677,
+          "longitude": -0.054067
+        },
+        {
+          "latitude": 51.357549,
+          "longitude": -0.053805
+        },
+        {
+          "latitude": 51.357406,
+          "longitude": -0.053535
+        },
+        {
+          "latitude": 51.357222,
+          "longitude": -0.053201
+        },
+        {
+          "latitude": 51.356966,
+          "longitude": -0.052748
+        },
+        {
+          "latitude": 51.356668,
+          "longitude": -0.052206
+        },
+        {
+          "latitude": 51.356554,
+          "longitude": -0.051994
+        },
+        {
+          "latitude": 51.356378,
+          "longitude": -0.051663
+        },
+        {
+          "latitude": 51.3562,
+          "longitude": -0.051309
+        },
+        {
+          "latitude": 51.356046,
+          "longitude": -0.050973
+        },
+        {
+          "latitude": 51.355902,
+          "longitude": -0.050635
+        },
+        {
+          "latitude": 51.355747,
+          "longitude": -0.050255
+        },
+        {
+          "latitude": 51.355601,
+          "longitude": -0.04987
+        },
+        {
+          "latitude": 51.355477,
+          "longitude": -0.049523
+        },
+        {
+          "latitude": 51.355379,
+          "longitude": -0.049217
+        },
+        {
+          "latitude": 51.355271,
+          "longitude": -0.048871
+        },
+        {
+          "latitude": 51.355154,
+          "longitude": -0.048451
+        },
+        {
+          "latitude": 51.355051,
+          "longitude": -0.048058
+        },
+        {
+          "latitude": 51.354958,
+          "longitude": -0.047663
+        },
+        {
+          "latitude": 51.354865,
+          "longitude": -0.047235
+        },
+        {
+          "latitude": 51.354785,
+          "longitude": -0.046818
+        },
+        {
+          "latitude": 51.35472,
+          "longitude": -0.04643
+        },
+        {
+          "latitude": 51.354655,
+          "longitude": -0.046022
+        },
+        {
+          "latitude": 51.354604,
+          "longitude": -0.045599
+        },
+        {
+          "latitude": 51.354559,
+          "longitude": -0.045225
+        },
+        {
+          "latitude": 51.354529,
+          "longitude": -0.044904
+        },
+        {
+          "latitude": 51.354494,
+          "longitude": -0.044341
+        },
+        {
+          "latitude": 51.354484,
+          "longitude": -0.044017
+        },
+        {
+          "latitude": 51.354491,
+          "longitude": -0.043504
+        },
+        {
+          "latitude": 51.354508,
+          "longitude": -0.043182
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCOO:940GZZCRLOY",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRLOY",
+      "toStationID": "940GZZCRCOO",
+      "schematicPoints": [
+        {
+          "x": 715.0,
+          "y": 955.0
+        },
+        {
+          "x": 775.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.364166,
+          "longitude": -0.080696
+        },
+        {
+          "latitude": 51.364146,
+          "longitude": -0.080347
+        },
+        {
+          "latitude": 51.364145,
+          "longitude": -0.080335
+        },
+        {
+          "latitude": 51.364129,
+          "longitude": -0.080041
+        },
+        {
+          "latitude": 51.364115,
+          "longitude": -0.07954
+        },
+        {
+          "latitude": 51.36409,
+          "longitude": -0.07913
+        },
+        {
+          "latitude": 51.364059,
+          "longitude": -0.078715
+        },
+        {
+          "latitude": 51.364029,
+          "longitude": -0.078421
+        },
+        {
+          "latitude": 51.363977,
+          "longitude": -0.077979
+        },
+        {
+          "latitude": 51.36395,
+          "longitude": -0.077752
+        },
+        {
+          "latitude": 51.363883,
+          "longitude": -0.077196
+        },
+        {
+          "latitude": 51.363814,
+          "longitude": -0.076628
+        },
+        {
+          "latitude": 51.363751,
+          "longitude": -0.076161
+        },
+        {
+          "latitude": 51.363689,
+          "longitude": -0.075621
+        },
+        {
+          "latitude": 51.363617,
+          "longitude": -0.075069
+        },
+        {
+          "latitude": 51.363592,
+          "longitude": -0.07489
+        },
+        {
+          "latitude": 51.36353,
+          "longitude": -0.074553
+        },
+        {
+          "latitude": 51.363479,
+          "longitude": -0.074292
+        },
+        {
+          "latitude": 51.363377,
+          "longitude": -0.073793
+        },
+        {
+          "latitude": 51.36329,
+          "longitude": -0.073353
+        },
+        {
+          "latitude": 51.36324,
+          "longitude": -0.073013
+        },
+        {
+          "latitude": 51.363207,
+          "longitude": -0.072719
+        },
+        {
+          "latitude": 51.363181,
+          "longitude": -0.072377
+        },
+        {
+          "latitude": 51.363166,
+          "longitude": -0.071943
+        },
+        {
+          "latitude": 51.363173,
+          "longitude": -0.071416
+        },
+        {
+          "latitude": 51.363189,
+          "longitude": -0.07099
+        },
+        {
+          "latitude": 51.363195,
+          "longitude": -0.070681
+        },
+        {
+          "latitude": 51.363195,
+          "longitude": -0.07036
+        },
+        {
+          "latitude": 51.363186,
+          "longitude": -0.070133
+        },
+        {
+          "latitude": 51.363169,
+          "longitude": -0.069829
+        },
+        {
+          "latitude": 51.363145,
+          "longitude": -0.069525
+        },
+        {
+          "latitude": 51.363114,
+          "longitude": -0.069138
+        },
+        {
+          "latitude": 51.363069,
+          "longitude": -0.068664
+        },
+        {
+          "latitude": 51.363036,
+          "longitude": -0.068227
+        },
+        {
+          "latitude": 51.36299,
+          "longitude": -0.067712
+        },
+        {
+          "latitude": 51.362962,
+          "longitude": -0.067413
+        },
+        {
+          "latitude": 51.362922,
+          "longitude": -0.0671
+        },
+        {
+          "latitude": 51.362886,
+          "longitude": -0.066871
+        },
+        {
+          "latitude": 51.362863,
+          "longitude": -0.066739
+        },
+        {
+          "latitude": 51.362814,
+          "longitude": -0.066502
+        },
+        {
+          "latitude": 51.362756,
+          "longitude": -0.066291
+        },
+        {
+          "latitude": 51.362707,
+          "longitude": -0.066126
+        },
+        {
+          "latitude": 51.362641,
+          "longitude": -0.065932
+        },
+        {
+          "latitude": 51.362575,
+          "longitude": -0.065772
+        },
+        {
+          "latitude": 51.36247,
+          "longitude": -0.06554
+        },
+        {
+          "latitude": 51.362375,
+          "longitude": -0.065334
+        },
+        {
+          "latitude": 51.362308,
+          "longitude": -0.065222
+        },
+        {
+          "latitude": 51.36222,
+          "longitude": -0.065087
+        },
+        {
+          "latitude": 51.362118,
+          "longitude": -0.06493
+        },
+        {
+          "latitude": 51.361967,
+          "longitude": -0.064737
+        },
+        {
+          "latitude": 51.361878,
+          "longitude": -0.064639
+        },
+        {
+          "latitude": 51.361741,
+          "longitude": -0.064499
+        },
+        {
+          "latitude": 51.361576,
+          "longitude": -0.064339
+        },
+        {
+          "latitude": 51.361342,
+          "longitude": -0.064122
+        },
+        {
+          "latitude": 51.361132,
+          "longitude": -0.063925
+        },
+        {
+          "latitude": 51.361046,
+          "longitude": -0.063827
+        },
+        {
+          "latitude": 51.360954,
+          "longitude": -0.063717
+        },
+        {
+          "latitude": 51.360841,
+          "longitude": -0.063559
+        },
+        {
+          "latitude": 51.360724,
+          "longitude": -0.063369
+        },
+        {
+          "latitude": 51.360645,
+          "longitude": -0.063213
+        },
+        {
+          "latitude": 51.360547,
+          "longitude": -0.063022
+        },
+        {
+          "latitude": 51.360391,
+          "longitude": -0.062687
+        },
+        {
+          "latitude": 51.360223,
+          "longitude": -0.062318
+        },
+        {
+          "latitude": 51.360138,
+          "longitude": -0.062137
+        },
+        {
+          "latitude": 51.36008,
+          "longitude": -0.061989
+        },
+        {
+          "latitude": 51.360001,
+          "longitude": -0.061769
+        },
+        {
+          "latitude": 51.359956,
+          "longitude": -0.061624
+        },
+        {
+          "latitude": 51.359911,
+          "longitude": -0.061425
+        },
+        {
+          "latitude": 51.359885,
+          "longitude": -0.061292
+        },
+        {
+          "latitude": 51.359855,
+          "longitude": -0.061056
+        },
+        {
+          "latitude": 51.359829,
+          "longitude": -0.060785
+        },
+        {
+          "latitude": 51.359805,
+          "longitude": -0.06044
+        },
+        {
+          "latitude": 51.359783,
+          "longitude": -0.060087
+        },
+        {
+          "latitude": 51.359762,
+          "longitude": -0.059735
+        },
+        {
+          "latitude": 51.359748,
+          "longitude": -0.059518
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCTR:940GZZCRRVC",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRRVC",
+      "toStationID": "940GZZCRCTR",
+      "schematicPoints": [
+        {
+          "x": 640.0,
+          "y": 955.0
+        },
+        {
+          "x": 650.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375296,
+          "longitude": -0.106382
+        },
+        {
+          "latitude": 51.375282,
+          "longitude": -0.106363
+        },
+        {
+          "latitude": 51.375256,
+          "longitude": -0.106338
+        },
+        {
+          "latitude": 51.375222,
+          "longitude": -0.10632
+        },
+        {
+          "latitude": 51.375197,
+          "longitude": -0.106313
+        },
+        {
+          "latitude": 51.375033,
+          "longitude": -0.106281
+        },
+        {
+          "latitude": 51.374803,
+          "longitude": -0.106252
+        },
+        {
+          "latitude": 51.374648,
+          "longitude": -0.106228
+        },
+        {
+          "latitude": 51.374601,
+          "longitude": -0.106221
+        },
+        {
+          "latitude": 51.37459,
+          "longitude": -0.10622
+        },
+        {
+          "latitude": 51.374545,
+          "longitude": -0.106214
+        },
+        {
+          "latitude": 51.374463,
+          "longitude": -0.106197
+        },
+        {
+          "latitude": 51.374403,
+          "longitude": -0.10616
+        },
+        {
+          "latitude": 51.374345,
+          "longitude": -0.106108
+        },
+        {
+          "latitude": 51.374304,
+          "longitude": -0.106045
+        },
+        {
+          "latitude": 51.374264,
+          "longitude": -0.105959
+        },
+        {
+          "latitude": 51.374249,
+          "longitude": -0.105911
+        },
+        {
+          "latitude": 51.37424,
+          "longitude": -0.105853
+        },
+        {
+          "latitude": 51.374237,
+          "longitude": -0.105798
+        },
+        {
+          "latitude": 51.374239,
+          "longitude": -0.105724
+        },
+        {
+          "latitude": 51.374245,
+          "longitude": -0.105671
+        },
+        {
+          "latitude": 51.374254,
+          "longitude": -0.105629
+        },
+        {
+          "latitude": 51.374267,
+          "longitude": -0.105585
+        },
+        {
+          "latitude": 51.374287,
+          "longitude": -0.105538
+        },
+        {
+          "latitude": 51.374303,
+          "longitude": -0.1055
+        },
+        {
+          "latitude": 51.374341,
+          "longitude": -0.105437
+        },
+        {
+          "latitude": 51.374471,
+          "longitude": -0.105303
+        },
+        {
+          "latitude": 51.374732,
+          "longitude": -0.105087
+        },
+        {
+          "latitude": 51.374865,
+          "longitude": -0.104977
+        },
+        {
+          "latitude": 51.374898,
+          "longitude": -0.104941
+        },
+        {
+          "latitude": 51.375086,
+          "longitude": -0.104733
+        },
+        {
+          "latitude": 51.375174,
+          "longitude": -0.104627
+        },
+        {
+          "latitude": 51.375388,
+          "longitude": -0.104387
+        },
+        {
+          "latitude": 51.375593,
+          "longitude": -0.104146
+        },
+        {
+          "latitude": 51.375867,
+          "longitude": -0.103784
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRCTR:940GZZCRWCR",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRCTR",
+      "toStationID": "940GZZCRWCR",
+      "schematicPoints": [
+        {
+          "x": 650.0,
+          "y": 955.0
+        },
+        {
+          "x": 655.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375867,
+          "longitude": -0.103784
+        },
+        {
+          "latitude": 51.37606,
+          "longitude": -0.103471
+        },
+        {
+          "latitude": 51.376134,
+          "longitude": -0.103373
+        },
+        {
+          "latitude": 51.376169,
+          "longitude": -0.103339
+        },
+        {
+          "latitude": 51.376213,
+          "longitude": -0.103308
+        },
+        {
+          "latitude": 51.376339,
+          "longitude": -0.103255
+        },
+        {
+          "latitude": 51.376402,
+          "longitude": -0.103234
+        },
+        {
+          "latitude": 51.376637,
+          "longitude": -0.103166
+        },
+        {
+          "latitude": 51.376933,
+          "longitude": -0.103092
+        },
+        {
+          "latitude": 51.377189,
+          "longitude": -0.10303
+        },
+        {
+          "latitude": 51.377353,
+          "longitude": -0.102993
+        },
+        {
+          "latitude": 51.377418,
+          "longitude": -0.102975
+        },
+        {
+          "latitude": 51.377516,
+          "longitude": -0.102954
+        },
+        {
+          "latitude": 51.377542,
+          "longitude": -0.102945
+        },
+        {
+          "latitude": 51.377577,
+          "longitude": -0.102929
+        },
+        {
+          "latitude": 51.377599,
+          "longitude": -0.102915
+        },
+        {
+          "latitude": 51.377626,
+          "longitude": -0.10289
+        },
+        {
+          "latitude": 51.377789,
+          "longitude": -0.102698
+        },
+        {
+          "latitude": 51.37782,
+          "longitude": -0.102666
+        },
+        {
+          "latitude": 51.377842,
+          "longitude": -0.10265
+        },
+        {
+          "latitude": 51.377864,
+          "longitude": -0.102635
+        },
+        {
+          "latitude": 51.377937,
+          "longitude": -0.102597
+        },
+        {
+          "latitude": 51.377994,
+          "longitude": -0.102555
+        },
+        {
+          "latitude": 51.37804,
+          "longitude": -0.102513
+        },
+        {
+          "latitude": 51.378058,
+          "longitude": -0.102492
+        },
+        {
+          "latitude": 51.37809,
+          "longitude": -0.102438
+        },
+        {
+          "latitude": 51.378154,
+          "longitude": -0.102313
+        },
+        {
+          "latitude": 51.378227,
+          "longitude": -0.102164
+        },
+        {
+          "latitude": 51.378283,
+          "longitude": -0.102074
+        },
+        {
+          "latitude": 51.378352,
+          "longitude": -0.101995
+        },
+        {
+          "latitude": 51.378431,
+          "longitude": -0.10194
+        },
+        {
+          "latitude": 51.378619,
+          "longitude": -0.101831
+        },
+        {
+          "latitude": 51.378788,
+          "longitude": -0.101745
+        },
+        {
+          "latitude": 51.379049,
+          "longitude": -0.101625
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRDDR:940GZZCRMTP",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRMTP",
+      "toStationID": "940GZZCRDDR",
+      "schematicPoints": [
+        {
+          "x": 375.0,
+          "y": 890.0
+        },
+        {
+          "x": 365.0,
+          "y": 880.0
+        },
+        {
+          "x": 355.0,
+          "y": 880.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.413591,
+          "longitude": -0.201171
+        },
+        {
+          "latitude": 51.413918,
+          "longitude": -0.201493
+        },
+        {
+          "latitude": 51.4141,
+          "longitude": -0.201685
+        },
+        {
+          "latitude": 51.414423,
+          "longitude": -0.202042
+        },
+        {
+          "latitude": 51.41446,
+          "longitude": -0.202083
+        },
+        {
+          "latitude": 51.41462,
+          "longitude": -0.202275
+        },
+        {
+          "latitude": 51.414786,
+          "longitude": -0.202499
+        },
+        {
+          "latitude": 51.414935,
+          "longitude": -0.202709
+        },
+        {
+          "latitude": 51.415076,
+          "longitude": -0.20293
+        },
+        {
+          "latitude": 51.415258,
+          "longitude": -0.203237
+        },
+        {
+          "latitude": 51.415453,
+          "longitude": -0.2036
+        },
+        {
+          "latitude": 51.415599,
+          "longitude": -0.203893
+        },
+        {
+          "latitude": 51.415729,
+          "longitude": -0.204179
+        },
+        {
+          "latitude": 51.415876,
+          "longitude": -0.204522
+        },
+        {
+          "latitude": 51.41604,
+          "longitude": -0.204952
+        },
+        {
+          "latitude": 51.41623,
+          "longitude": -0.205504
+        },
+        {
+          "latitude": 51.416373,
+          "longitude": -0.205892
+        },
+        {
+          "latitude": 51.416462,
+          "longitude": -0.206112
+        },
+        {
+          "latitude": 51.416572,
+          "longitude": -0.206359
+        },
+        {
+          "latitude": 51.416675,
+          "longitude": -0.206573
+        },
+        {
+          "latitude": 51.416819,
+          "longitude": -0.206801
+        },
+        {
+          "latitude": 51.417009,
+          "longitude": -0.207074
+        },
+        {
+          "latitude": 51.417195,
+          "longitude": -0.207291
+        },
+        {
+          "latitude": 51.417317,
+          "longitude": -0.207413
+        },
+        {
+          "latitude": 51.41742,
+          "longitude": -0.207509
+        },
+        {
+          "latitude": 51.417455,
+          "longitude": -0.207536
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRDDR:940GZZCRWMB",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRDDR",
+      "toStationID": "940GZZCRWMB",
+      "schematicPoints": [
+        {
+          "x": 355.0,
+          "y": 880.0
+        },
+        {
+          "x": 360.0,
+          "y": 875.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.417729,
+          "longitude": -0.207797
+        },
+        {
+          "latitude": 51.417766,
+          "longitude": -0.207827
+        },
+        {
+          "latitude": 51.417895,
+          "longitude": -0.20791
+        },
+        {
+          "latitude": 51.418028,
+          "longitude": -0.207963
+        },
+        {
+          "latitude": 51.418163,
+          "longitude": -0.208
+        },
+        {
+          "latitude": 51.418367,
+          "longitude": -0.208038
+        },
+        {
+          "latitude": 51.418628,
+          "longitude": -0.208072
+        },
+        {
+          "latitude": 51.418845,
+          "longitude": -0.208075
+        },
+        {
+          "latitude": 51.419053,
+          "longitude": -0.20805
+        },
+        {
+          "latitude": 51.419228,
+          "longitude": -0.208004
+        },
+        {
+          "latitude": 51.419394,
+          "longitude": -0.207942
+        },
+        {
+          "latitude": 51.419554,
+          "longitude": -0.207857
+        },
+        {
+          "latitude": 51.419706,
+          "longitude": -0.207764
+        },
+        {
+          "latitude": 51.419918,
+          "longitude": -0.207563
+        },
+        {
+          "latitude": 51.420057,
+          "longitude": -0.207436
+        },
+        {
+          "latitude": 51.420115,
+          "longitude": -0.207364
+        },
+        {
+          "latitude": 51.420913,
+          "longitude": -0.20609
+        },
+        {
+          "latitude": 51.421038,
+          "longitude": -0.20589
+        },
+        {
+          "latitude": 51.421066,
+          "longitude": -0.205846
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRECR:940GZZCRLEB",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRLEB",
+      "toStationID": "940GZZCRECR",
+      "schematicPoints": [
+        {
+          "x": 700.0,
+          "y": 955.0
+        },
+        {
+          "x": 680.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375202,
+          "longitude": -0.085075
+        },
+        {
+          "latitude": 51.375205,
+          "longitude": -0.085556
+        },
+        {
+          "latitude": 51.375205,
+          "longitude": -0.085895
+        },
+        {
+          "latitude": 51.375196,
+          "longitude": -0.086119
+        },
+        {
+          "latitude": 51.37515,
+          "longitude": -0.086556
+        },
+        {
+          "latitude": 51.375081,
+          "longitude": -0.087324
+        },
+        {
+          "latitude": 51.375037,
+          "longitude": -0.087757
+        },
+        {
+          "latitude": 51.375017,
+          "longitude": -0.088057
+        },
+        {
+          "latitude": 51.375011,
+          "longitude": -0.08846
+        },
+        {
+          "latitude": 51.375021,
+          "longitude": -0.08868
+        },
+        {
+          "latitude": 51.375052,
+          "longitude": -0.088987
+        },
+        {
+          "latitude": 51.375135,
+          "longitude": -0.089671
+        },
+        {
+          "latitude": 51.375179,
+          "longitude": -0.090005
+        },
+        {
+          "latitude": 51.37523,
+          "longitude": -0.090382
+        },
+        {
+          "latitude": 51.375244,
+          "longitude": -0.090466
+        },
+        {
+          "latitude": 51.375259,
+          "longitude": -0.090583
+        },
+        {
+          "latitude": 51.375273,
+          "longitude": -0.090693
+        },
+        {
+          "latitude": 51.375284,
+          "longitude": -0.090793
+        },
+        {
+          "latitude": 51.375286,
+          "longitude": -0.090897
+        },
+        {
+          "latitude": 51.375279,
+          "longitude": -0.091024
+        },
+        {
+          "latitude": 51.37525,
+          "longitude": -0.091177
+        },
+        {
+          "latitude": 51.375204,
+          "longitude": -0.091324
+        },
+        {
+          "latitude": 51.375097,
+          "longitude": -0.091688
+        },
+        {
+          "latitude": 51.375075,
+          "longitude": -0.091761
+        },
+        {
+          "latitude": 51.375057,
+          "longitude": -0.091821
+        },
+        {
+          "latitude": 51.37499,
+          "longitude": -0.092009
+        },
+        {
+          "latitude": 51.374942,
+          "longitude": -0.092132
+        },
+        {
+          "latitude": 51.374919,
+          "longitude": -0.0922
+        },
+        {
+          "latitude": 51.374897,
+          "longitude": -0.09228
+        },
+        {
+          "latitude": 51.374879,
+          "longitude": -0.092367
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRECR:940GZZCRWEL",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWEL",
+      "toStationID": "940GZZCRECR",
+      "schematicPoints": [
+        {
+          "x": 665.0,
+          "y": 955.0
+        },
+        {
+          "x": 680.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375284,
+          "longitude": -0.097361
+        },
+        {
+          "latitude": 51.375118,
+          "longitude": -0.097236
+        },
+        {
+          "latitude": 51.374604,
+          "longitude": -0.096882
+        },
+        {
+          "latitude": 51.374405,
+          "longitude": -0.096743
+        },
+        {
+          "latitude": 51.374378,
+          "longitude": -0.096718
+        },
+        {
+          "latitude": 51.374356,
+          "longitude": -0.09669
+        },
+        {
+          "latitude": 51.374337,
+          "longitude": -0.096661
+        },
+        {
+          "latitude": 51.37432,
+          "longitude": -0.096628
+        },
+        {
+          "latitude": 51.374306,
+          "longitude": -0.096591
+        },
+        {
+          "latitude": 51.374293,
+          "longitude": -0.096549
+        },
+        {
+          "latitude": 51.374284,
+          "longitude": -0.096499
+        },
+        {
+          "latitude": 51.374279,
+          "longitude": -0.096451
+        },
+        {
+          "latitude": 51.374278,
+          "longitude": -0.096398
+        },
+        {
+          "latitude": 51.374284,
+          "longitude": -0.096307
+        },
+        {
+          "latitude": 51.374291,
+          "longitude": -0.096226
+        },
+        {
+          "latitude": 51.374352,
+          "longitude": -0.09567
+        },
+        {
+          "latitude": 51.374387,
+          "longitude": -0.095382
+        },
+        {
+          "latitude": 51.374429,
+          "longitude": -0.095091
+        },
+        {
+          "latitude": 51.374451,
+          "longitude": -0.094952
+        },
+        {
+          "latitude": 51.374614,
+          "longitude": -0.093999
+        },
+        {
+          "latitude": 51.374644,
+          "longitude": -0.093844
+        },
+        {
+          "latitude": 51.374735,
+          "longitude": -0.093405
+        },
+        {
+          "latitude": 51.374805,
+          "longitude": -0.09318
+        },
+        {
+          "latitude": 51.374823,
+          "longitude": -0.093107
+        },
+        {
+          "latitude": 51.374851,
+          "longitude": -0.092977
+        },
+        {
+          "latitude": 51.374917,
+          "longitude": -0.092649
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRFLD:940GZZCRKGH",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRFLD",
+      "toStationID": "940GZZCRKGH",
+      "schematicPoints": [
+        {
+          "x": 875.0,
+          "y": 955.0
+        },
+        {
+          "x": 885.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.351171,
+          "longitude": -0.024279
+        },
+        {
+          "latitude": 51.350969,
+          "longitude": -0.02417
+        },
+        {
+          "latitude": 51.350734,
+          "longitude": -0.024036
+        },
+        {
+          "latitude": 51.350608,
+          "longitude": -0.023963
+        },
+        {
+          "latitude": 51.350399,
+          "longitude": -0.023824
+        },
+        {
+          "latitude": 51.350156,
+          "longitude": -0.023653
+        },
+        {
+          "latitude": 51.350032,
+          "longitude": -0.023577
+        },
+        {
+          "latitude": 51.349919,
+          "longitude": -0.0235
+        },
+        {
+          "latitude": 51.349668,
+          "longitude": -0.023357
+        },
+        {
+          "latitude": 51.349318,
+          "longitude": -0.023152
+        },
+        {
+          "latitude": 51.34856,
+          "longitude": -0.022726
+        },
+        {
+          "latitude": 51.3482,
+          "longitude": -0.022526
+        },
+        {
+          "latitude": 51.347726,
+          "longitude": -0.02226
+        },
+        {
+          "latitude": 51.347324,
+          "longitude": -0.022017
+        },
+        {
+          "latitude": 51.347104,
+          "longitude": -0.021885
+        },
+        {
+          "latitude": 51.346998,
+          "longitude": -0.021813
+        },
+        {
+          "latitude": 51.346943,
+          "longitude": -0.021775
+        },
+        {
+          "latitude": 51.346839,
+          "longitude": -0.021701
+        },
+        {
+          "latitude": 51.346743,
+          "longitude": -0.021624
+        },
+        {
+          "latitude": 51.346628,
+          "longitude": -0.021522
+        },
+        {
+          "latitude": 51.346517,
+          "longitude": -0.021414
+        },
+        {
+          "latitude": 51.346381,
+          "longitude": -0.02127
+        },
+        {
+          "latitude": 51.34626,
+          "longitude": -0.02113
+        },
+        {
+          "latitude": 51.346147,
+          "longitude": -0.020992
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRKGH:940GZZCRNWA",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRKGH",
+      "toStationID": "940GZZCRNWA",
+      "schematicPoints": [
+        {
+          "x": 885.0,
+          "y": 955.0
+        },
+        {
+          "x": 895.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.346147,
+          "longitude": -0.020992
+        },
+        {
+          "latitude": 51.345997,
+          "longitude": -0.020807
+        },
+        {
+          "latitude": 51.34592,
+          "longitude": -0.020718
+        },
+        {
+          "latitude": 51.345841,
+          "longitude": -0.020628
+        },
+        {
+          "latitude": 51.34576,
+          "longitude": -0.02055
+        },
+        {
+          "latitude": 51.345673,
+          "longitude": -0.020476
+        },
+        {
+          "latitude": 51.345636,
+          "longitude": -0.020446
+        },
+        {
+          "latitude": 51.345376,
+          "longitude": -0.020232
+        },
+        {
+          "latitude": 51.345209,
+          "longitude": -0.020082
+        },
+        {
+          "latitude": 51.345072,
+          "longitude": -0.019959
+        },
+        {
+          "latitude": 51.344722,
+          "longitude": -0.019648
+        },
+        {
+          "latitude": 51.344517,
+          "longitude": -0.019457
+        },
+        {
+          "latitude": 51.344325,
+          "longitude": -0.019275
+        },
+        {
+          "latitude": 51.344244,
+          "longitude": -0.019203
+        },
+        {
+          "latitude": 51.344168,
+          "longitude": -0.019148
+        },
+        {
+          "latitude": 51.344093,
+          "longitude": -0.019105
+        },
+        {
+          "latitude": 51.343999,
+          "longitude": -0.019059
+        },
+        {
+          "latitude": 51.34388,
+          "longitude": -0.018996
+        },
+        {
+          "latitude": 51.343773,
+          "longitude": -0.018917
+        },
+        {
+          "latitude": 51.343669,
+          "longitude": -0.018837
+        },
+        {
+          "latitude": 51.343558,
+          "longitude": -0.01874
+        },
+        {
+          "latitude": 51.343482,
+          "longitude": -0.018665
+        },
+        {
+          "latitude": 51.343354,
+          "longitude": -0.018526
+        },
+        {
+          "latitude": 51.343257,
+          "longitude": -0.018403
+        },
+        {
+          "latitude": 51.343143,
+          "longitude": -0.018255
+        },
+        {
+          "latitude": 51.343074,
+          "longitude": -0.018165
+        },
+        {
+          "latitude": 51.34299,
+          "longitude": -0.018052
+        },
+        {
+          "latitude": 51.342914,
+          "longitude": -0.017943
+        },
+        {
+          "latitude": 51.342755,
+          "longitude": -0.017699
+        },
+        {
+          "latitude": 51.342626,
+          "longitude": -0.017506
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRLEB:940GZZCRSAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRSAN",
+      "toStationID": "940GZZCRLEB",
+      "schematicPoints": [
+        {
+          "x": 720.0,
+          "y": 955.0
+        },
+        {
+          "x": 700.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375027,
+          "longitude": -0.078092
+        },
+        {
+          "latitude": 51.375051,
+          "longitude": -0.078221
+        },
+        {
+          "latitude": 51.375073,
+          "longitude": -0.078409
+        },
+        {
+          "latitude": 51.375078,
+          "longitude": -0.078583
+        },
+        {
+          "latitude": 51.375076,
+          "longitude": -0.079169
+        },
+        {
+          "latitude": 51.375085,
+          "longitude": -0.080027
+        },
+        {
+          "latitude": 51.375086,
+          "longitude": -0.08011
+        },
+        {
+          "latitude": 51.375097,
+          "longitude": -0.080773
+        },
+        {
+          "latitude": 51.375099,
+          "longitude": -0.080887
+        },
+        {
+          "latitude": 51.375105,
+          "longitude": -0.080987
+        },
+        {
+          "latitude": 51.375115,
+          "longitude": -0.081622
+        },
+        {
+          "latitude": 51.375116,
+          "longitude": -0.0817
+        },
+        {
+          "latitude": 51.375117,
+          "longitude": -0.081999
+        },
+        {
+          "latitude": 51.375111,
+          "longitude": -0.0823
+        },
+        {
+          "latitude": 51.375107,
+          "longitude": -0.082355
+        },
+        {
+          "latitude": 51.375057,
+          "longitude": -0.08306
+        },
+        {
+          "latitude": 51.37506,
+          "longitude": -0.083258
+        },
+        {
+          "latitude": 51.375061,
+          "longitude": -0.083283
+        },
+        {
+          "latitude": 51.375075,
+          "longitude": -0.083509
+        },
+        {
+          "latitude": 51.375131,
+          "longitude": -0.084042
+        },
+        {
+          "latitude": 51.375141,
+          "longitude": -0.08413
+        },
+        {
+          "latitude": 51.375186,
+          "longitude": -0.084519
+        },
+        {
+          "latitude": 51.375225,
+          "longitude": -0.084926
+        },
+        {
+          "latitude": 51.375233,
+          "longitude": -0.085017
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRLOY:940GZZCRSAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRSAN",
+      "toStationID": "940GZZCRLOY",
+      "schematicPoints": [
+        {
+          "x": 720.0,
+          "y": 955.0
+        },
+        {
+          "x": 715.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.375027,
+          "longitude": -0.078092
+        },
+        {
+          "latitude": 51.374965,
+          "longitude": -0.077747
+        },
+        {
+          "latitude": 51.374906,
+          "longitude": -0.077418
+        },
+        {
+          "latitude": 51.374881,
+          "longitude": -0.07726
+        },
+        {
+          "latitude": 51.374832,
+          "longitude": -0.077048
+        },
+        {
+          "latitude": 51.374766,
+          "longitude": -0.076806
+        },
+        {
+          "latitude": 51.374681,
+          "longitude": -0.076547
+        },
+        {
+          "latitude": 51.374548,
+          "longitude": -0.076152
+        },
+        {
+          "latitude": 51.374419,
+          "longitude": -0.075787
+        },
+        {
+          "latitude": 51.374346,
+          "longitude": -0.07558
+        },
+        {
+          "latitude": 51.374294,
+          "longitude": -0.075479
+        },
+        {
+          "latitude": 51.374249,
+          "longitude": -0.075426
+        },
+        {
+          "latitude": 51.374169,
+          "longitude": -0.075393
+        },
+        {
+          "latitude": 51.374106,
+          "longitude": -0.07539
+        },
+        {
+          "latitude": 51.374043,
+          "longitude": -0.075401
+        },
+        {
+          "latitude": 51.373943,
+          "longitude": -0.075452
+        },
+        {
+          "latitude": 51.373182,
+          "longitude": -0.076159
+        },
+        {
+          "latitude": 51.371298,
+          "longitude": -0.077859
+        },
+        {
+          "latitude": 51.371229,
+          "longitude": -0.077916
+        },
+        {
+          "latitude": 51.370548,
+          "longitude": -0.078565
+        },
+        {
+          "latitude": 51.370509,
+          "longitude": -0.078603
+        },
+        {
+          "latitude": 51.369209,
+          "longitude": -0.079806
+        },
+        {
+          "latitude": 51.368945,
+          "longitude": -0.080047
+        },
+        {
+          "latitude": 51.368326,
+          "longitude": -0.080596
+        },
+        {
+          "latitude": 51.36756,
+          "longitude": -0.0813
+        },
+        {
+          "latitude": 51.366954,
+          "longitude": -0.081843
+        },
+        {
+          "latitude": 51.366008,
+          "longitude": -0.082664
+        },
+        {
+          "latitude": 51.365952,
+          "longitude": -0.082713
+        },
+        {
+          "latitude": 51.365908,
+          "longitude": -0.082752
+        },
+        {
+          "latitude": 51.365722,
+          "longitude": -0.082905
+        },
+        {
+          "latitude": 51.365678,
+          "longitude": -0.082939
+        },
+        {
+          "latitude": 51.365365,
+          "longitude": -0.08318
+        },
+        {
+          "latitude": 51.365098,
+          "longitude": -0.083377
+        },
+        {
+          "latitude": 51.36494,
+          "longitude": -0.083498
+        },
+        {
+          "latitude": 51.364859,
+          "longitude": -0.08353
+        },
+        {
+          "latitude": 51.364783,
+          "longitude": -0.083537
+        },
+        {
+          "latitude": 51.364702,
+          "longitude": -0.08351
+        },
+        {
+          "latitude": 51.364648,
+          "longitude": -0.083464
+        },
+        {
+          "latitude": 51.3646,
+          "longitude": -0.083399
+        },
+        {
+          "latitude": 51.36455,
+          "longitude": -0.083302
+        },
+        {
+          "latitude": 51.364525,
+          "longitude": -0.083215
+        },
+        {
+          "latitude": 51.364501,
+          "longitude": -0.083115
+        },
+        {
+          "latitude": 51.364476,
+          "longitude": -0.082947
+        },
+        {
+          "latitude": 51.364451,
+          "longitude": -0.082741
+        },
+        {
+          "latitude": 51.364415,
+          "longitude": -0.082442
+        },
+        {
+          "latitude": 51.36436,
+          "longitude": -0.082059
+        },
+        {
+          "latitude": 51.364292,
+          "longitude": -0.081488
+        },
+        {
+          "latitude": 51.364244,
+          "longitude": -0.081034
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRMCH:940GZZCRMJT",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRMJT",
+      "toStationID": "940GZZCRMCH",
+      "schematicPoints": [
+        {
+          "x": 495.0,
+          "y": 930.0
+        },
+        {
+          "x": 485.0,
+          "y": 920.0
+        },
+        {
+          "x": 460.0,
+          "y": 920.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.392916,
+          "longitude": -0.158321
+        },
+        {
+          "latitude": 51.392952,
+          "longitude": -0.158389
+        },
+        {
+          "latitude": 51.393013,
+          "longitude": -0.158529
+        },
+        {
+          "latitude": 51.393196,
+          "longitude": -0.159103
+        },
+        {
+          "latitude": 51.393431,
+          "longitude": -0.159858
+        },
+        {
+          "latitude": 51.393478,
+          "longitude": -0.160088
+        },
+        {
+          "latitude": 51.393506,
+          "longitude": -0.160251
+        },
+        {
+          "latitude": 51.393559,
+          "longitude": -0.160491
+        },
+        {
+          "latitude": 51.39362,
+          "longitude": -0.160734
+        },
+        {
+          "latitude": 51.393696,
+          "longitude": -0.161027
+        },
+        {
+          "latitude": 51.393787,
+          "longitude": -0.16134
+        },
+        {
+          "latitude": 51.393895,
+          "longitude": -0.161662
+        },
+        {
+          "latitude": 51.394004,
+          "longitude": -0.161947
+        },
+        {
+          "latitude": 51.394121,
+          "longitude": -0.162252
+        },
+        {
+          "latitude": 51.394244,
+          "longitude": -0.162553
+        },
+        {
+          "latitude": 51.39436,
+          "longitude": -0.162814
+        },
+        {
+          "latitude": 51.394487,
+          "longitude": -0.163077
+        },
+        {
+          "latitude": 51.394763,
+          "longitude": -0.163598
+        },
+        {
+          "latitude": 51.395265,
+          "longitude": -0.164401
+        },
+        {
+          "latitude": 51.39556,
+          "longitude": -0.164867
+        },
+        {
+          "latitude": 51.395789,
+          "longitude": -0.165219
+        },
+        {
+          "latitude": 51.395925,
+          "longitude": -0.165437
+        },
+        {
+          "latitude": 51.396109,
+          "longitude": -0.165759
+        },
+        {
+          "latitude": 51.396313,
+          "longitude": -0.166133
+        },
+        {
+          "latitude": 51.396431,
+          "longitude": -0.166378
+        },
+        {
+          "latitude": 51.396576,
+          "longitude": -0.166723
+        },
+        {
+          "latitude": 51.396709,
+          "longitude": -0.16705
+        },
+        {
+          "latitude": 51.396878,
+          "longitude": -0.167519
+        },
+        {
+          "latitude": 51.396986,
+          "longitude": -0.167863
+        },
+        {
+          "latitude": 51.397082,
+          "longitude": -0.168214
+        },
+        {
+          "latitude": 51.397158,
+          "longitude": -0.168498
+        },
+        {
+          "latitude": 51.39723,
+          "longitude": -0.168837
+        },
+        {
+          "latitude": 51.397284,
+          "longitude": -0.169139
+        },
+        {
+          "latitude": 51.397341,
+          "longitude": -0.169494
+        },
+        {
+          "latitude": 51.397358,
+          "longitude": -0.169674
+        },
+        {
+          "latitude": 51.397476,
+          "longitude": -0.170725
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRMDN:940GZZCRMTP",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRMDN",
+      "toStationID": "940GZZCRMTP",
+      "schematicPoints": [
+        {
+          "x": 395.0,
+          "y": 895.0
+        },
+        {
+          "x": 390.0,
+          "y": 890.0
+        },
+        {
+          "x": 375.0,
+          "y": 890.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.408773,
+          "longitude": -0.192674
+        },
+        {
+          "latitude": 51.409824,
+          "longitude": -0.194842
+        },
+        {
+          "latitude": 51.410257,
+          "longitude": -0.195712
+        },
+        {
+          "latitude": 51.410493,
+          "longitude": -0.196201
+        },
+        {
+          "latitude": 51.410748,
+          "longitude": -0.196724
+        },
+        {
+          "latitude": 51.411472,
+          "longitude": -0.198198
+        },
+        {
+          "latitude": 51.411671,
+          "longitude": -0.198598
+        },
+        {
+          "latitude": 51.411853,
+          "longitude": -0.198937
+        },
+        {
+          "latitude": 51.412035,
+          "longitude": -0.199247
+        },
+        {
+          "latitude": 51.412223,
+          "longitude": -0.199545
+        },
+        {
+          "latitude": 51.412441,
+          "longitude": -0.199865
+        },
+        {
+          "latitude": 51.412593,
+          "longitude": -0.200078
+        },
+        {
+          "latitude": 51.412853,
+          "longitude": -0.20042
+        },
+        {
+          "latitude": 51.413188,
+          "longitude": -0.200784
+        },
+        {
+          "latitude": 51.413554,
+          "longitude": -0.201135
+        },
+        {
+          "latitude": 51.413574,
+          "longitude": -0.201154
+        },
+        {
+          "latitude": 51.413591,
+          "longitude": -0.201171
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRMDN:940GZZCRPHI",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRPHI",
+      "toStationID": "940GZZCRMDN",
+      "schematicPoints": [
+        {
+          "x": 425.0,
+          "y": 910.0
+        },
+        {
+          "x": 410.0,
+          "y": 895.0
+        },
+        {
+          "x": 395.0,
+          "y": 895.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.403351,
+          "longitude": -0.182114
+        },
+        {
+          "latitude": 51.403573,
+          "longitude": -0.182476
+        },
+        {
+          "latitude": 51.404142,
+          "longitude": -0.183436
+        },
+        {
+          "latitude": 51.404567,
+          "longitude": -0.184196
+        },
+        {
+          "latitude": 51.404941,
+          "longitude": -0.18488
+        },
+        {
+          "latitude": 51.405332,
+          "longitude": -0.185637
+        },
+        {
+          "latitude": 51.405706,
+          "longitude": -0.186403
+        },
+        {
+          "latitude": 51.40578,
+          "longitude": -0.186555
+        },
+        {
+          "latitude": 51.405896,
+          "longitude": -0.186798
+        },
+        {
+          "latitude": 51.405957,
+          "longitude": -0.186921
+        },
+        {
+          "latitude": 51.406291,
+          "longitude": -0.187609
+        },
+        {
+          "latitude": 51.406593,
+          "longitude": -0.188238
+        },
+        {
+          "latitude": 51.407329,
+          "longitude": -0.189701
+        },
+        {
+          "latitude": 51.407659,
+          "longitude": -0.19039
+        },
+        {
+          "latitude": 51.408204,
+          "longitude": -0.191501
+        },
+        {
+          "latitude": 51.408758,
+          "longitude": -0.192644
+        },
+        {
+          "latitude": 51.408773,
+          "longitude": -0.192674
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRRVC:940GZZCRWAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWAN",
+      "toStationID": "940GZZCRRVC",
+      "schematicPoints": [
+        {
+          "x": 620.0,
+          "y": 955.0
+        },
+        {
+          "x": 640.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.373426,
+          "longitude": -0.113311
+        },
+        {
+          "latitude": 51.373336,
+          "longitude": -0.113064
+        },
+        {
+          "latitude": 51.373284,
+          "longitude": -0.112904
+        },
+        {
+          "latitude": 51.373252,
+          "longitude": -0.112751
+        },
+        {
+          "latitude": 51.373225,
+          "longitude": -0.112552
+        },
+        {
+          "latitude": 51.373213,
+          "longitude": -0.112287
+        },
+        {
+          "latitude": 51.373195,
+          "longitude": -0.111925
+        },
+        {
+          "latitude": 51.373191,
+          "longitude": -0.11166
+        },
+        {
+          "latitude": 51.373199,
+          "longitude": -0.111394
+        },
+        {
+          "latitude": 51.373211,
+          "longitude": -0.111208
+        },
+        {
+          "latitude": 51.373233,
+          "longitude": -0.111023
+        },
+        {
+          "latitude": 51.373285,
+          "longitude": -0.110718
+        },
+        {
+          "latitude": 51.37335,
+          "longitude": -0.110354
+        },
+        {
+          "latitude": 51.373427,
+          "longitude": -0.109931
+        },
+        {
+          "latitude": 51.373512,
+          "longitude": -0.109485
+        },
+        {
+          "latitude": 51.373542,
+          "longitude": -0.109353
+        },
+        {
+          "latitude": 51.373578,
+          "longitude": -0.109226
+        },
+        {
+          "latitude": 51.373622,
+          "longitude": -0.109134
+        },
+        {
+          "latitude": 51.373673,
+          "longitude": -0.109054
+        },
+        {
+          "latitude": 51.373861,
+          "longitude": -0.108832
+        },
+        {
+          "latitude": 51.374081,
+          "longitude": -0.108581
+        },
+        {
+          "latitude": 51.374611,
+          "longitude": -0.107953
+        },
+        {
+          "latitude": 51.374683,
+          "longitude": -0.107863
+        },
+        {
+          "latitude": 51.374782,
+          "longitude": -0.107739
+        },
+        {
+          "latitude": 51.374822,
+          "longitude": -0.107688
+        },
+        {
+          "latitude": 51.375035,
+          "longitude": -0.107437
+        },
+        {
+          "latitude": 51.3751,
+          "longitude": -0.107344
+        },
+        {
+          "latitude": 51.37517,
+          "longitude": -0.107242
+        },
+        {
+          "latitude": 51.375242,
+          "longitude": -0.107121
+        },
+        {
+          "latitude": 51.375275,
+          "longitude": -0.107069
+        },
+        {
+          "latitude": 51.375329,
+          "longitude": -0.106986
+        },
+        {
+          "latitude": 51.375366,
+          "longitude": -0.106911
+        },
+        {
+          "latitude": 51.375383,
+          "longitude": -0.106864
+        },
+        {
+          "latitude": 51.375393,
+          "longitude": -0.106823
+        },
+        {
+          "latitude": 51.3754,
+          "longitude": -0.106773
+        },
+        {
+          "latitude": 51.375402,
+          "longitude": -0.106718
+        },
+        {
+          "latitude": 51.375399,
+          "longitude": -0.106655
+        },
+        {
+          "latitude": 51.375392,
+          "longitude": -0.106603
+        },
+        {
+          "latitude": 51.375385,
+          "longitude": -0.106565
+        },
+        {
+          "latitude": 51.375375,
+          "longitude": -0.10653
+        },
+        {
+          "latitude": 51.375367,
+          "longitude": -0.106504
+        },
+        {
+          "latitude": 51.375347,
+          "longitude": -0.106462
+        },
+        {
+          "latitude": 51.37532,
+          "longitude": -0.106418
+        },
+        {
+          "latitude": 51.375296,
+          "longitude": -0.106382
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRWAD:940GZZCRWAN",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWAN",
+      "toStationID": "940GZZCRWAD",
+      "schematicPoints": [
+        {
+          "x": 620.0,
+          "y": 955.0
+        },
+        {
+          "x": 610.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.373426,
+          "longitude": -0.113311
+        },
+        {
+          "latitude": 51.373469,
+          "longitude": -0.113415
+        },
+        {
+          "latitude": 51.373605,
+          "longitude": -0.113748
+        },
+        {
+          "latitude": 51.373702,
+          "longitude": -0.113964
+        },
+        {
+          "latitude": 51.373765,
+          "longitude": -0.114084
+        },
+        {
+          "latitude": 51.373867,
+          "longitude": -0.114244
+        },
+        {
+          "latitude": 51.373991,
+          "longitude": -0.114412
+        },
+        {
+          "latitude": 51.374115,
+          "longitude": -0.114572
+        },
+        {
+          "latitude": 51.374234,
+          "longitude": -0.114703
+        },
+        {
+          "latitude": 51.374413,
+          "longitude": -0.114902
+        },
+        {
+          "latitude": 51.374723,
+          "longitude": -0.115236
+        },
+        {
+          "latitude": 51.375074,
+          "longitude": -0.115621
+        },
+        {
+          "latitude": 51.375452,
+          "longitude": -0.116055
+        },
+        {
+          "latitude": 51.37583,
+          "longitude": -0.116498
+        },
+        {
+          "latitude": 51.376217,
+          "longitude": -0.116956
+        },
+        {
+          "latitude": 51.376624,
+          "longitude": -0.117444
+        },
+        {
+          "latitude": 51.376783,
+          "longitude": -0.117632
+        },
+        {
+          "latitude": 51.377004,
+          "longitude": -0.117897
+        }
+      ]
+    },
+    {
+      "id": "tram:940GZZCRWCR:940GZZCRWEL",
+      "lineID": "tram",
+      "fromStationID": "940GZZCRWCR",
+      "toStationID": "940GZZCRWEL",
+      "schematicPoints": [
+        {
+          "x": 655.0,
+          "y": 955.0
+        },
+        {
+          "x": 665.0,
+          "y": 955.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.379049,
+          "longitude": -0.101625
+        },
+        {
+          "latitude": 51.379179,
+          "longitude": -0.101568
+        },
+        {
+          "latitude": 51.379263,
+          "longitude": -0.10151
+        },
+        {
+          "latitude": 51.379327,
+          "longitude": -0.101435
+        },
+        {
+          "latitude": 51.379376,
+          "longitude": -0.10133
+        },
+        {
+          "latitude": 51.379443,
+          "longitude": -0.101117
+        },
+        {
+          "latitude": 51.37948,
+          "longitude": -0.100999
+        },
+        {
+          "latitude": 51.379531,
+          "longitude": -0.100802
+        },
+        {
+          "latitude": 51.37964,
+          "longitude": -0.100481
+        },
+        {
+          "latitude": 51.379663,
+          "longitude": -0.100393
+        },
+        {
+          "latitude": 51.37968,
+          "longitude": -0.100263
+        },
+        {
+          "latitude": 51.379677,
+          "longitude": -0.100176
+        },
+        {
+          "latitude": 51.37966,
+          "longitude": -0.10009
+        },
+        {
+          "latitude": 51.379639,
+          "longitude": -0.099982
+        },
+        {
+          "latitude": 51.379604,
+          "longitude": -0.099936
+        },
+        {
+          "latitude": 51.379574,
+          "longitude": -0.099906
+        },
+        {
+          "latitude": 51.379551,
+          "longitude": -0.09989
+        },
+        {
+          "latitude": 51.379527,
+          "longitude": -0.099878
+        },
+        {
+          "latitude": 51.379505,
+          "longitude": -0.099871
+        },
+        {
+          "latitude": 51.379483,
+          "longitude": -0.099867
+        },
+        {
+          "latitude": 51.379395,
+          "longitude": -0.099867
+        },
+        {
+          "latitude": 51.379137,
+          "longitude": -0.099869
+        },
+        {
+          "latitude": 51.379007,
+          "longitude": -0.099863
+        },
+        {
+          "latitude": 51.378943,
+          "longitude": -0.099857
+        },
+        {
+          "latitude": 51.378879,
+          "longitude": -0.099847
+        },
+        {
+          "latitude": 51.378812,
+          "longitude": -0.099834
+        },
+        {
+          "latitude": 51.378746,
+          "longitude": -0.099818
+        },
+        {
+          "latitude": 51.378654,
+          "longitude": -0.099793
+        },
+        {
+          "latitude": 51.378563,
+          "longitude": -0.099761
+        },
+        {
+          "latitude": 51.378441,
+          "longitude": -0.099716
+        },
+        {
+          "latitude": 51.378388,
+          "longitude": -0.099694
+        },
+        {
+          "latitude": 51.378299,
+          "longitude": -0.099652
+        },
+        {
+          "latitude": 51.378003,
+          "longitude": -0.099514
+        },
+        {
+          "latitude": 51.377735,
+          "longitude": -0.099333
+        },
+        {
+          "latitude": 51.377438,
+          "longitude": -0.099107
+        },
+        {
+          "latitude": 51.377112,
+          "longitude": -0.098879
+        },
+        {
+          "latitude": 51.376281,
+          "longitude": -0.098283
+        },
+        {
+          "latitude": 51.376156,
+          "longitude": -0.098194
+        },
+        {
+          "latitude": 51.376078,
+          "longitude": -0.098081
+        },
+        {
+          "latitude": 51.375968,
+          "longitude": -0.09792
+        },
+        {
+          "latitude": 51.375813,
+          "longitude": -0.097756
+        },
+        {
+          "latitude": 51.375624,
+          "longitude": -0.097617
+        },
+        {
+          "latitude": 51.375284,
+          "longitude": -0.097361
+        }
+      ]
+    },
+    {
       "id": "victoria:940GZZLUBLR:940GZZLUTMH",
       "lineID": "victoria",
       "fromStationID": "940GZZLUTMH",
@@ -82470,6 +88897,196 @@
           "910GHAYESAH",
           "910GHTRWAPT",
           "910GHTRWTM5"
+        ]
+      ]
+    },
+    {
+      "id": "tram",
+      "name": "Tram",
+      "segmentIDs": [
+        "tram:940GZZCRBEK:940GZZCRBRD",
+        "tram:940GZZCRAVE:940GZZCRBRD",
+        "tram:940GZZCRAVE:940GZZCRBIR",
+        "tram:940GZZCRBIR:940GZZCRHAR",
+        "tram:940GZZCRARA:940GZZCRHAR",
+        "tram:940GZZCRARA:940GZZCRWOD",
+        "tram:940GZZCRBLA:940GZZCRWOD",
+        "tram:940GZZCRADD:940GZZCRBLA",
+        "tram:940GZZCRADD:940GZZCRSAN",
+        "tram:940GZZCRLEB:940GZZCRSAN",
+        "tram:940GZZCRECR:940GZZCRLEB",
+        "tram:940GZZCRCEN:940GZZCRECR",
+        "tram:940GZZCRCEN:940GZZCRCHR",
+        "tram:940GZZCRCHR:940GZZCRWAN",
+        "tram:940GZZCRWAD:940GZZCRWAN",
+        "tram:940GZZCRAMP:940GZZCRWAD",
+        "tram:940GZZCRAMP:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRTPA",
+        "tram:940GZZCRBED:940GZZCRMJT",
+        "tram:940GZZCRMCH:940GZZCRMJT",
+        "tram:940GZZCRBGV:940GZZCRMCH",
+        "tram:940GZZCRBGV:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRPHI",
+        "tram:940GZZCRMDN:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRMTP",
+        "tram:940GZZCRDDR:940GZZCRWMB",
+        "tram:940GZZCRCHR:940GZZCRCTR",
+        "tram:940GZZCRCTR:940GZZCRWCR",
+        "tram:940GZZCRWCR:940GZZCRWEL",
+        "tram:940GZZCRECR:940GZZCRWEL",
+        "tram:940GZZCRLOY:940GZZCRSAN",
+        "tram:940GZZCRCOO:940GZZCRLOY",
+        "tram:940GZZCRCOO:940GZZCRGRA",
+        "tram:940GZZCRADV:940GZZCRGRA",
+        "tram:940GZZCRADV:940GZZCRFLD",
+        "tram:940GZZCRFLD:940GZZCRKGH",
+        "tram:940GZZCRKGH:940GZZCRNWA",
+        "tram:940GZZCRARA:940GZZCRELM",
+        "tram:940GZZCRRVC:940GZZCRWAN",
+        "tram:940GZZCRCTR:940GZZCRRVC"
+      ],
+      "routes": [
+        [
+          "940GZZCRBEK",
+          "940GZZCRBRD",
+          "940GZZCRAVE",
+          "940GZZCRBIR",
+          "940GZZCRHAR",
+          "940GZZCRARA",
+          "940GZZCRWOD",
+          "940GZZCRBLA",
+          "940GZZCRADD",
+          "940GZZCRSAN",
+          "940GZZCRLEB",
+          "940GZZCRECR",
+          "940GZZCRCEN",
+          "940GZZCRCHR",
+          "940GZZCRWAN",
+          "940GZZCRWAD",
+          "940GZZCRAMP",
+          "940GZZCRTPA",
+          "940GZZCRBED",
+          "940GZZCRMJT",
+          "940GZZCRMCH",
+          "940GZZCRBGV",
+          "940GZZCRPHI",
+          "940GZZCRMDN",
+          "940GZZCRMTP",
+          "940GZZCRDDR",
+          "940GZZCRWMB"
+        ],
+        [
+          "940GZZCRCHR",
+          "940GZZCRCTR",
+          "940GZZCRWCR",
+          "940GZZCRWEL",
+          "940GZZCRECR",
+          "940GZZCRLEB",
+          "940GZZCRSAN",
+          "940GZZCRLOY",
+          "940GZZCRCOO",
+          "940GZZCRGRA",
+          "940GZZCRADV",
+          "940GZZCRFLD",
+          "940GZZCRKGH",
+          "940GZZCRNWA"
+        ],
+        [
+          "940GZZCRELM",
+          "940GZZCRARA",
+          "940GZZCRWOD",
+          "940GZZCRBLA",
+          "940GZZCRADD",
+          "940GZZCRSAN",
+          "940GZZCRLEB",
+          "940GZZCRECR",
+          "940GZZCRCEN",
+          "940GZZCRCHR",
+          "940GZZCRWAN",
+          "940GZZCRWAD",
+          "940GZZCRAMP",
+          "940GZZCRTPA",
+          "940GZZCRBED",
+          "940GZZCRMJT",
+          "940GZZCRMCH",
+          "940GZZCRBGV",
+          "940GZZCRPHI",
+          "940GZZCRMDN",
+          "940GZZCRMTP",
+          "940GZZCRDDR",
+          "940GZZCRWMB"
+        ],
+        [
+          "940GZZCRNWA",
+          "940GZZCRKGH",
+          "940GZZCRFLD",
+          "940GZZCRADV",
+          "940GZZCRGRA",
+          "940GZZCRCOO",
+          "940GZZCRLOY",
+          "940GZZCRSAN",
+          "940GZZCRLEB",
+          "940GZZCRECR",
+          "940GZZCRCEN",
+          "940GZZCRCHR"
+        ],
+        [
+          "940GZZCRWMB",
+          "940GZZCRDDR",
+          "940GZZCRMTP",
+          "940GZZCRMDN",
+          "940GZZCRPHI",
+          "940GZZCRBGV",
+          "940GZZCRMCH",
+          "940GZZCRMJT",
+          "940GZZCRBED",
+          "940GZZCRTPA",
+          "940GZZCRAMP",
+          "940GZZCRWAD",
+          "940GZZCRWAN",
+          "940GZZCRRVC",
+          "940GZZCRCTR",
+          "940GZZCRWCR",
+          "940GZZCRWEL",
+          "940GZZCRECR",
+          "940GZZCRLEB",
+          "940GZZCRSAN",
+          "940GZZCRADD",
+          "940GZZCRBLA",
+          "940GZZCRWOD",
+          "940GZZCRARA",
+          "940GZZCRELM"
+        ],
+        [
+          "940GZZCRWMB",
+          "940GZZCRDDR",
+          "940GZZCRMTP",
+          "940GZZCRMDN",
+          "940GZZCRPHI",
+          "940GZZCRBGV",
+          "940GZZCRMCH",
+          "940GZZCRMJT",
+          "940GZZCRBED",
+          "940GZZCRTPA",
+          "940GZZCRAMP",
+          "940GZZCRWAD",
+          "940GZZCRWAN",
+          "940GZZCRRVC",
+          "940GZZCRCTR",
+          "940GZZCRWCR",
+          "940GZZCRWEL",
+          "940GZZCRECR",
+          "940GZZCRLEB",
+          "940GZZCRSAN",
+          "940GZZCRADD",
+          "940GZZCRBLA",
+          "940GZZCRWOD",
+          "940GZZCRARA",
+          "940GZZCRHAR",
+          "940GZZCRBIR",
+          "940GZZCRAVE",
+          "940GZZCRBRD",
+          "940GZZCRBEK"
         ]
       ]
     },

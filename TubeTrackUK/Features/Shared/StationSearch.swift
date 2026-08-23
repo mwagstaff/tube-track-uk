@@ -48,6 +48,32 @@ enum StationSearch {
         return Array(matches.prefix(limit))
     }
 
+    static func suggestions(
+        in graph: TubeGraph,
+        matching query: String,
+        selectedStationID: String? = nil,
+        limit: Int? = nil
+    ) -> [TubeStation] {
+        let ranked = suggestions(in: graph.stations, matching: query)
+        var orderedHubIDs: [String] = []
+        var representativeByHubID: [String: TubeStation] = [:]
+
+        for station in ranked {
+            let hubID = station.hubID ?? station.id
+            if representativeByHubID[hubID] == nil {
+                orderedHubIDs.append(hubID)
+                representativeByHubID[hubID] = station
+            }
+            if station.id == selectedStationID {
+                representativeByHubID[hubID] = station
+            }
+        }
+
+        let matches = orderedHubIDs.compactMap { representativeByHubID[$0] }
+        guard let limit else { return matches }
+        return Array(matches.prefix(limit))
+    }
+
     private static func normalized(_ value: String) -> String {
         value
             .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
@@ -61,14 +87,15 @@ struct StationSearchSheet: View {
     @State private var query = ""
     @State private var searchIsPresented = true
 
-    let stations: [TubeStation]
+    let graph: TubeGraph
     let selectedStationID: String?
     let onSelect: (TubeStation) -> Void
 
     private var suggestions: [TubeStation] {
         StationSearch.suggestions(
-            in: stations,
+            in: graph,
             matching: query,
+            selectedStationID: selectedStationID,
             limit: query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : 40
         )
     }
@@ -80,6 +107,7 @@ struct StationSearchSheet: View {
                     ContentUnavailableView.search(text: query)
                 } else {
                     List(suggestions) { station in
+                        let lineIDs = graph.lineIDs(at: station)
                         Button {
                             onSelect(station)
                             dismiss()
@@ -90,7 +118,7 @@ struct StationSearchSheet: View {
                                         .font(.body.weight(.semibold))
                                         .foregroundStyle(.primary)
 
-                                    StationLineLegend(lineIDs: station.lineIDs)
+                                    StationLineLegend(lineIDs: lineIDs)
                                 }
 
                                 Spacer(minLength: 8)
@@ -105,7 +133,7 @@ struct StationSearchSheet: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(station.name)
-                        .accessibilityValue(station.lineIDs.map(\.displayName).joined(separator: ", "))
+                        .accessibilityValue(lineIDs.map(\.displayName).joined(separator: ", "))
                         .accessibilityHint("Selects and focuses this station on the map")
                     }
                     .listStyle(.plain)

@@ -675,7 +675,7 @@ struct RealWorldRenderPath {
         case .piccadilly: 4
         case .victoria: 8
         case .waterlooCity: -4
-        case .central, .northern, .dlr, .elizabeth, .liberty, .lioness, .mildmay,
+        case .central, .northern, .dlr, .elizabeth, .tram, .liberty, .lioness, .mildmay,
              .suffragette, .weaver, .windrush: 0
         }
     }

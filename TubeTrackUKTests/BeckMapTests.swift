@@ -12,6 +12,10 @@ struct BeckMapTests {
             )
         }
         #expect(BeckMapPalette.dark.routeColor(for: .northern, muted: false) == .black)
+        #expect(
+            Color.tubeLine(.tram)
+                == Color(red: 105.0 / 255.0, green: 194.0 / 255.0, blue: 47.0 / 255.0)
+        )
     }
 
     @Test func darkPaletteAddsOnlyAFineNorthernLineCasing() {
@@ -78,6 +82,10 @@ struct BeckMapTests {
 
         #expect(styles.parallelRouteOuterStrokeWidth == 9)
         #expect(styles.parallelRouteInnerStrokeWidth == 3)
+        #expect(styles.parallelRouteOuterStrokeWidth(for: .dlr) == 9)
+        #expect(styles.parallelRouteInnerStrokeWidth(for: .elizabeth) == 3)
+        #expect(styles.parallelRouteOuterStrokeWidth(for: .tram) == 8.844)
+        #expect(styles.parallelRouteInnerStrokeWidth(for: .tram) == 2.768)
     }
 
     @Test func artworkPrimitivesUseStableTaggedJSON() throws {

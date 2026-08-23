@@ -13,7 +13,7 @@ struct StationDetailCard: View {
                     VStack(alignment: .leading, spacing: 3) {
                         Text(station.name)
                             .font(.headline)
-                        Text(station.interchange ? "Interchange station" : station.lineIDs.first?.modeName == "tube" ? "Underground station" : "Rail station")
+                        Text(stationKindDescription)
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -51,7 +51,11 @@ struct StationDetailCard: View {
 
                 Divider()
 
-                if let issue = appState.visibleDisruptions.first(where: { $0.affectedStationIDs.contains(station.id) }) {
+                if let issue = StationDisruptionLookup.firstMatching(
+                    station: station,
+                    graph: appState.graph,
+                    disruptions: appState.visibleDisruptions
+                ) {
                     Label(issue.title, systemImage: "exclamationmark.triangle.fill")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.red)
@@ -87,6 +91,16 @@ struct StationDetailCard: View {
         }
     }
 
+    private var stationKindDescription: String {
+        let lineIDs = appState.graph?.lineIDs(at: station) ?? station.lineIDs
+        if station.interchange || lineIDs.count > 1 { return "Interchange station" }
+        if lineIDs.contains(.tram), lineIDs.allSatisfy({ $0 == .tram }) {
+            return "Tram stop"
+        }
+        if lineIDs.allSatisfy(\.isUnderground) { return "Underground station" }
+        return "Rail station"
+    }
+
     private func arrivalRow(_ arrival: TfLArrivalPrediction) -> some View {
         HStack(spacing: 9) {
             if let line = TubeLineID(rawValue: arrival.lineId) {
@@ -111,6 +125,21 @@ struct StationDetailCard: View {
         guard let seconds else { return "—" }
         if seconds < 45 { return "Due" }
         return "\(max(1, seconds / 60)) min"
+    }
+}
+
+enum StationDisruptionLookup {
+    static func firstMatching(
+        station: TubeStation,
+        graph: TubeGraph?,
+        disruptions: [ResolvedDisruption]
+    ) -> ResolvedDisruption? {
+        let stationIDs = Set(
+            graph?.stations(inSamePlaceAs: station).map(\.id) ?? [station.id]
+        )
+        return disruptions.first {
+            !$0.affectedStationIDs.isDisjoint(with: stationIDs)
+        }
     }
 }
 
@@ -336,15 +365,17 @@ struct LineDetailCard: View {
                         .lineLimit(3)
                 }
 
-                Button {
-                    appState.setTrainFilter(lineID)
-                    appState.setLiveTrains(true)
-                } label: {
-                    Label("Show estimated live trains", systemImage: "tram.fill")
-                        .font(.caption.weight(.semibold))
-                        .frame(maxWidth: .infinity)
+                if lineID.supportsEstimatedTrains {
+                    Button {
+                        appState.setTrainFilter(lineID)
+                        appState.setLiveTrains(true)
+                    } label: {
+                        Label("Show estimated live trains", systemImage: "tram.fill")
+                            .font(.caption.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
-                .buttonStyle(.bordered)
             }
         }
     }

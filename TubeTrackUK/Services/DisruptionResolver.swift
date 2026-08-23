@@ -35,13 +35,29 @@ struct DisruptionResolver: Sendable {
         }
 
         let mentionedStations = stationsMentioned(in: reason, lineID: lineID)
-        if mentionedStations.count >= 2,
-           let path = repository.shortestSegmentPath(
-               from: mentionedStations[0].id,
-               to: mentionedStations[1].id,
-               on: lineID
-           ),
-           !path.isEmpty {
+        let inferredPath: [TubeSegment]? = if mentionedStations.count >= 2 {
+            if lineID == .tram {
+                repository.orderedSegmentPath(
+                    from: mentionedStations[0].id,
+                    to: mentionedStations[1].id,
+                    on: lineID
+                ) ?? repository.shortestSegmentPath(
+                    from: mentionedStations[0].id,
+                    to: mentionedStations[1].id,
+                    on: lineID
+                )
+            } else {
+                repository.shortestSegmentPath(
+                    from: mentionedStations[0].id,
+                    to: mentionedStations[1].id,
+                    on: lineID
+                )
+            }
+        } else {
+            nil
+        }
+
+        if let path = inferredPath, !path.isEmpty {
             var stationIDs = Set([mentionedStations[0].id, mentionedStations[1].id])
             path.forEach {
                 stationIDs.insert($0.fromStationID)
@@ -117,6 +133,7 @@ struct DisruptionResolver: Sendable {
     private func normalize(_ value: String) -> String {
         value.lowercased()
             .replacingOccurrences(of: " underground station", with: "")
+            .replacingOccurrences(of: " tram stop", with: "")
             .replacingOccurrences(of: "&", with: "and")
             .replacingOccurrences(of: ".", with: "")
     }

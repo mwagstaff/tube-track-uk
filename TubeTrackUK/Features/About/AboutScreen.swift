@@ -17,7 +17,7 @@ struct AboutScreen: View {
                             TubeTrackMark()
                             Text("Beautiful. Informative. Real-time.")
                                 .font(.headline)
-                            Text("A modern, independent live view of the London Underground.")
+                            Text("A modern, independent live view of London’s Tube, rail and tram network.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
@@ -47,7 +47,7 @@ struct AboutScreen: View {
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
                         Label("© OpenStreetMap contributors", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
                     }
-                    Text("The Real World view preserves Apple’s map attribution. Underground routes use an offline OSM railway graph so lines and train estimates follow the mapped track alignment instead of station-to-station chords.")
+                    Text("The Real World view preserves Apple’s map attribution. Rail and tram routes use an offline OSM railway graph so lines and supported train estimates follow mapped track alignments instead of station-to-station chords.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

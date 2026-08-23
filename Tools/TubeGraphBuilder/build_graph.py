@@ -37,6 +37,7 @@ LINE_IDS = (
     "waterloo-city",
     "dlr",
     "elizabeth",
+    "tram",
     "liberty",
     "lioness",
     "mildmay",
@@ -209,6 +210,7 @@ def clean_station_name(name: str) -> str:
     suffixes = (
         " Underground Station",
         " Rail Station",
+        " Tram Stop",
     )
     for suffix in suffixes:
         if name.endswith(suffix):
@@ -483,8 +485,9 @@ def main() -> int:
 
     for line_id in LINE_IDS:
         print(f"Fetching {line_id} topology...", file=sys.stderr)
+        direction = "all" if line_id == "tram" else "outbound"
         payload = fetch_json(
-            f"/Line/{urllib.parse.quote(line_id)}/Route/Sequence/outbound?serviceTypes=Regular"
+            f"/Line/{urllib.parse.quote(line_id)}/Route/Sequence/{direction}?serviceTypes=Regular"
         )
         line_payloads[line_id] = payload
 

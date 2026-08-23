@@ -67,6 +67,33 @@ struct TubeNetworkRepository: Sendable {
         return nil
     }
 
+    /// Resolves a section along TfL's ordered route variants. This matters for
+    /// one-way networks such as the central Croydon tram loop, where an
+    /// undirected shortest path can select the geographically shorter but
+    /// operationally impossible side of the loop.
+    func orderedSegmentPath(from startID: String, to endID: String, on lineID: TubeLineID) -> [TubeSegment]? {
+        guard startID != endID, let line = graph.line(lineID) else { return startID == endID ? [] : nil }
+
+        let candidates = line.routes.compactMap { route -> [TubeSegment]? in
+            guard let startIndex = route.firstIndex(of: startID),
+                  let endIndex = route.firstIndex(of: endID),
+                  startIndex < endIndex else {
+                return nil
+            }
+
+            let stationIDs = Array(route[startIndex ... endIndex])
+            let segments = zip(stationIDs, stationIDs.dropFirst()).compactMap {
+                segment(between: $0.0, and: $0.1, on: lineID)
+            }
+            return segments.count == stationIDs.count - 1 ? segments : nil
+        }
+
+        return candidates.min { left, right in
+            if left.count != right.count { return left.count < right.count }
+            return left.map(\.id).lexicographicallyPrecedes(right.map(\.id))
+        }
+    }
+
     func segment(between firstID: String, and secondID: String, on lineID: TubeLineID) -> TubeSegment? {
         segmentsByConnection[
             SegmentConnection(
@@ -109,6 +136,7 @@ struct TubeNetworkRepository: Sendable {
     private func normalize(_ value: String) -> String {
         value.lowercased()
             .replacingOccurrences(of: " underground station", with: "")
+            .replacingOccurrences(of: " tram stop", with: "")
             .replacingOccurrences(of: "&", with: "and")
             .replacingOccurrences(of: ".", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)

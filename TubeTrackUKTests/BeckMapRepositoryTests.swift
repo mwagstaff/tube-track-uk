@@ -284,6 +284,156 @@ struct BeckMapRepositoryTests {
         }
     }
 
+    @Test func fullMapCoversEveryLondonTramsSemanticSegment() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let graphSegmentIDs = Set(graph.segments.filter {
+            $0.lineID == .tram
+        }.map(\.id))
+        let authoredSegments = document.segments.filter { $0.lineID == .tram }
+        let authoredSegmentIDs = Set(authoredSegments.map(\.id))
+        let pathsByID = Dictionary(uniqueKeysWithValues: document.paths.map { ($0.id, $0) })
+        let routes = document.routes.filter { $0.lineID == .tram }
+
+        #expect(graphSegmentIDs.count == 40)
+        #expect(authoredSegmentIDs == graphSegmentIDs)
+        #expect(authoredSegments.allSatisfy {
+            $0.fromPort != nil
+                && $0.toPort != nil
+                && pathsByID[$0.pathID] != nil
+                && $0.pathID.contains(".official.v1.")
+        })
+        #expect(routes.count == 6)
+        #expect(routes.allSatisfy { route in
+            route.stationIDs.count == route.segmentIDs.count + 1
+                && Set(route.segmentIDs).isSubset(of: authoredSegmentIDs)
+        })
+
+        let cubicCount = authoredSegments.reduce(into: 0) { count, segment in
+            count += pathsByID[segment.pathID]?.commands.count {
+                if case .cubic = $0 { return true }
+                return false
+            } ?? 0
+        }
+        #expect(cubicCount >= 18)
+
+        // The loop, its western link and the Centrale-Church Street chord are
+        // all separate semantic edges; none may be replaced by a direct chord.
+        let croydonTopology: Set<String> = [
+            "tram:940GZZCRRVC:940GZZCRWAN",
+            "tram:940GZZCRCTR:940GZZCRRVC",
+            "tram:940GZZCRCTR:940GZZCRWCR",
+            "tram:940GZZCRWCR:940GZZCRWEL",
+            "tram:940GZZCRECR:940GZZCRWEL",
+            "tram:940GZZCRCEN:940GZZCRECR",
+            "tram:940GZZCRCEN:940GZZCRCHR",
+            "tram:940GZZCRCHR:940GZZCRWAN",
+            "tram:940GZZCRCHR:940GZZCRCTR",
+        ]
+        #expect(croydonTopology.isSubset(of: authoredSegmentIDs))
+    }
+
+    @Test func londonTramsUsesOfficialPortsAndDistinctConnectedInterchanges() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        func marker(_ stationID: String) throws -> BeckMapStationMarkerRecord {
+            try #require(document.stationMarkers.first { $0.stationID == stationID })
+        }
+
+        func circles(_ marker: BeckMapStationMarkerRecord) -> [BeckMapPoint] {
+            marker.primitives.compactMap {
+                if case let .circle(circle) = $0 { return circle.centre }
+                return nil
+            }
+        }
+
+        func connectors(_ marker: BeckMapStationMarkerRecord) -> [BeckMapLinePrimitive] {
+            marker.primitives.compactMap {
+                if case let .connector(connector) = $0 { return connector }
+                return nil
+            }
+        }
+
+        func ports(_ stationID: String) -> [BeckMapPoint] {
+            document.segments.compactMap { segment in
+                guard segment.lineID == .tram else { return nil }
+                if segment.fromStationID == stationID { return segment.fromPort }
+                if segment.toStationID == stationID { return segment.toPort }
+                return nil
+            }
+        }
+
+        func isNear(_ point: BeckMapPoint, _ expected: BeckMapPoint) -> Bool {
+            hypot(point.x - expected.x, point.y - expected.y) < 2
+        }
+
+        let officialTermini: [(String, BeckMapPoint)] = [
+            ("940GZZCRWMB", BeckMapPoint(x: 1_387.281, y: 2_406.609)),
+            ("940GZZCRBEK", BeckMapPoint(x: 3_804.578, y: 2_514.875)),
+            ("940GZZCRELM", BeckMapPoint(x: 3_434.876, y: 2_575.515)),
+            ("940GZZCRNWA", BeckMapPoint(x: 3_416.859, y: 2_982.078)),
+        ]
+        for (stationID, expected) in officialTermini {
+            #expect(ports(stationID).contains { isNear($0, expected) })
+        }
+
+        // Branch semantics terminate at the exact green joins beside the stop
+        // symbols, preserving TfL's loops instead of inventing straight links.
+        let officialJoinPorts: [(String, String, BeckMapPoint)] = [
+            (
+                "tram:940GZZCRADD:940GZZCRSAN", "940GZZCRSAN",
+                BeckMapPoint(x: 3_179.219, y: 2_756.719)
+            ),
+            (
+                "tram:940GZZCRARA:940GZZCRELM", "940GZZCRARA",
+                BeckMapPoint(x: 3_364.094, y: 2_584.359)
+            ),
+            (
+                "tram:940GZZCRCTR:940GZZCRRVC", "940GZZCRCTR",
+                BeckMapPoint(x: 2_572.422, y: 2_682.281)
+            ),
+            (
+                "tram:940GZZCRCHR:940GZZCRCTR", "940GZZCRCHR",
+                BeckMapPoint(x: 2_603.188, y: 2_756.672)
+            ),
+        ]
+        for (segmentID, stationID, expected) in officialJoinPorts {
+            let segment = try #require(document.segments.first { $0.id == segmentID })
+            let port = segment.fromStationID == stationID
+                ? segment.fromPort
+                : segment.toPort
+            #expect(port.map { isNear($0, expected) } == true)
+        }
+
+        for (firstID, secondID) in [
+            ("940GZZLUWIM", "940GZZCRWMB"),
+            ("910GWCROYDN", "940GZZCRWCR"),
+        ] {
+            let first = try marker(firstID)
+            let second = try marker(secondID)
+            let firstCircle = try #require(circles(first).first { $0 == first.anchor })
+            let secondCircle = try #require(circles(second).first { $0 == second.anchor })
+            #expect(circles(first).count == 1)
+            #expect(hypot(
+                firstCircle.x - secondCircle.x,
+                firstCircle.y - secondCircle.y
+            ) > 40)
+            let connector = try #require(connectors(second).first)
+            #expect(connector.start == firstCircle)
+            #expect(connector.end == secondCircle)
+
+            if secondID == "940GZZCRWCR" {
+                // West Croydon's Overground marker is drawn first, so the Tram
+                // marker redraws that endpoint above its connector.
+                #expect(circles(second).contains(firstCircle))
+                #expect(circles(second).count == 2)
+            } else {
+                #expect(circles(second).count == 1)
+            }
+        }
+    }
+
     @Test func correctedNorthLondonPathsStayMonotoneAndKinkFree() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)

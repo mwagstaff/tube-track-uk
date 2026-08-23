@@ -60,6 +60,14 @@ struct BeckMapStyleRecord: Codable, Hashable, Sendable {
 
     var parallelRouteOuterStrokeWidth: Double { routeStrokeWidth }
     var parallelRouteInnerStrokeWidth: Double { routeStrokeWidth / 3 }
+
+    func parallelRouteOuterStrokeWidth(for lineID: TubeLineID) -> Double {
+        lineID == .tram ? 8.844 : parallelRouteOuterStrokeWidth
+    }
+
+    func parallelRouteInnerStrokeWidth(for lineID: TubeLineID) -> Double {
+        lineID == .tram ? 2.768 : parallelRouteInnerStrokeWidth
+    }
 }
 
 struct BeckMapDebugReferenceRecord: Codable, Hashable, Sendable {

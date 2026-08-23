@@ -14,6 +14,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case waterlooCity = "waterloo-city"
     case dlr
     case elizabeth
+    case tram
     case liberty
     case lioness
     case mildmay
@@ -38,6 +39,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .waterlooCity: "Waterloo & City"
         case .dlr: "DLR"
         case .elizabeth: "Elizabeth line"
+        case .tram: "London Trams"
         case .liberty: "Liberty line"
         case .lioness: "Lioness line"
         case .mildmay: "Mildmay line"
@@ -54,7 +56,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
              .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity:
             true
-        case .dlr, .elizabeth, .liberty, .lioness, .mildmay, .suffragette,
+        case .dlr, .elizabeth, .tram, .liberty, .lioness, .mildmay, .suffragette,
              .weaver, .windrush:
             false
         }
@@ -64,6 +66,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         switch self {
         case .dlr: "dlr"
         case .elizabeth: "elizabeth-line"
+        case .tram: "tram"
         case .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush: "overground"
         default: "tube"
         }
@@ -97,6 +100,7 @@ extension Color {
         case .waterlooCity: Color(red: 0.46, green: 0.82, blue: 0.75)
         case .dlr: Color(red: 0.00, green: 0.686, blue: 0.678)
         case .elizabeth: Color(red: 0.376, green: 0.224, blue: 0.620)
+        case .tram: Color(red: 105.0 / 255.0, green: 194.0 / 255.0, blue: 47.0 / 255.0)
         case .liberty: Color(red: 0.310_699, green: 0.366_104, blue: 0.385_895)
         case .lioness: Color(red: 0.971_756, green: 0.613_312, blue: 0.056_473)
         case .mildmay: Color(red: 0.139_847, green: 0.524_109, blue: 0.794_968)

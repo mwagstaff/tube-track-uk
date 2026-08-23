@@ -469,7 +469,7 @@ private struct BeckMapCanvas: View {
                     with: .color(palette.routeColor(for: segment.lineID, muted: muted)),
                     style: StrokeStyle(
                         lineWidth: lineGroup.lineID.usesParallelSchematicStroke
-                            ? document.styles.parallelRouteOuterStrokeWidth
+                            ? document.styles.parallelRouteOuterStrokeWidth(for: lineGroup.lineID)
                             : document.styles.routeStrokeWidth,
                         lineCap: .round,
                         lineJoin: .round
@@ -482,7 +482,7 @@ private struct BeckMapCanvas: View {
                         segment.path,
                         with: .color(palette.paper),
                         style: StrokeStyle(
-                            lineWidth: document.styles.parallelRouteInnerStrokeWidth,
+                            lineWidth: document.styles.parallelRouteInnerStrokeWidth(for: lineGroup.lineID),
                             lineCap: .round,
                             lineJoin: .round
                         )

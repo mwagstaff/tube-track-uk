@@ -40,10 +40,78 @@ struct StationSearchTests {
         #expect(results.map(\.id) == ["tottenham-court-road"])
     }
 
+    @Test func findsLondonTramStopsWithoutRequiringTheModeSuffix() {
+        let stations = [
+            station(id: "east-croydon", name: "East Croydon", lineIDs: [.tram]),
+            station(id: "east-finchley", name: "East Finchley"),
+        ]
+
+        let results = StationSearch.suggestions(in: stations, matching: "east croy")
+
+        #expect(results.map(\.id) == ["east-croydon"])
+        #expect(results.first?.lineIDs == [.tram])
+    }
+
+    @Test func bundledHubSearchDeduplicatesTramInterchangesAndPreservesSelection() throws {
+        let graph = try TubeGraph.bundled()
+
+        let selectedDistrictWimbledon = StationSearch.suggestions(
+            in: graph,
+            matching: "Wimbledon",
+            selectedStationID: "940GZZLUWIM",
+            limit: 40
+        )
+        #expect(selectedDistrictWimbledon.filter { $0.name == "Wimbledon" }.map(\.id) == ["940GZZLUWIM"])
+
+        let selectedTramWimbledon = StationSearch.suggestions(
+            in: graph,
+            matching: "Wimbledon",
+            selectedStationID: "940GZZCRWMB",
+            limit: 40
+        )
+        #expect(selectedTramWimbledon.filter { $0.name == "Wimbledon" }.map(\.id) == ["940GZZCRWMB"])
+
+        let westCroydon = StationSearch.suggestions(
+            in: graph,
+            matching: "West Croydon",
+            limit: 40
+        )
+        #expect(westCroydon.count == 1)
+        #expect(Set(graph.lineIDs(at: try #require(westCroydon.first))) == [.tram, .windrush])
+    }
+
+    @Test func stationDisruptionLookupIncludesEveryStopAtAHub() throws {
+        let graph = try TubeGraph.bundled()
+        let westCroydonRail = try #require(graph.stationsByID["910GWCROYDN"])
+        let wimbledonTram = try #require(graph.stationsByID["940GZZCRWMB"])
+        let tramIssue = disruption(
+            id: "tram-west-croydon",
+            lineID: .tram,
+            affectedStationID: "940GZZCRWCR"
+        )
+        let districtIssue = disruption(
+            id: "district-wimbledon",
+            lineID: .district,
+            affectedStationID: "940GZZLUWIM"
+        )
+
+        #expect(StationDisruptionLookup.firstMatching(
+            station: westCroydonRail,
+            graph: graph,
+            disruptions: [tramIssue]
+        )?.id == tramIssue.id)
+        #expect(StationDisruptionLookup.firstMatching(
+            station: wimbledonTram,
+            graph: graph,
+            disruptions: [districtIssue]
+        )?.id == districtIssue.id)
+    }
+
     private func station(
         id: String,
         name: String,
-        aliases: [String] = []
+        aliases: [String] = [],
+        lineIDs: [TubeLineID] = [.central]
     ) -> TubeStation {
         TubeStation(
             id: id,
@@ -52,10 +120,27 @@ struct StationSearchTests {
             longitude: 0,
             schematicX: 0,
             schematicY: 0,
-            lineIDs: [.central],
+            lineIDs: lineIDs,
             interchange: false,
             searchAliases: aliases,
             hubID: nil
+        )
+    }
+
+    private func disruption(
+        id: String,
+        lineID: TubeLineID,
+        affectedStationID: String
+    ) -> ResolvedDisruption {
+        ResolvedDisruption(
+            id: id,
+            lineID: lineID,
+            title: "Part Closure",
+            reason: "Testing hub resolution",
+            severity: 5,
+            affectedStationIDs: [affectedStationID],
+            affectedSegmentIDs: [],
+            confidence: .exact
         )
     }
 }

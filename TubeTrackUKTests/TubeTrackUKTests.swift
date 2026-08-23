@@ -25,22 +25,27 @@ struct TubeTrackUKTests {
     }
 
     @Test func allTubeLinesHaveDisplayNames() {
-        #expect(TubeLineID.allCases.count == 19)
+        #expect(TubeLineID.allCases.count == 20)
         #expect(TubeLineID.undergroundCases.count == 11)
         #expect(TubeLineID.allCases.allSatisfy { !$0.displayName.isEmpty })
         #expect(TubeLineID.dlr.modeName == "dlr")
         #expect(TubeLineID.elizabeth.modeName == "elizabeth-line")
+        #expect(TubeLineID.tram.displayName == "London Trams")
+        #expect(TubeLineID.tram.modeName == "tram")
+        #expect(!TubeLineID.tram.isUnderground)
+        #expect(TubeLineID.tram.usesParallelSchematicStroke)
         #expect(TubeLineID.liberty.modeName == "overground")
         #expect(TubeLineID.windrush.modeName == "overground")
         #expect(!TubeLineID.dlr.supportsEstimatedTrains)
+        #expect(TubeLineID.tram.supportsEstimatedTrains)
         #expect(TubeLineID.elizabeth.supportsEstimatedTrains)
     }
 
     @Test func bundledGraphHasCompleteConnectedData() throws {
         let graph = try TubeGraph.bundled()
-        #expect(graph.lines.count == 19)
-        #expect(graph.stations.count == 470)
-        #expect(graph.segments.count == 577)
+        #expect(graph.lines.count == 20)
+        #expect(graph.stations.count == 509)
+        #expect(graph.segments.count == 617)
         #expect(graph.segments.allSatisfy { $0.geographicPoints.count >= 2 })
         #expect(graph.segments.filter { $0.geographicPoints.count > 2 }.count > 340)
         #expect(graph.source.attribution.contains("OpenStreetMap contributors"))
@@ -49,8 +54,10 @@ struct TubeTrackUKTests {
         })
         #expect(graph.line(.dlr)?.routes.count == 5)
         #expect(graph.line(.elizabeth)?.routes.count == 9)
+        #expect(graph.line(.tram)?.routes.count == 6)
         #expect(graph.segments(for: .dlr).count == 46)
         #expect(graph.segments(for: .elizabeth).count == 42)
+        #expect(graph.segments(for: .tram).count == 40)
         #expect(graph.segments(for: .liberty).count == 2)
         #expect(graph.segments(for: .lioness).count == 18)
         #expect(graph.segments(for: .mildmay).count == 27)
@@ -61,12 +68,15 @@ struct TubeTrackUKTests {
         #expect(bankStops.contains { $0.lineIDs.contains(.dlr) })
         #expect(bankStops.contains { $0.lineIDs.contains(.central) })
         #expect(bankStops.allSatisfy { $0.interchange })
+
+        let wimbledonTram = try #require(graph.stationsByID["940GZZCRWMB"])
+        #expect(Set(graph.lineIDs(at: wimbledonTram)) == [.district, .tram])
     }
 
     @Test func realWorldRailLinesUseDetailedTrackGeometry() throws {
         let graph = try TubeGraph.bundled()
 
-        for lineID in [TubeLineID.dlr, .elizabeth] {
+        for lineID in [TubeLineID.dlr, .elizabeth, .tram] {
             let segments = graph.segments(for: lineID)
             let detailedSegments = segments.filter { $0.geographicPoints.count > 2 }
             let contouredSegments = detailedSegments.filter {
@@ -130,6 +140,7 @@ struct TubeTrackUKTests {
         #expect(displayedIDs.contains("940GZZLUSWF")) // South Woodford, Central line
         #expect(displayedIDs.contains("910GRDNGSTN")) // Reading, Elizabeth line
         #expect(displayedIDs.contains("940GZZDLABR")) // Abbey Road, DLR
+        #expect(displayedIDs.contains("940GZZCRNWA")) // New Addington, London Trams
 
         let selectedDLRStation = "940GZZDLBNK"
         let withSelection = RealWorldStationDisplay.stations(
@@ -137,6 +148,13 @@ struct TubeTrackUKTests {
             selectedStationID: selectedDLRStation
         )
         #expect(withSelection.contains { $0.id == selectedDLRStation })
+
+        let selectedTramStation = "940GZZCRWMB"
+        let withTramSelection = RealWorldStationDisplay.stations(
+            in: graph,
+            selectedStationID: selectedTramStation
+        )
+        #expect(withTramSelection.contains { $0.id == selectedTramStation })
     }
 
     @Test func disruptionResolverFindsCamdenToEdgwareSection() throws {
@@ -158,6 +176,88 @@ struct TubeTrackUKTests {
 
         #expect(result.confidence == .lineOnly)
         #expect(result.affectedSegmentIDs.count == graph.segments(for: .victoria).count)
+    }
+
+    @Test func structuredTramDisruptionPreservesTheOrderedCroydonLoopSection() throws {
+        let graph = try TubeGraph.bundled()
+        let repository = TubeNetworkRepository(graph: graph)
+        let resolver = DisruptionResolver(repository: repository)
+        let stopIDs = [
+            "940GZZCRRVC", // Reeves Corner
+            "940GZZCRCTR", // Centrale
+            "940GZZCRWCR", // West Croydon
+            "940GZZCRWEL", // Wellesley Road
+            "940GZZCRECR", // East Croydon
+        ]
+        let route = TfLDisruptedRoute(
+            id: "tram-loop-inbound",
+            name: "Wimbledon Tram Stop - Beckenham Junction Tram Stop",
+            direction: "inbound",
+            originationName: "Wimbledon Tram Stop",
+            destinationName: "Beckenham Junction Tram Stop",
+            isEntireRouteSection: false,
+            routeSectionNaptanEntrySequence: stopIDs.enumerated().map { index, stationID in
+                TfLRouteStopEntry(
+                    ordinal: index,
+                    stopPoint: TfLStopPoint(
+                        naptanId: stationID,
+                        id: stationID,
+                        commonName: nil,
+                        lat: nil,
+                        lon: nil
+                    )
+                )
+            }
+        )
+        let status = TfLStatusEntry(
+            id: 0,
+            statusSeverity: 5,
+            statusSeverityDescription: "Part Closure",
+            reason: "No service between Reeves Corner and East Croydon",
+            validityPeriods: nil,
+            disruption: TfLDisruption(
+                category: "RealTime",
+                categoryDescription: "RealTime",
+                description: nil,
+                affectedRoutes: [route],
+                affectedStops: nil,
+                closureText: nil
+            )
+        )
+
+        let result = resolver.resolve(status, lineID: .tram)
+        let expectedSegmentIDs = Set(zip(stopIDs, stopIDs.dropFirst()).compactMap {
+            repository.segment(between: $0.0, and: $0.1, on: .tram)?.id
+        })
+
+        #expect(result.confidence == .exact)
+        #expect(result.affectedStationIDs == Set(stopIDs))
+        #expect(expectedSegmentIDs.count == stopIDs.count - 1)
+        #expect(result.affectedSegmentIDs == expectedSegmentIDs)
+    }
+
+    @Test func inferredTramDisruptionFollowsTheOneWayCroydonLoop() throws {
+        let graph = try TubeGraph.bundled()
+        let repository = TubeNetworkRepository(graph: graph)
+        let resolver = DisruptionResolver(repository: repository)
+        let stopIDs = [
+            "940GZZCRCHR", // Church Street
+            "940GZZCRCTR", // Centrale
+            "940GZZCRWCR", // West Croydon
+            "940GZZCRWEL", // Wellesley Road
+        ]
+
+        let result = resolver.resolve(
+            status(reason: "No service between Church Street Tram Stop and Wellesley Road Tram Stop"),
+            lineID: .tram
+        )
+        let expectedSegmentIDs = Set(zip(stopIDs, stopIDs.dropFirst()).compactMap {
+            repository.segment(between: $0.0, and: $0.1, on: .tram)?.id
+        })
+
+        #expect(result.confidence == .inferred)
+        #expect(expectedSegmentIDs.count == stopIDs.count - 1)
+        #expect(result.affectedSegmentIDs == expectedSegmentIDs)
     }
 
     @Test func disruptionRowsHaveStableDistinctIDsWhenTfLReusesStatusID() throws {
@@ -510,6 +610,21 @@ struct TubeTrackUKTests {
         let decoded = try JSONDecoder.tfl.decode([TfLLineStatus].self, from: Data(json.utf8))
         #expect(decoded.first?.id == .central)
         #expect(decoded.first?.lineStatuses.first?.validityPeriods?.first?.fromDate != nil)
+    }
+
+    @Test func tflDecoderRecognizesLondonTramsStatusAndArrivals() throws {
+        let statusJSON = """
+        [{"id":"tram","name":"Tram","lineStatuses":[{"id":1,"statusSeverity":10,"statusSeverityDescription":"Good Service","reason":null,"validityPeriods":null,"disruption":null}]}]
+        """
+        let arrivalJSON = """
+        [{"id":"tram-prediction","vehicleId":"2533","lineId":"tram","stationName":"Wimbledon Tram Stop","naptanId":"940GZZCRWMB","platformName":null,"direction":"inbound","destinationName":"Wimbledon Tram Stop","destinationNaptanId":"940GZZCRWMB","towards":"Wimbledon","expectedArrival":null,"timeToStation":60,"currentLocation":"Between stops"}]
+        """
+
+        let statuses = try JSONDecoder.tfl.decode([TfLLineStatus].self, from: Data(statusJSON.utf8))
+        let arrivals = try JSONDecoder.tfl.decode([TfLArrivalPrediction].self, from: Data(arrivalJSON.utf8))
+
+        #expect(statuses.first?.id == .tram)
+        #expect(TubeLineID(rawValue: try #require(arrivals.first?.lineId)) == .tram)
     }
 
     @Test func trainProjectionMovesSmoothlyAndCapsAtStation() {
