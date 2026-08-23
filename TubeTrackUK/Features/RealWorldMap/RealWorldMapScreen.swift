@@ -37,7 +37,7 @@ struct RealWorldMapScreen: View {
                                 appState.select(station: station)
                             }
                         }
-                        .onMapCameraChange(frequency: .onEnd) { context in
+                        .onMapCameraChange(frequency: .continuous) { context in
                             visibleRegion = context.region
                         }
                         .simultaneousGesture(
