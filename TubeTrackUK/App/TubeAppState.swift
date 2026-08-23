@@ -4,7 +4,6 @@ import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
     case map
-    case realWorld
     case nearMe
     case works
     case about
@@ -15,7 +14,6 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .map: "Map"
         case .nearMe: "Near Me"
-        case .realWorld: "Real World"
         case .works: "Works"
         case .about: "About"
         }
@@ -25,7 +23,6 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .map: "map"
         case .nearMe: "location.fill"
-        case .realWorld: "globe.europe.africa"
         case .works: "wrench.and.screwdriver"
         case .about: "info.circle"
         }
@@ -84,6 +81,9 @@ final class TubeAppState {
     private static let appearanceModeKey = "appearanceMode"
 
     var selectedTab: AppTab = .map
+    var mapPresentationMode: MapPresentationMode = .beck
+    var sharedMapViewport: SharedMapViewport?
+    var beckMapCameraSnapshot: BeckMapCameraSnapshot?
     var disruptionDisplayMode: DisruptionDisplayMode = .normal
     var disruptionDateSelection: DisruptionDateSelection = .today
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
@@ -156,6 +156,11 @@ final class TubeAppState {
         if let flag = arguments.firstIndex(of: "-DebugTab"), arguments.indices.contains(flag + 1),
            let tab = AppTab(rawValue: arguments[flag + 1]) {
             selectedTab = tab
+        }
+        if let flag = arguments.firstIndex(of: "-DebugMapMode"),
+           arguments.indices.contains(flag + 1),
+           let mode = MapPresentationMode(rawValue: arguments[flag + 1]) {
+            mapPresentationMode = mode
         }
         if arguments.contains("-DebugLiveTrains") {
             showLiveTrains = true

@@ -163,12 +163,40 @@ struct MapStatusDock: View {
                         .layoutPriority(1)
                     DisruptionHighlightMenu()
                         .fixedSize()
+                    MapPresentationModeButton()
+                        .fixedSize()
                 }
             }
         }
         .padding(.horizontal, 12)
         .animation(.smooth(duration: 0.25), value: appState.disruptionDisplayMode)
         .animation(.smooth(duration: 0.25), value: appState.isViewingLiveStatus)
+    }
+}
+
+private struct MapPresentationModeButton: View {
+    @Environment(TubeAppState.self) private var appState
+
+    private var destinationMode: MapPresentationMode {
+        appState.mapPresentationMode.toggled
+    }
+
+    var body: some View {
+        Button {
+            appState.mapPresentationMode = destinationMode
+        } label: {
+            Image(systemName: appState.mapPresentationMode.symbol)
+                .font(.headline.weight(.semibold))
+                .frame(width: 44, height: 44)
+                .contentTransition(.symbolEffect(.replace))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(Color(uiColor: .label))
+        .contentShape(.circle)
+        .glassEffect(.regular.interactive(), in: .circle)
+        .accessibilityLabel("Switch to \(destinationMode.title) view")
+        .accessibilityHint("Morphs the rail network while preserving the current centre and zoom")
+        .accessibilityValue(appState.mapPresentationMode.title)
     }
 }
 

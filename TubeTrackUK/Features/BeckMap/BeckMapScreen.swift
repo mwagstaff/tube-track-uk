@@ -15,13 +15,12 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
 
 struct BeckMapScreen: View {
     @Environment(TubeAppState.self) private var appState
-    @AppStorage("statusPanelExpanded") private var statusExpanded = false
+    let resetToken: Int
     @State private var document: BeckMapDocument?
     @State private var renderCache: BeckMapCanvas.RenderCache?
     @State private var documentLoadError: String?
     @State private var loadedGraphGeneratedAt: String?
     @State private var isLoadingDocument = false
-    @State private var resetToken = 0
     @State private var selectedRegion: BeckMapRegion = Self.initialRegion
     #if DEBUG
     @State private var showsReferenceOverlay = ProcessInfo.processInfo.arguments.contains("-DebugBeckReference")
@@ -84,13 +83,6 @@ struct BeckMapScreen: View {
                     description: Text(appState.statusError ?? "The Tube network data could not be loaded.")
                 )
             }
-        }
-        .overlay(alignment: .top) {
-            MapToolbar { resetToken += 1 }
-                .tint(.tubeBlue)
-        }
-        .overlay(alignment: .bottom) {
-            bottomOverlay
         }
         .task(id: documentTaskID) {
             document = nil
@@ -193,46 +185,10 @@ struct BeckMapScreen: View {
         return disruptionIDsBySegmentID
     }
 
-    private var bottomOverlay: some View {
-        VStack(spacing: 9) {
-            if appState.showLiveTrains {
-                TrainFilterBar()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            if let station = appState.selectedStation {
-                StationDetailCard(station: station)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let work = appState.selectedEngineeringWork {
-                PlannedWorkDetailCard(work: work)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let disruption = appState.selectedDisruption {
-                DisruptionDetailCard(disruption: disruption)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let lineID = appState.selectedLineID {
-                LineDetailCard(lineID: lineID)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-
-            if statusExpanded {
-                LiveStatusPanel(expanded: $statusExpanded)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else {
-                MapStatusDock(expanded: $statusExpanded)
-            }
-        }
-        .animation(.smooth(duration: 0.35), value: appState.showLiveTrains)
-        .animation(.smooth(duration: 0.35), value: appState.selectedStationID)
-        .safeAreaPadding(.bottom, 4)
-    }
 }
 
 private struct BeckMapCanvas: View {
+    @Environment(TubeAppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
 
     let document: BeckMapDocument
@@ -257,6 +213,7 @@ private struct BeckMapCanvas: View {
     @State private var cameraOffset = CGSize.zero
     @State private var minimumCameraScale: CGFloat = 0.2
     @State private var maximumCameraScale: CGFloat = 3.8
+    @State private var fittedCameraScale: CGFloat = 0.35
     @State private var panStartOffset: CGSize?
     @State private var pinchStartScale: CGFloat?
     @State private var pinchMapPoint: CGPoint?
@@ -313,8 +270,17 @@ private struct BeckMapCanvas: View {
                 }
 
                 BeckMapGestureSurface(
-                    onPan: handlePan,
-                    onPinch: handlePinch,
+                    onPan: { translation, phase in
+                        handlePan(translation: translation, phase: phase, in: proxy.size)
+                    },
+                    onPinch: { magnification, location, phase in
+                        handlePinch(
+                            magnification: magnification,
+                            location: location,
+                            phase: phase,
+                            in: proxy.size
+                        )
+                    },
                     onTap: selectMapFeature(at:)
                 )
                 .accessibilityHidden(true)
@@ -332,16 +298,26 @@ private struct BeckMapCanvas: View {
                 guard proxy.size.width > 0, proxy.size.height > 0 else { return }
                 await Task.yield()
                 resetCamera(in: proxy.size)
-                if let selectedStationID = presentation.selectedStationID {
+                if appState.sharedMapViewport != nil {
+                    applySharedViewport(in: proxy.size)
+                } else if let selectedStationID = presentation.selectedStationID {
                     focus(on: [selectedStationID], in: proxy.size)
                 } else if presentation.emphasizesIssues {
                     focus(on: presentation.affectedStationIDs, in: proxy.size)
+                } else {
+                    publishViewport(in: proxy.size)
                 }
             }
             .onChange(of: resetToken) { _, _ in
+                guard appState.mapPresentationMode == .beck else { return }
                 withAnimation(.smooth(duration: 0.5)) {
                     resetCamera(in: proxy.size)
                 }
+                publishViewport(in: proxy.size)
+            }
+            .onChange(of: appState.mapPresentationMode) { _, mode in
+                guard mode == .beck else { return }
+                applySharedViewport(in: proxy.size)
             }
             .onChange(of: presentation.affectedStationIDs) { _, stationIDs in
                 if presentation.emphasizesIssues {
@@ -862,6 +838,7 @@ private struct BeckMapCanvas: View {
             max(1, size.width - 32) / max(1, fittingBounds.width),
             max(1, size.height - 32) / max(1, fittingBounds.height)
         )
+        fittedCameraScale = fittedScale
         minimumCameraScale = max(0.01, fittedScale * 0.82)
         maximumCameraScale = max(3.8, fittedScale * 4)
         cameraScale = fittedScale
@@ -869,6 +846,7 @@ private struct BeckMapCanvas: View {
             width: size.width / 2 - fittingBounds.midX * cameraScale,
             height: size.height / 2 - fittingBounds.midY * cameraScale
         )
+        updateCameraSnapshot(in: size)
     }
 
     private func focus(on stationIDs: Set<String>, in size: CGSize) {
@@ -886,13 +864,15 @@ private struct BeckMapCanvas: View {
             offset: CGSize(
                 width: size.width / 2 - CGFloat((minX + maxX) / 2) * nextScale,
                 height: size.height / 2 - CGFloat((minY + maxY) / 2) * nextScale - 28
-            )
+            ),
+            viewportSize: size
         )
     }
 
     private func animateCamera(
         toScale targetScale: CGFloat,
         offset targetOffset: CGSize,
+        viewportSize: CGSize,
         duration: TimeInterval = 2
     ) {
         cameraTransitionTask?.cancel()
@@ -914,8 +894,12 @@ private struct BeckMapCanvas: View {
                     height: startOffset.height
                         + (targetOffset.height - startOffset.height) * CGFloat(easedProgress)
                 )
+                updateCameraSnapshot(in: viewportSize)
 
-                guard progress < 1 else { return }
+                guard progress < 1 else {
+                    publishViewport(in: viewportSize)
+                    return
+                }
                 do {
                     try await Task.sleep(for: .milliseconds(16))
                 } catch {
@@ -925,7 +909,11 @@ private struct BeckMapCanvas: View {
         }
     }
 
-    private func handlePan(translation: CGSize, phase: BeckMapGesturePhase) {
+    private func handlePan(
+        translation: CGSize,
+        phase: BeckMapGesturePhase,
+        in size: CGSize
+    ) {
         switch phase {
         case .began:
             cameraTransitionTask?.cancel()
@@ -936,13 +924,20 @@ private struct BeckMapCanvas: View {
             let start = panStartOffset ?? cameraOffset
             panStartOffset = start
             cameraOffset = CGSize(width: start.width + translation.width, height: start.height + translation.height)
+            updateCameraSnapshot(in: size)
         case .ended:
             isPanning = false
             panStartOffset = nil
+            publishViewport(in: size)
         }
     }
 
-    private func handlePinch(magnification: CGFloat, location: CGPoint, phase: BeckMapGesturePhase) {
+    private func handlePinch(
+        magnification: CGFloat,
+        location: CGPoint,
+        phase: BeckMapGesturePhase,
+        in size: CGSize
+    ) {
         switch phase {
         case .began:
             cameraTransitionTask?.cancel()
@@ -961,12 +956,67 @@ private struct BeckMapCanvas: View {
                 width: location.x - mapPoint.x * nextScale,
                 height: location.y - mapPoint.y * nextScale
             )
+            updateCameraSnapshot(in: size)
         case .ended:
             isPinching = false
             pinchStartScale = nil
             pinchMapPoint = nil
             panStartOffset = nil
+            publishViewport(in: size)
         }
+    }
+
+    private func applySharedViewport(in size: CGSize) {
+        guard let viewport = appState.sharedMapViewport,
+              let graph = appState.graph,
+              let centre = SharedMapProjection.artworkPoint(
+                  for: viewport.coordinate,
+                  document: document,
+                  graph: graph
+              ) else {
+            updateCameraSnapshot(in: size)
+            return
+        }
+        cameraTransitionTask?.cancel()
+        cameraScale = min(
+            maximumCameraScale,
+            max(minimumCameraScale, fittedCameraScale * viewport.zoom)
+        )
+        cameraOffset = CGSize(
+            width: size.width / 2 - centre.x * cameraScale,
+            height: size.height / 2 - centre.y * cameraScale
+        )
+        updateCameraSnapshot(in: size)
+    }
+
+    private func publishViewport(in size: CGSize) {
+        updateCameraSnapshot(in: size)
+        guard appState.mapPresentationMode == .beck,
+              let graph = appState.graph else { return }
+        let scale = max(0.000_001, cameraScale)
+        let centre = CGPoint(
+            x: (size.width / 2 - cameraOffset.width) / scale,
+            y: (size.height / 2 - cameraOffset.height) / scale
+        )
+        guard let coordinate = SharedMapProjection.coordinate(
+            for: centre,
+            document: document,
+            graph: graph
+        ) else { return }
+        appState.sharedMapViewport = SharedMapViewport(
+            coordinate: coordinate,
+            zoom: cameraScale / max(0.000_001, fittedCameraScale)
+        )
+    }
+
+    private func updateCameraSnapshot(in size: CGSize) {
+        appState.beckMapCameraSnapshot = BeckMapCameraSnapshot(
+            scale: cameraScale,
+            offsetX: cameraOffset.width,
+            offsetY: cameraOffset.height,
+            viewportWidth: size.width,
+            viewportHeight: size.height
+        )
     }
 
     private func selectMapFeature(at location: CGPoint) {

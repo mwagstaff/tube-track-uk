@@ -66,6 +66,7 @@ struct WorkDetailView: View {
 
                     VStack(spacing: 10) {
                         Button {
+                            appState.mapPresentationMode = .beck
                             appState.focus(on: work, in: .map)
                             dismiss()
                         } label: {
@@ -75,7 +76,8 @@ struct WorkDetailView: View {
                         .buttonStyle(.borderedProminent)
 
                         Button {
-                            appState.focus(on: work, in: .realWorld)
+                            appState.mapPresentationMode = .realWorld
+                            appState.focus(on: work, in: .map)
                             dismiss()
                         } label: {
                             Label("View on real-world map", systemImage: "globe.europe.africa")

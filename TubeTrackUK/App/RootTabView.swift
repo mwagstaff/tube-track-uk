@@ -12,23 +12,13 @@ struct RootTabView: View {
         TabView(selection: $state.selectedTab) {
             Group {
                 if appState.selectedTab == .map {
-                    BeckMapScreen()
+                    UnifiedMapScreen()
                 } else {
                     Color.clear
                 }
             }
             .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
             .tag(AppTab.map)
-
-            Group {
-                if appState.selectedTab == .realWorld {
-                    RealWorldMapScreen()
-                } else {
-                    Color.clear
-                }
-            }
-            .tabItem { Label(AppTab.realWorld.title, systemImage: AppTab.realWorld.symbol) }
-            .tag(AppTab.realWorld)
 
             Group {
                 if appState.selectedTab == .nearMe {

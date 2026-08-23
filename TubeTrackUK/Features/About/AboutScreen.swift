@@ -47,7 +47,7 @@ struct AboutScreen: View {
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
                         Label("© OpenStreetMap contributors", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
                     }
-                    Text("The Real World view preserves Apple’s map attribution. Rail and tram routes use an offline OSM railway graph so lines and supported train estimates follow mapped track alignments instead of station-to-station chords.")
+                    Text("The real-world map mode preserves Apple’s map attribution. Rail and tram routes use an offline OSM railway graph so lines and supported train estimates follow mapped track alignments instead of station-to-station chords.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

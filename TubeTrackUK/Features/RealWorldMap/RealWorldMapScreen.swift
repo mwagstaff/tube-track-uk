@@ -3,11 +3,12 @@ import SwiftUI
 
 struct RealWorldMapScreen: View {
     @Environment(TubeAppState.self) private var appState
+    let resetToken: Int
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
     @State private var visibleRegion = Self.centralLondon
-    @AppStorage("statusPanelExpanded") private var statusExpanded = false
+    @State private var acceptsCameraUpdates = false
 
     private static let centralLondon = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 51.5078, longitude: -0.1278),
@@ -19,71 +20,74 @@ struct RealWorldMapScreen: View {
             if let graph = appState.graph,
                let renderData,
                renderData.graphID == graph.generatedAt {
-                MapReader { proxy in
-                    ZStack {
-                        Map(position: $position, selection: $mapSelection) {
-                            tubeOverlays(renderData: renderData)
-                            stationAnnotations(graph: graph)
-                        }
-                        .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
-                        .mapControls {
-                            MapCompass()
-                            MapScaleView()
-                        }
-                        .onChange(of: mapSelection) { _, stationID in
-                            guard let stationID,
-                                  let station = graph.stations.first(where: { $0.id == stationID }) else { return }
-                            withAnimation(.spring(duration: 0.35)) {
-                                appState.select(station: station)
+                GeometryReader { viewportProxy in
+                    MapReader { proxy in
+                        ZStack {
+                            Map(position: $position, selection: $mapSelection) {
+                                tubeOverlays(renderData: renderData)
+                                stationAnnotations(graph: graph)
+                            }
+                            .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
+                            .mapControls {
+                                MapCompass()
+                                MapScaleView()
+                            }
+                            .onChange(of: mapSelection) { _, stationID in
+                                guard let stationID,
+                                      let station = graph.stations.first(where: { $0.id == stationID }) else { return }
+                                withAnimation(.smooth(duration: 0.35)) {
+                                    appState.select(station: station)
+                                }
+                            }
+                            .onMapCameraChange(frequency: .continuous) { context in
+                                visibleRegion = context.region
+                                guard appState.mapPresentationMode == .realWorld,
+                                      acceptsCameraUpdates else { return }
+                                appState.sharedMapViewport = SharedMapProjection.viewport(
+                                    from: context.rect,
+                                    graph: graph,
+                                    size: viewportProxy.size
+                                )
+                            }
+                            .simultaneousGesture(
+                                SpatialTapGesture()
+                                    .onEnded { value in
+                                        handleLineTap(
+                                            at: value.location,
+                                            proxy: proxy,
+                                            graph: graph,
+                                            renderData: renderData
+                                        )
+                                    }
+                            )
+
+                            if appState.showLiveTrains, appState.selectedTab == .map {
+                                RealWorldTrainCanvas(
+                                    proxy: proxy,
+                                    pathsBySegmentID: renderData.pathsBySegmentID,
+                                    visibleRegion: visibleRegion
+                                )
                             }
                         }
-                        .onMapCameraChange(frequency: .continuous) { context in
-                            visibleRegion = context.region
+                    }
+                    .onChange(of: appState.mapPresentationMode) { _, mode in
+                        acceptsCameraUpdates = false
+                        guard mode == .realWorld else { return }
+                        applySharedViewport(in: viewportProxy.size)
+                        Task { @MainActor in
+                            await Task.yield()
+                            guard appState.mapPresentationMode == .realWorld else { return }
+                            acceptsCameraUpdates = true
                         }
-                        .simultaneousGesture(
-                            SpatialTapGesture()
-                                .onEnded { value in
-                                    handleLineTap(
-                                        at: value.location,
-                                        proxy: proxy,
-                                        graph: graph,
-                                        renderData: renderData
-                                    )
-                                }
-                        )
-
-                        if appState.showLiveTrains, appState.selectedTab == .realWorld {
-                            RealWorldTrainCanvas(
-                                proxy: proxy,
-                                pathsBySegmentID: renderData.pathsBySegmentID,
-                                visibleRegion: visibleRegion
-                            )
-                        }
+                    }
+                    .onChange(of: resetToken) { _, _ in
+                        guard appState.mapPresentationMode == .realWorld else { return }
+                        resetCamera()
                     }
                 }
             } else {
                 ProgressView("Loading geographic map…")
             }
-        }
-        .overlay(alignment: .top) {
-            VStack(spacing: 6) {
-                MapToolbar { resetCamera() }
-                HStack {
-                    Spacer()
-                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
-                        Text("© OpenStreetMap contributors")
-                            .font(.caption2.weight(.medium))
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 5)
-                            .glassEffect(.regular, in: .capsule)
-                    }
-                    .foregroundStyle(.primary)
-                }
-                .padding(.horizontal, 12)
-            }
-        }
-        .overlay(alignment: .bottom) {
-            bottomOverlay
         }
         .onChange(of: appState.focusedStationIDs) { _, stations in
             guard !stations.isEmpty else { return }
@@ -100,11 +104,17 @@ struct RealWorldMapScreen: View {
             focus(on: [stationID])
         }
         .onAppear {
+            guard appState.mapPresentationMode == .realWorld else { return }
             if let stationID = appState.selectedStationID {
                 mapSelection = stationID
                 focus(on: [stationID])
             } else if appState.hasFocusedMapSection || appState.selectedDisruption != nil {
                 focus(on: appState.activeAffectedStationIDs)
+            }
+            Task { @MainActor in
+                await Task.yield()
+                guard appState.mapPresentationMode == .realWorld else { return }
+                acceptsCameraUpdates = true
             }
         }
         .task(id: appState.graph?.generatedAt) {
@@ -180,6 +190,8 @@ struct RealWorldMapScreen: View {
         ForEach(displayStations(graph: graph)) { station in
             Annotation(station.name, coordinate: station.coordinate, anchor: .center) {
                 let selected = appState.selectedStationID == station.id
+                let networkZoom = CGFloat(appState.sharedMapViewport?.zoom ?? 4)
+                let markerDiameter = max(5, min(11, 3 + networkZoom * 2))
                 ZStack {
                     if selected {
                         Circle()
@@ -191,8 +203,14 @@ struct RealWorldMapScreen: View {
 
                     Circle()
                         .fill(.background)
-                        .stroke(selected ? Color.blue : Color.primary, lineWidth: selected ? 3 : 2)
-                        .frame(width: selected ? 18 : 11, height: selected ? 18 : 11)
+                        .stroke(
+                            selected ? Color.blue : Color.primary,
+                            lineWidth: selected ? 3 : (markerDiameter < 8 ? 1.25 : 2)
+                        )
+                        .frame(
+                            width: selected ? 18 : markerDiameter,
+                            height: selected ? 18 : markerDiameter
+                        )
                 }
                     .animation(.smooth(duration: 0.3), value: selected)
                     .accessibilityLabel(station.name)
@@ -256,44 +274,19 @@ struct RealWorldMapScreen: View {
         }
     }
 
-    private var bottomOverlay: some View {
-        VStack(spacing: 9) {
-            if appState.showLiveTrains { TrainFilterBar() }
-            if let station = appState.selectedStation {
-                StationDetailCard(station: station, onClose: closeStationCard)
-                    .padding(.horizontal, 12)
-            } else if let work = appState.selectedEngineeringWork {
-                PlannedWorkDetailCard(work: work)
-                    .padding(.horizontal, 12)
-            } else if let disruption = appState.selectedDisruption {
-                DisruptionDetailCard(disruption: disruption)
-                    .padding(.horizontal, 12)
-            } else if let lineID = appState.selectedLineID {
-                LineDetailCard(lineID: lineID)
-                    .padding(.horizontal, 12)
-            }
-            if statusExpanded {
-                LiveStatusPanel(expanded: $statusExpanded)
-                    .padding(.horizontal, 12)
-            } else {
-                MapStatusDock(expanded: $statusExpanded)
-            }
-        }
-        .safeAreaPadding(.bottom, 4)
-        .animation(.spring(duration: 0.4, bounce: 0.12), value: appState.selectedStationID)
-        .animation(.spring(duration: 0.4, bounce: 0.12), value: appState.showLiveTrains)
-    }
-
     private func resetCamera() {
         position = .region(Self.centralLondon)
         appState.clearMapSelection()
     }
 
-    private func closeStationCard() {
-        withAnimation(.spring(duration: 0.35)) {
-            mapSelection = nil
-            appState.clearStationSelection()
-        }
+    private func applySharedViewport(in size: CGSize) {
+        guard let graph = appState.graph,
+              let viewport = appState.sharedMapViewport else { return }
+        position = .rect(SharedMapProjection.geographicRect(
+            for: viewport,
+            graph: graph,
+            size: size
+        ))
     }
 
     private func focus(on stationIDs: Set<String>) {
@@ -373,23 +366,25 @@ private struct RealWorldTrainCanvas: View {
     var body: some View {
         let trains = appState.liveTrains
 
-        Canvas { context, size in
-            let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
-            var trainIcon = context.resolve(Image(systemName: "tram.fill"))
-            trainIcon.shading = .color(.white)
+        TimelineView(.periodic(from: .now, by: 1)) { timeline in
+            Canvas { context, size in
+                let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
+                var trainIcon = context.resolve(Image(systemName: "tram.fill"))
+                trainIcon.shading = .color(.white)
 
-            for train in trains {
-                guard let path = pathsBySegmentID[train.segmentID],
-                      let coordinate = path.coordinate(at: train.projectedProgress(at: .now)),
-                      visibleRegion.containsExpanded(coordinate),
-                      let point = proxy.convert(coordinate, to: .local),
-                      visibleBounds.contains(point) else { continue }
+                for train in trains {
+                    guard let path = pathsBySegmentID[train.segmentID],
+                          let coordinate = path.coordinate(at: train.projectedProgress(at: timeline.date)),
+                          visibleRegion.containsExpanded(coordinate),
+                          let point = proxy.convert(coordinate, to: .local),
+                          visibleBounds.contains(point) else { continue }
 
-                let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
-                let marker = Path(roundedRect: markerRect, cornerRadius: 6)
-                context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
-                context.stroke(marker, with: .color(.white), lineWidth: 1.5)
-                context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
+                    let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
+                    let marker = Path(roundedRect: markerRect, cornerRadius: 6)
+                    context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
+                    context.stroke(marker, with: .color(.white), lineWidth: 1.5)
+                    context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
+                }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

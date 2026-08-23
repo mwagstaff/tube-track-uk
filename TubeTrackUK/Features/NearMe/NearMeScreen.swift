@@ -213,7 +213,7 @@ private struct NearbyStationCard: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("\(station.name), \(distanceText) away")
-            .accessibilityHint("Shows this station on the Real World map")
+            .accessibilityHint("Shows this station in the real-world map view")
 
             ScrollView(.horizontal) {
                 HStack(spacing: 7) {
@@ -330,7 +330,8 @@ private struct NearbyStationCard: View {
     private func showOnMap() {
         appState.clearMapSelection()
         appState.select(station: station)
-        appState.selectedTab = .realWorld
+        appState.mapPresentationMode = .realWorld
+        appState.selectedTab = .map
     }
 }
 
