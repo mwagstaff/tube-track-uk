@@ -21,7 +21,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GABWDXR",
-      "text": "Abbey Wood"
+      "text": "Abbey Wood",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -33,7 +34,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GACTNCTL",
-      "text": "Acton Central"
+      "text": "Acton Central",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -45,7 +47,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GACTONML",
-      "text": "Acton Main Line"
+      "text": "Acton Main Line",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -57,7 +60,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GANERLEY",
-      "text": "Anerley"
+      "text": "Anerley",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -69,7 +73,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBARKRIV",
-      "text": "Barking Riverside"
+      "text": "Barking Riverside",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -81,7 +86,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBHILLPK",
-      "text": "Bush Hill Park"
+      "text": "Bush Hill Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -93,7 +99,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBNHAM",
-      "text": "Burnham (Berks)"
+      "text": "Burnham (Berks)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -105,7 +112,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBRBY",
-      "text": "Brondesbury"
+      "text": "Brondesbury",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -117,7 +125,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBRBYPK",
-      "text": "Brondesbury Park"
+      "text": "Brondesbury Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -129,7 +138,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBROCKLY",
-      "text": "Brockley"
+      "text": "Brockley",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -141,7 +151,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBRTWOOD",
-      "text": "Brentwood"
+      "text": "Brentwood",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -153,19 +164,24 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBRUCGRV",
-      "text": "Bruce Grove"
+      "text": "Bruce Grove",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "940GZZLUBLG"
+      ],
       "id": "label.910GBTHNLGR",
       "position": {
         "x": 2740.905,
         "y": 1361.344
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GBTHNLGR",
-      "text": "Bethnal Green"
+      "text": "Bethnal Green",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -177,7 +193,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GBUSHYDC",
-      "text": "Bushey"
+      "text": "Bushey",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -189,7 +206,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCAMHTH",
-      "text": "Cambridge Heath (London)"
+      "text": "Cambridge Heath (London)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -201,7 +219,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCHDWLHT",
-      "text": "Chadwell Heath"
+      "text": "Chadwell Heath",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -213,7 +232,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCHESHNT",
-      "text": "Cheshunt"
+      "text": "Cheshunt",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -225,7 +245,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCHINGFD",
-      "text": "Chingford"
+      "text": "Chingford",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -237,7 +258,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCLAPTON",
-      "text": "Clapton"
+      "text": "Clapton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -249,7 +271,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCLDNNRB",
-      "text": "Caledonian Road & Barnsbury"
+      "text": "Caledonian Road & Barnsbury",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -261,31 +284,24 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCLPHHS",
-      "text": "Clapham High Street"
+      "text": "Clapham High Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "910GCLPHMJC"
+      ],
       "id": "label.910GCLPHMJ1",
       "position": {
         "x": 1525.797,
         "y": 2277.328
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GCLPHMJ1",
-      "text": "Clapham Junction"
-    },
-    {
-      "alignment": "leading",
-      "id": "label.910GCLPHMJC",
-      "position": {
-        "x": 1493.407,
-        "y": 2248.062
-      },
-      "priority": 5,
-      "rotationDegrees": 0,
-      "stationID": "910GCLPHMJC",
-      "text": "Clapham Junction"
+      "text": "Clapham Junction",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -297,7 +313,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCMDNRD",
-      "text": "Camden Road"
+      "text": "Camden Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -306,10 +323,11 @@
         "x": 2550.384,
         "y": 1172.221
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GCNNB",
-      "text": "Canonbury"
+      "text": "Canonbury",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -321,7 +339,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCROUCHH",
-      "text": "Crouch Hill"
+      "text": "Crouch Hill",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -333,7 +352,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCRPNDPK",
-      "text": "Carpenders Park"
+      "text": "Carpenders Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -345,7 +365,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCRYSTLP",
-      "text": "Crystal Palace"
+      "text": "Crystal Palace",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -357,7 +378,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCSEAH",
-      "text": "Imperial Wharf"
+      "text": "Imperial Wharf",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -369,7 +391,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCUSTMHS",
-      "text": "Custom House"
+      "text": "Custom House",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -381,7 +404,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GDALS",
-      "text": "Dalston Junction"
+      "text": "Dalston Junction",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -393,7 +417,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GDALSKLD",
-      "text": "Dalston Kingsland"
+      "text": "Dalston Kingsland",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -405,7 +430,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GDENMRKH",
-      "text": "Denmark Hill"
+      "text": "Denmark Hill",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -417,7 +443,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GEDMNGRN",
-      "text": "Edmonton Green"
+      "text": "Edmonton Green",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -429,7 +456,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GEMRSPKH",
-      "text": "Emerson Park"
+      "text": "Emerson Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -441,7 +469,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GENFLDTN",
-      "text": "Enfield Town"
+      "text": "Enfield Town",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -453,7 +482,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GFNCHLYR",
-      "text": "Finchley Road & Frognal"
+      "text": "Finchley Road & Frognal",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -465,7 +495,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GFORESTH",
-      "text": "Forest Hill"
+      "text": "Forest Hill",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -477,7 +508,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GFRSTGT",
-      "text": "Forest Gate"
+      "text": "Forest Gate",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -489,7 +521,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GGIDEAPK",
-      "text": "Gidea Park"
+      "text": "Gidea Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -501,7 +534,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GGODMAYS",
-      "text": "Goodmayes"
+      "text": "Goodmayes",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -510,10 +544,11 @@
         "x": 1974.691,
         "y": 1051.61
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GGOSPLOK",
-      "text": "Gospel Oak"
+      "text": "Gospel Oak",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -525,7 +560,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHACKNYC",
-      "text": "Hackney Central"
+      "text": "Hackney Central",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -537,7 +573,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHACKNYW",
-      "text": "Hackney Wick"
+      "text": "Hackney Wick",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -549,7 +586,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHAGGERS",
-      "text": "Haggerston"
+      "text": "Haggerston",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -561,7 +599,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHAKNYNM",
-      "text": "Hackney Downs"
+      "text": "Hackney Downs",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -573,7 +612,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHANWELL",
-      "text": "Hanwell"
+      "text": "Hanwell",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -585,7 +625,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHAYESAH",
-      "text": "Hayes & Harlington"
+      "text": "Hayes & Harlington",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -597,7 +638,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHEDSTNL",
-      "text": "Headstone Lane"
+      "text": "Headstone Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -609,7 +651,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHGHMSPK",
-      "text": "Highams Park"
+      "text": "Highams Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -621,7 +664,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHMPSTDH",
-      "text": "Hampstead Heath"
+      "text": "Hampstead Heath",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -633,7 +677,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHOMRTON",
-      "text": "Homerton"
+      "text": "Homerton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -645,7 +690,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHONROPK",
-      "text": "Honor Oak Park"
+      "text": "Honor Oak Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -657,7 +703,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHOXTON",
-      "text": "Hoxton"
+      "text": "Hoxton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -669,7 +716,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHRGYGL",
-      "text": "Harringay Green Lanes"
+      "text": "Harringay Green Lanes",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -681,7 +729,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHRLDWOD",
-      "text": "Harold Wood"
+      "text": "Harold Wood",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -693,7 +742,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GHTCHEND",
-      "text": "Hatch End"
+      "text": "Hatch End",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -705,7 +755,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GILFORD",
-      "text": "Ilford"
+      "text": "Ilford",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -717,7 +768,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GIVER",
-      "text": "Iver"
+      "text": "Iver",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -729,7 +781,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GKENR",
-      "text": "Kensal Rise"
+      "text": "Kensal Rise",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -741,7 +794,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GKLBRNHR",
-      "text": "Kilburn High Road"
+      "text": "Kilburn High Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -753,7 +807,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GKNTSHTW",
-      "text": "Kentish Town West"
+      "text": "Kentish Town West",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -765,7 +820,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GLANGLEY",
-      "text": "Langley (Berks)"
+      "text": "Langley (Berks)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -777,7 +833,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GLEYTNMR",
-      "text": "Leyton Midland Road"
+      "text": "Leyton Midland Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -789,7 +846,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GLONFLDS",
-      "text": "London Fields"
+      "text": "London Fields",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -801,7 +859,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GLYTNSHR",
-      "text": "Leytonstone High Road"
+      "text": "Leytonstone High Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -813,7 +872,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GMANRPK",
-      "text": "Manor Park"
+      "text": "Manor Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -825,7 +885,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GMDNHEAD",
-      "text": "Maidenhead"
+      "text": "Maidenhead",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -837,7 +898,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GMRYLAND",
-      "text": "Maryland"
+      "text": "Maryland",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -849,7 +911,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GNEWXGTE",
-      "text": "New Cross Gate"
+      "text": "New Cross Gate",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -861,7 +924,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GNORWDJ",
-      "text": "Norwood Junction"
+      "text": "Norwood Junction",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -873,7 +937,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GNWCRELL",
-      "text": "New Cross ELL"
+      "text": "New Cross ELL",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -885,7 +950,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GPCKHMQD",
-      "text": "Queens Road Peckham"
+      "text": "Queens Road Peckham",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -897,7 +963,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GPCKHMRY",
-      "text": "Peckham Rye"
+      "text": "Peckham Rye",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -909,7 +976,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GPENEW",
-      "text": "Penge West"
+      "text": "Penge West",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -921,7 +989,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GRCTRYRD",
-      "text": "Rectory Road"
+      "text": "Rectory Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -933,7 +1002,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GRDNGSTN",
-      "text": "Reading"
+      "text": "Reading",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -942,10 +1012,11 @@
         "x": 3789.56,
         "y": 983.559
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GROMFORD",
-      "text": "Romford"
+      "text": "Romford",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -957,7 +1028,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GRTHERHI",
-      "text": "Rotherhithe"
+      "text": "Rotherhithe",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -969,7 +1041,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSACTON",
-      "text": "South Acton"
+      "text": "South Acton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -981,7 +1054,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSBURY",
-      "text": "Southbury"
+      "text": "Southbury",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -993,7 +1067,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSHENFLD",
-      "text": "Shenfield"
+      "text": "Shenfield",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1005,7 +1080,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSHMPSTD",
-      "text": "South Hampstead"
+      "text": "South Hampstead",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1017,7 +1093,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSHRDHST",
-      "text": "Shoreditch High Street"
+      "text": "Shoreditch High Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1029,7 +1106,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSIVRST",
-      "text": "Silver Street"
+      "text": "Silver Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1041,7 +1119,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSLOUGH",
-      "text": "Slough"
+      "text": "Slough",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1053,7 +1132,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSTHALL",
-      "text": "Southall"
+      "text": "Southall",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1065,7 +1145,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSTJMSST",
-      "text": "St James Street (London)"
+      "text": "St James Street (London)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1077,7 +1158,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSTKNWNG",
-      "text": "Stoke Newington"
+      "text": "Stoke Newington",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1089,7 +1171,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSTMFDHL",
-      "text": "Stamford Hill"
+      "text": "Stamford Hill",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1101,7 +1184,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSTOTNHM",
-      "text": "South Tottenham"
+      "text": "South Tottenham",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1113,7 +1197,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSURREYQ",
-      "text": "Surrey Quays"
+      "text": "Surrey Quays",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1125,7 +1210,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSVNKNGS",
-      "text": "Seven Kings"
+      "text": "Seven Kings",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1137,7 +1223,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GSYDENHM",
-      "text": "Sydenham"
+      "text": "Sydenham",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1149,7 +1236,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GTAPLOW",
-      "text": "Taplow"
+      "text": "Taplow",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1161,7 +1249,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GTHBLDSG",
-      "text": "Theobalds Grove"
+      "text": "Theobalds Grove",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1173,7 +1262,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GTURKYST",
-      "text": "Turkey Street"
+      "text": "Turkey Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1185,7 +1275,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GTWYFORD",
-      "text": "Twyford"
+      "text": "Twyford",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1197,7 +1288,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GUPRHLWY",
-      "text": "Upper Holloway"
+      "text": "Upper Holloway",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1209,7 +1301,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWAPPING",
-      "text": "Wapping"
+      "text": "Wapping",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1221,7 +1314,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWATFDHS",
-      "text": "Watford High Street"
+      "text": "Watford High Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1233,7 +1327,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWATFJDC",
-      "text": "Watford Junction"
+      "text": "Watford Junction",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1245,7 +1340,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWCROYDN",
-      "text": "West Croydon"
+      "text": "West Croydon",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1257,7 +1353,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWDGRNPK",
-      "text": "Woodgrange Park"
+      "text": "Woodgrange Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1269,7 +1366,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWDRYTON",
-      "text": "West Drayton"
+      "text": "West Drayton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1281,7 +1379,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWDST",
-      "text": "Wood Street"
+      "text": "Wood Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1293,7 +1392,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWEALING",
-      "text": "West Ealing"
+      "text": "West Ealing",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1305,7 +1405,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWHHRTLA",
-      "text": "White Hart Lane"
+      "text": "White Hart Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1317,7 +1418,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWLTHQRD",
-      "text": "Walthamstow Queens Road"
+      "text": "Walthamstow Queens Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1329,7 +1431,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWNDSWRD",
-      "text": "Wandsworth Road"
+      "text": "Wandsworth Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1341,7 +1444,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWNSTDPK",
-      "text": "Wanstead Park"
+      "text": "Wanstead Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1353,7 +1457,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GWOLWXR",
-      "text": "Woolwich"
+      "text": "Woolwich",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1365,7 +1470,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZBPSUST",
-      "text": "Battersea\nPower Station"
+      "text": "Battersea\nPower Station",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -1377,7 +1483,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRADD",
-      "text": "Addiscombe"
+      "text": "Addiscombe",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1389,7 +1496,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRADV",
-      "text": "Addington Village"
+      "text": "Addington Village",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1401,7 +1509,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRAMP",
-      "text": "Ampere\nWay"
+      "text": "Ampere\nWay",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1413,7 +1522,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRARA",
-      "text": "Arena"
+      "text": "Arena",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1425,7 +1535,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRAVE",
-      "text": "Avenue\nRoad"
+      "text": "Avenue\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1437,7 +1548,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBED",
-      "text": "Beddington\nLane"
+      "text": "Beddington\nLane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1449,7 +1561,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBEK",
-      "text": "Beckenham\nJunction"
+      "text": "Beckenham\nJunction",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1461,7 +1574,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBGV",
-      "text": "Belgrave\nWalk"
+      "text": "Belgrave\nWalk",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1473,7 +1587,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBIR",
-      "text": "Birkbeck"
+      "text": "Birkbeck",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1485,7 +1600,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBLA",
-      "text": "Blackhorse Lane"
+      "text": "Blackhorse Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1497,7 +1613,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRBRD",
-      "text": "Beckenham\nRoad"
+      "text": "Beckenham\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1509,7 +1626,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRCEN",
-      "text": "George\nStreet"
+      "text": "George\nStreet",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1521,7 +1639,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRCHR",
-      "text": "Church Street"
+      "text": "Church Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1533,7 +1652,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRCOO",
-      "text": "Coombe Lane"
+      "text": "Coombe Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1545,7 +1665,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRCTR",
-      "text": "Centrale"
+      "text": "Centrale",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1557,7 +1678,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRDDR",
-      "text": "Dundonald\nRoad"
+      "text": "Dundonald\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1569,7 +1691,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRECR",
-      "text": "East\nCroydon"
+      "text": "East\nCroydon",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1581,7 +1704,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRELM",
-      "text": "Elmers End"
+      "text": "Elmers End",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1593,7 +1717,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRFLD",
-      "text": "Fieldway"
+      "text": "Fieldway",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1605,7 +1730,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRGRA",
-      "text": "Gravel Hill"
+      "text": "Gravel Hill",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1617,7 +1743,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRHAR",
-      "text": "Harrington\nRoad"
+      "text": "Harrington\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1629,7 +1756,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRKGH",
-      "text": "King Henry's Drive"
+      "text": "King Henry's Drive",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1641,7 +1769,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRLEB",
-      "text": "Lebanon\nRoad"
+      "text": "Lebanon\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1653,7 +1782,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRLOY",
-      "text": "Lloyd Park"
+      "text": "Lloyd Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1665,7 +1795,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRMCH",
-      "text": "Mitcham"
+      "text": "Mitcham",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1677,7 +1808,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRMDN",
-      "text": "Morden\nRoad"
+      "text": "Morden\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1689,7 +1821,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRMJT",
-      "text": "Mitcham\nJunction"
+      "text": "Mitcham\nJunction",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1701,7 +1834,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRMTP",
-      "text": "Merton\nPark"
+      "text": "Merton\nPark",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1713,7 +1847,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRNWA",
-      "text": "New Addington"
+      "text": "New Addington",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1725,7 +1860,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRPHI",
-      "text": "Phipps\nBridge"
+      "text": "Phipps\nBridge",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1737,7 +1873,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRRVC",
-      "text": "Reeves\nCorner"
+      "text": "Reeves\nCorner",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1749,7 +1886,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRSAN",
-      "text": "Sandilands"
+      "text": "Sandilands",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1761,7 +1899,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRTPA",
-      "text": "Therapia\nLane"
+      "text": "Therapia\nLane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1773,7 +1912,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRWAD",
-      "text": "Waddon\nMarsh"
+      "text": "Waddon\nMarsh",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1785,7 +1925,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRWAN",
-      "text": "Wandle\nPark"
+      "text": "Wandle\nPark",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "centre",
@@ -1797,7 +1938,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRWEL",
-      "text": "Wellesley\nRoad"
+      "text": "Wellesley\nRoad",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1809,7 +1951,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZCRWOD",
-      "text": "Woodside"
+      "text": "Woodside",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1821,7 +1964,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLABR",
-      "text": "Abbey Road"
+      "text": "Abbey Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1833,7 +1977,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLALL",
-      "text": "All Saints"
+      "text": "All Saints",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1845,7 +1990,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLBEC",
-      "text": "Beckton"
+      "text": "Beckton",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1857,7 +2003,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLBLA",
-      "text": "Blackwall"
+      "text": "Blackwall",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1869,7 +2016,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLBOW",
-      "text": "Bow Church"
+      "text": "Bow Church",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1881,7 +2029,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLBPK",
-      "text": "Beckton Park"
+      "text": "Beckton Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1893,7 +2042,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLCLA",
-      "text": "Crossharbour"
+      "text": "Crossharbour",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1905,7 +2055,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLCUS",
-      "text": "Custom House (for ExCel)"
+      "text": "Custom House (for ExCel)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1917,7 +2068,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLCUT",
-      "text": "Cutty Sark (for Maritime Greenwich)"
+      "text": "Cutty Sark (for Maritime Greenwich)",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1929,7 +2081,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLCYP",
-      "text": "Cyprus"
+      "text": "Cyprus",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1941,7 +2094,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLDEP",
-      "text": "Deptford Bridge"
+      "text": "Deptford Bridge",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1953,7 +2107,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLDEV",
-      "text": "Devons Road"
+      "text": "Devons Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1965,7 +2120,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLEIN",
-      "text": "East India"
+      "text": "East India",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -1977,7 +2133,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLELV",
-      "text": "Elverson Road"
+      "text": "Elverson Road",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -1989,7 +2146,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLGAL",
-      "text": "Gallions Reach"
+      "text": "Gallions Reach",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2001,7 +2159,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLGRE",
-      "text": "Greenwich"
+      "text": "Greenwich",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2013,7 +2172,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLHEQ",
-      "text": "Heron Quays"
+      "text": "Heron Quays",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2025,7 +2185,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLISL",
-      "text": "Island Gardens"
+      "text": "Island Gardens",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2037,7 +2198,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLKGV",
-      "text": "King George V"
+      "text": "King George V",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2049,7 +2211,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLLCA",
-      "text": "London City Airport"
+      "text": "London City Airport",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2061,7 +2224,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLLDP",
-      "text": "Langdon Park"
+      "text": "Langdon Park",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2073,7 +2237,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLLEW",
-      "text": "Lewisham"
+      "text": "Lewisham",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2085,7 +2250,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLLIM",
-      "text": "Limehouse"
+      "text": "Limehouse",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2097,7 +2263,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLMUD",
-      "text": "Mudchute"
+      "text": "Mudchute",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2109,7 +2276,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLPDK",
-      "text": "Pontoon Dock"
+      "text": "Pontoon Dock",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2121,7 +2289,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLPOP",
-      "text": "Poplar"
+      "text": "Poplar",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2133,7 +2302,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLPRE",
-      "text": "Prince Regent"
+      "text": "Prince Regent",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2145,7 +2315,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLPUD",
-      "text": "Pudding Mill Lane"
+      "text": "Pudding Mill Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2157,7 +2328,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLRAL",
-      "text": "Royal Albert"
+      "text": "Royal Albert",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2169,7 +2341,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLRVC",
-      "text": "Royal Victoria"
+      "text": "Royal Victoria",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2181,7 +2354,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLSHA",
-      "text": "Shadwell"
+      "text": "Shadwell",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2193,7 +2367,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLSHS",
-      "text": "Stratford High Street"
+      "text": "Stratford High Street",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2205,7 +2380,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLSIT",
-      "text": "Stratford International"
+      "text": "Stratford International",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2217,7 +2393,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLSOQ",
-      "text": "South Quay"
+      "text": "South Quay",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2229,7 +2406,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLSTL",
-      "text": "Star Lane"
+      "text": "Star Lane",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2241,7 +2419,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLTWG",
-      "text": "Tower Gateway"
+      "text": "Tower Gateway",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2253,7 +2432,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLWFE",
-      "text": "Westferry"
+      "text": "Westferry",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "trailing",
@@ -2265,7 +2445,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLWIQ",
-      "text": "West India Quay"
+      "text": "West India Quay",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2277,7 +2458,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLWLA",
-      "text": "Woolwich Arsenal"
+      "text": "Woolwich Arsenal",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2289,7 +2471,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZDLWSV",
-      "text": "West Silvertown"
+      "text": "West Silvertown",
+      "visibilityTier": "minor"
     },
     {
       "alignment": "leading",
@@ -2301,7 +2484,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUACT",
-      "text": "Acton Town"
+      "text": "Acton Town",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2313,7 +2497,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUACY",
-      "text": "Archway"
+      "text": "Archway",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2325,7 +2510,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUADE",
-      "text": "Aldgate\nEast"
+      "text": "Aldgate\nEast",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2337,7 +2523,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUAGL",
-      "text": "Angel"
+      "text": "Angel",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2349,7 +2536,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUALD",
-      "text": "Aldgate"
+      "text": "Aldgate",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2361,7 +2549,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUALP",
-      "text": "Alperton"
+      "text": "Alperton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2373,7 +2562,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUAMS",
-      "text": "Amersham"
+      "text": "Amersham",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2385,7 +2575,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUASG",
-      "text": "Arnos Grove"
+      "text": "Arnos Grove",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2397,7 +2588,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUASL",
-      "text": "Arsenal"
+      "text": "Arsenal",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2409,7 +2601,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBBB",
-      "text": "Bromley-by-Bow"
+      "text": "Bromley-by-Bow",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2421,7 +2614,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBBN",
-      "text": "Barbican"
+      "text": "Barbican",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2433,7 +2627,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBDS",
-      "text": "Bounds Green"
+      "text": "Bounds Green",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2445,7 +2640,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBEC",
-      "text": "Becontree"
+      "text": "Becontree",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2457,7 +2653,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBKE",
-      "text": "Barkingside"
+      "text": "Barkingside",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2469,7 +2666,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBKF",
-      "text": "Blackfriars"
+      "text": "Blackfriars",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -2481,7 +2679,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBKG",
-      "text": "Barking"
+      "text": "Barking",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2493,19 +2692,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBKH",
-      "text": "Buckhurst Hill"
-    },
-    {
-      "alignment": "leading",
-      "id": "label.940GZZLUBLG",
-      "position": {
-        "x": 2746.0,
-        "y": 1454.0
-      },
-      "priority": 5,
-      "rotationDegrees": 0,
-      "stationID": "940GZZLUBLG",
-      "text": "Bethnal\nGreen"
+      "text": "Buckhurst Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2517,7 +2705,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBLM",
-      "text": "Balham"
+      "text": "Balham",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2529,7 +2718,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBLR",
-      "text": "Blackhorse\nRoad"
+      "text": "Blackhorse\nRoad",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2541,7 +2731,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBMY",
-      "text": "Bermondsey"
+      "text": "Bermondsey",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2553,19 +2744,24 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBND",
-      "text": "Bond\nStreet"
+      "text": "Bond\nStreet",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "940GZZDLBNK"
+      ],
       "id": "label.940GZZLUBNK",
       "position": {
         "x": 2366.0,
         "y": 1626.0
       },
-      "priority": 10,
+      "priority": 32,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBNK",
-      "text": "Bank"
+      "text": "Bank",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
@@ -2577,7 +2773,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBOR",
-      "text": "Borough"
+      "text": "Borough",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2589,7 +2786,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBOS",
-      "text": "Boston Manor"
+      "text": "Boston Manor",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2601,7 +2799,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBSC",
-      "text": "Barons Court"
+      "text": "Barons Court",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -2610,10 +2809,11 @@
         "x": 1710.0,
         "y": 1358.0
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBST",
-      "text": "Baker Street"
+      "text": "Baker Street",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -2625,7 +2825,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBTK",
-      "text": "Burnt Oak"
+      "text": "Burnt Oak",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2637,7 +2838,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBTX",
-      "text": "Brent Cross"
+      "text": "Brent Cross",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2649,7 +2851,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBWR",
-      "text": "Bow Road"
+      "text": "Bow Road",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2661,7 +2864,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBWT",
-      "text": "Bayswater"
+      "text": "Bayswater",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2673,7 +2877,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBXN",
-      "text": "Brixton"
+      "text": "Brixton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2685,7 +2890,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUBZP",
-      "text": "Belsize Park"
+      "text": "Belsize Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2697,7 +2903,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCAL",
-      "text": "Chalfont &\nLatimer"
+      "text": "Chalfont &\nLatimer",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2709,7 +2916,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCAR",
-      "text": "Caledonian\nRoad"
+      "text": "Caledonian\nRoad",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2721,7 +2929,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCFM",
-      "text": "Chalk Farm"
+      "text": "Chalk Farm",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2733,19 +2942,24 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCGN",
-      "text": "Covent\nGarden"
+      "text": "Covent\nGarden",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "940GZZDLCGT"
+      ],
       "id": "label.940GZZLUCGT",
       "position": {
         "x": 3257.07,
         "y": 1811.755
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCGT",
-      "text": "Canning Town"
+      "text": "Canning Town",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -2757,7 +2971,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCHL",
-      "text": "Chancery\nLane"
+      "text": "Chancery\nLane",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2769,7 +2984,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCHX",
-      "text": "Charing\nCross"
+      "text": "Charing\nCross",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2781,7 +2997,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCKS",
-      "text": "Cockfosters"
+      "text": "Cockfosters",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2793,7 +3010,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCND",
-      "text": "Colindale"
+      "text": "Colindale",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2805,7 +3023,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCPC",
-      "text": "Clapham\nCommon"
+      "text": "Clapham\nCommon",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2817,7 +3036,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCPK",
-      "text": "Canons Park"
+      "text": "Canons Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2829,7 +3049,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCPN",
-      "text": "Clapham North"
+      "text": "Clapham North",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2841,7 +3062,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCPS",
-      "text": "Clapham South"
+      "text": "Clapham South",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2853,7 +3075,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCSD",
-      "text": "Colliers\nWood"
+      "text": "Colliers\nWood",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2865,7 +3088,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCSM",
-      "text": "Chesham"
+      "text": "Chesham",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2877,7 +3101,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCST",
-      "text": "Cannon\nStreet"
+      "text": "Cannon\nStreet",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -2889,7 +3114,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCTN",
-      "text": "Camden Town"
+      "text": "Camden Town",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2901,7 +3127,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCWL",
-      "text": "Chigwell"
+      "text": "Chigwell",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -2913,7 +3140,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCWP",
-      "text": "Chiswick Park"
+      "text": "Chiswick Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2925,7 +3153,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCWR",
-      "text": "Canada\nWater"
+      "text": "Canada\nWater",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2937,7 +3166,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCXY",
-      "text": "Croxley"
+      "text": "Croxley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -2949,19 +3179,25 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCYD",
-      "text": "Chorleywood"
+      "text": "Chorleywood",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GCANWHRF",
+        "940GZZDLCAN"
+      ],
       "id": "label.940GZZLUCYF",
       "position": {
         "x": 2955.92,
         "y": 1882.085
       },
-      "priority": 5,
+      "priority": 38,
       "rotationDegrees": 0,
       "stationID": "940GZZLUCYF",
-      "text": "Canary Wharf"
+      "text": "Canary Wharf",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -2973,7 +3209,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUDBN",
-      "text": "Debden"
+      "text": "Debden",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2985,7 +3222,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUDGE",
-      "text": "Dagenham East"
+      "text": "Dagenham East",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -2997,7 +3235,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUDGY",
-      "text": "Dagenham Heathway"
+      "text": "Dagenham Heathway",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3009,7 +3248,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUDOH",
-      "text": "Dollis Hill"
+      "text": "Dollis Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3021,7 +3261,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEAC",
-      "text": "Elephant & Castle"
+      "text": "Elephant & Castle",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3033,7 +3274,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEAE",
-      "text": "Eastcote"
+      "text": "Eastcote",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3045,7 +3287,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEAN",
-      "text": "East Acton"
+      "text": "East Acton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3057,7 +3300,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEBY",
-      "text": "Ealing Broadway"
+      "text": "Ealing Broadway",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3069,7 +3313,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUECM",
-      "text": "Ealing Common"
+      "text": "Ealing Common",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3081,7 +3326,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUECT",
-      "text": "Earl's Court"
+      "text": "Earl's Court",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3093,7 +3339,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEFY",
-      "text": "East Finchley"
+      "text": "East Finchley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3105,7 +3352,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEGW",
-      "text": "Edgware"
+      "text": "Edgware",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3117,7 +3365,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEHM",
-      "text": "East Ham"
+      "text": "East Ham",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3129,7 +3378,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEMB",
-      "text": "Embankment"
+      "text": "Embankment",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3141,7 +3391,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEPG",
-      "text": "Epping"
+      "text": "Epping",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3153,7 +3404,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEPK",
-      "text": "Elm Park"
+      "text": "Elm Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3165,7 +3417,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEPY",
-      "text": "East Putney"
+      "text": "East Putney",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3177,7 +3430,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUERB",
-      "text": "Edgware Road\n(Bakerloo)"
+      "text": "Edgware Road\n(Bakerloo)",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3189,7 +3443,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUERC",
-      "text": "Edgware Road\n(Circle Line)"
+      "text": "Edgware Road\n(Circle Line)",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3201,19 +3456,24 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUESQ",
-      "text": "Euston Square"
+      "text": "Euston Square",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GEUSTON"
+      ],
       "id": "label.940GZZLUEUS",
       "position": {
         "x": 1963.0,
         "y": 1301.0
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUEUS",
-      "text": "Euston"
+      "text": "Euston",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -3225,7 +3485,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFBY",
-      "text": "Fulham Broadway"
+      "text": "Fulham Broadway",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3237,7 +3498,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFCN",
-      "text": "Farringdon"
+      "text": "Farringdon",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3249,7 +3511,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFLP",
-      "text": "Fairlop"
+      "text": "Fairlop",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3258,10 +3521,11 @@
         "x": 2424.0,
         "y": 1061.0
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFPK",
-      "text": "Finsbury\nPark"
+      "text": "Finsbury\nPark",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -3273,7 +3537,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFYC",
-      "text": "Finchley Central"
+      "text": "Finchley Central",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3285,7 +3550,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFYR",
-      "text": "Finchley Road"
+      "text": "Finchley Road",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3297,7 +3563,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGBY",
-      "text": "Gunnersbury"
+      "text": "Gunnersbury",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3309,7 +3576,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGDG",
-      "text": "Goodge\nStreet"
+      "text": "Goodge\nStreet",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3321,7 +3589,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGFD",
-      "text": "Greenford"
+      "text": "Greenford",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3333,7 +3602,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGGH",
-      "text": "Grange Hill"
+      "text": "Grange Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3345,7 +3615,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGGN",
-      "text": "Golders Green"
+      "text": "Golders Green",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3357,7 +3628,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGHK",
-      "text": "Goldhawk Road"
+      "text": "Goldhawk Road",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3366,10 +3638,11 @@
         "x": 1745.087,
         "y": 1685.203
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGPK",
-      "text": "Green Park"
+      "text": "Green Park",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "centre",
@@ -3381,7 +3654,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGPS",
-      "text": "Great Portland Street"
+      "text": "Great Portland Street",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3393,7 +3667,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGTH",
-      "text": "Gants Hill"
+      "text": "Gants Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3405,19 +3680,24 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUGTR",
-      "text": "Gloucester Road"
+      "text": "Gloucester Road",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GHGHI"
+      ],
       "id": "label.940GZZLUHAI",
       "position": {
         "x": 2388.132,
         "y": 1142.976
       },
-      "priority": 5,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHAI",
-      "text": "Highbury &\nIslington"
+      "text": "Highbury &\nIslington",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -3429,7 +3709,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHAW",
-      "text": "Harrow &\nWealdstone"
+      "text": "Harrow &\nWealdstone",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3441,7 +3722,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHBN",
-      "text": "Holborn"
+      "text": "Holborn",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3453,7 +3735,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHBT",
-      "text": "High Barnet"
+      "text": "High Barnet",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3465,7 +3748,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHCH",
-      "text": "Hornchurch"
+      "text": "Hornchurch",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3477,7 +3761,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHCL",
-      "text": "Hendon Central"
+      "text": "Hendon Central",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3489,7 +3774,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHGD",
-      "text": "Hillingdon"
+      "text": "Hillingdon",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3501,7 +3787,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHGR",
-      "text": "Hanger Lane"
+      "text": "Hanger Lane",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3513,7 +3800,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHGT",
-      "text": "Highgate"
+      "text": "Highgate",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3525,7 +3813,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHLT",
-      "text": "Hainault"
+      "text": "Hainault",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3537,7 +3826,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHNX",
-      "text": "Hatton Cross"
+      "text": "Hatton Cross",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3549,7 +3839,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHOH",
-      "text": "Harrow-\non-the-Hill"
+      "text": "Harrow-\non-the-Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3561,7 +3852,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHPC",
-      "text": "Hyde Park Corner"
+      "text": "Hyde Park Corner",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3573,7 +3865,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHPK",
-      "text": "Holland Park"
+      "text": "Holland Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3585,7 +3878,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHR4",
-      "text": "Heathrow\nTerminal 4"
+      "text": "Heathrow\nTerminal 4",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3597,7 +3891,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHR5",
-      "text": "Heathrow\nTerminal 5"
+      "text": "Heathrow\nTerminal 5",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3606,10 +3901,11 @@
         "x": 296.513,
         "y": 2094.585
       },
-      "priority": 10,
+      "priority": 30,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHRC",
-      "text": "Heathrow\nTerminals 2 & 3"
+      "text": "Heathrow\nTerminals 2 & 3",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -3621,7 +3917,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHSC",
-      "text": "Hammersmith (H&C Line)"
+      "text": "Hammersmith (H&C Line)",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3633,7 +3930,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHSD",
-      "text": "Hammersmith (Dist&Picc Line)"
+      "text": "Hammersmith (Dist&Picc Line)",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3645,7 +3943,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHSK",
-      "text": "High Street Kensington"
+      "text": "High Street Kensington",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3657,7 +3956,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHSN",
-      "text": "Harlesden"
+      "text": "Harlesden",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3669,7 +3969,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHTD",
-      "text": "Hampstead"
+      "text": "Hampstead",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3681,7 +3982,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHWC",
-      "text": "Hounslow Central"
+      "text": "Hounslow Central",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3693,7 +3995,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHWE",
-      "text": "Hounslow East"
+      "text": "Hounslow East",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3705,7 +4008,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHWT",
-      "text": "Hounslow West"
+      "text": "Hounslow West",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3717,7 +4021,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUHWY",
-      "text": "Holloway\nRoad"
+      "text": "Holloway\nRoad",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3729,7 +4034,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUICK",
-      "text": "Ickenham"
+      "text": "Ickenham",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -3741,7 +4047,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKBN",
-      "text": "Kilburn"
+      "text": "Kilburn",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3753,7 +4060,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKBY",
-      "text": "Kingsbury"
+      "text": "Kingsbury",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3765,7 +4073,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKEN",
-      "text": "Kenton"
+      "text": "Kenton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3777,7 +4086,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKNB",
-      "text": "Knightsbridge"
+      "text": "Knightsbridge",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3789,7 +4099,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKNG",
-      "text": "Kennington"
+      "text": "Kennington",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -3801,7 +4112,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKOY",
-      "text": "Kensington (Olympia)"
+      "text": "Kensington (Olympia)",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3813,7 +4125,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKPK",
-      "text": "Kilburn Park"
+      "text": "Kilburn Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3825,7 +4138,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKSH",
-      "text": "Kentish\nTown"
+      "text": "Kentish\nTown",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3837,7 +4151,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKSL",
-      "text": "Kensal Green"
+      "text": "Kensal Green",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3846,10 +4161,11 @@
         "x": 2163.0,
         "y": 1372.0
       },
-      "priority": 10,
+      "priority": 36,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKSX",
-      "text": "King's Cross\n& St Pancras"
+      "text": "King's Cross\n& St Pancras",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
@@ -3861,7 +4177,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKWG",
-      "text": "Kew Gardens"
+      "text": "Kew Gardens",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3873,7 +4190,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULAD",
-      "text": "Ladbroke Grove"
+      "text": "Ladbroke Grove",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3885,7 +4203,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULBN",
-      "text": "Lambeth\nNorth"
+      "text": "Lambeth\nNorth",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3897,7 +4216,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULGN",
-      "text": "Loughton"
+      "text": "Loughton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -3909,7 +4229,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULGT",
-      "text": "Lancaster Gate"
+      "text": "Lancaster Gate",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3918,10 +4239,11 @@
         "x": 2365.0,
         "y": 1846.0
       },
-      "priority": 10,
+      "priority": 33,
       "rotationDegrees": 0,
       "stationID": "940GZZLULNB",
-      "text": "London Bridge"
+      "text": "London Bridge",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
@@ -3933,7 +4255,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULRD",
-      "text": "Latimer Road"
+      "text": "Latimer Road",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -3945,19 +4268,25 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLULSQ",
-      "text": "Leicester\nSquare"
+      "text": "Leicester\nSquare",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "910GLIVST",
+        "910GLIVSTLL"
+      ],
       "id": "label.940GZZLULVT",
       "position": {
         "x": 2441.0,
         "y": 1450.0
       },
-      "priority": 10,
+      "priority": 35,
       "rotationDegrees": 0,
       "stationID": "940GZZLULVT",
-      "text": "Liverpool\nStreet"
+      "text": "Liverpool\nStreet",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -3969,7 +4298,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLULYN",
-      "text": "Leyton"
+      "text": "Leyton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -3981,7 +4311,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLULYS",
-      "text": "Leytonstone"
+      "text": "Leytonstone",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -3993,7 +4324,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMBA",
-      "text": "Marble Arch"
+      "text": "Marble Arch",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4005,7 +4337,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMDN",
-      "text": "Morden"
+      "text": "Morden",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4017,7 +4350,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMED",
-      "text": "Mile End"
+      "text": "Mile End",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4029,7 +4363,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMGT",
-      "text": "Moorgate"
+      "text": "Moorgate",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4041,7 +4376,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMHL",
-      "text": "Mill Hill East"
+      "text": "Mill Hill East",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4053,7 +4389,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMMT",
-      "text": "Monument"
+      "text": "Monument",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -4065,7 +4402,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMPK",
-      "text": "Moor Park"
+      "text": "Moor Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4077,7 +4415,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMRH",
-      "text": "Manor House"
+      "text": "Manor House",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4089,7 +4428,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMSH",
-      "text": "Mansion\nHouse"
+      "text": "Mansion\nHouse",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4101,7 +4441,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMTC",
-      "text": "Mornington\nCrescent"
+      "text": "Mornington\nCrescent",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4113,7 +4454,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMVL",
-      "text": "Maida Vale"
+      "text": "Maida Vale",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4125,7 +4467,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUMYB",
-      "text": "Marylebone"
+      "text": "Marylebone",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4137,7 +4480,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNAN",
-      "text": "North Acton"
+      "text": "North Acton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4149,7 +4493,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNBP",
-      "text": "Newbury Park"
+      "text": "Newbury Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4161,7 +4506,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNDN",
-      "text": "Neasden"
+      "text": "Neasden",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4173,7 +4519,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNEN",
-      "text": "North Ealing"
+      "text": "North Ealing",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4185,7 +4532,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNFD",
-      "text": "Northfields"
+      "text": "Northfields",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4197,7 +4545,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNGW",
-      "text": "North Greenwich"
+      "text": "North Greenwich",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4209,7 +4558,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNHA",
-      "text": "North Harrow"
+      "text": "North Harrow",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4221,7 +4571,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNHG",
-      "text": "Notting Hill Gate"
+      "text": "Notting Hill Gate",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4233,7 +4584,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNHT",
-      "text": "Northolt"
+      "text": "Northolt",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4245,7 +4597,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNKP",
-      "text": "Northwick\nPark"
+      "text": "Northwick\nPark",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4257,7 +4610,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNOW",
-      "text": "Northwood"
+      "text": "Northwood",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4269,7 +4623,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNWH",
-      "text": "Northwood Hills"
+      "text": "Northwood Hills",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4281,7 +4636,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUNWY",
-      "text": "North Wembley"
+      "text": "North Wembley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4293,7 +4649,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUOAK",
-      "text": "Oakwood"
+      "text": "Oakwood",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4305,7 +4662,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUODS",
-      "text": "Old\nStreet"
+      "text": "Old\nStreet",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4317,7 +4675,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUOSY",
-      "text": "Osterley"
+      "text": "Osterley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4329,7 +4688,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUOVL",
-      "text": "Oval"
+      "text": "Oval",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4338,34 +4698,29 @@
         "x": 1816.003,
         "y": 1610.344
       },
-      "priority": 10,
+      "priority": 31,
       "rotationDegrees": 0,
       "stationID": "940GZZLUOXC",
-      "text": "Oxford Circus"
+      "text": "Oxford Circus",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "910GPADTLL",
+        "910GPADTON",
+        "940GZZLUPAH"
+      ],
       "id": "label.940GZZLUPAC",
       "position": {
         "x": 1477.982,
         "y": 1422.188
       },
-      "priority": 10,
+      "priority": 34,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPAC",
-      "text": "Paddington"
-    },
-    {
-      "alignment": "leading",
-      "id": "label.940GZZLUPAH",
-      "position": {
-        "x": 1477.989,
-        "y": 1421.627
-      },
-      "priority": 10,
-      "rotationDegrees": 0,
-      "stationID": "940GZZLUPAH",
-      "text": "Paddington"
+      "text": "Paddington",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
@@ -4377,7 +4732,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPCC",
-      "text": "Piccadilly\nCircus"
+      "text": "Piccadilly\nCircus",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4389,7 +4745,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPCO",
-      "text": "Pimlico"
+      "text": "Pimlico",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4401,7 +4758,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPKR",
-      "text": "Park Royal"
+      "text": "Park Royal",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4413,7 +4771,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPLW",
-      "text": "Plaistow"
+      "text": "Plaistow",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4425,7 +4784,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPNR",
-      "text": "Pinner"
+      "text": "Pinner",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4437,7 +4797,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPRD",
-      "text": "Preston\nRoad"
+      "text": "Preston\nRoad",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4449,7 +4810,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPSG",
-      "text": "Parsons Green"
+      "text": "Parsons Green",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4461,7 +4823,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPVL",
-      "text": "Perivale"
+      "text": "Perivale",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4473,7 +4836,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUPYB",
-      "text": "Putney Bridge"
+      "text": "Putney Bridge",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4485,7 +4849,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUQBY",
-      "text": "Queensbury"
+      "text": "Queensbury",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4497,7 +4862,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUQPS",
-      "text": "Queen's Park"
+      "text": "Queen's Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4509,7 +4875,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUQWY",
-      "text": "Queensway"
+      "text": "Queensway",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4521,7 +4888,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURBG",
-      "text": "Redbridge"
+      "text": "Redbridge",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4533,7 +4901,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURGP",
-      "text": "Regent's Park"
+      "text": "Regent's Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4545,7 +4914,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURKW",
-      "text": "Rickmansworth"
+      "text": "Rickmansworth",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4557,7 +4927,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURMD",
-      "text": "Richmond"
+      "text": "Richmond",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4569,7 +4940,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURSG",
-      "text": "Ruislip Gardens"
+      "text": "Ruislip Gardens",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4581,7 +4953,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLURSM",
-      "text": "Ruislip Manor"
+      "text": "Ruislip Manor",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -4593,7 +4966,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLURSP",
-      "text": "Ruislip"
+      "text": "Ruislip",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -4605,7 +4979,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURSQ",
-      "text": "Russell\nSquare"
+      "text": "Russell\nSquare",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4617,7 +4992,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURVP",
-      "text": "Ravenscourt Park"
+      "text": "Ravenscourt Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4629,7 +5005,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURVY",
-      "text": "Roding Valley"
+      "text": "Roding Valley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4641,7 +5018,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLURYL",
-      "text": "Rayners Lane"
+      "text": "Rayners Lane",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4653,7 +5031,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLURYO",
-      "text": "Royal Oak"
+      "text": "Royal Oak",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4665,7 +5044,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSBC",
-      "text": "Shepherd's Bush (Central)"
+      "text": "Shepherd's Bush (Central)",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4677,7 +5057,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSBM",
-      "text": "Shepherd's Bush Market"
+      "text": "Shepherd's Bush Market",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4689,7 +5070,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSEA",
-      "text": "South Ealing"
+      "text": "South Ealing",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4701,7 +5083,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSFB",
-      "text": "Stamford Brook"
+      "text": "Stamford Brook",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4713,7 +5096,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSFS",
-      "text": "Southfields"
+      "text": "Southfields",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4725,7 +5109,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSGN",
-      "text": "Stepney\nGreen"
+      "text": "Stepney\nGreen",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4737,7 +5122,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSGP",
-      "text": "Stonebridge Park"
+      "text": "Stonebridge Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4749,7 +5135,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSGT",
-      "text": "Southgate"
+      "text": "Southgate",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4761,7 +5148,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSHH",
-      "text": "South Harrow"
+      "text": "South Harrow",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4773,7 +5161,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSJP",
-      "text": "St. James's Park"
+      "text": "St. James's Park",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -4785,7 +5174,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSJW",
-      "text": "St. John's Wood"
+      "text": "St. John's Wood",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4797,7 +5187,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSKS",
-      "text": "South Kensington"
+      "text": "South Kensington",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4809,7 +5200,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSKT",
-      "text": "South Kenton"
+      "text": "South Kenton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4821,7 +5213,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSKW",
-      "text": "Stockwell"
+      "text": "Stockwell",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -4833,7 +5226,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSNB",
-      "text": "Snaresbrook"
+      "text": "Snaresbrook",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4845,7 +5239,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSPU",
-      "text": "St Paul's"
+      "text": "St Paul's",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4857,7 +5252,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSRP",
-      "text": "South Ruislip"
+      "text": "South Ruislip",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -4869,19 +5265,25 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSSQ",
-      "text": "Sloane Square"
+      "text": "Sloane Square",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "910GSTFD",
+        "940GZZDLSTD"
+      ],
       "id": "label.940GZZLUSTD",
       "position": {
         "x": 3231.45,
         "y": 1260.51
       },
-      "priority": 10,
+      "priority": 39,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSTD",
-      "text": "Stratford"
+      "text": "Stratford",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "leading",
@@ -4893,7 +5295,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSTM",
-      "text": "Stanmore"
+      "text": "Stanmore",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4905,7 +5308,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSUH",
-      "text": "Sudbury Hill"
+      "text": "Sudbury Hill",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4917,7 +5321,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSUT",
-      "text": "Sudbury Town"
+      "text": "Sudbury Town",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4929,7 +5334,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSVS",
-      "text": "Seven\nSisters"
+      "text": "Seven\nSisters",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4941,7 +5347,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSWC",
-      "text": "Swiss Cottage"
+      "text": "Swiss Cottage",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4953,7 +5360,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSWF",
-      "text": "South Woodford"
+      "text": "South Woodford",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4965,7 +5373,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSWK",
-      "text": "Southwark"
+      "text": "Southwark",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -4977,7 +5386,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUSWN",
-      "text": "South Wimbledon"
+      "text": "South Wimbledon",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -4989,7 +5399,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTAW",
-      "text": "Totteridge & Whetstone"
+      "text": "Totteridge & Whetstone",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5001,7 +5412,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTBC",
-      "text": "Tooting Bec"
+      "text": "Tooting Bec",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5013,7 +5425,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTBY",
-      "text": "Tooting Broadway"
+      "text": "Tooting Broadway",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5025,7 +5438,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTCR",
-      "text": "Tottenham\nCourt Road"
+      "text": "Tottenham\nCourt Road",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -5037,7 +5451,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTFP",
-      "text": "Tufnell Park"
+      "text": "Tufnell Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5049,7 +5464,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTHB",
-      "text": "Theydon Bois"
+      "text": "Theydon Bois",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5061,7 +5477,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTMH",
-      "text": "Tottenham\nHale"
+      "text": "Tottenham\nHale",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5073,7 +5490,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTMP",
-      "text": "Temple"
+      "text": "Temple",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -5085,7 +5503,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTNG",
-      "text": "Turnham Green"
+      "text": "Turnham Green",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5097,7 +5516,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTPN",
-      "text": "Turnpike\nLane"
+      "text": "Turnpike\nLane",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5109,7 +5529,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUTWH",
-      "text": "Tower\nHill"
+      "text": "Tower\nHill",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -5121,7 +5542,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUUPB",
-      "text": "Upminster Bridge"
+      "text": "Upminster Bridge",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5133,7 +5555,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUUPK",
-      "text": "Upton Park"
+      "text": "Upton Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5145,7 +5568,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUUPM",
-      "text": "Upminster"
+      "text": "Upminster",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -5157,7 +5581,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUUPY",
-      "text": "Upney"
+      "text": "Upney",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5169,7 +5594,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUUXB",
-      "text": "Uxbridge"
+      "text": "Uxbridge",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5178,10 +5604,11 @@
         "x": 1715.473,
         "y": 1849.036
       },
-      "priority": 10,
+      "priority": 40,
       "rotationDegrees": 0,
       "stationID": "940GZZLUVIC",
-      "text": "Victoria"
+      "text": "Victoria",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -5193,7 +5620,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUVXL",
-      "text": "Vauxhall"
+      "text": "Vauxhall",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5205,7 +5633,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWAF",
-      "text": "Watford"
+      "text": "Watford",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5217,7 +5646,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWBN",
-      "text": "West Brompton"
+      "text": "West Brompton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5229,7 +5659,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWCY",
-      "text": "White City"
+      "text": "White City",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5241,7 +5672,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWFN",
-      "text": "West Finchley"
+      "text": "West Finchley",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5253,7 +5685,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWHM",
-      "text": "West Ham"
+      "text": "West Ham",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -5265,7 +5698,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWHP",
-      "text": "West Hampstead"
+      "text": "West Hampstead",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5277,7 +5711,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWHW",
-      "text": "West\nHarrow"
+      "text": "West\nHarrow",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5289,7 +5724,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWIG",
-      "text": "Willesden Green"
+      "text": "Willesden Green",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5301,7 +5737,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWIM",
-      "text": "Wimbledon"
+      "text": "Wimbledon",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5313,7 +5750,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWIP",
-      "text": "Wimbledon Park"
+      "text": "Wimbledon Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5325,7 +5763,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWJN",
-      "text": "Willesden Junction"
+      "text": "Willesden Junction",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5337,7 +5776,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWKA",
-      "text": "Warwick\nAvenue"
+      "text": "Warwick\nAvenue",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5349,7 +5789,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWKN",
-      "text": "West Kensington"
+      "text": "West Kensington",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5361,7 +5802,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWLA",
-      "text": "Wood Lane"
+      "text": "Wood Lane",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5370,10 +5812,11 @@
         "x": 1933.0,
         "y": 1995.0
       },
-      "priority": 10,
+      "priority": 37,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWLO",
-      "text": "Waterloo"
+      "text": "Waterloo",
+      "visibilityTier": "overview"
     },
     {
       "alignment": "trailing",
@@ -5385,7 +5828,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWOF",
-      "text": "Woodford"
+      "text": "Woodford",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5397,7 +5841,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWOG",
-      "text": "Wood Green"
+      "text": "Wood Green",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5409,7 +5854,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWOP",
-      "text": "Woodside Park"
+      "text": "Woodside Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5421,7 +5867,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWPL",
-      "text": "Whitechapel"
+      "text": "Whitechapel",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -5433,7 +5880,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWRP",
-      "text": "West Ruislip"
+      "text": "West Ruislip",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5445,7 +5893,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWRR",
-      "text": "Warren\nStreet"
+      "text": "Warren\nStreet",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -5457,7 +5906,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWSD",
-      "text": "Wanstead"
+      "text": "Wanstead",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5469,7 +5919,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWSM",
-      "text": "Westminster"
+      "text": "Westminster",
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -5481,7 +5932,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWSP",
-      "text": "Westbourne Park"
+      "text": "Westbourne Park",
+      "visibilityTier": "local"
     },
     {
       "alignment": "centre",
@@ -5493,7 +5945,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWTA",
-      "text": "West Acton"
+      "text": "West Acton",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5505,7 +5958,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWWL",
-      "text": "Walthamstow\nCentral"
+      "text": "Walthamstow\nCentral",
+      "visibilityTier": "local"
     },
     {
       "alignment": "trailing",
@@ -5517,7 +5971,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWYC",
-      "text": "Wembley Central"
+      "text": "Wembley Central",
+      "visibilityTier": "local"
     },
     {
       "alignment": "leading",
@@ -5529,7 +5984,8 @@
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWYP",
-      "text": "Wembley Park"
+      "text": "Wembley Park",
+      "visibilityTier": "network"
     },
     {
       "alignment": "centre",
@@ -5541,7 +5997,8 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZNEUGST",
-      "text": "Nine\nElms"
+      "text": "Nine\nElms",
+      "visibilityTier": "local"
     }
   ],
   "paths": [

@@ -247,6 +247,18 @@ struct BeckMapRepository {
             guard label.rotationDegrees.isFinite else {
                 throw invalid(.nonFiniteValue(context: "label \(label.id) rotation"))
             }
+            if let associatedStationIDs = label.associatedStationIDs {
+                try validateUnique(
+                    associatedStationIDs,
+                    kind: "label \(label.id) associated station"
+                )
+                for stationID in associatedStationIDs where !markerIDs.contains(stationID) {
+                    throw invalid(.missingStationMarker(
+                        stationID: stationID,
+                        context: "label \(label.id) associated station"
+                    ))
+                }
+            }
         }
 
         for route in document.routes {

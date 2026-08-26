@@ -1287,6 +1287,106 @@ struct BeckMapRepositoryTests {
         ) < 45)
     }
 
+    @Test func fullUndergroundLabelsHaveProgressiveVisibilityTiers() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let labelsByStationID = Dictionary(
+            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+        )
+
+        for stationID in ["940GZZLUVIC", "940GZZLUSTD", "940GZZLUCYF"] {
+            #expect(labelsByStationID[stationID]?.effectiveVisibilityTier == .overview)
+        }
+        #expect(labelsByStationID["940GZZLUWOF"]?.effectiveVisibilityTier == .network)
+        #expect(labelsByStationID["940GZZLUSWN"]?.effectiveVisibilityTier == .local)
+        #expect(labelsByStationID["940GZZDLDEV"]?.effectiveVisibilityTier == .minor)
+
+        let tierCounts = Dictionary(grouping: document.labels, by: \.effectiveVisibilityTier)
+            .mapValues(\.count)
+        #expect(tierCounts[.overview] == 17)
+        #expect(tierCounts[.network] == 66)
+        #expect(tierCounts[.local] == 192)
+        #expect(tierCounts[.minor] == 183)
+    }
+
+    @Test func splitPhysicalHubsShareTheirCanonicalLabel() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let canaryWharf = try #require(document.labels.first {
+            $0.stationID == "940GZZLUCYF"
+        })
+        let stratford = try #require(document.labels.first {
+            $0.stationID == "940GZZLUSTD"
+        })
+
+        #expect(canaryWharf.represents(stationID: "910GCANWHRF"))
+        #expect(canaryWharf.represents(stationID: "940GZZDLCAN"))
+        #expect(stratford.represents(stationID: "910GSTFD"))
+        #expect(stratford.represents(stationID: "940GZZDLSTD"))
+        #expect(!stratford.represents(stationID: "940GZZLUVIC"))
+
+        let claphamJunctionLabels = document.labels.filter { $0.text == "Clapham Junction" }
+        let claphamJunction = try #require(claphamJunctionLabels.first)
+        #expect(claphamJunctionLabels.count == 1)
+        #expect(claphamJunction.effectiveVisibilityTier == .network)
+        #expect(claphamJunction.represents(stationID: "910GCLPHMJ1"))
+        #expect(claphamJunction.represents(stationID: "910GCLPHMJC"))
+    }
+
+    @Test func labelVisibilityPolicyRevealsDetailProgressively() {
+        #expect(!BeckMapLabelVisibilityPolicy.shows(.overview, at: 0.08))
+        #expect(BeckMapLabelVisibilityPolicy.shows(
+            .overview,
+            at: BeckMapLabelVisibilityPolicy.overviewMinimumCameraScale
+        ))
+        #expect(!BeckMapLabelVisibilityPolicy.shows(.network, at: 0.16))
+        #expect(BeckMapLabelVisibilityPolicy.shows(
+            .network,
+            at: BeckMapLabelVisibilityPolicy.networkMinimumCameraScale
+        ))
+        #expect(!BeckMapLabelVisibilityPolicy.shows(
+            .local,
+            at: BeckMapLabelVisibilityPolicy.localMinimumCameraScale - 0.01
+        ))
+        #expect(BeckMapLabelVisibilityPolicy.shows(
+            .local,
+            at: BeckMapLabelVisibilityPolicy.localMinimumCameraScale
+        ))
+        #expect(!BeckMapLabelVisibilityPolicy.shows(
+            .minor,
+            at: BeckMapLabelVisibilityPolicy.minorMinimumCameraScale - 0.01
+        ))
+        #expect(BeckMapLabelVisibilityPolicy.shows(
+            .minor,
+            at: BeckMapLabelVisibilityPolicy.minorMinimumCameraScale
+        ))
+    }
+
+    @Test func reportedHighZoomStationsHaveAuthoredLabels() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let labelsByStationID = Dictionary(
+            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+        )
+
+        #expect(labelsByStationID["940GZZLURYL"]?.text == "Rayners Lane")
+        #expect(labelsByStationID["940GZZLURYL"]?.effectiveVisibilityTier == .network)
+        #expect(labelsByStationID["910GEMRSPKH"]?.text == "Emerson Park")
+        #expect(labelsByStationID["910GEMRSPKH"]?.effectiveVisibilityTier == .minor)
+        for stationID in [
+            "940GZZLUCPN",
+            "940GZZLUCPC",
+            "940GZZLUCPS",
+            "940GZZLUTBC",
+            "940GZZLUTBY",
+            "940GZZLUCSD",
+            "940GZZLUSWN",
+            "940GZZLUMDN",
+        ] {
+            #expect(labelsByStationID[stationID]?.effectiveVisibilityTier == .local)
+        }
+    }
+
     @Test func labelCollisionResolverRejectsMarkersAndEarlierLabels() {
         let frame = CGRect(x: 20, y: 20, width: 80, height: 24)
 
@@ -1335,73 +1435,216 @@ struct BeckMapRepositoryTests {
         ))
     }
 
-    @Test func labelPlacementCandidatesPreserveAuthoredDirectionAndBoundDistance() {
+    @Test func stationLabelLayoutKeepsTextOffRouteLines() throws {
+        let boundsByAlignment = Dictionary(uniqueKeysWithValues:
+            [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
+                (alignment, BeckMapLabelBounds.backgroundBounds(
+                    textSize: CGSize(width: 110, height: 24),
+                    alignment: alignment,
+                    horizontalPadding: 2,
+                    verticalPadding: 2
+                ))
+            }
+        )
+        let route = BeckMapLineBlocker(
+            start: CGPoint(x: 0, y: 240),
+            end: CGPoint(x: 320, y: 240),
+            clearance: 5
+        )
+        let placements = StationLabelLayoutEngine.layout(
+            inputs: [StationLabelLayoutInput(
+                id: "clapham-junction",
+                priority: 10,
+                tier: .network,
+                selected: false,
+                stationScreenPosition: CGPoint(x: 160, y: 240),
+                markerFrame: CGRect(x: 150, y: 230, width: 20, height: 20),
+                preferredAlignment: .leading,
+                screenOffset: CGVector(dx: 20, dy: 0),
+                rotation: .identity,
+                boundsByAlignment: boundsByAlignment
+            )],
+            viewport: CGRect(x: 0, y: 80, width: 320, height: 340),
+            markerBlockers: [BeckMapLabelBlocker(
+                stationID: "clapham-junction",
+                frame: CGRect(x: 150, y: 230, width: 20, height: 20)
+            )],
+            lineBlockers: [route]
+        )
+
+        let placement = try #require(placements.first)
+        #expect(!route.intersects(placement.collisionFrame))
+    }
+
+    @Test func stationLabelLayoutLetsHigherPriorityLabelsWin() throws {
+        let boundsByAlignment = Dictionary(uniqueKeysWithValues:
+            [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
+                (alignment, BeckMapLabelBounds.backgroundBounds(
+                    textSize: CGSize(width: 260, height: 24),
+                    alignment: alignment,
+                    horizontalPadding: 2,
+                    verticalPadding: 2
+                ))
+            }
+        )
+        func input(id: String, priority: Int, tier: BeckMapLabelVisibilityTier) -> StationLabelLayoutInput {
+            StationLabelLayoutInput(
+                id: id,
+                priority: priority,
+                tier: tier,
+                selected: false,
+                stationScreenPosition: CGPoint(x: 150, y: 150),
+                markerFrame: CGRect(x: 140, y: 140, width: 20, height: 20),
+                preferredAlignment: .centre,
+                screenOffset: CGVector(dx: 0, dy: -10),
+                rotation: .identity,
+                boundsByAlignment: boundsByAlignment
+            )
+        }
+        let placements = StationLabelLayoutEngine.layout(
+            inputs: [
+                input(id: "ordinary", priority: 5, tier: .local),
+                input(id: "major", priority: 40, tier: .overview),
+            ],
+            viewport: CGRect(x: 0, y: 90, width: 300, height: 120),
+            markerBlockers: [BeckMapLabelBlocker(
+                stationID: "shared",
+                frame: CGRect(x: 140, y: 140, width: 20, height: 20)
+            )],
+            lineBlockers: [BeckMapLineBlocker(
+                start: CGPoint(x: 0, y: 180),
+                end: CGPoint(x: 300, y: 180),
+                clearance: 5
+            )]
+        )
+
+        #expect(placements.map(\.labelID) == ["major"])
+    }
+
+    @Test func stationLabelViewportProtectsMapChrome() {
+        let viewport = StationLabelLayoutEngine.availableViewport(
+            in: CGSize(width: 390, height: 844)
+        )
+
+        #expect(viewport.minX == StationLabelLayoutEngine.horizontalViewportInset)
+        #expect(viewport.minY > 80)
+        #expect(viewport.maxY < 770)
+    }
+
+    @Test func labelPlacementCandidatesPreserveAuthoredSideAndEdgeGap() {
         let station = CGPoint(x: 200, y: 300)
-        let artworkOffset = CGVector(dx: -110, dy: 4)
+        let markerFrame = CGRect(x: 190, y: 290, width: 20, height: 20)
+        let labelBounds = CGRect(x: -80, y: -12, width: 80, height: 24)
         let candidates = BeckMapLabelPlacementResolver.candidates(
             stationScreenPosition: station,
-            artworkOffset: artworkOffset
+            markerFrame: markerFrame,
+            labelBounds: labelBounds,
+            screenOffset: CGVector(dx: -110, dy: 4),
+            authoredAlignment: .trailing
         )
 
         let preferred = candidates.first
         #expect(preferred?.alignment == .trailing)
-        #expect(abs(hypot(
-            (preferred?.position.x ?? 0) - station.x,
-            (preferred?.position.y ?? 0) - station.y
-        ) - BeckMapLabelPlacementResolver.preferredTether) < 0.001)
+        #expect(abs((preferred?.position.x ?? 0) + labelBounds.maxX
+            - (markerFrame.minX - BeckMapLabelPlacementResolver.preferredGap)) < 0.001)
+        #expect(abs((preferred?.position.y ?? 0) - 304) < 0.001)
+        #expect(candidates.allSatisfy { $0.alignment == .trailing })
         #expect(candidates.allSatisfy {
-            hypot($0.position.x - station.x, $0.position.y - station.y)
-                <= BeckMapLabelPlacementResolver.maximumTether + 0.001
+            $0.position.x + labelBounds.maxX
+                <= markerFrame.minX - BeckMapLabelPlacementResolver.preferredGap + 0.001
         })
     }
 
-    @Test func goodgeStreetAndTottenhamCourtRoadLabelsStayWithTheirOwnStations() throws {
+    @Test func labelPlacementFlipsSidesAtTheViewportEdge() throws {
+        let viewport = CGRect(x: 0, y: 0, width: 320, height: 480)
+        let station = CGPoint(x: 12, y: 180)
+        let markerFrame = CGRect(x: 2, y: 170, width: 20, height: 20)
+        let options = BeckMapLabelPlacementResolver.placementOptions(
+            authoredAlignment: .trailing,
+            screenOffset: CGVector(dx: -40, dy: 0)
+        )
+        let placement = try #require(options.lazy.compactMap { option -> BeckMapLabelPlacementCandidate? in
+            let bounds = BeckMapLabelBounds.backgroundBounds(
+                textSize: CGSize(width: 120, height: 24),
+                alignment: option.alignment,
+                horizontalPadding: 2,
+                verticalPadding: 2
+            )
+            return BeckMapLabelPlacementResolver.candidates(
+                stationScreenPosition: station,
+                markerFrame: markerFrame,
+                labelBounds: bounds,
+                screenOffset: option.screenOffset,
+                authoredAlignment: option.alignment
+            ).first { candidate in
+                viewport.contains(bounds.offsetBy(
+                    dx: candidate.position.x,
+                    dy: candidate.position.y
+                ))
+            }
+        }.first)
+
+        #expect(placement.alignment == .leading)
+    }
+
+    @Test func reportedLabelsStayMarkerAttachedAcrossCameraScales() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
-        func screenDistance(_ lhs: CGPoint, _ rhs: CGPoint) -> CGFloat {
-            hypot(lhs.x - rhs.x, lhs.y - rhs.y)
-        }
 
-        let goodgeID = "940GZZLUGDG"
-        let tottenhamCourtRoadID = "940GZZLUTCR"
-        let goodgeMarker = try #require(document.stationMarkers.first { $0.stationID == goodgeID })
-        let tottenhamCourtRoadMarker = try #require(document.stationMarkers.first {
-            $0.stationID == tottenhamCourtRoadID
-        })
-        let goodgeLabel = try #require(document.labels.first { $0.stationID == goodgeID })
-        let tottenhamCourtRoadLabel = try #require(document.labels.first {
-            $0.stationID == tottenhamCourtRoadID
-        })
-
-        for scale in [CGFloat(1), 2, 4] {
-            let goodgeStation = CGPoint(x: goodgeMarker.anchor.x * scale, y: goodgeMarker.anchor.y * scale)
-            let tottenhamCourtRoadStation = CGPoint(
-                x: tottenhamCourtRoadMarker.anchor.x * scale,
-                y: tottenhamCourtRoadMarker.anchor.y * scale
-            )
-            let goodgePosition = try #require(BeckMapLabelPlacementResolver.candidates(
-                stationScreenPosition: goodgeStation,
-                artworkOffset: CGVector(
-                    dx: goodgeLabel.position.x - goodgeMarker.anchor.x,
-                    dy: goodgeLabel.position.y - goodgeMarker.anchor.y
+        for stationID in [
+            "940GZZLUTBC", // Tooting Bec
+            "940GZZLUTBY", // Tooting Broadway
+            "940GZZLUWSM", // Westminster
+            "940GZZLURYL", // Rayners Lane
+            "910GEMRSPKH", // Emerson Park
+        ] {
+            let marker = try #require(document.stationMarkers.first { $0.stationID == stationID })
+            let label = try #require(document.labels.first { $0.stationID == stationID })
+            for scale in [CGFloat(0.1), 1, 4] {
+                let station = CGPoint(x: marker.anchor.x * scale, y: marker.anchor.y * scale)
+                let markerFrame = CGRect(
+                    x: station.x - 10,
+                    y: station.y - 10,
+                    width: 20,
+                    height: 20
                 )
-            ).first).position
-            let tottenhamCourtRoadPosition = try #require(BeckMapLabelPlacementResolver.candidates(
-                stationScreenPosition: tottenhamCourtRoadStation,
-                artworkOffset: CGVector(
-                    dx: tottenhamCourtRoadLabel.position.x - tottenhamCourtRoadMarker.anchor.x,
-                    dy: tottenhamCourtRoadLabel.position.y - tottenhamCourtRoadMarker.anchor.y
+                let labelBounds = BeckMapLabelBounds.backgroundBounds(
+                    textSize: CGSize(width: 160, height: 24),
+                    alignment: label.alignment,
+                    horizontalPadding: 2,
+                    verticalPadding: 2
                 )
-            ).first).position
-
-            #expect(screenDistance(goodgePosition, goodgeStation)
-                <= BeckMapLabelPlacementResolver.preferredTether + 0.001)
-            #expect(screenDistance(tottenhamCourtRoadPosition, tottenhamCourtRoadStation)
-                <= BeckMapLabelPlacementResolver.preferredTether + 0.001)
-            #expect(screenDistance(goodgePosition, goodgeStation)
-                < screenDistance(goodgePosition, tottenhamCourtRoadStation))
-            #expect(screenDistance(tottenhamCourtRoadPosition, tottenhamCourtRoadStation)
-                < screenDistance(tottenhamCourtRoadPosition, goodgeStation))
+                let candidate = try #require(BeckMapLabelPlacementResolver.candidates(
+                    stationScreenPosition: station,
+                    markerFrame: markerFrame,
+                    labelBounds: labelBounds,
+                    screenOffset: CGVector(
+                        dx: (label.position.x - marker.anchor.x) * scale,
+                        dy: (label.position.y - marker.anchor.y) * scale
+                    ),
+                    authoredAlignment: label.alignment
+                ).first)
+                let labelFrame = labelBounds.offsetBy(
+                    dx: candidate.position.x,
+                    dy: candidate.position.y
+                )
+                #expect(candidate.alignment == label.alignment)
+                #expect(!labelFrame.intersects(markerFrame))
+                switch candidate.alignment {
+                case .leading:
+                    #expect(abs(labelFrame.minX
+                        - (markerFrame.maxX + BeckMapLabelPlacementResolver.preferredGap)) < 0.001)
+                case .trailing:
+                    #expect(abs(labelFrame.maxX
+                        - (markerFrame.minX - BeckMapLabelPlacementResolver.preferredGap)) < 0.001)
+                case .centre where label.position.y < marker.anchor.y:
+                    #expect(abs(labelFrame.maxY
+                        - (markerFrame.minY - BeckMapLabelPlacementResolver.preferredGap)) < 0.001)
+                case .centre:
+                    #expect(abs(labelFrame.minY
+                        - (markerFrame.maxY + BeckMapLabelPlacementResolver.preferredGap)) < 0.001)
+                }
+            }
         }
     }
 
@@ -1413,33 +1656,23 @@ struct BeckMapRepositoryTests {
         )
         let routes = [
             BeckMapLineBlocker(
-                start: CGPoint(x: 0, y: 100),
-                end: CGPoint(x: 200, y: 100),
-                clearance: 8
-            ),
-            BeckMapLineBlocker(
-                start: CGPoint(x: 100, y: 0),
-                end: CGPoint(x: 100, y: 200),
-                clearance: 8
+                start: CGPoint(x: 88, y: 0),
+                end: CGPoint(x: 88, y: 200),
+                clearance: 3
             ),
         ]
+        let labelBounds = CGRect(x: -82, y: -13, width: 82, height: 26)
         let candidates = BeckMapLabelPlacementResolver.candidates(
             stationScreenPosition: station,
-            artworkOffset: CGVector(dx: 0, dy: -20)
+            markerFrame: marker.frame,
+            labelBounds: labelBounds,
+            screenOffset: CGVector(dx: -20, dy: 0),
+            authoredAlignment: .trailing
         )
         let placement = try #require(candidates.first { candidate in
-            let size = CGSize(width: 82, height: 26)
-            let originX: CGFloat
-            switch candidate.alignment {
-            case .leading: originX = candidate.position.x
-            case .centre: originX = candidate.position.x - size.width / 2
-            case .trailing: originX = candidate.position.x - size.width
-            }
-            let frame = CGRect(
-                x: originX,
-                y: candidate.position.y - size.height / 2,
-                width: size.width,
-                height: size.height
+            let frame = labelBounds.offsetBy(
+                dx: candidate.position.x,
+                dy: candidate.position.y
             )
             return BeckMapLabelCollisionResolver.accepts(
                 frame,
@@ -1449,8 +1682,8 @@ struct BeckMapRepositoryTests {
             )
         })
 
-        #expect(hypot(placement.position.x - station.x, placement.position.y - station.y)
-            >= BeckMapLabelPlacementResolver.preferredTether)
+        #expect(placement.alignment == .trailing)
+        #expect(placement.position.x + labelBounds.maxX < marker.frame.minX)
     }
 
     @Test func fullUndergroundCircleBranchesShareTheGloucesterRoadPort() throws {

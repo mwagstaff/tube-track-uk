@@ -190,6 +190,7 @@ struct BeckMapScreen: View {
 private struct BeckMapCanvas: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
+    @ScaledMetric(relativeTo: .caption) private var labelTypeScale: CGFloat = 1
 
     let document: BeckMapDocument
     let renderCache: RenderCache
@@ -628,36 +629,38 @@ private struct BeckMapCanvas: View {
         if document.geometryStatus != .authored, cameraScale < max(0.48, minimumCameraScale) {
             return
         }
-        let viewportRect = CGRect(origin: .zero, size: viewport).insetBy(dx: 4, dy: 4)
-        let zoomRatio = cameraScale / max(0.001, minimumCameraScale)
-        let showsSecondaryLabels = document.geometryStatus != .authored
-            ? cameraScale >= 0.72
-            : zoomRatio >= 2.15
+        let viewportRect = StationLabelLayoutEngine.availableViewport(in: viewport)
         let selectedStationID = presentation.selectedStationID
         let visibleLabels = renderedLabels.filter { renderedLabel in
             let label = renderedLabel.label
-            return label.priority >= 10
-                || showsSecondaryLabels
-                || label.stationID == selectedStationID
+            return label.represents(stationID: selectedStationID)
+                || BeckMapLabelVisibilityPolicy.shows(
+                    label.effectiveVisibilityTier,
+                    at: cameraScale
+                )
         }
-        let labels: [RenderedLabel]
-        if let selectedStationID {
-            labels = visibleLabels.filter { $0.label.stationID == selectedStationID }
-                + visibleLabels.filter { $0.label.stationID != selectedStationID }
-        } else {
-            labels = visibleLabels
-        }
+        guard !visibleLabels.isEmpty else { return }
         let markerFrames = markerExclusionFrames()
+        let markerFramesByStationID = Dictionary(grouping: markerFrames, by: \.stationID)
+            .mapValues { blockers in
+                blockers.reduce(into: CGRect.null) { bounds, blocker in
+                    bounds = bounds.union(blocker.frame)
+                }
+            }
         let lineBlockers = lineExclusionBlockers(in: viewportRect)
-        let markerIndex = BeckMapSpatialIndex(markerFrames, bounds: \.frame)
-        let lineIndex = BeckMapSpatialIndex(lineBlockers, bounds: \.bounds)
-        var occupiedIndex = BeckMapSpatialIndex<CGRect>()
+        var resolvedTextByLabelID: [String: GraphicsContext.ResolvedText] = [:]
+        var layoutInputs: [StationLabelLayoutInput] = []
 
-        for renderedLabel in labels {
+        for renderedLabel in visibleLabels {
             let label = renderedLabel.label
+            let selected = label.represents(stationID: selectedStationID)
             let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
-            let weight: Font.Weight = label.priority >= 10 ? .semibold : .medium
-            let fontSize = renderedLabel.metrics[label.alignment].fontSize
+            let tier = label.effectiveVisibilityTier
+            let weight: Font.Weight = tier == .overview ? .semibold : .medium
+            let fontSize = BeckMapLabelVisibilityPolicy.fontSize(
+                for: tier,
+                at: cameraScale
+            ) * min(1.6, max(1, labelTypeScale))
             var text = context.resolve(Text(label.text).font(.system(
                 size: fontSize,
                 weight: weight
@@ -668,44 +671,53 @@ private struct BeckMapCanvas: View {
                 height: CGFloat.infinity
             ))
             let documentPadding = CGFloat(document.styles.labelPadding)
-            var placement: (
-                candidate: BeckMapLabelPlacementCandidate,
-                backgroundBounds: CGRect,
-                frame: CGRect
-            )?
-            for candidateOffset in renderedLabel.candidateOffsets {
-                let candidate = BeckMapLabelPlacementCandidate(
-                    position: CGPoint(
-                        x: screenAnchor.x + candidateOffset.position.x,
-                    y: screenAnchor.y + candidateOffset.position.y
-                    ),
-                    alignment: candidateOffset.alignment
-                )
-                let backgroundBounds = BeckMapLabelBounds.backgroundBounds(
-                    textSize: measuredTextSize,
-                    alignment: candidate.alignment,
-                    horizontalPadding: documentPadding + palette.labelHorizontalPadding,
-                    verticalPadding: documentPadding + palette.labelVerticalPadding
-                )
-                let labelFrame = backgroundBounds
-                    .applying(renderedLabel.rotation)
-                    .standardized
-                    .offsetBy(dx: candidate.position.x, dy: candidate.position.y)
-                guard viewportRect.intersects(labelFrame) else { continue }
-                let collisionFrame = labelFrame.insetBy(dx: -3, dy: -2)
-                guard BeckMapLabelCollisionResolver.accepts(
-                    collisionFrame,
-                    markerIndex: markerIndex,
-                    lineIndex: lineIndex,
-                    occupiedIndex: occupiedIndex
-                ) else { continue }
-                placement = (candidate, backgroundBounds, collisionFrame)
-                break
+            let boundsByAlignment = Dictionary(uniqueKeysWithValues:
+                [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
+                    (alignment, BeckMapLabelBounds.backgroundBounds(
+                        textSize: measuredTextSize,
+                        alignment: alignment,
+                        horizontalPadding: documentPadding + palette.labelHorizontalPadding,
+                        verticalPadding: documentPadding + palette.labelVerticalPadding
+                    ))
+                }
+            )
+            let representedStationIDs = [label.stationID] + (label.associatedStationIDs ?? [])
+            let targetMarkerFrame = representedStationIDs.compactMap {
+                markerFramesByStationID[$0]
+            }.reduce(into: CGRect.null) { frame, markerFrame in
+                frame = frame.union(markerFrame)
             }
-            guard let placement else { continue }
+            resolvedTextByLabelID[label.id] = text
+            layoutInputs.append(StationLabelLayoutInput(
+                id: label.id,
+                priority: label.priority,
+                tier: tier,
+                selected: selected,
+                stationScreenPosition: screenAnchor,
+                markerFrame: targetMarkerFrame.isNull
+                    ? CGRect(x: screenAnchor.x - 6, y: screenAnchor.y - 6, width: 12, height: 12)
+                    : targetMarkerFrame,
+                preferredAlignment: label.alignment,
+                screenOffset: CGVector(
+                    dx: renderedLabel.artworkOffset.dx * cameraScale,
+                    dy: renderedLabel.artworkOffset.dy * cameraScale
+                ),
+                rotation: renderedLabel.rotation,
+                boundsByAlignment: boundsByAlignment
+            ))
+        }
+
+        let placements = StationLabelLayoutEngine.layout(
+            inputs: layoutInputs,
+            viewport: viewportRect,
+            markerBlockers: markerFrames,
+            lineBlockers: lineBlockers
+        )
+        for placement in placements {
+            guard let text = resolvedTextByLabelID[placement.labelID] else { continue }
 
             let anchor: UnitPoint
-            switch placement.candidate.alignment {
+            switch placement.alignment {
             case .leading:
                 anchor = .leading
             case .centre:
@@ -716,9 +728,9 @@ private struct BeckMapCanvas: View {
 
             var labelContext = context
             labelContext.concatenate(
-                renderedLabel.rotation.concatenating(CGAffineTransform(
-                    translationX: placement.candidate.position.x,
-                    y: placement.candidate.position.y
+                placement.rotation.concatenating(CGAffineTransform(
+                    translationX: placement.position.x,
+                    y: placement.position.y
                 ))
             )
             let backgroundPath = Path(
@@ -737,7 +749,6 @@ private struct BeckMapCanvas: View {
                 )
             }
             labelContext.draw(text, at: .zero, anchor: anchor)
-            occupiedIndex.insert(placement.frame, bounds: placement.frame)
         }
     }
 
@@ -1374,51 +1385,23 @@ private struct BeckMapCanvas: View {
             self.renderedLabels = document.labels.map { label in
                 let artworkPosition = CGPoint(label.position)
                 let artworkAnchor = stationAnchors[label.stationID] ?? artworkPosition
-                let candidateOffsets: [BeckMapLabelPlacementCandidate]
-                if let stationAnchor = stationAnchors[label.stationID] {
-                    candidateOffsets = BeckMapLabelPlacementResolver.candidates(
-                        stationScreenPosition: .zero,
-                        artworkOffset: CGVector(
-                            dx: artworkPosition.x - stationAnchor.x,
-                            dy: artworkPosition.y - stationAnchor.y
-                        )
-                    )
-                } else {
-                    candidateOffsets = [
-                        .init(position: .zero, alignment: label.alignment),
-                    ]
-                }
-                let fontSize: CGFloat = label.priority >= 10 ? 16 : 14
                 return RenderedLabel(
                     label: label,
                     artworkAnchor: artworkAnchor,
-                    candidateOffsets: candidateOffsets,
+                    artworkOffset: CGVector(
+                        dx: artworkPosition.x - artworkAnchor.x,
+                        dy: artworkPosition.y - artworkAnchor.y
+                    ),
                     rotation: CGAffineTransform(
                         rotationAngle: label.rotationDegrees * .pi / 180
-                    ),
-                    metrics: LabelMetricsByAlignment(
-                        leading: BeckMapCanvas.labelMetrics(
-                            for: label,
-                            styles: document.styles,
-                            fontSizeOverride: fontSize,
-                            alignmentOverride: .leading
-                        ),
-                        centre: BeckMapCanvas.labelMetrics(
-                            for: label,
-                            styles: document.styles,
-                            fontSizeOverride: fontSize,
-                            alignmentOverride: .centre
-                        ),
-                        trailing: BeckMapCanvas.labelMetrics(
-                            for: label,
-                            styles: document.styles,
-                            fontSizeOverride: fontSize,
-                            alignmentOverride: .trailing
-                        )
                     )
                 )
             }
             .sorted { lhs, rhs in
+                if lhs.label.effectiveVisibilityTier != rhs.label.effectiveVisibilityTier {
+                    return lhs.label.effectiveVisibilityTier.renderPriority
+                        > rhs.label.effectiveVisibilityTier.renderPriority
+                }
                 if lhs.label.priority != rhs.label.priority {
                     return lhs.label.priority > rhs.label.priority
                 }
@@ -1450,23 +1433,8 @@ private struct BeckMapCanvas: View {
     struct RenderedLabel {
         let label: BeckMapLabelRecord
         let artworkAnchor: CGPoint
-        let candidateOffsets: [BeckMapLabelPlacementCandidate]
+        let artworkOffset: CGVector
         let rotation: CGAffineTransform
-        let metrics: LabelMetricsByAlignment
-    }
-
-    struct LabelMetricsByAlignment {
-        let leading: LabelMetrics
-        let centre: LabelMetrics
-        let trailing: LabelMetrics
-
-        subscript(alignment: BeckMapLabelAlignment) -> LabelMetrics {
-            switch alignment {
-            case .leading: leading
-            case .centre: centre
-            case .trailing: trailing
-            }
-        }
     }
 
     struct LabelMetrics {
@@ -1820,45 +1788,258 @@ struct BeckMapLabelPlacementCandidate: Equatable {
     let alignment: BeckMapLabelAlignment
 }
 
+struct BeckMapLabelPlacementOption: Equatable {
+    let alignment: BeckMapLabelAlignment
+    let screenOffset: CGVector
+}
+
+struct StationLabelLayoutInput {
+    let id: String
+    let priority: Int
+    let tier: BeckMapLabelVisibilityTier
+    let selected: Bool
+    let stationScreenPosition: CGPoint
+    let markerFrame: CGRect
+    let preferredAlignment: BeckMapLabelAlignment
+    let screenOffset: CGVector
+    let rotation: CGAffineTransform
+    let boundsByAlignment: [BeckMapLabelAlignment: CGRect]
+}
+
+struct StationLabelPlacement {
+    let labelID: String
+    let position: CGPoint
+    let alignment: BeckMapLabelAlignment
+    let rotation: CGAffineTransform
+    let backgroundBounds: CGRect
+    let collisionFrame: CGRect
+}
+
+enum StationLabelLayoutEngine {
+    static let horizontalViewportInset: CGFloat = 8
+    static let maximumTopViewportInset: CGFloat = 96
+    static let maximumBottomViewportInset: CGFloat = 88
+    static let horizontalLabelClearance: CGFloat = 4
+    static let verticalLabelClearance: CGFloat = 3
+
+    static func availableViewport(in size: CGSize) -> CGRect {
+        let topInset = min(maximumTopViewportInset, max(8, size.height * 0.11))
+        let bottomInset = min(maximumBottomViewportInset, max(8, size.height * 0.1))
+        return CGRect(
+            x: horizontalViewportInset,
+            y: topInset,
+            width: max(1, size.width - horizontalViewportInset * 2),
+            height: max(1, size.height - topInset - bottomInset)
+        )
+    }
+
+    static func layout(
+        inputs: [StationLabelLayoutInput],
+        viewport: CGRect,
+        markerBlockers: [BeckMapLabelBlocker],
+        lineBlockers: [BeckMapLineBlocker]
+    ) -> [StationLabelPlacement] {
+        let orderedInputs = inputs.sorted { lhs, rhs in
+            if lhs.selected != rhs.selected { return lhs.selected }
+            if lhs.tier != rhs.tier {
+                return lhs.tier.renderPriority > rhs.tier.renderPriority
+            }
+            if lhs.priority != rhs.priority { return lhs.priority > rhs.priority }
+            return lhs.id < rhs.id
+        }
+        let markerIndex = BeckMapSpatialIndex(markerBlockers, bounds: \.frame)
+        let lineIndex = BeckMapSpatialIndex(lineBlockers, bounds: \.bounds)
+        var occupiedIndex = BeckMapSpatialIndex<CGRect>()
+        var placements: [StationLabelPlacement] = []
+
+        for input in orderedInputs {
+            let options = BeckMapLabelPlacementResolver.placementOptions(
+                authoredAlignment: input.preferredAlignment,
+                screenOffset: input.screenOffset
+            )
+            var bestPlacement: (score: Int, placement: StationLabelPlacement)?
+
+            for (optionIndex, option) in options.enumerated() {
+                guard let backgroundBounds = input.boundsByAlignment[option.alignment] else {
+                    continue
+                }
+                let candidates = BeckMapLabelPlacementResolver.candidates(
+                    stationScreenPosition: input.stationScreenPosition,
+                    markerFrame: input.markerFrame,
+                    labelBounds: backgroundBounds,
+                    screenOffset: option.screenOffset,
+                    authoredAlignment: option.alignment
+                )
+                for (candidateIndex, candidate) in candidates.enumerated() {
+                    let labelFrame = backgroundBounds
+                        .applying(input.rotation)
+                        .standardized
+                        .offsetBy(dx: candidate.position.x, dy: candidate.position.y)
+                    guard viewport.contains(labelFrame) else { continue }
+                    let collisionFrame = labelFrame.insetBy(
+                        dx: -horizontalLabelClearance,
+                        dy: -verticalLabelClearance
+                    )
+                    guard BeckMapLabelCollisionResolver.accepts(
+                        collisionFrame,
+                        markerIndex: markerIndex,
+                        lineIndex: lineIndex,
+                        occupiedIndex: occupiedIndex
+                    ) else { continue }
+
+                    let score = optionIndex * 18 + candidateIndex
+                    let placement = StationLabelPlacement(
+                        labelID: input.id,
+                        position: candidate.position,
+                        alignment: candidate.alignment,
+                        rotation: input.rotation,
+                        backgroundBounds: backgroundBounds,
+                        collisionFrame: collisionFrame
+                    )
+                    if bestPlacement.map({ score < $0.score }) ?? true {
+                        bestPlacement = (score, placement)
+                    }
+                }
+            }
+
+            guard let placement = bestPlacement?.placement else { continue }
+            placements.append(placement)
+            occupiedIndex.insert(
+                placement.collisionFrame,
+                bounds: placement.collisionFrame
+            )
+        }
+        return placements
+    }
+}
+
+enum BeckMapLabelVisibilityPolicy {
+    // The authored full map uses one immutable design space. Absolute projected
+    // scale therefore tracks actual station spacing more reliably than a ratio
+    // to the device-dependent fit scale.
+    static let overviewMinimumCameraScale: CGFloat = 0.1
+    static let networkMinimumCameraScale: CGFloat = 0.24
+    static let localMinimumCameraScale: CGFloat = 0.5
+    static let minorMinimumCameraScale: CGFloat = 0.9
+
+    static func shows(
+        _ tier: BeckMapLabelVisibilityTier,
+        at cameraScale: CGFloat
+    ) -> Bool {
+        switch tier {
+        case .overview:
+            cameraScale >= overviewMinimumCameraScale
+        case .network:
+            cameraScale >= networkMinimumCameraScale
+        case .local:
+            cameraScale >= localMinimumCameraScale
+        case .minor:
+            cameraScale >= minorMinimumCameraScale
+        }
+    }
+
+    static func fontSize(
+        for tier: BeckMapLabelVisibilityTier,
+        at cameraScale: CGFloat
+    ) -> CGFloat {
+        switch tier {
+        case .overview:
+            15
+        case .network, .local, .minor:
+            14
+        }
+    }
+}
+
 enum BeckMapLabelPlacementResolver {
-    static let preferredTether: CGFloat = 30
-    static let maximumTether: CGFloat = 68
-    private static let tetherDistances: [CGFloat] = [30, 38, 46, 56, 68]
-    private static let angleOffsets: [CGFloat] = [
-        0,
-        .pi / 4,
-        -.pi / 4,
-        .pi / 2,
-        -.pi / 2,
-        .pi * 3 / 4,
-        -.pi * 3 / 4,
-        .pi,
-    ]
+    static let preferredGap: CGFloat = 6
+    static let maximumGap: CGFloat = 18
+    static let maximumTangentialOffset: CGFloat = 30
+    private static let outwardAdjustments: [CGFloat] = [0, 6, 12]
+    private static let tangentialAdjustments: [CGFloat] = [0, -18, 18, -30, 30]
+
+    static func placementOptions(
+        authoredAlignment: BeckMapLabelAlignment,
+        screenOffset: CGVector
+    ) -> [BeckMapLabelPlacementOption] {
+        let verticalMagnitude = max(1, abs(screenOffset.dy))
+        let oppositeVerticalOffset = CGVector(
+            dx: screenOffset.dx,
+            dy: screenOffset.dy < 0 ? verticalMagnitude : -verticalMagnitude
+        )
+
+        switch authoredAlignment {
+        case .leading:
+            return [
+                .init(alignment: .leading, screenOffset: screenOffset),
+                .init(alignment: .trailing, screenOffset: screenOffset),
+                .init(alignment: .centre, screenOffset: screenOffset),
+                .init(alignment: .centre, screenOffset: oppositeVerticalOffset),
+            ]
+        case .trailing:
+            return [
+                .init(alignment: .trailing, screenOffset: screenOffset),
+                .init(alignment: .leading, screenOffset: screenOffset),
+                .init(alignment: .centre, screenOffset: screenOffset),
+                .init(alignment: .centre, screenOffset: oppositeVerticalOffset),
+            ]
+        case .centre:
+            return [
+                .init(alignment: .centre, screenOffset: screenOffset),
+                .init(alignment: .centre, screenOffset: oppositeVerticalOffset),
+                .init(alignment: .leading, screenOffset: screenOffset),
+                .init(alignment: .trailing, screenOffset: screenOffset),
+            ]
+        }
+    }
 
     static func candidates(
         stationScreenPosition: CGPoint,
-        artworkOffset: CGVector
+        markerFrame: CGRect,
+        labelBounds: CGRect,
+        screenOffset: CGVector,
+        authoredAlignment: BeckMapLabelAlignment
     ) -> [BeckMapLabelPlacementCandidate] {
-        let distance = hypot(artworkOffset.dx, artworkOffset.dy)
-        let baseAngle = distance > 0.001 ? atan2(artworkOffset.dy, artworkOffset.dx) : 0
-        return tetherDistances.flatMap { tether in
-            angleOffsets.map { angleOffset in
-                let angle = baseAngle + angleOffset
-                let direction = CGVector(dx: cos(angle), dy: sin(angle))
-                let alignment: BeckMapLabelAlignment
-                if direction.dx > 0.25 {
-                    alignment = .leading
-                } else if direction.dx < -0.25 {
-                    alignment = .trailing
-                } else {
-                    alignment = .centre
+        let markerFrame = markerFrame.standardized
+        let verticalOffset = min(
+            maximumTangentialOffset,
+            max(-maximumTangentialOffset, screenOffset.dy)
+        )
+        let horizontalOffset = min(
+            maximumTangentialOffset,
+            max(-maximumTangentialOffset, screenOffset.dx)
+        )
+        let verticalDirection: CGFloat = screenOffset.dy < 0 ? -1 : 1
+
+        return outwardAdjustments.flatMap { outwardAdjustment in
+            tangentialAdjustments.map { tangentialAdjustment in
+                let gap = preferredGap + outwardAdjustment
+                let position: CGPoint
+                switch authoredAlignment {
+                case .leading:
+                    position = CGPoint(
+                        x: markerFrame.maxX + gap - labelBounds.minX,
+                        y: stationScreenPosition.y + verticalOffset + tangentialAdjustment
+                    )
+                case .trailing:
+                    position = CGPoint(
+                        x: markerFrame.minX - gap - labelBounds.maxX,
+                        y: stationScreenPosition.y + verticalOffset + tangentialAdjustment
+                    )
+                case .centre where verticalDirection < 0:
+                    position = CGPoint(
+                        x: stationScreenPosition.x + horizontalOffset + tangentialAdjustment,
+                        y: markerFrame.minY - gap - labelBounds.maxY
+                    )
+                case .centre:
+                    position = CGPoint(
+                        x: stationScreenPosition.x + horizontalOffset + tangentialAdjustment,
+                        y: markerFrame.maxY + gap - labelBounds.minY
+                    )
                 }
                 return BeckMapLabelPlacementCandidate(
-                    position: CGPoint(
-                        x: stationScreenPosition.x + direction.dx * tether,
-                        y: stationScreenPosition.y + direction.dy * tether
-                    ),
-                    alignment: alignment
+                    position: position,
+                    alignment: authoredAlignment
                 )
             }
         }

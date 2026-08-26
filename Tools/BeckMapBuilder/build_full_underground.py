@@ -32,6 +32,144 @@ UNDERGROUND_LINE_IDS = {
     "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
     "waterloo-city",
 }
+MINOR_RAIL_LINE_IDS = {
+    "dlr", "elizabeth", "liberty", "lioness", "mildmay", "suffragette",
+    "weaver", "windrush", "tram",
+}
+
+# Full-map labels use an explicit level-of-detail hierarchy.  The overview set
+# is intentionally small and stable: these are the anchors passengers use to
+# orient themselves when the complete network fits on an iPhone screen.
+OVERVIEW_LABEL_STATION_IDS = {
+    "940GZZLUBNK",  # Bank
+    "940GZZLUBST",  # Baker Street
+    "940GZZLUCGT",  # Canning Town
+    "940GZZLUCYF",  # Canary Wharf
+    "940GZZLUEUS",  # Euston
+    "940GZZLUFPK",  # Finsbury Park
+    "940GZZLUGPK",  # Green Park
+    "940GZZLUHAI",  # Highbury & Islington
+    "940GZZLUHRC",  # Heathrow Terminals 2 & 3
+    "940GZZLUKSX",  # King's Cross St. Pancras
+    "940GZZLULNB",  # London Bridge
+    "940GZZLULVT",  # Liverpool Street
+    "940GZZLUOXC",  # Oxford Circus
+    "940GZZLUPAC",  # Paddington
+    "940GZZLUSTD",  # Stratford
+    "940GZZLUVIC",  # Victoria
+    "940GZZLUWLO",  # Waterloo
+}
+
+OVERVIEW_LABEL_PRIORITIES = {
+    "940GZZLUVIC": 40,
+    "940GZZLUSTD": 39,
+    "940GZZLUCYF": 38,
+    "940GZZLUWLO": 37,
+    "940GZZLUKSX": 36,
+    "940GZZLULVT": 35,
+    "940GZZLUPAC": 34,
+    "940GZZLULNB": 33,
+    "940GZZLUBNK": 32,
+    "940GZZLUOXC": 31,
+}
+
+# Several physical hubs are split into multiple semantic records so every rail
+# mode remains independently selectable.  One authored label represents the
+# whole hub and must remain selected for any of those records.
+LABEL_ASSOCIATED_STATION_IDS = {
+    "940GZZLUBNK": ("940GZZDLBNK",),
+    "940GZZLUCGT": ("940GZZDLCGT",),
+    "940GZZLUCYF": ("910GCANWHRF", "940GZZDLCAN"),
+    "940GZZLUEUS": ("910GEUSTON",),
+    "940GZZLUHAI": ("910GHGHI",),
+    "940GZZLULVT": ("910GLIVST", "910GLIVSTLL"),
+    "940GZZLUPAC": ("910GPADTON", "910GPADTLL", "940GZZLUPAH"),
+    "940GZZLUSTD": ("910GSTFD", "940GZZDLSTD"),
+}
+
+
+def coalesce_physical_hub_labels(document: dict) -> None:
+    """Represent duplicate same-name physical hubs with one stable label."""
+    grouped: dict[str, list[dict]] = {}
+    for label in document["labels"]:
+        key = " ".join(label["text"].split()).casefold()
+        grouped.setdefault(key, []).append(label)
+
+    labels: list[dict] = []
+    for group in grouped.values():
+        canonical = sorted(
+            group,
+            key=lambda label: (
+                label["stationID"] not in OVERVIEW_LABEL_STATION_IDS,
+                -label.get("priority", 0),
+                label["id"],
+            ),
+        )[0]
+        represented_station_ids = {
+            represented_id
+            for label in group
+            for represented_id in (
+                label["stationID"],
+                *label.get("associatedStationIDs", ()),
+            )
+        }
+        represented_station_ids.discard(canonical["stationID"])
+        if represented_station_ids:
+            canonical["associatedStationIDs"] = sorted(represented_station_ids)
+        labels.append(canonical)
+    document["labels"] = sorted(labels, key=lambda value: value["id"])
+
+
+def apply_label_presentation_metadata(document: dict) -> None:
+    """Attach a zoom hierarchy derived from physical station importance."""
+    markers_by_id = {
+        marker["stationID"]: marker for marker in document["stationMarkers"]
+    }
+    marker_ids = set(markers_by_id)
+    for label in document["labels"]:
+        station_id = label["stationID"]
+        associated_ids = [
+            associated_id
+            for associated_id in (
+                *label.get("associatedStationIDs", ()),
+                *LABEL_ASSOCIATED_STATION_IDS.get(station_id, ()),
+            )
+            if associated_id in marker_ids
+        ]
+        represented_markers = [
+            markers_by_id[represented_id]
+            for represented_id in (station_id, *associated_ids)
+            if represented_id in markers_by_id
+        ]
+        represented_line_ids = {
+            line_id
+            for marker in represented_markers
+            for line_id in marker["lineIDs"]
+        }
+        has_interchange_symbol = any(
+            primitive["kind"] == "circle"
+            for marker in represented_markers
+            for primitive in marker["primitives"]
+        ) and len(represented_line_ids) >= 2
+
+        if station_id in OVERVIEW_LABEL_STATION_IDS:
+            label["visibilityTier"] = "overview"
+            label["priority"] = max(
+                label.get("priority", 0),
+                OVERVIEW_LABEL_PRIORITIES.get(station_id, 30),
+            )
+        elif label["priority"] >= 10 or has_interchange_symbol:
+            label["visibilityTier"] = "network"
+            label["priority"] = max(label.get("priority", 0), 10)
+        elif represented_line_ids and represented_line_ids <= MINOR_RAIL_LINE_IDS:
+            label["visibilityTier"] = "minor"
+        else:
+            label["visibilityTier"] = "local"
+
+        if associated_ids:
+            label["associatedStationIDs"] = sorted(set(associated_ids))
+
+
 @dataclass(frozen=True)
 class Slice:
     name: str
@@ -2307,6 +2445,8 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "mildmay", "suffragette", "weaver", "windrush", "tram",
         ],
     }
+    coalesce_physical_hub_labels(document)
+    apply_label_presentation_metadata(document)
     normalize_station_markers.normalize(document, graph)
     return document
 

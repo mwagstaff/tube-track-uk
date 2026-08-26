@@ -273,6 +273,22 @@ enum BeckMapLabelAlignment: String, Codable, Hashable, Sendable {
     case trailing
 }
 
+enum BeckMapLabelVisibilityTier: String, Codable, Hashable, Sendable {
+    case overview
+    case network
+    case local
+    case minor
+
+    var renderPriority: Int {
+        switch self {
+        case .overview: 4
+        case .network: 3
+        case .local: 2
+        case .minor: 1
+        }
+    }
+}
+
 /// Labels keep an authored preferred position. The renderer preserves that
 /// direction while enforcing screen-space clearance from map content.
 struct BeckMapLabelRecord: Codable, Identifiable, Hashable, Sendable {
@@ -283,6 +299,23 @@ struct BeckMapLabelRecord: Codable, Identifiable, Hashable, Sendable {
     let alignment: BeckMapLabelAlignment
     let rotationDegrees: Double
     let priority: Int
+    /// Authored level-of-detail. Older slice documents fall back to the
+    /// historic priority so they remain valid while the full map carries the
+    /// richer three-tier hierarchy.
+    var visibilityTier: BeckMapLabelVisibilityTier? = nil
+    /// Other semantic station records represented by this one physical label.
+    /// This keeps split hubs such as Canary Wharf and Stratford visible when a
+    /// non-canonical platform record is selected.
+    var associatedStationIDs: [String]? = nil
+
+    var effectiveVisibilityTier: BeckMapLabelVisibilityTier {
+        visibilityTier ?? (priority >= 10 ? .network : .local)
+    }
+
+    func represents(stationID candidate: String?) -> Bool {
+        guard let candidate else { return false }
+        return stationID == candidate || associatedStationIDs?.contains(candidate) == true
+    }
 }
 
 struct BeckMapRouteRecord: Codable, Identifiable, Hashable, Sendable {
