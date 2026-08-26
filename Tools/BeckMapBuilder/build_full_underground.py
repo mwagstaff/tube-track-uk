@@ -21,6 +21,7 @@ import build_central_core_join as vector
 import build_rail_extensions as rail
 import build_overground_extensions as overground
 import build_tram_extensions as tram
+import normalize_station_markers
 
 
 ARTWORK_WIDTH = 4764.0
@@ -2265,7 +2266,7 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         circle(star_lane_branch_roundel),
     ]
 
-    return {
+    document = {
         "schemaVersion": {"major": 1, "minor": 2},
         "identifier": "tube-track-uk.beck.full-underground.v1",
         "geometryStatus": "authored",
@@ -2306,6 +2307,8 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "mildmay", "suffragette", "weaver", "windrush", "tram",
         ],
     }
+    normalize_station_markers.normalize(document, graph)
+    return document
 
 
 def main() -> None:

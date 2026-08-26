@@ -39819,15 +39819,19 @@
       "name": "Abbey Wood",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3563.892,
-              "y": 2317.98
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3556.892,
+              "y": 2317.973
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3570.892,
+              "y": 2317.987
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GABWDXR"
@@ -39844,15 +39848,19 @@
       "name": "Acton Central",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 891.0,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 884.0,
               "y": 1727.039
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 898.0,
+              "y": 1727.039
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GACTNCTL"
@@ -39869,15 +39877,19 @@
       "name": "Acton Main Line",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 873.971,
-              "y": 1502.933
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 878.923,
+              "y": 1507.88
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 869.019,
+              "y": 1497.986
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GACTONML"
@@ -39894,15 +39906,19 @@
       "name": "Anerley",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2492.924
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2492.924
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GANERLEY"
@@ -39958,15 +39974,19 @@
       "name": "Barking Riverside",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3782.641,
-              "y": 1617.547
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3782.639,
+              "y": 1624.547
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 3782.643,
+              "y": 1610.547
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBARKRIV"
@@ -39983,15 +40003,19 @@
       "name": "Bush Hill Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 611.487
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 611.487
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBHILLPK"
@@ -40047,15 +40071,19 @@
       "name": "Burnham (Berks)",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1244.776
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1244.776
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBNHAM"
@@ -40097,15 +40125,19 @@
       "name": "Brondesbury",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1405.247,
-              "y": 1174.922
+              "y": 1167.922
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1405.247,
+              "y": 1181.922
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBRBY"
@@ -40122,15 +40154,19 @@
       "name": "Brondesbury Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1334.264,
-              "y": 1174.922
+              "y": 1167.922
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1334.264,
+              "y": 1181.922
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBRBYPK"
@@ -40147,15 +40183,19 @@
       "name": "Brockley",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2293.268
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2293.268
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBROCKLY"
@@ -40172,15 +40212,19 @@
       "name": "Brentwood",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3943.764,
-              "y": 831.348
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3938.814,
+              "y": 826.398
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3948.714,
+              "y": 836.298
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBRTWOOD"
@@ -40197,15 +40241,19 @@
       "name": "Bruce Grove",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 820.17
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 820.17
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBRUCGRV"
@@ -40222,15 +40270,19 @@
       "name": "Bethnal Green",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2724.905,
-              "y": 1379.344
+              "y": 1386.344
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2724.905,
+              "y": 1372.344
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBTHNLGR"
@@ -40247,15 +40299,19 @@
       "name": "Bushey",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 551.53
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 551.53
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GBUSHYDC"
@@ -40272,15 +40328,19 @@
       "name": "Cambridge Heath (London)",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2789.872,
-              "y": 1379.344
+              "y": 1386.344
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2789.872,
+              "y": 1372.344
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCAMHTH"
@@ -40322,15 +40382,19 @@
       "name": "Chadwell Heath",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3715.561,
-              "y": 1059.56
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3710.611,
+              "y": 1054.61
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3720.511,
+              "y": 1064.51
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCHDWLHT"
@@ -40347,15 +40411,19 @@
       "name": "Cheshunt",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2884.484,
-              "y": 482.797
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2889.434,
+              "y": 487.747
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2879.534,
+              "y": 477.847
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCHESHNT"
@@ -40372,15 +40440,19 @@
       "name": "Chingford",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2986.344,
-              "y": 648.812
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2993.344,
+              "y": 648.813
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2979.344,
+              "y": 648.811
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCHINGFD"
@@ -40397,15 +40469,19 @@
       "name": "Clapton",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2889.311,
-              "y": 1137.033
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2894.437,
+              "y": 1141.8
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2884.185,
+              "y": 1132.266
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCLAPTON"
@@ -40461,15 +40537,19 @@
       "name": "Clapham High Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1711.588,
-              "y": 2295.328
+              "y": 2288.328
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 1711.588,
+              "y": 2302.328
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCLPHHS"
@@ -40536,15 +40616,19 @@
       "name": "Camden Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2104.773,
-              "y": 1175.047
+              "y": 1168.047
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 2104.773,
+              "y": 1182.047
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCMDNRD"
@@ -40651,15 +40735,19 @@
       "name": "Crouch Hill",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2262.918,
-              "y": 887.516
+              "y": 894.516
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 2262.918,
+              "y": 880.516
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCROUCHH"
@@ -40676,15 +40764,19 @@
       "name": "Carpenders Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 613.805
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 613.805
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCRPNDPK"
@@ -40701,15 +40793,19 @@
       "name": "Crystal Palace",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2572.0,
-              "y": 2563.844
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2567.05,
+              "y": 2558.895
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2576.95,
+              "y": 2568.793
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCRYSTLP"
@@ -40726,15 +40822,19 @@
       "name": "Imperial Wharf",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1440.907,
-              "y": 2110.707
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1435.96,
+              "y": 2115.66
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1445.854,
+              "y": 2105.754
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GCSEAH"
@@ -40776,15 +40876,19 @@
       "name": "Dalston Junction",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2575.231,
-              "y": 1205.469
+              "y": 1212.469
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2575.231,
+              "y": 1198.469
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GDALS"
@@ -40801,15 +40905,19 @@
       "name": "Dalston Kingsland",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2598.281,
-              "y": 1174.97
+              "y": 1167.97
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 2598.281,
+              "y": 1181.97
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GDALSKLD"
@@ -40826,15 +40934,19 @@
       "name": "Denmark Hill",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2264.35,
-              "y": 2308.562
+              "y": 2301.562
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2264.35,
+              "y": 2315.562
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GDENMRKH"
@@ -40876,15 +40988,19 @@
       "name": "Edmonton Green",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 670.432
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 670.432
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GEDMNGRN"
@@ -40901,15 +41017,19 @@
       "name": "Emerson Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3868.716,
-              "y": 1100.097
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3863.766,
+              "y": 1105.047
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "liberty",
+            "start": {
+              "x": 3873.666,
+              "y": 1095.147
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GEMRSPKH"
@@ -40926,15 +41046,19 @@
       "name": "Enfield Town",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 555.395
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 555.395
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GENFLDTN"
@@ -40990,15 +41114,19 @@
       "name": "Finchley Road & Frognal",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1705.62,
-              "y": 1164.71
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1700.671,
+              "y": 1159.759
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1710.569,
+              "y": 1169.661
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GFNCHLYR"
@@ -41015,15 +41143,19 @@
       "name": "Forest Hill",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2369.646
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2369.646
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GFORESTH"
@@ -41065,15 +41197,19 @@
       "name": "Forest Gate",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3375.951,
-              "y": 1153.437
+              "y": 1146.437
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3375.951,
+              "y": 1160.437
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GFRSTGT"
@@ -41090,15 +41226,19 @@
       "name": "Gidea Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3817.911,
-              "y": 957.206
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3812.961,
+              "y": 952.256
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3822.861,
+              "y": 962.156
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GGIDEAPK"
@@ -41154,15 +41294,19 @@
       "name": "Goodmayes",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3657.942,
-              "y": 1117.182
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3652.992,
+              "y": 1112.232
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3662.892,
+              "y": 1122.132
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GGODMAYS"
@@ -41255,15 +41399,19 @@
       "name": "Hackney Wick",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3076.593,
-              "y": 1269.313
+              "y": 1262.313
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 3076.593,
+              "y": 1276.313
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHACKNYW"
@@ -41280,15 +41428,19 @@
       "name": "Haggerston",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2661.692,
-              "y": 1248.33
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2656.758,
+              "y": 1253.295
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2666.626,
+              "y": 1243.365
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHAGGERS"
@@ -41330,15 +41482,19 @@
       "name": "Hanwell",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 466.966,
-              "y": 1657.203
+              "y": 1664.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 466.966,
+              "y": 1650.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHANWELL"
@@ -41444,15 +41600,19 @@
       "name": "Headstone Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 732.768
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 732.768
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHEDSTNL"
@@ -41534,15 +41694,19 @@
       "name": "Highams Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2986.327,
-              "y": 748.398
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2993.327,
+              "y": 748.399
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2979.327,
+              "y": 748.397
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHGHMSPK"
@@ -41559,15 +41723,19 @@
       "name": "Hampstead Heath",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1817.694,
-              "y": 1090.438
+              "y": 1083.438
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1817.694,
+              "y": 1097.438
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHMPSTDH"
@@ -41584,15 +41752,19 @@
       "name": "Homerton",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2990.655,
-              "y": 1269.313
+              "y": 1262.313
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 2990.655,
+              "y": 1276.313
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHOMRTON"
@@ -41609,15 +41781,19 @@
       "name": "Honor Oak Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2332.127
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2332.127
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHONROPK"
@@ -41634,15 +41810,19 @@
       "name": "Hoxton",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 1323.131
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 1323.131
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHOXTON"
@@ -41659,15 +41839,19 @@
       "name": "Harringay Green Lanes",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2582.145,
-              "y": 887.543
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2582.141,
+              "y": 894.543
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 2582.149,
+              "y": 880.543
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHRGYGL"
@@ -41684,15 +41868,19 @@
       "name": "Harold Wood",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3863.779,
-              "y": 911.336
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3858.829,
+              "y": 906.386
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3868.729,
+              "y": 916.286
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHRLDWOD"
@@ -41748,15 +41936,19 @@
       "name": "Hatch End",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 671.291
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 671.291
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHTCHEND"
@@ -41848,15 +42040,19 @@
       "name": "Ilford",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3546.986,
-              "y": 1153.437
+              "y": 1146.437
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3546.986,
+              "y": 1160.437
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GILFORD"
@@ -41873,15 +42069,19 @@
       "name": "Iver",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1466.754
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1466.754
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GIVER"
@@ -41937,15 +42137,19 @@
       "name": "Kensal Rise",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1232.263,
-              "y": 1174.922
+              "y": 1167.922
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 1232.263,
+              "y": 1181.922
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GKENR"
@@ -42040,15 +42244,19 @@
       "name": "Kilburn High Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1650.02,
-              "y": 1254.703
+              "y": 1247.703
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1650.02,
+              "y": 1261.703
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GKLBRNHR"
@@ -42065,15 +42273,19 @@
       "name": "Kentish Town West",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2011.532,
-              "y": 1118.5
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2016.482,
+              "y": 1113.55
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 2006.582,
+              "y": 1123.45
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GKNTSHTW"
@@ -42129,15 +42341,19 @@
       "name": "Langley (Berks)",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1395.241
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1395.241
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GLANGLEY"
@@ -42154,15 +42370,19 @@
       "name": "Leyton Midland Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3077.761,
-              "y": 1112.344
+              "y": 1119.344
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 3077.761,
+              "y": 1105.344
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GLEYTNMR"
@@ -42255,15 +42475,19 @@
       "name": "London Fields",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2831.114,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2838.114,
               "y": 1297.101
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2824.114,
+              "y": 1297.101
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GLONFLDS"
@@ -42280,15 +42504,19 @@
       "name": "Leytonstone High Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3229.876,
-              "y": 1112.344
+              "y": 1119.344
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 3229.876,
+              "y": 1105.344
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GLYTNSHR"
@@ -42305,15 +42533,19 @@
       "name": "Manor Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3477.053,
-              "y": 1153.437
+              "y": 1146.437
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3477.053,
+              "y": 1160.437
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GMANRPK"
@@ -42330,15 +42562,19 @@
       "name": "Maidenhead",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1098.888
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1098.888
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GMDNHEAD"
@@ -42355,15 +42591,19 @@
       "name": "Maryland",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3287.07,
-              "y": 1202.953
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3282.12,
+              "y": 1198.004
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3292.02,
+              "y": 1207.902
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GMRYLAND"
@@ -42380,15 +42620,19 @@
       "name": "New Cross Gate",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2222.25
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2222.25
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GNEWXGTE"
@@ -42405,15 +42649,19 @@
       "name": "Norwood Junction",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2539.822
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2539.822
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GNORWDJ"
@@ -42430,15 +42678,19 @@
       "name": "New Cross ELL",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2741.859,
-              "y": 2186.734
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2736.909,
+              "y": 2191.684
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2746.809,
+              "y": 2181.784
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GNWCRELL"
@@ -42544,15 +42796,19 @@
       "name": "Queens Road Peckham",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2459.695,
-              "y": 2224.891
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2454.745,
+              "y": 2219.942
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2464.645,
+              "y": 2229.84
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GPCKHMQD"
@@ -42569,15 +42825,19 @@
       "name": "Peckham Rye",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2399.454,
-              "y": 2285.102
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2394.503,
+              "y": 2280.153
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2404.405,
+              "y": 2290.051
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GPCKHMRY"
@@ -42594,15 +42854,19 @@
       "name": "Penge West",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2452.724
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2452.724
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GPENEW"
@@ -42644,15 +42908,19 @@
       "name": "Rectory Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2765.763,
-              "y": 1098.435
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2770.713,
+              "y": 1093.485
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2760.813,
+              "y": 1103.385
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GRCTRYRD"
@@ -42669,15 +42937,19 @@
       "name": "Reading",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 962.726
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 962.726
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GRDNGSTN"
@@ -42759,15 +43031,19 @@
       "name": "Rotherhithe",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 1876.538
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 1876.538
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GRTHERHI"
@@ -42784,15 +43060,19 @@
       "name": "South Acton",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 891.0,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 884.0,
               "y": 1779.355
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "mildmay",
+            "start": {
+              "x": 898.0,
+              "y": 1779.355
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSACTON"
@@ -42809,15 +43089,19 @@
       "name": "Southbury",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2757.621,
-              "y": 609.66
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2762.571,
+              "y": 614.61
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2752.671,
+              "y": 604.71
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSBURY"
@@ -42912,15 +43196,19 @@
       "name": "Shenfield",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 4008.964,
-              "y": 766.145
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 4004.014,
+              "y": 761.195
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 4013.914,
+              "y": 771.095
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSHENFLD"
@@ -42937,15 +43225,19 @@
       "name": "South Hampstead",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1737.692,
-              "y": 1254.708
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1737.693,
+              "y": 1247.708
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1737.691,
+              "y": 1261.708
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSHMPSTD"
@@ -43001,15 +43293,19 @@
       "name": "Shoreditch High Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 1415.589
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 1415.589
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSHRDHST"
@@ -43026,15 +43322,19 @@
       "name": "Silver Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 729.852
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 729.852
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSIVRST"
@@ -43090,15 +43390,19 @@
       "name": "Slough",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1320.866
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1320.866
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSLOUGH"
@@ -43155,15 +43459,19 @@
       "name": "Southall",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 421.123,
-              "y": 1657.203
+              "y": 1664.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 421.123,
+              "y": 1650.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTHALL"
@@ -43180,15 +43488,19 @@
       "name": "St James Street (London)",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2940.215,
-              "y": 1086.129
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2945.165,
+              "y": 1091.079
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2935.265,
+              "y": 1081.179
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTJMSST"
@@ -43205,15 +43517,19 @@
       "name": "Stoke Newington",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2711.178,
-              "y": 1041.119
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2717.546,
+              "y": 1038.213
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2704.81,
+              "y": 1044.025
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTKNWNG"
@@ -43230,15 +43546,19 @@
       "name": "Stamford Hill",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 1001.757
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 1001.757
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTMFDHL"
@@ -43294,15 +43614,19 @@
       "name": "South Tottenham",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2797.191,
-              "y": 887.662
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2797.187,
+              "y": 894.662
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 2797.195,
+              "y": 880.662
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTOTNHM"
@@ -43319,15 +43643,19 @@
       "name": "Surrey Quays",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2007.855
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2007.855
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSURREYQ"
@@ -43344,15 +43672,19 @@
       "name": "Seven Kings",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3594.918,
-              "y": 1153.437
+              "y": 1146.437
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3594.918,
+              "y": 1160.437
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSVNKNGS"
@@ -43369,15 +43701,19 @@
       "name": "Sydenham",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 2404.486
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 2404.486
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSYDENHM"
@@ -43394,15 +43730,19 @@
       "name": "Taplow",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1166.969
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1166.969
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GTAPLOW"
@@ -43419,15 +43759,19 @@
       "name": "Theobalds Grove",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2861.464,
-              "y": 505.817
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2866.414,
+              "y": 510.767
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2856.514,
+              "y": 500.867
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GTHBLDSG"
@@ -43469,15 +43813,19 @@
       "name": "Turkey Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2811.895,
-              "y": 555.386
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2816.845,
+              "y": 560.336
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2806.945,
+              "y": 550.436
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GTURKYST"
@@ -43494,15 +43842,19 @@
       "name": "Twyford",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.281,
               "y": 1030.807
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.281,
+              "y": 1030.807
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GTWYFORD"
@@ -43558,15 +43910,19 @@
       "name": "Upper Holloway",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2223.615,
-              "y": 887.516
+              "y": 894.516
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 2223.615,
+              "y": 880.516
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GUPRHLWY"
@@ -43583,15 +43939,19 @@
       "name": "Wapping",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2704.938,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2697.938,
               "y": 1789.44
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 2711.938,
+              "y": 1789.44
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWAPPING"
@@ -43608,15 +43968,19 @@
       "name": "Watford High Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 487.657
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 487.657
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWATFDHS"
@@ -43633,15 +43997,19 @@
       "name": "Watford Junction",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1162.547,
               "y": 430.172
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "lioness",
+            "start": {
+              "x": 1148.547,
+              "y": 430.172
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWATFJDC"
@@ -43786,15 +44154,19 @@
       "name": "Woodgrange Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3492.746,
-              "y": 1307.332
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.797,
+              "y": 1312.282
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 3497.695,
+              "y": 1302.382
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWDGRNPK"
@@ -43811,15 +44183,19 @@
       "name": "West Drayton",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 160.267,
-              "y": 1549.006
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 167.267,
+              "y": 1549.01
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 153.267,
+              "y": 1549.002
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWDRYTON"
@@ -43836,15 +44212,19 @@
       "name": "Wood Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2986.31,
-              "y": 851.276
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2993.31,
+              "y": 851.277
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2979.31,
+              "y": 851.275
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWDST"
@@ -43861,15 +44241,19 @@
       "name": "West Ealing",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 534.132,
-              "y": 1657.203
+              "y": 1664.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 534.132,
+              "y": 1650.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWEALING"
@@ -43886,15 +44270,19 @@
       "name": "White Hart Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2708.25,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2715.25,
               "y": 775.011
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "weaver",
+            "start": {
+              "x": 2701.25,
+              "y": 775.011
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWHHRTLA"
@@ -44015,15 +44403,19 @@
       "name": "Walthamstow Queens Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2934.622,
-              "y": 994.81
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2929.672,
+              "y": 999.76
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 2939.572,
+              "y": 989.86
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWLTHQRD"
@@ -44118,15 +44510,19 @@
       "name": "Wandsworth Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1679.614,
-              "y": 2295.328
+              "y": 2288.328
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "windrush",
+            "start": {
+              "x": 1679.614,
+              "y": 2302.328
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWNDSWRD"
@@ -44143,15 +44539,19 @@
       "name": "Wanstead Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3408.458,
-              "y": 1223.036
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3403.508,
+              "y": 1227.986
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "suffragette",
+            "start": {
+              "x": 3413.408,
+              "y": 1218.086
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWNSTDPK"
@@ -44168,15 +44568,19 @@
       "name": "Woolwich",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3563.904,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3556.904,
               "y": 2246.013
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "elizabeth",
+            "start": {
+              "x": 3570.904,
+              "y": 2246.013
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWOLWXR"
@@ -44222,15 +44626,19 @@
       "name": "Addiscombe",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3238.695,
-              "y": 2709.755
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3233.745,
+              "y": 2704.805
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3243.645,
+              "y": 2714.705
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRADD"
@@ -44247,15 +44655,19 @@
       "name": "Addington Village",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3316.621,
-              "y": 2881.965
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3311.674,
+              "y": 2886.918
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3321.568,
+              "y": 2877.012
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRADV"
@@ -44272,15 +44684,19 @@
       "name": "Ampere Way",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2301.572,
-              "y": 2756.649
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2301.571,
+              "y": 2763.649
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2301.573,
+              "y": 2749.649
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRAMP"
@@ -44297,15 +44713,19 @@
       "name": "Arena",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3351.43,
-              "y": 2597.013
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3346.48,
+              "y": 2592.063
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3356.38,
+              "y": 2601.963
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRARA"
@@ -44322,15 +44742,19 @@
       "name": "Avenue Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3625.336,
-              "y": 2514.875
+              "y": 2507.875
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3625.336,
+              "y": 2521.875
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRAVE"
@@ -44347,15 +44771,19 @@
       "name": "Beddington Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2126.887,
-              "y": 2756.631
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2126.886,
+              "y": 2763.631
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2126.888,
+              "y": 2749.631
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBED"
@@ -44372,15 +44800,19 @@
       "name": "Beckenham Junction",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3804.578,
-              "y": 2514.875
+              "y": 2507.875
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3804.578,
+              "y": 2521.875
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBEK"
@@ -44397,15 +44829,19 @@
       "name": "Belgrave Walk",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1795.839,
-              "y": 2756.597
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1795.838,
+              "y": 2763.597
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1795.84,
+              "y": 2749.597
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBGV"
@@ -44422,15 +44858,19 @@
       "name": "Birkbeck",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3551.488,
-              "y": 2514.875
+              "y": 2507.875
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3551.488,
+              "y": 2521.875
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBIR"
@@ -44447,15 +44887,19 @@
       "name": "Blackhorse Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3281.055,
-              "y": 2667.393
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3276.105,
+              "y": 2662.443
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3286.005,
+              "y": 2672.343
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBLA"
@@ -44472,15 +44916,19 @@
       "name": "Beckenham Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3709.221,
-              "y": 2514.875
+              "y": 2507.875
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3709.221,
+              "y": 2521.875
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRBRD"
@@ -44497,15 +44945,19 @@
       "name": "George Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2748.67,
-              "y": 2756.694
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2748.669,
+              "y": 2763.694
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2748.671,
+              "y": 2749.694
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRCEN"
@@ -44522,15 +44974,19 @@
       "name": "Church Street",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2641.171,
-              "y": 2756.683
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2641.17,
+              "y": 2763.683
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2641.172,
+              "y": 2749.683
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRCHR"
@@ -44547,15 +45003,19 @@
       "name": "Coombe Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3256.328,
-              "y": 2821.747
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3251.381,
+              "y": 2826.7
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3261.275,
+              "y": 2816.794
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRCOO"
@@ -44572,15 +45032,19 @@
       "name": "Centrale",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2615.963,
-              "y": 2669.516
+              "y": 2662.516
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2615.963,
+              "y": 2676.516
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRCTR"
@@ -44597,15 +45061,19 @@
       "name": "Dundonald Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1387.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1380.281,
               "y": 2480.502
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1394.281,
+              "y": 2480.502
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRDDR"
@@ -44622,15 +45090,19 @@
       "name": "East Croydon",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2935.571,
-              "y": 2756.714
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2935.57,
+              "y": 2763.714
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2935.572,
+              "y": 2749.714
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRECR"
@@ -44647,15 +45119,19 @@
       "name": "Elmers End",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3434.876,
-              "y": 2575.515
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3434.878,
+              "y": 2568.515
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3434.874,
+              "y": 2582.515
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRELM"
@@ -44672,15 +45148,19 @@
       "name": "Fieldway",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3347.611,
-              "y": 2912.917
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3342.664,
+              "y": 2917.87
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3352.558,
+              "y": 2907.964
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRFLD"
@@ -44697,15 +45177,19 @@
       "name": "Gravel Hill",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3285.948,
-              "y": 2851.33
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3281.001,
+              "y": 2856.283
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3290.895,
+              "y": 2846.377
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRGRA"
@@ -44722,15 +45206,19 @@
       "name": "Harrington Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3466.169,
-              "y": 2514.875
+              "y": 2507.875
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3466.169,
+              "y": 2521.875
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRHAR"
@@ -44747,15 +45235,19 @@
       "name": "King Henry's Drive",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3380.848,
-              "y": 2946.112
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3375.901,
+              "y": 2951.065
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3385.795,
+              "y": 2941.159
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRKGH"
@@ -44772,15 +45264,19 @@
       "name": "Lebanon Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3039.713,
-              "y": 2756.719
+              "y": 2763.719
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3039.713,
+              "y": 2749.719
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRLEB"
@@ -44797,15 +45293,19 @@
       "name": "Lloyd Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3224.1,
-              "y": 2789.558
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3219.153,
+              "y": 2794.51
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3229.047,
+              "y": 2784.606
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRLOY"
@@ -44822,15 +45322,19 @@
       "name": "Mitcham",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1889.901,
-              "y": 2756.607
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1889.9,
+              "y": 2763.607
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1889.902,
+              "y": 2749.607
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRMCH"
@@ -44847,15 +45351,19 @@
       "name": "Morden Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1604.717,
-              "y": 2756.578
+              "y": 2763.578
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1604.717,
+              "y": 2749.578
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRMDN"
@@ -44872,15 +45380,19 @@
       "name": "Mitcham Junction",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2035.268,
-              "y": 2756.621
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2035.267,
+              "y": 2763.621
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2035.269,
+              "y": 2749.621
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRMJT"
@@ -44897,15 +45409,19 @@
       "name": "Merton Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 1387.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 1380.281,
               "y": 2565.602
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1394.281,
+              "y": 2565.602
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRMTP"
@@ -44922,15 +45438,19 @@
       "name": "New Addington",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3416.859,
-              "y": 2982.078
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3411.912,
+              "y": 2987.031
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3421.806,
+              "y": 2977.125
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRNWA"
@@ -44947,15 +45467,19 @@
       "name": "Phipps Bridge",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 1697.996,
-              "y": 2756.578
+              "y": 2763.578
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 1697.996,
+              "y": 2749.578
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRPHI"
@@ -44972,15 +45496,19 @@
       "name": "Reeves Corner",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2536.805,
-              "y": 2717.878
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2541.754,
+              "y": 2722.829
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2531.856,
+              "y": 2712.927
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRRVC"
@@ -44997,15 +45525,19 @@
       "name": "Sandilands",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3140.106,
-              "y": 2756.719
+              "y": 2763.719
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3140.106,
+              "y": 2749.719
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRSAN"
@@ -45022,15 +45554,19 @@
       "name": "Therapia Lane",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2217.283,
-              "y": 2756.64
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2217.282,
+              "y": 2763.64
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2217.284,
+              "y": 2749.64
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRTPA"
@@ -45047,15 +45583,19 @@
       "name": "Waddon Marsh",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2383.418,
-              "y": 2756.657
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2383.417,
+              "y": 2763.657
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2383.419,
+              "y": 2749.657
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRWAD"
@@ -45072,15 +45612,19 @@
       "name": "Wandle Park",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2461.599,
-              "y": 2756.665
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2461.598,
+              "y": 2763.665
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2461.6,
+              "y": 2749.665
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRWAN"
@@ -45147,15 +45691,19 @@
       "name": "Wellesley Road",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2747.86,
-              "y": 2669.516
+              "y": 2662.516
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 2747.86,
+              "y": 2676.516
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRWEL"
@@ -45211,15 +45759,19 @@
       "name": "Woodside",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3317.587,
-              "y": 2630.858
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3312.637,
+              "y": 2625.908
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "tram",
+            "start": {
+              "x": 3322.537,
+              "y": 2635.808
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZCRWOD"
@@ -45236,15 +45788,19 @@
       "name": "Abbey Road DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3280.781,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3287.781,
               "y": 1442.878
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3273.781,
+              "y": 1442.878
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLABR"
@@ -45261,15 +45817,19 @@
       "name": "All Saints DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.294,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.294,
               "y": 1703.869
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.294,
+              "y": 1703.869
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLALL"
@@ -45286,15 +45846,19 @@
       "name": "Beckton DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 2165.031
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 2165.031
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLBEC"
@@ -45311,15 +45875,19 @@
       "name": "Blackwall DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3104.015,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3104.015,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLBLA"
@@ -45389,15 +45957,19 @@
       "name": "Bow Church DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.297,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.297,
               "y": 1516.553
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.297,
+              "y": 1516.553
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLBOW"
@@ -45414,15 +45986,19 @@
       "name": "Beckton Park DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 2014.896
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 2014.896
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLBPK"
@@ -45503,15 +46079,19 @@
       "name": "Crossharbour DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.287,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.287,
               "y": 2083.256
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.287,
+              "y": 2083.256
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLCLA"
@@ -45553,15 +46133,19 @@
       "name": "Cutty Sark (for Maritime Greenwich) DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.285,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.285,
               "y": 2241.096
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.285,
+              "y": 2241.096
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLCUT"
@@ -45578,15 +46162,19 @@
       "name": "Cyprus DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 2065.953
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 2065.953
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLCYP"
@@ -45603,15 +46191,19 @@
       "name": "Deptford Bridge DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.283,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.283,
               "y": 2366.607
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.283,
+              "y": 2366.607
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLDEP"
@@ -45628,15 +46220,19 @@
       "name": "Devons Road DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.295,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.295,
               "y": 1613.539
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.295,
+              "y": 1613.539
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLDEV"
@@ -45653,15 +46249,19 @@
       "name": "East India DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3184.059,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3184.059,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLEIN"
@@ -45678,15 +46278,19 @@
       "name": "Elverson Road DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.282,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.282,
               "y": 2413.199
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.282,
+              "y": 2413.199
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLELV"
@@ -45703,15 +46307,19 @@
       "name": "Gallions Reach DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 2118.114
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 2118.114
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLGAL"
@@ -45728,15 +46336,19 @@
       "name": "Greenwich DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.284,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.284,
               "y": 2318.114
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.284,
+              "y": 2318.114
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLGRE"
@@ -45753,15 +46365,19 @@
       "name": "Heron Quays DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.289,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.289,
               "y": 1999.582
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.289,
+              "y": 1999.582
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLHEQ"
@@ -45778,15 +46394,19 @@
       "name": "Island Gardens DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.286,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.286,
               "y": 2165.029
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.286,
+              "y": 2165.029
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLISL"
@@ -45803,15 +46423,19 @@
       "name": "King George V DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3494.422,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.422,
               "y": 2163.02
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3501.422,
+              "y": 2163.02
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLKGV"
@@ -45828,15 +46452,19 @@
       "name": "London City Airport DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3494.422,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.422,
               "y": 2084.913
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3501.422,
+              "y": 2084.913
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLLCA"
@@ -45853,15 +46481,19 @@
       "name": "Langdon Park DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.294,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.294,
               "y": 1662.032
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.294,
+              "y": 1662.032
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLLDP"
@@ -45878,15 +46510,19 @@
       "name": "Lewisham DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.281,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.281,
               "y": 2456.937
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.281,
+              "y": 2456.937
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLLEW"
@@ -45903,15 +46539,19 @@
       "name": "Limehouse DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2827.781,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 2827.781,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLLIM"
@@ -45928,15 +46568,19 @@
       "name": "Mudchute DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.287,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.287,
               "y": 2125.093
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.287,
+              "y": 2125.093
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLMUD"
@@ -45953,15 +46597,19 @@
       "name": "Pontoon Dock DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3494.422,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.422,
               "y": 2015.895
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3501.422,
+              "y": 2015.895
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLPDK"
@@ -45978,15 +46626,19 @@
       "name": "Poplar DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3026.981,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3026.981,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLPOP"
@@ -46003,15 +46655,19 @@
       "name": "Prince Regent DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 1911.954
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 1911.954
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLPRE"
@@ -46028,15 +46684,19 @@
       "name": "Pudding Mill Lane DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3130.004,
-              "y": 1392.074
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3125.089,
+              "y": 1387.09
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3134.919,
+              "y": 1397.058
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLPUD"
@@ -46053,15 +46713,19 @@
       "name": "Royal Albert DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3627.875,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3620.875,
               "y": 1963.011
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3634.875,
+              "y": 1963.011
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLRAL"
@@ -46078,15 +46742,19 @@
       "name": "Royal Victoria DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3454.95,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3454.95,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLRVC"
@@ -46128,15 +46796,19 @@
       "name": "Stratford High Street DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3280.781,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3287.781,
               "y": 1360.112
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3273.781,
+              "y": 1360.112
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLSHS"
@@ -46153,15 +46825,19 @@
       "name": "Stratford International DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 3070.859,
-              "y": 1161.188
+              "y": 1154.188
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3070.859,
+              "y": 1168.188
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLSIT"
@@ -46178,15 +46854,19 @@
       "name": "South Quay DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3027.288,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3020.288,
               "y": 2041.419
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3034.288,
+              "y": 2041.419
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLSOQ"
@@ -46242,15 +46922,19 @@
       "name": "Star Lane DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3280.781,
-              "y": 1643.156
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3287.781,
+              "y": 1643.158
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3273.781,
+              "y": 1643.154
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLSTL"
@@ -46267,15 +46951,19 @@
       "name": "Tower Gateway DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2573.0,
-              "y": 1733.031
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2568.048,
+              "y": 1737.978
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 2577.952,
+              "y": 1728.084
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLTWG"
@@ -46292,15 +46980,19 @@
       "name": "Westferry DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
+          "kind": "tick",
+          "tick": {
+            "end": {
               "x": 2908.706,
-              "y": 1758.203
+              "y": 1765.203
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 2908.706,
+              "y": 1751.203
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLWFE"
@@ -46367,15 +47059,19 @@
       "name": "Woolwich Arsenal DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3494.422,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.422,
               "y": 2245.168
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3501.422,
+              "y": 2245.168
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLWLA"
@@ -46392,15 +47088,19 @@
       "name": "West Silvertown DLR Station",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3494.422,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3487.422,
               "y": 1944.857
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "dlr",
+            "start": {
+              "x": 3501.422,
+              "y": 1944.857
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZDLWSV"
@@ -48146,15 +48846,19 @@
       "name": "Camden Town",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2012.109,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2005.109,
               "y": 1191.844
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "northern",
+            "start": {
+              "x": 2019.109,
+              "y": 1191.844
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUCTN"
@@ -49373,15 +50077,19 @@
       "name": "Finchley Central",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 2112.6,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 2105.6,
               "y": 744.0
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "northern",
+            "start": {
+              "x": 2119.6,
+              "y": 744.0
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUFYC"
@@ -50101,15 +50809,19 @@
       "name": "Hatton Cross",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 343.518,
-              "y": 2093.56
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 348.47,
+              "y": 2098.508
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "piccadilly",
+            "start": {
+              "x": 338.566,
+              "y": 2088.612
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLUHNX"
@@ -51356,15 +52068,19 @@
       "name": "Leytonstone",
       "primitives": [
         {
-          "circle": {
-            "centre": {
-              "x": 3320.515,
+          "kind": "tick",
+          "tick": {
+            "end": {
+              "x": 3327.515,
               "y": 1068.191
             },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "lineID": "central",
+            "start": {
+              "x": 3313.515,
+              "y": 1068.191
+            },
+            "width": 3.2
+          }
         }
       ],
       "stationID": "940GZZLULYS"

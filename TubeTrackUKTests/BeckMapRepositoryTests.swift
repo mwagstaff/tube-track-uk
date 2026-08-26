@@ -44,6 +44,46 @@ struct BeckMapRepositoryTests {
         })
     }
 
+    @Test func isolatedSingleLineStationsUseTicksAcrossEveryNetwork() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let stationsByID = graph.stationsByID
+        let hubSizes = Dictionary(
+            grouping: graph.stations,
+            by: { $0.hubID ?? $0.id }
+        ).mapValues(\.count)
+        let connectorEndpoints = document.stationMarkers.flatMap { marker in
+            marker.primitives.flatMap { primitive -> [BeckMapPoint] in
+                switch primitive {
+                case let .connector(connector), let .walkingConnector(connector):
+                    [connector.start, connector.end]
+                case .circle, .tick:
+                    []
+                }
+            }
+        }
+        let additionalConnectedStationIDs: Set<String> = [
+            "910GHACKNYC", "910GHAKNYNM",
+        ]
+        let ordinaryMarkers = try document.stationMarkers.filter { marker in
+            let station = try #require(stationsByID[marker.stationID])
+            let hubID = station.hubID ?? station.id
+            let touchesConnection = connectorEndpoints.contains { endpoint in
+                hypot(endpoint.x - marker.anchor.x, endpoint.y - marker.anchor.y) <= 10
+            }
+            return station.lineIDs.count == 1
+                && hubSizes[hubID] == 1
+                && !additionalConnectedStationIDs.contains(marker.stationID)
+                && !touchesConnection
+        }
+
+        #expect(ordinaryMarkers.count > 150)
+        #expect(ordinaryMarkers.allSatisfy { marker in
+            marker.primitives.contains { if case .tick = $0 { true } else { false } }
+                && !marker.primitives.contains { if case .circle = $0 { true } else { false } }
+        })
+    }
+
     @Test func fullUndergroundMapContainsExactVectorSeams() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
@@ -186,7 +226,8 @@ struct BeckMapRepositoryTests {
             )
         }
 
-        // Shared rail records resolve to a single physical roundel.
+        // Shared rail records resolve to a single physical roundel. Hackney
+        // Downs retains one for its out-of-station link to Hackney Central.
         #expect(circles(try marker("910GROMFORD")).count == 1)
         let hackneyDowns = try marker("910GHAKNYNM")
         #expect(circles(hackneyDowns).count == 1)
@@ -631,11 +672,13 @@ struct BeckMapRepositoryTests {
         #expect(connectorCount(turnhamGreen) == 1)
 
         let finchleyCentral = try marker("940GZZLUFYC")
-        #expect(circleCount(finchleyCentral) == 1)
+        #expect(circleCount(finchleyCentral) == 0)
+        #expect(tickCount(finchleyCentral) == 1)
         #expect(connectorCount(finchleyCentral) == 0)
 
         let camdenTown = try marker("940GZZLUCTN")
-        #expect(circleCount(camdenTown) == 1)
+        #expect(circleCount(camdenTown) == 0)
+        #expect(tickCount(camdenTown) == 1)
         #expect(connectorCount(camdenTown) == 0)
 
         let edgwareRoad = try marker("940GZZLUERC")
@@ -1029,11 +1072,15 @@ struct BeckMapRepositoryTests {
         #expect(circleCount(liverpoolStreet) == 3)
         #expect(connectorCount(liverpoolStreet) == 2)
 
-        for stationID in ["940GZZLUHR5", "940GZZLUHRC", "940GZZLUHNX", "940GZZLUHR4"] {
+        for stationID in ["940GZZLUHR5", "940GZZLUHRC", "940GZZLUHR4"] {
             let heathrowMarker = try marker(stationID)
             #expect(circleCount(heathrowMarker) == 1)
             #expect(connectorCount(heathrowMarker) == 0)
         }
+        let hattonCross = try marker("940GZZLUHNX")
+        #expect(circleCount(hattonCross) == 0)
+        #expect(tickCount(hattonCross) == 1)
+        #expect(connectorCount(hattonCross) == 0)
     }
 
     @Test func fullUndergroundNorthernLineIsContinuousAtLondonBridge() throws {
