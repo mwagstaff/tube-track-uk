@@ -51,6 +51,14 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
 
     static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
 
+    static var liveTrainFilterCases: [Self] {
+        allCases
+            .filter(\.supportsEstimatedTrains)
+            .sorted {
+                $0.displayName.localizedStandardCompare($1.displayName) == .orderedAscending
+            }
+    }
+
     var isUnderground: Bool {
         switch self {
         case .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
@@ -75,10 +83,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     var usesParallelSchematicStroke: Bool { !isUnderground }
 
     var supportsEstimatedTrains: Bool {
-        switch self {
-        case .dlr: false
-        default: true
-        }
+        true
     }
 }
 

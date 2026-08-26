@@ -24,21 +24,51 @@ enum MapPresentationMode: String, CaseIterable, Identifiable, Sendable {
     var toggled: Self {
         self == .beck ? .realWorld : .beck
     }
+
+    var switchActionTitle: String {
+        switch toggled {
+        case .beck: "Show line view"
+        case .realWorld: "Show map view"
+        }
+    }
+
+    var switchActionSymbol: String {
+        toggled.symbol
+    }
 }
 
 struct SharedMapViewport: Equatable, Sendable {
     var latitude: Double
     var longitude: Double
-    /// A renderer-independent multiplier where 1 fits the whole network.
+    /// The geographic footprint is the source of truth for camera scale.
+    /// `zoom` remains a convenient derived value for marker styling.
+    var mapPointWidth: Double
+    var mapPointHeight: Double
     var zoom: Double
 
     var coordinate: CLLocationCoordinate2D {
         CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
     }
 
-    init(coordinate: CLLocationCoordinate2D, zoom: Double) {
+    var visibleMapRect: MKMapRect {
+        let centre = MKMapPoint(coordinate)
+        return MKMapRect(
+            x: centre.x - mapPointWidth / 2,
+            y: centre.y - mapPointHeight / 2,
+            width: mapPointWidth,
+            height: mapPointHeight
+        )
+    }
+
+    init(
+        coordinate: CLLocationCoordinate2D,
+        visibleMapRect: MKMapRect,
+        zoom: Double
+    ) {
         latitude = coordinate.latitude
         longitude = coordinate.longitude
+        mapPointWidth = max(1, visibleMapRect.width)
+        mapPointHeight = max(1, visibleMapRect.height)
         self.zoom = max(0.2, min(24, zoom))
     }
 }
@@ -104,15 +134,7 @@ enum SharedMapProjection {
         graph: TubeGraph,
         size: CGSize
     ) -> MKMapRect {
-        let fitted = fittedGeographicRect(for: graph, size: size)
-        let centre = MKMapPoint(viewport.coordinate)
-        let zoom = max(0.2, viewport.zoom)
-        return MKMapRect(
-            x: centre.x - fitted.width / zoom / 2,
-            y: centre.y - fitted.height / zoom / 2,
-            width: fitted.width / zoom,
-            height: fitted.height / zoom
-        )
+        aspectFittedMapRect(viewport.visibleMapRect, size: size)
     }
 
     static func viewport(
@@ -120,14 +142,73 @@ enum SharedMapProjection {
         graph: TubeGraph,
         size: CGSize
     ) -> SharedMapViewport {
+        let visibleRect = aspectFittedMapRect(rect, size: size)
         let fitted = fittedGeographicRect(for: graph, size: size)
         let zoom = min(
-            fitted.width / max(1, rect.width),
-            fitted.height / max(1, rect.height)
+            fitted.width / max(1, visibleRect.width),
+            fitted.height / max(1, visibleRect.height)
         )
         return SharedMapViewport(
-            coordinate: MKMapPoint(x: rect.midX, y: rect.midY).coordinate,
+            coordinate: MKMapPoint(x: visibleRect.midX, y: visibleRect.midY).coordinate,
+            visibleMapRect: visibleRect,
             zoom: zoom
+        )
+    }
+
+    static func viewport(
+        fromArtworkRect artworkRect: CGRect,
+        document: BeckMapDocument,
+        graph: TubeGraph,
+        size: CGSize
+    ) -> SharedMapViewport? {
+        let artworkCentre = CGPoint(x: artworkRect.midX, y: artworkRect.midY)
+        guard let centreCoordinate = coordinate(
+            for: artworkCentre,
+            document: document,
+            graph: graph
+        ), let mapPointsPerArtworkPoint = localMapPointsPerArtworkPoint(
+            around: artworkCentre,
+            document: document,
+            graph: graph
+        ) else { return nil }
+
+        let centre = MKMapPoint(centreCoordinate)
+        let visibleRect = aspectFittedMapRect(
+            MKMapRect(
+                x: centre.x - Double(artworkRect.width) * mapPointsPerArtworkPoint / 2,
+                y: centre.y - Double(artworkRect.height) * mapPointsPerArtworkPoint / 2,
+                width: Double(artworkRect.width) * mapPointsPerArtworkPoint,
+                height: Double(artworkRect.height) * mapPointsPerArtworkPoint
+            ),
+            size: size
+        )
+        return viewport(from: visibleRect, graph: graph, size: size)
+    }
+
+    static func artworkRect(
+        for viewport: SharedMapViewport,
+        document: BeckMapDocument,
+        graph: TubeGraph,
+        size: CGSize
+    ) -> CGRect? {
+        let geographicRect = geographicRect(for: viewport, graph: graph, size: size)
+        guard let centre = artworkPoint(
+            for: viewport.coordinate,
+            document: document,
+            graph: graph
+        ), let mapPointsPerArtworkPoint = localMapPointsPerArtworkPoint(
+            around: centre,
+            document: document,
+            graph: graph
+        ) else { return nil }
+
+        let width = CGFloat(geographicRect.width / mapPointsPerArtworkPoint)
+        let height = CGFloat(geographicRect.height / mapPointsPerArtworkPoint)
+        return CGRect(
+            x: centre.x - width / 2,
+            y: centre.y - height / 2,
+            width: width,
+            height: height
         )
     }
 
@@ -140,6 +221,23 @@ enum SharedMapProjection {
         return CGPoint(
             x: (point.x - rect.minX) / max(1, rect.width) * size.width,
             y: (point.y - rect.minY) / max(1, rect.height) * size.height
+        )
+    }
+
+    private static func aspectFittedMapRect(_ rect: MKMapRect, size: CGSize) -> MKMapRect {
+        let aspect = max(0.1, Double(size.width / max(1, size.height)))
+        var width = max(1, rect.width)
+        var height = max(1, rect.height)
+        if width / height > aspect {
+            height = width / aspect
+        } else {
+            width = height * aspect
+        }
+        return MKMapRect(
+            x: rect.midX - width / 2,
+            y: rect.midY - height / 2,
+            width: width,
+            height: height
         )
     }
 
@@ -182,15 +280,78 @@ enum SharedMapProjection {
     private static func pairedStations(
         document: BeckMapDocument,
         graph: TubeGraph
-    ) -> [(artworkPoint: CGPoint, mapPoint: MKMapPoint)] {
+    ) -> [(stationID: String, artworkPoint: CGPoint, mapPoint: MKMapPoint)] {
         let stations = graph.stationsByID
-        return document.stationMarkers.compactMap { marker -> (artworkPoint: CGPoint, mapPoint: MKMapPoint)? in
+        return document.stationMarkers.compactMap { marker -> (
+            stationID: String,
+            artworkPoint: CGPoint,
+            mapPoint: MKMapPoint
+        )? in
             guard let station = stations[marker.stationID] else { return nil }
             return (
+                marker.stationID,
                 CGPoint(x: marker.anchor.x, y: marker.anchor.y),
                 MKMapPoint(station.coordinate)
             )
         }
+    }
+
+    /// Converts visual scale using the authored spacing of nearby connected
+    /// stations. This avoids distant anchors in schematic whitespace making a
+    /// tightly zoomed local view appear zoomed out on the geographic map.
+    private static func localMapPointsPerArtworkPoint(
+        around artworkPoint: CGPoint,
+        document: BeckMapDocument,
+        graph: TubeGraph
+    ) -> Double? {
+        let nearbyStations = pairedStations(document: document, graph: graph)
+            .sorted {
+                hypot($0.artworkPoint.x - artworkPoint.x, $0.artworkPoint.y - artworkPoint.y)
+                    < hypot($1.artworkPoint.x - artworkPoint.x, $1.artworkPoint.y - artworkPoint.y)
+            }
+            .prefix(12)
+        let nearbyByID = nearbyStations.reduce(into: [:]) { result, station in
+            result[station.stationID] = station
+        }
+        var ratios = graph.segments.compactMap { segment -> Double? in
+            guard let start = nearbyByID[segment.fromStationID],
+                  let end = nearbyByID[segment.toStationID] else { return nil }
+            let artworkDistance = hypot(
+                start.artworkPoint.x - end.artworkPoint.x,
+                start.artworkPoint.y - end.artworkPoint.y
+            )
+            guard artworkDistance > 1 else { return nil }
+            let mapDistance = hypot(
+                start.mapPoint.x - end.mapPoint.x,
+                start.mapPoint.y - end.mapPoint.y
+            )
+            return mapDistance / Double(artworkDistance)
+        }
+        .filter { $0.isFinite && $0 > 0 }
+        .sorted()
+
+        if ratios.isEmpty {
+            let stations = Array(nearbyStations)
+            ratios = stations.indices.flatMap { startIndex in
+                stations.indices.dropFirst(startIndex + 1).compactMap { endIndex -> Double? in
+                    let start = stations[startIndex]
+                    let end = stations[endIndex]
+                    let artworkDistance = hypot(
+                        start.artworkPoint.x - end.artworkPoint.x,
+                        start.artworkPoint.y - end.artworkPoint.y
+                    )
+                    guard artworkDistance > 1 else { return nil }
+                    return hypot(
+                        start.mapPoint.x - end.mapPoint.x,
+                        start.mapPoint.y - end.mapPoint.y
+                    ) / Double(artworkDistance)
+                }
+            }
+            .filter { $0.isFinite && $0 > 0 }
+            .sorted()
+        }
+        guard !ratios.isEmpty else { return nil }
+        return ratios[ratios.count / 2]
     }
 
     /// Smoothly maps between two differently distorted layouts by blending

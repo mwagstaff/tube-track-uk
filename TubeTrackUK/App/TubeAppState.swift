@@ -73,6 +73,14 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
         case .dark: .dark
         }
     }
+
+    var actionTitle: String {
+        switch self {
+        case .system: "Use system appearance"
+        case .light: "Enable light mode"
+        case .dark: "Enable dark mode"
+        }
+    }
 }
 
 @MainActor
@@ -80,7 +88,12 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
 final class TubeAppState {
     private static let appearanceModeKey = "appearanceMode"
 
-    var selectedTab: AppTab = .map
+    var selectedTab: AppTab = .map {
+        didSet {
+            guard selectedTab != oldValue else { return }
+            updateSelectedStationArrivalsVisibility()
+        }
+    }
     var mapPresentationMode: MapPresentationMode = .beck
     var sharedMapViewport: SharedMapViewport?
     var beckMapCameraSnapshot: BeckMapCameraSnapshot?
@@ -89,6 +102,7 @@ final class TubeAppState {
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
     var showLiveTrains = false
+    var isLoadingLiveTrains = false
     var trainLineFilter: Set<TubeLineID> = []
     var selectedLineID: TubeLineID?
     var selectedStationID: String?
@@ -114,6 +128,7 @@ final class TubeAppState {
     var disruptions: [ResolvedDisruption] = []
     var engineeringWorks: [EngineeringWork] = []
     var liveTrains: [LiveTubeTrain] = []
+    var activeTrainCounts = ActiveTrainCounts()
     var stationArrivals: [TfLArrivalPrediction] = []
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
@@ -135,6 +150,7 @@ final class TubeAppState {
     @ObservationIgnored private var trainService: TubeTrainService?
     @ObservationIgnored private var stationArrivalsService: StationArrivalsService?
     @ObservationIgnored private var stationArrivalsTask: Task<Void, Never>?
+    @ObservationIgnored private var stationArrivalsPollingTask: Task<Void, Never>?
     @ObservationIgnored private var stationArrivalsGeneration: UInt = 0
     @ObservationIgnored private var nearbyArrivalsGenerationByStationID: [String: UInt] = [:]
     @ObservationIgnored private var statusPollingTask: Task<Void, Never>?
@@ -356,12 +372,14 @@ final class TubeAppState {
     func setLiveTrains(_ enabled: Bool) {
         showLiveTrains = enabled
         if enabled {
+            isLoadingLiveTrains = liveTrains.isEmpty
             startTrainPolling()
         } else {
             trainPollingTask?.cancel()
             trainPollingTask = nil
             cancelTrainRefresh()
             liveTrains = []
+            activeTrainCounts = ActiveTrainCounts()
         }
     }
 
@@ -418,6 +436,7 @@ final class TubeAppState {
     }
 
     func select(station: TubeStation) {
+        cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedStationID = station.id
         stationSelectionGeneration &+= 1
@@ -426,10 +445,14 @@ final class TubeAppState {
         selectedEngineeringWorkID = nil
         stationArrivals = []
         stationArrivalsError = nil
-        requestStationArrivals(for: station.id)
+        if selectedTab == .map {
+            requestStationArrivals(for: station.id)
+            startStationArrivalsPolling()
+        }
     }
 
     func clearStationSelection() {
+        cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedStationID = nil
         stationArrivals = []
@@ -498,12 +521,12 @@ final class TubeAppState {
     }
 
     func select(disruption: ResolvedDisruption) {
+        clearStationSelection()
         selectedDisruptionID = disruption.id
         selectedEngineeringWorkID = engineeringWork(
             matchingProjectedDisruptionID: disruption.id
         )?.id
         selectedLineID = disruption.lineID
-        selectedStationID = nil
         focusedSegmentIDs = []
         focusedStationIDs = []
         focusedLineIDs = []
@@ -555,17 +578,16 @@ final class TubeAppState {
     func setActive(_ active: Bool) {
         appIsActive = active
         if active {
-            startStatusPolling()
+            startStatusPolling(refreshImmediately: true)
             if showLiveTrains { startTrainPolling() }
-            if let selectedStationID, stationArrivals.isEmpty {
-                requestStationArrivals(for: selectedStationID)
-            }
+            updateSelectedStationArrivalsVisibility()
         } else {
             statusPollingTask?.cancel()
             statusPollingTask = nil
             trainPollingTask?.cancel()
             trainPollingTask = nil
             cancelTrainRefresh()
+            cancelStationArrivalsPolling()
             cancelStationArrivalsRefresh()
         }
     }
@@ -574,14 +596,17 @@ final class TubeAppState {
         trainPollingTask?.cancel()
         trainPollingTask = nil
         cancelTrainRefresh()
+        cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         showLiveTrains = false
         liveTrains.removeAll(keepingCapacity: false)
+        activeTrainCounts = ActiveTrainCounts()
         stationArrivals.removeAll(keepingCapacity: false)
         nearbyArrivalsByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsLoadingStationIDs.removeAll(keepingCapacity: false)
         nearbyArrivalsErrorsByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsGenerationByStationID.removeAll(keepingCapacity: false)
+        updateSelectedStationArrivalsVisibility()
     }
 
     private func resolvedDisruptions(for work: EngineeringWork) -> [ResolvedDisruption] {
@@ -617,9 +642,12 @@ final class TubeAppState {
         }
     }
 
-    private func startStatusPolling() {
-        guard appIsActive, statusPollingTask == nil else { return }
+    private func startStatusPolling(refreshImmediately: Bool = false) {
+        guard appIsActive, statusPollingTask == nil, statusService != nil else { return }
         statusPollingTask = Task { [weak self] in
+            if refreshImmediately {
+                await self?.refreshStatus()
+            }
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(30))
                 guard !Task.isCancelled else { return }
@@ -684,6 +712,10 @@ final class TubeAppState {
             return
         }
         liveTrains = trains
+        activeTrainCounts.update(
+            with: trains,
+            requestedLineIDs: requestedFilter
+        )
         #if DEBUG
         print("[TubeTrack] live trains resolved=\(trains.count) filter=\(requestedFilter.map(\.rawValue).sorted())")
         #endif
@@ -704,6 +736,10 @@ final class TubeAppState {
         let freshTrains = liveTrains.filter { Date.now.timeIntervalSince($0.updatedAt) < 90 }
         if freshTrains.count != liveTrains.count {
             liveTrains = freshTrains
+            activeTrainCounts.update(
+                with: freshTrains,
+                requestedLineIDs: requestedFilter
+            )
         }
     }
 
@@ -711,6 +747,7 @@ final class TubeAppState {
         guard generation == trainRefreshGeneration else { return }
         trainRefreshTask = nil
         trainRefreshFilter = nil
+        isLoadingLiveTrains = false
     }
 
     private func cancelTrainRefresh() {
@@ -718,10 +755,12 @@ final class TubeAppState {
         trainRefreshTask?.cancel()
         trainRefreshTask = nil
         trainRefreshFilter = nil
+        isLoadingLiveTrains = false
     }
 
     private func requestStationArrivals(for stationID: String) {
         guard appIsActive,
+              selectedTab == .map,
               stationArrivalsService != nil,
               selectedStationID == stationID else {
             return
@@ -733,6 +772,33 @@ final class TubeAppState {
         isRefreshingStationArrivals = true
         stationArrivalsTask = Task { [weak self] in
             await self?.loadStationArrivals(for: stationID, generation: generation)
+        }
+    }
+
+    private func startStationArrivalsPolling() {
+        guard appIsActive,
+              selectedTab == .map,
+              selectedStationID != nil,
+              stationArrivalsService != nil,
+              stationArrivalsPollingTask == nil else {
+            return
+        }
+
+        stationArrivalsPollingTask = Task { [weak self] in
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(30))
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled,
+                      let self,
+                      let stationID = self.selectedStationID else {
+                    return
+                }
+                guard self.stationArrivalsTask == nil else { continue }
+                self.requestStationArrivals(for: stationID)
+            }
         }
     }
 
@@ -751,7 +817,7 @@ final class TubeAppState {
                   selectedStationID == stationID else {
                 return
             }
-            stationArrivals = Array(arrivals.prefix(12))
+            stationArrivals = arrivals
             stationArrivalsError = nil
         } catch {
             guard !Task.isCancelled,
@@ -774,6 +840,52 @@ final class TubeAppState {
         stationArrivalsTask?.cancel()
         stationArrivalsTask = nil
         isRefreshingStationArrivals = false
+    }
+
+    private func cancelStationArrivalsPolling() {
+        stationArrivalsPollingTask?.cancel()
+        stationArrivalsPollingTask = nil
+    }
+
+    private func updateSelectedStationArrivalsVisibility() {
+        guard appIsActive,
+              selectedTab == .map,
+              let selectedStationID else {
+            cancelStationArrivalsPolling()
+            cancelStationArrivalsRefresh()
+            return
+        }
+        requestStationArrivals(for: selectedStationID)
+        startStationArrivalsPolling()
+    }
+}
+
+struct ActiveTrainCounts: Equatable, Sendable {
+    private(set) var byLineID: [TubeLineID: Int] = [:]
+
+    var total: Int {
+        byLineID.values.reduce(0, +)
+    }
+
+    func count(for lineID: TubeLineID) -> Int {
+        byLineID[lineID, default: 0]
+    }
+
+    mutating func update(
+        with trains: [LiveTubeTrain],
+        requestedLineIDs: Set<TubeLineID>
+    ) {
+        let incomingCounts = Dictionary(grouping: trains, by: \.lineID)
+            .mapValues(\.count)
+
+        guard !requestedLineIDs.isEmpty else {
+            byLineID = incomingCounts
+            return
+        }
+
+        for lineID in requestedLineIDs {
+            byLineID[lineID] = incomingCounts[lineID, default: 0]
+        }
     }
 }
 

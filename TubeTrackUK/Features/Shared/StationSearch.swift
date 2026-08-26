@@ -100,6 +100,18 @@ struct StationSearchSheet: View {
         )
     }
 
+    private var searchPresentation: Binding<Bool> {
+        Binding(
+            get: { searchIsPresented },
+            set: { presented in
+                searchIsPresented = presented
+                if !presented {
+                    dismiss()
+                }
+            }
+        )
+    }
+
     var body: some View {
         NavigationStack {
             Group {
@@ -143,7 +155,7 @@ struct StationSearchSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .searchable(
                 text: $query,
-                isPresented: $searchIsPresented,
+                isPresented: searchPresentation,
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Station name"
             )

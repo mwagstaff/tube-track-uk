@@ -39,18 +39,57 @@ struct MapMorphTransitionTests {
         #expect(abs(coordinate.longitude - station.longitude) < 0.000_001)
     }
 
-    @Test func geographicViewportPreservesCentreAndNormalizedZoom() throws {
+    @Test func geographicViewportPreservesCentreAndVisibleFootprint() throws {
         let graph = try TubeGraph.bundled()
         let size = CGSize(width: 393, height: 852)
-        let viewport = SharedMapViewport(
-            coordinate: CLLocationCoordinate2D(latitude: 51.515, longitude: -0.142),
-            zoom: 3.4
+        let centre = MKMapPoint(CLLocationCoordinate2D(latitude: 51.515, longitude: -0.142))
+        let rect = MKMapRect(
+            x: centre.x - 18_000,
+            y: centre.y - 39_023,
+            width: 36_000,
+            height: 78_046
         )
-        let rect = SharedMapProjection.geographicRect(for: viewport, graph: graph, size: size)
-        let roundTrip = SharedMapProjection.viewport(from: rect, graph: graph, size: size)
+        let viewport = SharedMapProjection.viewport(from: rect, graph: graph, size: size)
+        let roundTrip = SharedMapProjection.geographicRect(for: viewport, graph: graph, size: size)
 
-        #expect(abs(roundTrip.latitude - viewport.latitude) < 0.000_001)
-        #expect(abs(roundTrip.longitude - viewport.longitude) < 0.000_001)
-        #expect(abs(roundTrip.zoom - viewport.zoom) < 0.000_001)
+        #expect(abs(roundTrip.midX - rect.midX) < 0.001)
+        #expect(abs(roundTrip.midY - rect.midY) < 0.001)
+        #expect(abs(roundTrip.width - rect.width) < 1)
+        #expect(abs(roundTrip.height - rect.height) < 1)
+    }
+
+    @Test func localBeckViewportProducesAReusableGeographicFootprint() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
+        let markers = document.stationMarkers.filter {
+            $0.name == "East Croydon" || $0.name == "Lebanon Road"
+        }
+        #expect(markers.count == 2)
+        let bounds = markers.reduce(CGRect.null) { partial, marker in
+            partial.union(CGRect(x: marker.anchor.x, y: marker.anchor.y, width: 1, height: 1))
+        }.insetBy(dx: -80, dy: -160)
+        let size = CGSize(width: 393, height: 852)
+
+        let viewport = try #require(SharedMapProjection.viewport(
+            fromArtworkRect: bounds,
+            document: document,
+            graph: graph,
+            size: size
+        ))
+        let restoredArtworkRect = try #require(SharedMapProjection.artworkRect(
+            for: viewport,
+            document: document,
+            graph: graph,
+            size: size
+        ))
+
+        #expect(viewport.mapPointWidth > 1)
+        #expect(viewport.mapPointHeight > viewport.mapPointWidth)
+        #expect(markers.allSatisfy {
+            restoredArtworkRect.insetBy(dx: -1, dy: -1).contains(CGPoint(
+                x: $0.anchor.x,
+                y: $0.anchor.y
+            ))
+        })
     }
 }

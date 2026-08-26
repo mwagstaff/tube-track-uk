@@ -67,7 +67,7 @@ struct TfLStopPoint: Codable, Equatable, Sendable {
     let lon: Double?
 }
 
-struct TfLArrivalPrediction: Codable, Identifiable, Sendable {
+struct TfLArrivalPrediction: Codable, Sendable {
     let id: String
     let vehicleId: String?
     let lineId: String
@@ -81,6 +81,48 @@ struct TfLArrivalPrediction: Codable, Identifiable, Sendable {
     let expectedArrival: Date?
     let timeToStation: Int?
     let currentLocation: String?
+
+    /// TfL's `id` is not unique for every departure. DLR predictions, in
+    /// particular, can reuse one value for an entire station board, so use the
+    /// fields that describe an individual prediction whenever the app needs a
+    /// stable identity or removes exact duplicates.
+    var departureIdentity: DepartureIdentity {
+        DepartureIdentity(
+            sourceID: id,
+            vehicleID: Self.normalized(vehicleId),
+            lineID: lineId,
+            stationID: Self.normalized(naptanId),
+            platformName: Self.normalized(platformName),
+            direction: Self.normalized(direction),
+            destinationID: Self.normalized(destinationNaptanId),
+            destinationName: Self.normalized(destinationName),
+            towards: Self.normalized(towards),
+            expectedArrival: expectedArrival,
+            fallbackTimeToStation: expectedArrival == nil ? timeToStation : nil
+        )
+    }
+
+    struct DepartureIdentity: Hashable, Sendable {
+        let sourceID: String
+        let vehicleID: String?
+        let lineID: String
+        let stationID: String?
+        let platformName: String?
+        let direction: String?
+        let destinationID: String?
+        let destinationName: String?
+        let towards: String?
+        let expectedArrival: Date?
+        let fallbackTimeToStation: Int?
+    }
+
+    private static func normalized(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else {
+            return nil
+        }
+        return value
+    }
 }
 
 /// The subset of a TfL arrival prediction needed to estimate a vehicle's

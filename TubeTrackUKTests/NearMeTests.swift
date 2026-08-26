@@ -40,7 +40,7 @@ struct NearMeTests {
             arrival(id: "tram", line: .tram, platform: nil, direction: "outbound", seconds: 45),
         ]
 
-        let groups = NearbyDepartureGroup.groups(from: arrivals)
+        let groups = StationDepartureGroup.groups(from: arrivals)
         let eastbound = try #require(groups.first {
             $0.lineID == .district && $0.direction == "Eastbound"
         })
@@ -50,6 +50,86 @@ struct NearMeTests {
         #expect(groups.contains { $0.lineID == .district && $0.direction == "Westbound" })
         #expect(groups.contains { $0.lineID == .piccadilly && $0.direction == "Inbound" })
         #expect(groups.contains { $0.lineID == .tram && $0.direction == "Outbound" })
+    }
+
+    @Test func elizabethLineUsesPassengerFacingDirectionsAndPlatformLabels() throws {
+        let eastbound = arrival(
+            id: "eastbound",
+            line: .elizabeth,
+            platform: " A ",
+            direction: "inbound",
+            seconds: 60
+        )
+        let westbound = arrival(
+            id: "westbound",
+            line: .elizabeth,
+            platform: "B",
+            direction: "outbound",
+            seconds: 120
+        )
+
+        let groups = StationDepartureGroup.groups(from: [eastbound, westbound])
+
+        #expect(groups.contains { $0.direction == "Eastbound" })
+        #expect(groups.contains { $0.direction == "Westbound" })
+        #expect(StationDepartureMetadata.platformLabel(for: eastbound) == "Platform A")
+        #expect(StationDepartureMetadata.platformLabel(for: westbound) == "Platform B")
+    }
+
+    @Test func plannedDisruptionsGroupByEachLineServingANearbyStation() throws {
+        let start = try #require(
+            LondonRailDate.calendar.date(
+                from: DateComponents(year: 2026, month: 8, day: 29, hour: 8)
+            )
+        )
+        let districtWork = engineeringWork(
+            id: "district-later",
+            lineIDs: [.district],
+            startDate: start.addingTimeInterval(3_600)
+        )
+        let sharedWork = engineeringWork(
+            id: "shared-earlier",
+            lineIDs: [.district, .piccadilly],
+            startDate: start
+        )
+
+        let groups = NearbyLineDisruptionGroup.groups(
+            lineIDs: [.district, .piccadilly, .jubilee],
+            works: [districtWork, sharedWork]
+        )
+
+        #expect(groups.map(\.lineID) == [.district, .piccadilly, .jubilee])
+        #expect(groups[0].works.map(\.id) == ["shared-earlier", "district-later"])
+        #expect(groups[1].works.map(\.id) == ["shared-earlier"])
+        #expect(groups[2].works.isEmpty)
+    }
+
+    @Test @MainActor func plannedDisruptionMapFocusPreservesMapStyleAndEnablesHighlighting() throws {
+        let start = try #require(
+            LondonRailDate.calendar.date(
+                from: DateComponents(year: 2026, month: 8, day: 29, hour: 8)
+            )
+        )
+        let plannedWork = engineeringWork(
+            id: "district-work",
+            lineIDs: [.district],
+            startDate: start
+        )
+        let appState = TubeAppState()
+        appState.engineeringWorks = [plannedWork]
+        appState.selectedTab = .nearMe
+        appState.mapPresentationMode = .realWorld
+        appState.disruptionDisplayMode = .normal
+        appState.setDisruptionDateSelection(.custom(start))
+
+        appState.focus(on: plannedWork, in: .map)
+
+        #expect(appState.selectedTab == .map)
+        #expect(appState.mapPresentationMode == .realWorld)
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.selectedEngineeringWorkID == plannedWork.id)
+        #expect(appState.focusedLineIDs == [.district])
+        #expect(appState.focusedSegmentIDs == ["district-work-segment"])
     }
 
     private func station(
@@ -108,6 +188,26 @@ struct NearMeTests {
             expectedArrival: nil,
             timeToStation: seconds,
             currentLocation: nil
+        )
+    }
+
+    private func engineeringWork(
+        id: String,
+        lineIDs: [TubeLineID],
+        startDate: Date
+    ) -> EngineeringWork {
+        EngineeringWork(
+            id: id,
+            title: "Part closure",
+            detail: "A full planned-disruption message.",
+            lineIDs: lineIDs,
+            affectedStationIDs: [],
+            affectedSegmentIDs: ["\(id)-segment"],
+            startDate: startDate,
+            endDate: startDate.addingTimeInterval(7_200),
+            source: .unifiedAPI,
+            fetchedAt: startDate,
+            confidence: .lineOnly
         )
     }
 }

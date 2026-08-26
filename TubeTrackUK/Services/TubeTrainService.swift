@@ -18,6 +18,7 @@ actor TubeTrainService {
         var nearestByVehicle: [LiveVehicleKey: NearestLivePrediction] = [:]
         nearestByVehicle.reserveCapacity(512)
         var tramPredictionsByVehicleID: [String: [TfLLiveTrainPrediction]] = [:]
+        var dlrPredictions: [TfLLiveTrainPrediction] = []
 
         for batch in TubeTrainRequestBatcher.batches(from: requestedLines) {
             try Task.checkCancellation()
@@ -26,8 +27,7 @@ actor TubeTrainService {
             try Task.checkCancellation()
 
             for prediction in predictions {
-                guard let vehicleID = prediction.vehicleId,
-                      let lineID = TubeLineID(rawValue: prediction.lineId),
+                guard let lineID = TubeLineID(rawValue: prediction.lineId),
                       requested.contains(lineID),
                       let nextStationID = prediction.naptanId,
                       let seconds = prediction.timeToStation,
@@ -35,6 +35,11 @@ actor TubeTrainService {
                     continue
                 }
 
+                if lineID == .dlr {
+                    dlrPredictions.append(prediction)
+                    continue
+                }
+                guard let vehicleID = prediction.vehicleId, !vehicleID.isEmpty else { continue }
                 let key = LiveVehicleKey(lineID: lineID, vehicleID: vehicleID)
                 if lineID == .tram {
                     tramPredictionsByVehicleID[vehicleID, default: []].append(prediction)
@@ -108,6 +113,11 @@ actor TubeTrainService {
             trains.append(resolution.train)
             tramContextsByVehicleID[vehicleID] = resolution.context
         }
+        trains.append(contentsOf: DLRPredictionResolver.resolve(
+            predictions: dlrPredictions,
+            repository: repository,
+            now: now
+        ))
 
         return trains.sorted { $0.id < $1.id }
     }
@@ -360,6 +370,248 @@ private struct TramRouteCandidate: Sendable {
         self.nearestIndex = nearestIndex
         self.matchedObservationCount = routeIndices.count
         self.orderedObservationCount = orderedObservationCount
+        self.proposal = proposal
+    }
+}
+
+enum DLRPredictionResolver {
+    static func resolve(
+        predictions: [TfLLiveTrainPrediction],
+        repository: TubeNetworkRepository,
+        now: Date
+    ) -> [LiveTubeTrain] {
+        guard let line = repository.graph.line(.dlr) else { return [] }
+
+        let directionalRoutes = line.routes.enumerated().flatMap { routeIndex, route in
+            [
+                DLRDirectionalRoute(id: routeIndex * 2, stationIDs: route),
+                DLRDirectionalRoute(id: routeIndex * 2 + 1, stationIDs: route.reversed()),
+            ]
+        }
+        var seenPredictions: Set<DLRPredictionKey> = []
+        let observations = predictions.enumerated().compactMap { sourceIndex, prediction -> DLRObservation? in
+            guard prediction.lineId == TubeLineID.dlr.rawValue,
+                  let stationID = prediction.naptanId,
+                  let destinationStationID = prediction.destinationNaptanId,
+                  let seconds = prediction.timeToStation,
+                  seconds >= 0 else {
+                return nil
+            }
+            let key = DLRPredictionKey(
+                stationID: stationID,
+                destinationStationID: destinationStationID,
+                seconds: seconds
+            )
+            guard seenPredictions.insert(key).inserted else { return nil }
+            return DLRObservation(
+                sourceIndex: sourceIndex,
+                prediction: prediction,
+                stationID: stationID,
+                destinationStationID: destinationStationID,
+                seconds: seconds
+            )
+        }
+
+        var output: [LiveTubeTrain] = []
+        var emittedOrigins: Set<DLROriginKey> = []
+        for destinationStationID in Set(observations.map(\.destinationStationID)).sorted() {
+            let group = observations
+                .filter { $0.destinationStationID == destinationStationID }
+                .sorted(by: dlrObservationOrder)
+            let candidatesBySourceIndex = Dictionary(uniqueKeysWithValues: group.map { observation in
+                let candidates = directionalRoutes.compactMap { route in
+                    DLRRouteCandidate(
+                        route: route,
+                        observation: observation,
+                        repository: repository
+                    )
+                }
+                return (observation.sourceIndex, candidates)
+            })
+
+            let shadowed = Set(group.compactMap { observation -> Int? in
+                guard let candidates = candidatesBySourceIndex[observation.sourceIndex] else { return nil }
+                let predecessorIDs = Set(candidates.compactMap(\.predecessorStationID))
+                guard !predecessorIDs.isEmpty else { return nil }
+                let hasEarlierPrediction = group.contains { earlier in
+                    guard predecessorIDs.contains(earlier.stationID),
+                          earlier.seconds < observation.seconds else {
+                        return false
+                    }
+                    let interval = observation.seconds - earlier.seconds
+                    return (15 ... 240).contains(interval)
+                }
+                return hasEarlierPrediction ? observation.sourceIndex : nil
+            })
+
+            for observation in group where !shadowed.contains(observation.sourceIndex) {
+                guard let candidates = candidatesBySourceIndex[observation.sourceIndex],
+                      let chosen = unambiguousCandidate(from: candidates) else {
+                    continue
+                }
+                let proposal = chosen.proposal
+                if chosen.stationIndex == 0 {
+                    let originKey = DLROriginKey(
+                        stationID: observation.stationID,
+                        destinationStationID: destinationStationID
+                    )
+                    // Countdown boards include several future departures at a
+                    // terminal. Only the first can represent a vehicle that is
+                    // currently at, or about to leave, that platform.
+                    guard emittedOrigins.insert(originKey).inserted else { continue }
+                }
+                guard let segment = repository.segment(
+                    between: proposal.previousStationID,
+                    and: proposal.nextStationID,
+                    on: .dlr
+                ) else {
+                    continue
+                }
+
+                let startsAtRouteOrigin = chosen.stationIndex == 0
+                let secondsToNextStation: Int
+                let progress: Double
+                if startsAtRouteOrigin {
+                    secondsToNextStation = group.first(where: {
+                        $0.stationID == proposal.nextStationID && $0.seconds > observation.seconds
+                    })?.seconds ?? max(observation.seconds + 45, 1)
+                    progress = 0.05
+                } else {
+                    secondsToNextStation = max(observation.seconds, 1)
+                    progress = estimatedDLRProgress(
+                        seconds: observation.seconds,
+                        currentLocation: observation.prediction.currentLocation
+                    )
+                }
+
+                // DLR predictions do not currently expose vehicle IDs. The
+                // station, destination and absolute arrival slot provide a
+                // stable identity while a vehicle approaches its next stop.
+                let absoluteArrivalSlot = Int(
+                    (now.timeIntervalSince1970 + Double(observation.seconds)) / 30
+                )
+                let syntheticID = [
+                    TubeLineID.dlr.rawValue,
+                    destinationStationID,
+                    observation.stationID,
+                    String(absoluteArrivalSlot),
+                ].joined(separator: ":")
+                output.append(LiveTubeTrain(
+                    id: syntheticID,
+                    vehicleID: "DLR-\(absoluteArrivalSlot)",
+                    lineID: .dlr,
+                    destination: observation.prediction.destinationName ?? observation.prediction.towards,
+                    direction: observation.prediction.direction ?? observation.prediction.platformName,
+                    previousStationID: proposal.previousStationID,
+                    nextStationID: proposal.nextStationID,
+                    segmentID: segment.id,
+                    progress: progress,
+                    secondsToNextStation: max(secondsToNextStation, 1),
+                    updatedAt: now
+                ))
+            }
+        }
+        return output.sorted { $0.id < $1.id }
+    }
+
+    private static func unambiguousCandidate(from candidates: [DLRRouteCandidate]) -> DLRRouteCandidate? {
+        let proposals = Set(candidates.map(\.proposal))
+        guard proposals.count == 1 else { return nil }
+        return candidates.min { $0.route.id < $1.route.id }
+    }
+
+    private static func dlrObservationOrder(_ left: DLRObservation, _ right: DLRObservation) -> Bool {
+        if left.seconds != right.seconds { return left.seconds < right.seconds }
+        if left.stationID != right.stationID { return left.stationID < right.stationID }
+        return left.sourceIndex < right.sourceIndex
+    }
+
+    private static func estimatedDLRProgress(seconds: Int, currentLocation: String?) -> Double {
+        let baselineDuration = max(75, min(180, seconds + 45))
+        if currentLocation?.localizedCaseInsensitiveContains("at platform") == true {
+            return 1
+        }
+        return max(0.05, min(0.95, 1 - Double(seconds) / Double(baselineDuration)))
+    }
+}
+
+private struct DLRPredictionKey: Hashable {
+    let stationID: String
+    let destinationStationID: String
+    let seconds: Int
+}
+
+private struct DLROriginKey: Hashable {
+    let stationID: String
+    let destinationStationID: String
+}
+
+private struct DLRObservation: Sendable {
+    let sourceIndex: Int
+    let prediction: TfLLiveTrainPrediction
+    let stationID: String
+    let destinationStationID: String
+    let seconds: Int
+}
+
+private struct DLRDirectionalRoute: Sendable {
+    let id: Int
+    let stationIDs: [String]
+
+    init(id: Int, stationIDs: some Sequence<String>) {
+        self.id = id
+        self.stationIDs = Array(stationIDs)
+    }
+}
+
+private struct DLRRouteCandidate: Sendable {
+    let route: DLRDirectionalRoute
+    let stationIndex: Int
+    let predecessorStationID: String?
+    let proposal: TramRouteProposal
+
+    init?(
+        route: DLRDirectionalRoute,
+        observation: DLRObservation,
+        repository: TubeNetworkRepository
+    ) {
+        guard let stationIndex = route.stationIDs.firstIndex(of: observation.stationID),
+              let destinationIndex = route.stationIDs.firstIndex(of: observation.destinationStationID),
+              destinationIndex >= stationIndex else {
+            return nil
+        }
+
+        let proposal: TramRouteProposal
+        if stationIndex == 0 {
+            guard route.stationIDs.count > 1,
+                  repository.segment(
+                      between: route.stationIDs[0],
+                      and: route.stationIDs[1],
+                      on: .dlr
+                  ) != nil else {
+                return nil
+            }
+            proposal = TramRouteProposal(
+                previousStationID: route.stationIDs[0],
+                nextStationID: route.stationIDs[1]
+            )
+        } else {
+            guard repository.segment(
+                between: route.stationIDs[stationIndex - 1],
+                and: route.stationIDs[stationIndex],
+                on: .dlr
+            ) != nil else {
+                return nil
+            }
+            proposal = TramRouteProposal(
+                previousStationID: route.stationIDs[stationIndex - 1],
+                nextStationID: route.stationIDs[stationIndex]
+            )
+        }
+
+        self.route = route
+        self.stationIndex = stationIndex
+        self.predecessorStationID = stationIndex > 0 ? route.stationIDs[stationIndex - 1] : nil
         self.proposal = proposal
     }
 }

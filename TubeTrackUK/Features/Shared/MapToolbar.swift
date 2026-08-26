@@ -1,9 +1,11 @@
 import SwiftUI
 
+enum MapDockMetrics {
+    static let controlSize: CGFloat = 44
+}
+
 struct MapToolbar: View {
     @Environment(TubeAppState.self) private var appState
-    @State private var stationSearchPresented = false
-    @State private var pendingStationSelection: TubeStation?
     let onReset: () -> Void
 
     var body: some View {
@@ -13,20 +15,10 @@ struct MapToolbar: View {
             HStack(spacing: 8) {
                 Spacer(minLength: 4)
 
-                Button {
-                    stationSearchPresented = true
-                } label: {
-                    Image(systemName: "magnifyingglass")
-                        .frame(width: 34, height: 34)
-                }
-                .buttonStyle(.glass)
-                .disabled(appState.graph == nil)
-                .accessibilityLabel("Search stations")
-
                 Menu {
                     Picker("Appearance", selection: $state.appearanceMode) {
                         ForEach(AppAppearanceMode.allCases) { mode in
-                            Label(mode.title, systemImage: mode.symbol)
+                            Label(mode.actionTitle, systemImage: mode.symbol)
                                 .tag(mode)
                         }
                     }
@@ -38,16 +30,6 @@ struct MapToolbar: View {
                 .accessibilityLabel("Appearance")
                 .accessibilityValue(appState.appearanceMode.title)
 
-                Button {
-                    appState.setLiveTrains(!appState.showLiveTrains)
-                } label: {
-                    Image(systemName: appState.showLiveTrains ? "tram.fill" : "tram")
-                        .foregroundStyle(appState.showLiveTrains ? .blue : .primary)
-                        .frame(width: 34, height: 34)
-                }
-                .buttonStyle(.glass)
-                .accessibilityLabel(appState.showLiveTrains ? "Hide live trains" : "Show live trains")
-
                 Button(action: onReset) {
                     Image(systemName: "scope")
                         .frame(width: 34, height: 34)
@@ -58,6 +40,56 @@ struct MapToolbar: View {
         }
         .padding(.horizontal, 12)
         .padding(.top, 6)
+    }
+}
+
+struct MapActionButtons: View {
+    @Environment(TubeAppState.self) private var appState
+    @State private var stationSearchPresented = false
+    @State private var pendingStationSelection: TubeStation?
+
+    private var destinationMode: MapPresentationMode {
+        appState.mapPresentationMode.toggled
+    }
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Button {
+                appState.mapPresentationMode = destinationMode
+            } label: {
+                Image(systemName: appState.mapPresentationMode.switchActionSymbol)
+            }
+            .mapDockButtonStyle()
+            .accessibilityLabel(appState.mapPresentationMode.switchActionTitle)
+
+            Button {
+                appState.setLiveTrains(!appState.showLiveTrains)
+            } label: {
+                if appState.isLoadingLiveTrains {
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(.blue)
+                } else {
+                    Image(systemName: appState.showLiveTrains ? "tram.fill" : "tram")
+                        .foregroundStyle(appState.showLiveTrains ? .blue : .primary)
+                }
+            }
+            .mapDockButtonStyle()
+            .accessibilityLabel(
+                appState.isLoadingLiveTrains
+                    ? "Loading live trains"
+                    : appState.showLiveTrains ? "Hide live trains" : "Show live trains"
+            )
+
+            Button {
+                stationSearchPresented = true
+            } label: {
+                Image(systemName: "magnifyingglass")
+            }
+            .mapDockButtonStyle()
+            .disabled(appState.graph == nil)
+            .accessibilityLabel("Station search")
+        }
         .sheet(isPresented: $stationSearchPresented, onDismiss: {
             guard let station = pendingStationSelection else { return }
             pendingStationSelection = nil
@@ -79,64 +111,19 @@ struct MapToolbar: View {
                     )
                 }
             }
-            .presentationDetents([.medium, .large])
+            .presentationDetents([.large])
             .presentationDragIndicator(.visible)
         }
     }
 }
 
-struct DisruptionHighlightMenu: View {
-    @Environment(TubeAppState.self) private var appState
-
-    var body: some View {
-        Menu {
-            Section("Highlight") {
-                ForEach(DisruptionCategory.allCases) { category in
-                    Toggle(isOn: categoryBinding(for: category)) {
-                        Label(category.title, systemImage: category.symbol)
-                    }
-                }
-            }
-        } label: {
-            Image(
-                systemName: appState.disruptionDisplayMode == .issues
-                    ? "exclamationmark.triangle.fill"
-                    : "exclamationmark.triangle"
-            )
+private extension View {
+    func mapDockButtonStyle() -> some View {
+        self
             .font(.headline)
-            .foregroundStyle(
-                appState.disruptionDisplayMode == .issues ? .red : .primary
-            )
-            .frame(width: 56, height: 56)
-            .contentShape(.rect)
-        } primaryAction: {
-            withAnimation(.smooth(duration: 0.25)) {
-                appState.toggleDisruptionHighlighting()
-            }
-        }
-        .buttonStyle(.glass)
-        .menuActionDismissBehavior(.disabled)
-        .accessibilityLabel(
-            appState.disruptionDisplayMode == .issues
-                ? "Hide disruption highlights"
-                : "Show disruption highlights"
-        )
-        .accessibilityValue(highlightAccessibilityValue)
-        .accessibilityHint("Touch and hold for disruption category filters")
-    }
-
-    private func categoryBinding(for category: DisruptionCategory) -> Binding<Bool> {
-        Binding(
-            get: { appState.highlightedDisruptionCategories.contains(category) },
-            set: { appState.setDisruptionCategory(category, highlighted: $0) }
-        )
-    }
-
-    private var highlightAccessibilityValue: String {
-        guard appState.disruptionDisplayMode == .issues else { return "Off" }
-        let titles = DisruptionCategory.allCases
-            .filter { appState.highlightedDisruptionCategories.contains($0) }
-            .map(\.title)
-        return titles.isEmpty ? "No categories selected" : titles.joined(separator: ", ")
+            .frame(width: MapDockMetrics.controlSize, height: MapDockMetrics.controlSize)
+            .contentShape(.circle)
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: .circle)
     }
 }

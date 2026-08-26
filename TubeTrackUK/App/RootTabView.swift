@@ -20,15 +20,9 @@ struct RootTabView: View {
             .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
             .tag(AppTab.map)
 
-            Group {
-                if appState.selectedTab == .nearMe {
-                    NearMeScreen()
-                } else {
-                    Color.clear
-                }
-            }
-            .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
-            .tag(AppTab.nearMe)
+            NearMeScreen()
+                .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
+                .tag(AppTab.nearMe)
 
             WorksScreen()
                 .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }

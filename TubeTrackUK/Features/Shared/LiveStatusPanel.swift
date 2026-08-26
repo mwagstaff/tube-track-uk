@@ -6,7 +6,7 @@ struct LiveStatusDock: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Binding var expanded: Bool
 
-    private var summary: (symbol: String, color: Color, title: String, detail: String) {
+    private var summary: (symbol: String, color: Color, title: String, detail: String?) {
         if !appState.isViewingLiveStatus {
             let date = LondonRailDate.formatted(
                 appState.selectedDisruptionDate,
@@ -43,7 +43,7 @@ struct LiveStatusDock: View {
         }
         if appState.currentIssueCount > 0 {
             let count = appState.currentIssueCount
-            return ("exclamationmark.triangle.fill", .red, "\(count) disruption\(count == 1 ? "" : "s")", "Tap for affected lines")
+            return ("exclamationmark.triangle.fill", .red, "\(count) disruption\(count == 1 ? "" : "s")", nil)
         }
         let overnight = !appState.statuses.isEmpty && appState.statuses.allSatisfy {
             $0.lineStatuses.allSatisfy(\.isOvernightClosure)
@@ -77,16 +77,14 @@ struct LiveStatusDock: View {
             statusIcon
             statusText(lineLimit: 1)
             Spacer()
-            if appState.isViewingLiveStatus {
-                FreshnessLabel(
-                    date: appState.disruptionDataUpdatedAt,
-                    cached: appState.isUsingCachedDisruptionData
-                )
-            }
             disclosureIcon
         }
         .padding(.horizontal, 14)
-        .frame(maxWidth: .infinity, minHeight: 56)
+        .frame(
+            maxWidth: .infinity,
+            minHeight: MapDockMetrics.controlSize,
+            maxHeight: MapDockMetrics.controlSize
+        )
         .contentShape(.interaction, Rectangle())
         .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 18))
     }
@@ -96,13 +94,7 @@ struct LiveStatusDock: View {
             statusIcon
                 .frame(width: 44, height: 44)
 
-            VStack(alignment: .leading, spacing: 7) {
-                statusText(lineLimit: 2)
-                FreshnessLabel(
-                    date: appState.disruptionDataUpdatedAt,
-                    cached: appState.isUsingCachedDisruptionData
-                )
-            }
+            statusText(lineLimit: 2)
 
             Spacer(minLength: 4)
             disclosureIcon
@@ -127,10 +119,12 @@ struct LiveStatusDock: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(lineLimit)
-            Text(summary.detail)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(lineLimit)
+            if let detail = summary.detail {
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(lineLimit)
+            }
         }
     }
 
@@ -142,61 +136,18 @@ struct LiveStatusDock: View {
 }
 
 struct MapStatusDock: View {
-    @Environment(TubeAppState.self) private var appState
     @Binding var expanded: Bool
 
     var body: some View {
-        VStack(alignment: .trailing, spacing: 8) {
-            if appState.disruptionDisplayMode == .issues {
-                DisruptionDateMenu()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-
-                if !appState.isViewingLiveStatus {
-                    DisruptionTimeFilterBar()
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
-            }
-
-            GlassEffectContainer(spacing: 8) {
-                HStack(alignment: .bottom, spacing: 8) {
-                    LiveStatusDock(expanded: $expanded)
-                        .layoutPriority(1)
-                    DisruptionHighlightMenu()
-                        .fixedSize()
-                    MapPresentationModeButton()
-                        .fixedSize()
-                }
+        GlassEffectContainer(spacing: 8) {
+            HStack(alignment: .bottom, spacing: 8) {
+                LiveStatusDock(expanded: $expanded)
+                    .layoutPriority(1)
+                MapActionButtons()
+                    .fixedSize()
             }
         }
         .padding(.horizontal, 12)
-        .animation(.smooth(duration: 0.25), value: appState.disruptionDisplayMode)
-        .animation(.smooth(duration: 0.25), value: appState.isViewingLiveStatus)
-    }
-}
-
-private struct MapPresentationModeButton: View {
-    @Environment(TubeAppState.self) private var appState
-
-    private var destinationMode: MapPresentationMode {
-        appState.mapPresentationMode.toggled
-    }
-
-    var body: some View {
-        Button {
-            appState.mapPresentationMode = destinationMode
-        } label: {
-            Image(systemName: appState.mapPresentationMode.symbol)
-                .font(.headline.weight(.semibold))
-                .frame(width: 44, height: 44)
-                .contentTransition(.symbolEffect(.replace))
-        }
-        .buttonStyle(.plain)
-        .foregroundStyle(Color(uiColor: .label))
-        .contentShape(.circle)
-        .glassEffect(.regular.interactive(), in: .circle)
-        .accessibilityLabel("Switch to \(destinationMode.title) view")
-        .accessibilityHint("Morphs the rail network while preserving the current centre and zoom")
-        .accessibilityValue(appState.mapPresentationMode.title)
     }
 }
 
@@ -422,14 +373,8 @@ struct LiveStatusPanel: View {
         GlassPanel {
             VStack(spacing: 12) {
                 HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(appState.isViewingLiveStatus ? "Live Status" : "Planned Work")
-                            .font(.headline)
-                        FreshnessLabel(
-                            date: appState.disruptionDataUpdatedAt,
-                            cached: appState.isUsingCachedDisruptionData
-                        )
-                    }
+                    Text(appState.isViewingLiveStatus ? "Live Status" : "Planned Work")
+                        .font(.headline)
                     Spacer()
                     Button("Close", systemImage: "xmark.circle.fill") {
                         withAnimation(.spring(duration: 0.35)) { expanded = false }
@@ -447,15 +392,25 @@ struct LiveStatusPanel: View {
                     )
                 }
 
-                if appState.disruptionDisplayMode == .issues {
-                    VStack(alignment: .leading, spacing: 8) {
+                if appState.isViewingLiveStatus {
+                    StaleLiveStatusNotice(updatedAt: appState.statusUpdatedAt)
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    ViewThatFits(in: .horizontal) {
                         HStack {
                             DisruptionDateMenu()
-                            Spacer(minLength: 0)
+                            Spacer(minLength: 8)
+                            DisruptionCategoryFilterMenu()
                         }
-                        if !appState.isViewingLiveStatus {
-                            DisruptionTimeFilterBar()
+
+                        VStack(alignment: .leading, spacing: 8) {
+                            DisruptionDateMenu()
+                            DisruptionCategoryFilterMenu()
                         }
+                    }
+                    if !appState.isViewingLiveStatus {
+                        DisruptionTimeFilterBar()
                     }
                 }
 
@@ -464,8 +419,37 @@ struct LiveStatusPanel: View {
                 } else {
                     plannedWorksContent
                 }
+
+                disruptionHighlightAction
             }
         }
+    }
+
+    private var disruptionHighlightAction: some View {
+        Button {
+            withAnimation(.smooth(duration: 0.3)) {
+                appState.toggleDisruptionHighlighting()
+                expanded = false
+            }
+        } label: {
+            Label(
+                appState.disruptionDisplayMode == .issues
+                    ? "Show normal line colours"
+                    : "Highlight disrupted lines",
+                systemImage: appState.disruptionDisplayMode == .issues
+                    ? "arrow.uturn.backward.circle.fill"
+                    : "exclamationmark.triangle.fill"
+            )
+            .font(.headline)
+            .frame(maxWidth: .infinity, minHeight: 50)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(.tubeBlue)
+        .accessibilityHint(
+            appState.disruptionDisplayMode == .issues
+                ? "Restores normal line colours and closes this panel"
+                : "Highlights disrupted lines, fades working lines, and closes this panel"
+        )
     }
 
     @ViewBuilder
@@ -576,6 +560,80 @@ struct LiveStatusPanel: View {
             )
             .frame(height: 160)
         }
+    }
+}
+
+private struct StaleLiveStatusNotice: View {
+    let updatedAt: Date?
+
+    var body: some View {
+        if let updatedAt {
+            TimelineView(.periodic(from: .now, by: 1)) { context in
+                if LiveStatusStaleness.isStale(
+                    updatedAt: updatedAt,
+                    now: context.date
+                ) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.orange)
+
+                        Text("Live disruption data is stale. Retrying…")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.primary)
+
+                        Spacer(minLength: 4)
+
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(.orange)
+                            .accessibilityLabel("Retrying")
+                    }
+                    .padding(.horizontal, 12)
+                    .frame(minHeight: 44)
+                    .background(Color.orange.opacity(0.12), in: .rect(cornerRadius: 12))
+                    .accessibilityElement(children: .combine)
+                }
+            }
+        }
+    }
+}
+
+private struct DisruptionCategoryFilterMenu: View {
+    @Environment(TubeAppState.self) private var appState
+
+    var body: some View {
+        Menu {
+            Section("Lines to highlight") {
+                ForEach(DisruptionCategory.allCases) { category in
+                    Toggle(isOn: categoryBinding(for: category)) {
+                        Label(category.title, systemImage: category.symbol)
+                    }
+                }
+            }
+        } label: {
+            Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 12)
+                .frame(minHeight: 44)
+        }
+        .buttonStyle(.glass)
+        .menuActionDismissBehavior(.disabled)
+        .accessibilityLabel("Disruption categories")
+        .accessibilityValue(highlightAccessibilityValue)
+    }
+
+    private func categoryBinding(for category: DisruptionCategory) -> Binding<Bool> {
+        Binding(
+            get: { appState.highlightedDisruptionCategories.contains(category) },
+            set: { appState.setDisruptionCategory(category, highlighted: $0) }
+        )
+    }
+
+    private var highlightAccessibilityValue: String {
+        let titles = DisruptionCategory.allCases
+            .filter { appState.highlightedDisruptionCategories.contains($0) }
+            .map(\.title)
+        return titles.isEmpty ? "No categories selected" : titles.joined(separator: ", ")
     }
 }
 

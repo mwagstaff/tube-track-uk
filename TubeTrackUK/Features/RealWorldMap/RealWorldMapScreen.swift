@@ -374,7 +374,11 @@ private struct RealWorldTrainCanvas: View {
 
                 for train in trains {
                     guard let path = pathsBySegmentID[train.segmentID],
-                          let coordinate = path.coordinate(at: train.projectedProgress(at: timeline.date)),
+                          let coordinate = path.coordinate(
+                              at: train.projectedProgress(at: timeline.date),
+                              previousStationID: train.previousStationID,
+                              nextStationID: train.nextStationID
+                          ),
                           visibleRegion.containsExpanded(coordinate),
                           let point = proxy.convert(coordinate, to: .local),
                           visibleBounds.contains(point) else { continue }
@@ -569,6 +573,8 @@ enum RealWorldPolylineBuilder {
 
 struct RealWorldRenderPath {
     let coordinates: [CLLocationCoordinate2D]
+    private let fromStationID: String
+    private let toStationID: String
     private let cumulativeLengths: [Double]
     private let totalLength: Double
 
@@ -585,6 +591,8 @@ struct RealWorldRenderPath {
         }
 
         self.coordinates = coordinates
+        fromStationID = segment.fromStationID
+        toStationID = segment.toStationID
         self.cumulativeLengths = cumulativeLengths
         totalLength = cumulativeLengths.last ?? 0
     }
@@ -620,6 +628,17 @@ struct RealWorldRenderPath {
             latitude: start.latitude + (end.latitude - start.latitude) * fraction,
             longitude: start.longitude + (end.longitude - start.longitude) * fraction
         )
+    }
+
+    func coordinate(
+        at progress: Double,
+        previousStationID: String,
+        nextStationID: String
+    ) -> CLLocationCoordinate2D? {
+        let followsStoredDirection = previousStationID == fromStationID && nextStationID == toStationID
+        let runsAgainstStoredDirection = previousStationID == toStationID && nextStationID == fromStationID
+        guard followsStoredDirection || runsAgainstStoredDirection else { return nil }
+        return coordinate(at: runsAgainstStoredDirection ? 1 - progress : progress)
     }
 
     private static func displayCoordinates(

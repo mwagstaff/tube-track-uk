@@ -6,6 +6,37 @@ struct StationDetailCard: View {
     let station: TubeStation
     var onClose: (() -> Void)? = nil
 
+    private var lineIDs: [TubeLineID] {
+        appState.graph?.lineIDs(at: station) ?? station.lineIDs
+    }
+
+    private var stationIssue: ResolvedDisruption? {
+        StationDisruptionLookup.firstMatching(
+            station: station,
+            graph: appState.graph,
+            disruptions: appState.visibleDisruptions
+        )
+    }
+
+    private var stationWarning: StationDepartureWarning? {
+        guard let stationIssue else { return nil }
+        guard !appState.isViewingLiveStatus else {
+            return StationDepartureWarning(
+                title: stationIssue.title,
+                detail: stationIssue.reason
+            )
+        }
+
+        let date = LondonRailDate.formatted(
+            appState.selectedDisruptionDate,
+            dateFormat: "EEE d MMM"
+        )
+        return StationDepartureWarning(
+            title: stationIssue.title,
+            detail: "Planned for \(date). \(stationIssue.reason)"
+        )
+    }
+
     var body: some View {
         GlassPanel {
             VStack(alignment: .leading, spacing: 10) {
@@ -33,56 +64,17 @@ struct StationDetailCard: View {
                     .buttonStyle(.plain)
                     .accessibilityHint("Closes station details")
                 }
-                ScrollView(.horizontal) {
-                    HStack(spacing: 6) {
-                        ForEach(appState.graph?.lineIDs(at: station) ?? station.lineIDs) { lineID in
-                            Button {
-                                withAnimation(.easeInOut(duration: 0.35)) {
-                                    appState.selectedLineID = lineID
-                                }
-                            } label: {
-                                LineBadge(lineID: lineID)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-                .scrollIndicators(.hidden)
-
-                Divider()
-
-                if let issue = StationDisruptionLookup.firstMatching(
-                    station: station,
-                    graph: appState.graph,
-                    disruptions: appState.visibleDisruptions
-                ) {
-                    Label(issue.title, systemImage: "exclamationmark.triangle.fill")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.red)
-                    Text(issue.reason)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                    Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
-                        presentedDisruption = issue
-                    }
-                    .font(.caption.weight(.semibold))
-                    .buttonStyle(.plain)
-                    .foregroundStyle(.tint)
-                } else if appState.isRefreshingStationArrivals {
-                    ProgressView("Loading live departures…")
-                        .font(.caption)
-                } else if appState.stationArrivals.isEmpty {
-                    Text(appState.stationArrivalsError ?? "No imminent departures reported.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                } else {
-                    VStack(spacing: 8) {
-                        ForEach(appState.stationArrivals.prefix(3)) { arrival in
-                            arrivalRow(arrival)
-                        }
-                    }
-                }
+                StationDeparturesSection(
+                    lineIDs: lineIDs,
+                    arrivals: appState.stationArrivals,
+                    statuses: appState.statuses,
+                    isLoading: appState.isRefreshingStationArrivals,
+                    errorMessage: appState.stationArrivalsError,
+                    warning: stationWarning,
+                    maxDeparturesHeight: 280,
+                    onShowWarning: showStationIssue
+                )
+                .id(station.id)
             }
         }
         .accessibilityElement(children: .contain)
@@ -92,7 +84,6 @@ struct StationDetailCard: View {
     }
 
     private var stationKindDescription: String {
-        let lineIDs = appState.graph?.lineIDs(at: station) ?? station.lineIDs
         if station.interchange || lineIDs.count > 1 { return "Interchange station" }
         if lineIDs.contains(.tram), lineIDs.allSatisfy({ $0 == .tram }) {
             return "Tram stop"
@@ -101,30 +92,8 @@ struct StationDetailCard: View {
         return "Rail station"
     }
 
-    private func arrivalRow(_ arrival: TfLArrivalPrediction) -> some View {
-        HStack(spacing: 9) {
-            if let line = TubeLineID(rawValue: arrival.lineId) {
-                Circle().fill(Color.tubeLine(line)).frame(width: 9, height: 9)
-            }
-            VStack(alignment: .leading, spacing: 1) {
-                Text(arrival.destinationName ?? arrival.towards ?? "Check platform")
-                    .font(.caption.weight(.semibold))
-                    .lineLimit(1)
-                Text(arrival.platformName ?? "Live TfL prediction")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Text(departureTime(arrival.timeToStation))
-                .font(.caption.weight(.bold))
-                .foregroundStyle(.green)
-        }
-    }
-
-    private func departureTime(_ seconds: Int?) -> String {
-        guard let seconds else { return "—" }
-        if seconds < 45 { return "Due" }
-        return "\(max(1, seconds / 60)) min"
+    private func showStationIssue() {
+        presentedDisruption = stationIssue
     }
 }
 
@@ -310,11 +279,15 @@ struct TrainFilterBar: View {
                 }
                 .buttonStyle(.plain)
 
-                ForEach(TubeLineID.allCases.filter(\.supportsEstimatedTrains)) { lineID in
+                ForEach(TubeLineID.liveTrainFilterCases) { lineID in
                     Button {
                         appState.setTrainFilter(lineID)
                     } label: {
-                        LineBadge(lineID: lineID, showsName: true)
+                        LineBadge(
+                            lineID: lineID,
+                            showsName: true,
+                            activeTrainCount: appState.activeTrainCounts.count(for: lineID)
+                        )
                             .overlay {
                                 if appState.trainLineFilter.contains(lineID) {
                                     Capsule().stroke(Color.blue, lineWidth: 2)
@@ -323,6 +296,15 @@ struct TrainFilterBar: View {
                     }
                     .buttonStyle(.plain)
                 }
+
+                Text("\(appState.activeTrainCounts.total) active trains")
+                    .font(.caption2.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .fixedSize()
+                    .padding(.leading, 3)
+                    .accessibilityLabel(
+                        "\(appState.activeTrainCounts.total) active trains across all lines"
+                    )
             }
             .padding(.horizontal, 12)
         }

@@ -15,18 +15,18 @@ struct PerformanceRegressionTests {
         let batches = TubeTrainRequestBatcher.batches(from: requestedLines)
 
         #expect(requestedLines == requestedLines.sorted { $0.rawValue < $1.rawValue })
-        #expect(!requestedLines.contains(.dlr))
+        #expect(requestedLines.contains(.dlr))
         #expect(requestedLines.contains(.tram))
         #expect(batches.allSatisfy { !$0.isEmpty && $0.count <= 3 })
         #expect(batches.flatMap { $0 } == requestedLines)
         #expect(batches == [
             [.bakerloo, .central, .circle],
-            [.district, .elizabeth, .hammersmithCity],
-            [.jubilee, .liberty, .lioness],
-            [.metropolitan, .mildmay, .northern],
-            [.piccadilly, .suffragette, .tram],
-            [.victoria, .waterlooCity, .weaver],
-            [.windrush],
+            [.district, .dlr, .elizabeth],
+            [.hammersmithCity, .jubilee, .liberty],
+            [.lioness, .metropolitan, .mildmay],
+            [.northern, .piccadilly, .suffragette],
+            [.tram, .victoria, .waterlooCity],
+            [.weaver, .windrush],
         ])
     }
 
@@ -36,9 +36,28 @@ struct PerformanceRegressionTests {
         )
         let batches = TubeTrainRequestBatcher.batches(from: requestedLines)
 
-        #expect(requestedLines == [.bakerloo, .central, .tram, .victoria])
-        #expect(batches == [[.bakerloo, .central, .tram], [.victoria]])
+        #expect(requestedLines == [.bakerloo, .central, .dlr, .tram, .victoria])
+        #expect(batches == [[.bakerloo, .central, .dlr], [.tram, .victoria]])
         #expect(TubeTrainRequestBatcher.batches(from: []) == [])
+    }
+
+    @Test func liveTrainFilterPillsAreAlphabeticalByPassengerFacingName() {
+        let names = TubeLineID.liveTrainFilterCases.map(\.displayName)
+        let alphabetizedNames = names.sorted {
+            $0.localizedStandardCompare($1) == .orderedAscending
+        }
+
+        #expect(names == alphabetizedNames)
+        #expect(names.first == "Bakerloo")
+        #expect(names.last == "Windrush line")
+    }
+
+    @Test func mapOptionsExposeStateAwareActionLabels() {
+        #expect(MapPresentationMode.beck.switchActionTitle == "Show map view")
+        #expect(MapPresentationMode.realWorld.switchActionTitle == "Show line view")
+        #expect(AppAppearanceMode.system.actionTitle == "Use system appearance")
+        #expect(AppAppearanceMode.light.actionTitle == "Enable light mode")
+        #expect(AppAppearanceMode.dark.actionTitle == "Enable dark mode")
     }
 
     @Test func lightweightLivePredictionIgnoresUnusedDatePayload() throws {
@@ -193,6 +212,79 @@ struct PerformanceRegressionTests {
         #expect(resolution?.context.routeIndex == 5)
     }
 
+    @Test func dlrCountdownBoardPredictionsCollapseIntoIndividualMovingVehicles() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let now = Date(timeIntervalSince1970: 4_000)
+        let predictions = [
+            dlrPrediction(stationID: "940GZZDLSHA", seconds: 30, destinationStationID: "940GZZDLBNK"),
+            dlrPrediction(stationID: "940GZZDLBNK", seconds: 90, destinationStationID: "940GZZDLBNK"),
+            dlrPrediction(stationID: "940GZZDLLIM", seconds: 60, destinationStationID: "940GZZDLBNK"),
+            dlrPrediction(stationID: "940GZZDLSHA", seconds: 120, destinationStationID: "940GZZDLBNK"),
+            dlrPrediction(stationID: "940GZZDLBNK", seconds: 180, destinationStationID: "940GZZDLBNK"),
+        ]
+
+        let trains = DLRPredictionResolver.resolve(
+            predictions: predictions,
+            repository: repository,
+            now: now
+        )
+
+        #expect(trains.count == 2)
+        #expect(trains.allSatisfy { $0.lineID == .dlr })
+        #expect(Set(trains.map(\.nextStationID)) == ["940GZZDLSHA", "940GZZDLLIM"])
+        #expect(Set(trains.map(\.previousStationID)) == ["940GZZDLLIM", "940GZZDLWFE"])
+        #expect(Set(trains.map(\.id)).count == trains.count)
+    }
+
+    @Test func dlrResolverSuppressesAnUnidentifiedIncomingBranch() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let trains = DLRPredictionResolver.resolve(
+            predictions: [
+                dlrPrediction(
+                    stationID: "940GZZDLCGT",
+                    seconds: 45,
+                    destinationStationID: "940GZZDLWLA"
+                ),
+            ],
+            repository: repository,
+            now: Date(timeIntervalSince1970: 5_000)
+        )
+
+        #expect(trains.isEmpty)
+    }
+
+    @Test func dlrResolverShowsOnlyTheNextTerminalDeparture() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let trains = DLRPredictionResolver.resolve(
+            predictions: [
+                dlrPrediction(
+                    stationID: "940GZZDLTWG",
+                    seconds: 40,
+                    destinationStationID: "940GZZDLBEC"
+                ),
+                dlrPrediction(
+                    stationID: "940GZZDLTWG",
+                    seconds: 340,
+                    destinationStationID: "940GZZDLBEC"
+                ),
+                dlrPrediction(
+                    stationID: "940GZZDLSHA",
+                    seconds: 100,
+                    destinationStationID: "940GZZDLBEC"
+                ),
+            ],
+            repository: repository,
+            now: Date(timeIntervalSince1970: 6_000)
+        )
+
+        let train = try #require(trains.first)
+        #expect(trains.count == 1)
+        #expect(train.previousStationID == "940GZZDLTWG")
+        #expect(train.nextStationID == "940GZZDLSHA")
+        #expect(train.progress == 0.05)
+        #expect(train.secondsToNextStation == 100)
+    }
+
     @Test func indexedSegmentLookupMatchesEveryBundledConnectionInBothDirections() throws {
         let graph = try TubeGraph.bundled()
         let repository = TubeNetworkRepository(graph: graph)
@@ -254,8 +346,14 @@ struct PerformanceRegressionTests {
         )
 
         let quarter = try #require(path.coordinate(at: 0.25))
+        let reverseQuarter = try #require(path.coordinate(
+            at: 0.25,
+            previousStationID: to.id,
+            nextStationID: from.id
+        ))
         #expect(abs(quarter.latitude - 51) < 0.000_001)
         #expect(abs(quarter.longitude - 0.005) < 0.000_001)
+        #expect(abs(reverseQuarter.longitude - 0.015) < 0.000_001)
         #expect(path.coordinate(at: -1)?.longitude == from.longitude)
         #expect(path.coordinate(at: 2)?.longitude == to.longitude)
     }
@@ -300,5 +398,24 @@ private func tramPrediction(
         timeToStation: seconds,
         currentLocation: nil,
         platformName: "Westbound"
+    )
+}
+
+private func dlrPrediction(
+    stationID: String,
+    seconds: Int,
+    destinationStationID: String
+) -> TfLLiveTrainPrediction {
+    TfLLiveTrainPrediction(
+        vehicleId: "",
+        lineId: TubeLineID.dlr.rawValue,
+        naptanId: stationID,
+        direction: "inbound",
+        destinationName: "Bank DLR Station",
+        destinationNaptanId: destinationStationID,
+        towards: "",
+        timeToStation: seconds,
+        currentLocation: "",
+        platformName: "Platform 2"
     )
 }

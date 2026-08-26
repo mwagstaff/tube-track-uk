@@ -37,14 +37,42 @@ struct NearMeScreen: View {
                 }
             }
         }
-        .task {
+        .task(id: appState.selectedTab) {
+            guard appState.selectedTab == .nearMe else { return }
             locationProvider.requestLocation()
         }
         .task(id: initialStationTaskID) {
+            guard appState.selectedTab == .nearMe,
+                  appState.isViewingLiveStatus else {
+                return
+            }
             visibleStationCount = Self.stationBatchSize
             let stations = nearbyStations.map(\.station)
             guard !stations.isEmpty else { return }
             await appState.refreshNearbyArrivals(for: stations)
+        }
+        .task(id: nearbyArrivalsPollingTaskID) {
+            guard appState.selectedTab == .nearMe,
+                  appState.isViewingLiveStatus,
+                  !nearbyStations.isEmpty else {
+                return
+            }
+
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(for: .seconds(30))
+                } catch {
+                    return
+                }
+                guard !Task.isCancelled,
+                      appState.selectedTab == .nearMe,
+                      appState.isViewingLiveStatus else {
+                    return
+                }
+                await appState.refreshNearbyArrivals(
+                    for: nearbyStations.map(\.station)
+                )
+            }
         }
     }
 
@@ -58,7 +86,16 @@ struct NearMeScreen: View {
     }
 
     private var initialStationTaskID: String {
-        allNearbyStations.prefix(Self.stationBatchSize).map(\.id).joined(separator: ":")
+        let stationIDs = allNearbyStations
+            .prefix(Self.stationBatchSize)
+            .map(\.id)
+            .joined(separator: ":")
+        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned")"
+    }
+
+    private var nearbyArrivalsPollingTaskID: String {
+        let stationIDs = nearbyStations.map(\.id).joined(separator: ":")
+        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned")"
     }
 
     private var hasMoreStations: Bool {
@@ -68,6 +105,8 @@ struct NearMeScreen: View {
     private func stationList(graph: TubeGraph) -> some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 14) {
+                disruptionDateControl
+
                 VStack(alignment: .leading, spacing: 5) {
                     Text("Closest stations")
                         .font(.title3.weight(.bold))
@@ -101,8 +140,31 @@ struct NearMeScreen: View {
         }
         .refreshable {
             locationProvider.requestLocation()
-            await appState.refreshNearbyArrivals(for: nearbyStations.map(\.station))
+            if appState.isViewingLiveStatus {
+                await appState.refreshNearbyArrivals(for: nearbyStations.map(\.station))
+            } else {
+                await appState.refreshWorks()
+            }
         }
+    }
+
+    private var disruptionDateControl: some View {
+        HStack(spacing: 12) {
+            Label("Disruptions", systemImage: "exclamationmark.triangle.fill")
+                .font(.headline)
+                .foregroundStyle(Color.primary)
+
+            Spacer(minLength: 8)
+
+            DisruptionDateMenu()
+        }
+        .padding(14)
+        .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(Color.primary.opacity(0.07), lineWidth: 1)
+        }
+        .accessibilityElement(children: .contain)
     }
 
     private var permissionUnavailable: some View {
@@ -134,10 +196,14 @@ struct NearMeScreen: View {
 
     private func refresh() {
         locationProvider.requestLocation()
-        let stations = nearbyStations.map(\.station)
-        guard !stations.isEmpty else { return }
         Task {
-            await appState.refreshNearbyArrivals(for: stations)
+            if appState.isViewingLiveStatus {
+                let stations = nearbyStations.map(\.station)
+                guard !stations.isEmpty else { return }
+                await appState.refreshNearbyArrivals(for: stations)
+            } else {
+                await appState.refreshWorks()
+            }
         }
     }
 
@@ -153,8 +219,10 @@ struct NearMeScreen: View {
         withAnimation(.smooth(duration: 0.3)) {
             visibleStationCount = nextCount
         }
-        Task {
-            await appState.refreshNearbyArrivals(for: newlyVisibleStations)
+        if appState.isViewingLiveStatus {
+            Task {
+                await appState.refreshNearbyArrivals(for: newlyVisibleStations)
+            }
         }
     }
 }
@@ -180,7 +248,6 @@ private struct LoadMoreStationsTrigger: View {
 
 private struct NearbyStationCard: View {
     @Environment(TubeAppState.self) private var appState
-    @State private var presentedLineID: TubeLineID?
 
     let nearbyStation: NearbyStation
     let rank: Int
@@ -196,8 +263,11 @@ private struct NearbyStationCard: View {
         appState.nearbyArrivalsByStationID[station.id] ?? []
     }
 
-    private var departureGroups: [NearbyDepartureGroup] {
-        NearbyDepartureGroup.groups(from: arrivals)
+    private var plannedDisruptionGroups: [NearbyLineDisruptionGroup] {
+        NearbyLineDisruptionGroup.groups(
+            lineIDs: lineIDs,
+            works: appState.plannedWorksForSelectedDate
+        )
     }
 
     private var distanceText: String {
@@ -215,29 +285,25 @@ private struct NearbyStationCard: View {
             .accessibilityLabel("\(station.name), \(distanceText) away")
             .accessibilityHint("Shows this station in the real-world map view")
 
-            ScrollView(.horizontal) {
-                HStack(spacing: 7) {
-                    ForEach(lineIDs) { lineID in
-                        StationLineStatusPill(
-                            lineID: lineID,
-                            condition: LineServiceCondition.condition(
-                                for: appState.statuses.first { $0.id == lineID }
-                            ),
-                            action: { presentedLineID = lineID }
-                        )
-                    }
-                }
+            if appState.isViewingLiveStatus {
+                StationDeparturesSection(
+                    lineIDs: lineIDs,
+                    arrivals: arrivals,
+                    statuses: appState.statuses,
+                    isLoading: appState.nearbyArrivalsLoadingStationIDs.contains(station.id),
+                    errorMessage: appState.nearbyArrivalsErrorsByStationID[station.id]
+                )
+                .id(station.id)
                 .padding(.horizontal, 15)
+                .padding(.bottom, 13)
+            } else {
+                Divider()
+                    .padding(.horizontal, 15)
+
+                plannedDisruptionsContent
+                    .padding(.horizontal, 15)
+                    .padding(.vertical, 13)
             }
-            .scrollIndicators(.hidden)
-            .padding(.bottom, 14)
-
-            Divider()
-                .padding(.horizontal, 15)
-
-            departuresContent
-                .padding(.horizontal, 15)
-                .padding(.vertical, 13)
         }
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
         .overlay {
@@ -245,9 +311,6 @@ private struct NearbyStationCard: View {
                 .stroke(Color.primary.opacity(0.07), lineWidth: 1)
         }
         .accessibilityElement(children: .contain)
-        .sheet(item: $presentedLineID) { lineID in
-            LineStatusDetailSheet(lineID: lineID)
-        }
     }
 
     private var stationHeader: some View {
@@ -284,42 +347,38 @@ private struct NearbyStationCard: View {
     }
 
     @ViewBuilder
-    private var departuresContent: some View {
-        if appState.nearbyArrivalsLoadingStationIDs.contains(station.id), arrivals.isEmpty {
+    private var plannedDisruptionsContent: some View {
+        if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
             HStack(spacing: 9) {
                 ProgressView()
-                Text("Loading live departures…")
+                Text("Loading planned disruptions…")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
-        } else if let error = appState.nearbyArrivalsErrorsByStationID[station.id], arrivals.isEmpty {
+        } else if let error = appState.worksError, appState.engineeringWorks.isEmpty {
             Label {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Departures unavailable")
+                    Text("Planned disruptions unavailable")
                         .font(.subheadline.weight(.semibold))
                     Text(error)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
                 }
             } icon: {
                 Image(systemName: "wifi.exclamationmark")
                     .foregroundStyle(.orange)
             }
-            .padding(.vertical, 3)
-        } else if departureGroups.isEmpty {
-            Text("No imminent departures reported.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 6)
         } else {
-            VStack(spacing: 13) {
-                ForEach(Array(departureGroups.enumerated()), id: \.element.id) { index, group in
-                    NearbyDepartureGroupView(group: group)
-                    if index < departureGroups.count - 1 {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Planned disruptions")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                ForEach(Array(plannedDisruptionGroups.enumerated()), id: \.element.id) { index, group in
+                    NearbyLineDisruptionView(group: group)
+                    if index < plannedDisruptionGroups.count - 1 {
                         Divider()
                     }
                 }
@@ -335,236 +394,131 @@ private struct NearbyStationCard: View {
     }
 }
 
-private struct StationLineStatusPill: View {
+struct NearbyLineDisruptionGroup: Identifiable, Equatable {
     let lineID: TubeLineID
-    let condition: LineServiceCondition
-    let action: () -> Void
+    let works: [EngineeringWork]
 
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 6) {
-                Circle()
-                    .fill(Color.tubeLine(lineID))
-                    .frame(width: 10, height: 10)
-                    .overlay {
-                        if lineID == .northern || lineID == .jubilee {
-                            Circle().stroke(.white.opacity(0.8), lineWidth: 1)
+    var id: TubeLineID { lineID }
+
+    static func groups(
+        lineIDs: [TubeLineID],
+        works: [EngineeringWork]
+    ) -> [NearbyLineDisruptionGroup] {
+        lineIDs.map { lineID in
+            NearbyLineDisruptionGroup(
+                lineID: lineID,
+                works: works
+                    .filter { $0.lineIDs.contains(lineID) }
+                    .sorted {
+                        if $0.startDate != $1.startDate {
+                            return $0.startDate < $1.startDate
                         }
+                        return $0.id < $1.id
                     }
-                Text(lineID.displayName)
-                    .lineLimit(1)
-
-                switch condition {
-                case .majorDisruption:
-                    Image(systemName: "exclamationmark.octagon.fill")
-                        .foregroundStyle(.red)
-                case .minorDisruption:
-                    Image(systemName: "exclamationmark.triangle.fill")
-                        .foregroundStyle(.yellow)
-                case .good, .updating:
-                    EmptyView()
-                }
-
-                Image(systemName: "chevron.right")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(.tertiary)
-            }
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(Color(.tertiarySystemGroupedBackground), in: .capsule)
-            .overlay {
-                Capsule().stroke(Color.primary.opacity(0.08), lineWidth: 1)
-            }
-            .contentShape(.capsule)
+            )
         }
-        .buttonStyle(.plain)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(lineID.displayName), \(condition.accessibilityDescription)")
-        .accessibilityHint("Shows full service status")
     }
 }
 
-private struct LineStatusDetailSheet: View {
+private struct NearbyLineDisruptionView: View {
     @Environment(TubeAppState.self) private var appState
-    @Environment(\.dismiss) private var dismiss
 
-    let lineID: TubeLineID
-
-    private var lineStatus: TfLLineStatus? {
-        appState.statuses.first { $0.id == lineID }
-    }
-
-    private var entries: [TfLStatusEntry] {
-        lineStatus?.lineStatuses ?? []
-    }
-
-    var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    LineBadge(lineID: lineID)
-
-                    if entries.isEmpty {
-                        ContentUnavailableView(
-                            "Status updating",
-                            systemImage: "arrow.clockwise",
-                            description: Text("Service details for this line aren’t available yet.")
-                        )
-                        .frame(maxWidth: .infinity, minHeight: 220)
-                    } else {
-                        ForEach(Array(entries.enumerated()), id: \.offset) { index, entry in
-                            statusEntry(entry)
-                            if index < entries.count - 1 {
-                                Divider()
-                            }
-                        }
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(20)
-            }
-            .navigationTitle("\(lineID.displayName) status")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-        .presentationDetents([.medium, .large])
-        .presentationDragIndicator(.visible)
-    }
-
-    private func statusEntry(_ entry: TfLStatusEntry) -> some View {
-        let presentation = presentation(for: entry)
-        return VStack(alignment: .leading, spacing: 10) {
-            Label(entry.statusSeverityDescription, systemImage: presentation.symbol)
-                .font(.headline)
-                .foregroundStyle(presentation.color)
-
-            if let reason = entry.reason, !reason.isEmpty {
-                Text(reason)
-                    .font(.body)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .textSelection(.enabled)
-            } else {
-                Text(entry.isGoodService ? "TfL is reporting normal service." : "No additional details were reported.")
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private func presentation(for entry: TfLStatusEntry) -> (symbol: String, color: Color) {
-        if entry.isOvernightClosure {
-            return ("moon.zzz.fill", .indigo)
-        }
-        if entry.isActionableIssue, entry.statusSeverity != 9 {
-            return ("exclamationmark.octagon.fill", .red)
-        }
-        if entry.isActionableIssue {
-            return ("exclamationmark.triangle.fill", .yellow)
-        }
-        return ("checkmark.circle.fill", .green)
-    }
-}
-
-private struct NearbyDepartureGroupView: View {
-    let group: NearbyDepartureGroup
-    @State private var isExpanded = false
-
-    private var visibleArrivals: ArraySlice<TfLArrivalPrediction> {
-        isExpanded ? group.arrivals[...] : group.arrivals.prefix(3)
-    }
+    let group: NearbyLineDisruptionGroup
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 7) {
                 Circle()
                     .fill(Color.tubeLine(group.lineID))
-                    .frame(width: 9, height: 9)
+                    .frame(width: 10, height: 10)
+                    .overlay {
+                        if group.lineID == .northern || group.lineID == .jubilee {
+                            Circle().stroke(.white.opacity(0.8), lineWidth: 1)
+                        }
+                    }
                 Text(group.lineID.displayName)
                     .font(.subheadline.weight(.bold))
-                Text(group.direction)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
             }
             .accessibilityElement(children: .combine)
 
-            VStack(spacing: 8) {
-                ForEach(visibleArrivals) { arrival in
-                    departureRow(arrival)
-                }
-            }
-
-            if group.arrivals.count > 3 {
-                Button {
-                    withAnimation(.smooth(duration: 0.25)) {
-                        isExpanded.toggle()
-                    }
-                } label: {
-                    HStack(spacing: 5) {
-                        Text(isExpanded ? "Show fewer departures" : "View all departures")
-                        Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
-                    }
-                    .font(.caption.weight(.semibold))
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .contentShape(.rect)
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(Color.tubeBlue)
-                .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
-            }
-        }
-    }
-
-    private func departureRow(_ arrival: TfLArrivalPrediction) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(destination(for: arrival))
-                    .font(.subheadline.weight(.medium))
-                    .lineLimit(2)
-                if let platform = platformDetail(for: arrival) {
-                    Text(platform)
-                        .font(.caption2)
+            if group.works.isEmpty {
+                Label {
+                    Text("No planned disruption reported")
                         .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                }
+                .font(.subheadline)
+            } else {
+                ForEach(Array(group.works.enumerated()), id: \.element.id) { index, work in
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.55)) {
+                            appState.focus(on: work, in: .map)
+                        }
+                    } label: {
+                        VStack(alignment: .leading, spacing: 9) {
+                            Text(work.title)
+                                .font(.subheadline.weight(.bold))
+                                .foregroundStyle(.orange)
+                            Text(work.detail)
+                                .font(.subheadline)
+                                .foregroundStyle(.primary)
+                                .fixedSize(horizontal: false, vertical: true)
+
+                            Label(validityLabel(for: work), systemImage: "clock.fill")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            Divider()
+
+                            HStack(spacing: 6) {
+                                Spacer(minLength: 0)
+                                Label("View on map", systemImage: "map.fill")
+                                    .font(.caption.weight(.bold))
+                                    .foregroundStyle(Color.tubeBlue)
+
+                                Image(systemName: "chevron.right")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(Color.tubeBlue)
+                            }
+                        }
+                        .padding(12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .background(Color(.systemBackground), in: .rect(cornerRadius: 12))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color.primary.opacity(0.16), lineWidth: 1)
+                        }
+                        .contentShape(.rect(cornerRadius: 12))
+                    }
+                    .buttonStyle(NearbyDisruptionButtonStyle())
+                    .accessibilityHint("Opens the Map and highlights the affected section")
+
+                    if index < group.works.count - 1 {
+                        Divider()
+                    }
                 }
             }
-            Spacer(minLength: 10)
-            Text(departureTime(for: arrival))
-                .font(.subheadline.weight(.bold))
-                .monospacedDigit()
-                .foregroundStyle(Color.tubeBlue)
         }
-        .accessibilityElement(children: .combine)
     }
 
-    private func destination(for arrival: TfLArrivalPrediction) -> String {
-        (arrival.destinationName ?? arrival.towards ?? "Check platform")
-            .replacingOccurrences(of: " Underground Station", with: "")
+    private func validityLabel(for work: EngineeringWork) -> String {
+        let start = LondonRailDate.formatted(work.startDate, dateFormat: "EEE d MMM, HH:mm")
+        let endFormat = LondonRailDate.calendar.isDate(
+            work.startDate,
+            inSameDayAs: work.endDate
+        ) ? "HH:mm" : "EEE d MMM, HH:mm"
+        let end = LondonRailDate.formatted(work.endDate, dateFormat: endFormat)
+        return "\(start) – \(end)"
     }
+}
 
-    private func platformDetail(for arrival: TfLArrivalPrediction) -> String? {
-        guard let platform = arrival.platformName, !platform.isEmpty else { return nil }
-        let cardinalDirections = ["Northbound", "Southbound", "Eastbound", "Westbound"]
-        if cardinalDirections.contains(where: { platform.localizedCaseInsensitiveContains($0) }),
-           !platform.localizedCaseInsensitiveContains("platform") {
-            return nil
-        }
-        return platform
-    }
-
-    private func departureTime(for arrival: TfLArrivalPrediction) -> String {
-        let seconds: Int?
-        if let expectedArrival = arrival.expectedArrival {
-            seconds = max(0, Int(expectedArrival.timeIntervalSinceNow))
-        } else {
-            seconds = arrival.timeToStation
-        }
-        guard let seconds else { return "—" }
-        if seconds < 45 { return "Due" }
-        return "\(max(1, seconds / 60)) min"
+private struct NearbyDisruptionButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.72 : 1)
+            .scaleEffect(configuration.isPressed ? 0.99 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
     }
 }

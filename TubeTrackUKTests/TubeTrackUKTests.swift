@@ -36,7 +36,7 @@ struct TubeTrackUKTests {
         #expect(TubeLineID.tram.usesParallelSchematicStroke)
         #expect(TubeLineID.liberty.modeName == "overground")
         #expect(TubeLineID.windrush.modeName == "overground")
-        #expect(!TubeLineID.dlr.supportsEstimatedTrains)
+        #expect(TubeLineID.dlr.supportsEstimatedTrains)
         #expect(TubeLineID.tram.supportsEstimatedTrains)
         #expect(TubeLineID.elizabeth.supportsEstimatedTrains)
     }
@@ -325,6 +325,63 @@ struct TubeTrackUKTests {
 
         #expect(appState.disruptionDisplayMode == .issues)
         #expect(appState.highlightedDisruptionCategories == DisruptionCategory.defaultHighlighted)
+    }
+
+    @Test @MainActor func disruptionHighlightToggleReturnsTheMapToNormalView() {
+        let appState = TubeAppState()
+
+        appState.toggleDisruptionHighlighting()
+        #expect(appState.disruptionDisplayMode == .issues)
+
+        appState.toggleDisruptionHighlighting()
+        #expect(appState.disruptionDisplayMode == .normal)
+    }
+
+    @Test func dataFreshnessUsesStableCopyInsteadOfACountdown() {
+        let updatedAt = Date(timeIntervalSince1970: 1_000)
+
+        #expect(
+            RailDataFreshness.evaluate(
+                updatedAt: updatedAt,
+                now: updatedAt.addingTimeInterval(119),
+                cached: false,
+                staleAfter: 120
+            ) == .current
+        )
+        #expect(
+            RailDataFreshness.evaluate(
+                updatedAt: updatedAt,
+                now: updatedAt.addingTimeInterval(120),
+                cached: false,
+                staleAfter: 120
+            ) == .stale
+        )
+        #expect(
+            RailDataFreshness.evaluate(
+                updatedAt: updatedAt,
+                now: updatedAt,
+                cached: true,
+                staleAfter: 120
+            ) == .stale
+        )
+    }
+
+    @Test func liveStatusWarningAppearsAfterThirtySecondsOfStaleness() {
+        let updatedAt = Date(timeIntervalSince1970: 1_000)
+
+        #expect(
+            !LiveStatusStaleness.isStale(
+                updatedAt: updatedAt,
+                now: updatedAt.addingTimeInterval(29.999)
+            )
+        )
+        #expect(
+            LiveStatusStaleness.isStale(
+                updatedAt: updatedAt,
+                now: updatedAt.addingTimeInterval(30)
+            )
+        )
+        #expect(!LiveStatusStaleness.isStale(updatedAt: nil, now: updatedAt))
     }
 
     @Test func weekendDateSelectionsUseUpcomingLondonDays() throws {
@@ -639,6 +696,48 @@ struct TubeTrackUKTests {
         #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_500)) == 1)
     }
 
+    @Test func activeTrainCountsKeepAllLineTotalsWhenAFilteredLineRefreshes() {
+        func train(_ id: String, lineID: TubeLineID) -> LiveTubeTrain {
+            LiveTubeTrain(
+                id: id,
+                vehicleID: id,
+                lineID: lineID,
+                destination: "Destination",
+                direction: "outbound",
+                previousStationID: "a",
+                nextStationID: "b",
+                segmentID: "segment",
+                progress: 0.5,
+                secondsToNextStation: 60,
+                updatedAt: .now
+            )
+        }
+
+        var counts = ActiveTrainCounts()
+        counts.update(
+            with: [
+                train("dlr-1", lineID: .dlr),
+                train("dlr-2", lineID: .dlr),
+                train("tram-1", lineID: .tram),
+            ],
+            requestedLineIDs: []
+        )
+
+        #expect(counts.count(for: .dlr) == 2)
+        #expect(counts.count(for: .tram) == 1)
+        #expect(counts.total == 3)
+
+        counts.update(
+            with: [train("dlr-3", lineID: .dlr)],
+            requestedLineIDs: [.dlr]
+        )
+
+        #expect(counts.count(for: .dlr) == 1)
+        #expect(counts.count(for: .tram) == 1)
+        #expect(counts.count(for: .victoria) == 0)
+        #expect(counts.total == 2)
+    }
+
     @Test @MainActor func memoryWarningDropsSupplementalLiveData() {
         let appState = TubeAppState()
         appState.showLiveTrains = true
@@ -659,8 +758,28 @@ struct TubeTrackUKTests {
         appState.handleMemoryWarning()
 
         #expect(!appState.showLiveTrains)
+        #expect(!appState.isLoadingLiveTrains)
         #expect(appState.liveTrains.isEmpty)
+        #expect(appState.activeTrainCounts.total == 0)
         #expect(appState.stationArrivals.isEmpty)
+    }
+
+    @Test @MainActor func enablingLiveTrainsPublishesAnInitialLoadingState() {
+        let appState = TubeAppState()
+
+        appState.setLiveTrains(true)
+
+        #expect(appState.showLiveTrains)
+        #expect(appState.isLoadingLiveTrains)
+
+        appState.setLiveTrains(false)
+
+        #expect(!appState.showLiveTrains)
+        #expect(!appState.isLoadingLiveTrains)
+    }
+
+    @Test func mapDockControlsUseTheSharedCompactHeight() {
+        #expect(MapDockMetrics.controlSize == 44)
     }
 
     @Test func beckMapTrainPathRespectsTravelAndAuthoredDirections() throws {

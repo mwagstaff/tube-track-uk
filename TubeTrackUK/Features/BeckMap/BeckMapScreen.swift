@@ -969,6 +969,12 @@ private struct BeckMapCanvas: View {
     private func applySharedViewport(in size: CGSize) {
         guard let viewport = appState.sharedMapViewport,
               let graph = appState.graph,
+              let artworkRect = SharedMapProjection.artworkRect(
+                  for: viewport,
+                  document: document,
+                  graph: graph,
+                  size: size
+              ),
               let centre = SharedMapProjection.artworkPoint(
                   for: viewport.coordinate,
                   document: document,
@@ -978,9 +984,13 @@ private struct BeckMapCanvas: View {
             return
         }
         cameraTransitionTask?.cancel()
+        let scaleToFit = min(
+            size.width / max(1, artworkRect.width),
+            size.height / max(1, artworkRect.height)
+        )
         cameraScale = min(
             maximumCameraScale,
-            max(minimumCameraScale, fittedCameraScale * viewport.zoom)
+            max(minimumCameraScale, scaleToFit)
         )
         cameraOffset = CGSize(
             width: size.width / 2 - centre.x * cameraScale,
@@ -994,19 +1004,19 @@ private struct BeckMapCanvas: View {
         guard appState.mapPresentationMode == .beck,
               let graph = appState.graph else { return }
         let scale = max(0.000_001, cameraScale)
-        let centre = CGPoint(
-            x: (size.width / 2 - cameraOffset.width) / scale,
-            y: (size.height / 2 - cameraOffset.height) / scale
+        let artworkRect = CGRect(
+            x: (0 - cameraOffset.width) / scale,
+            y: (0 - cameraOffset.height) / scale,
+            width: size.width / scale,
+            height: size.height / scale
         )
-        guard let coordinate = SharedMapProjection.coordinate(
-            for: centre,
+        guard let viewport = SharedMapProjection.viewport(
+            fromArtworkRect: artworkRect,
             document: document,
-            graph: graph
+            graph: graph,
+            size: size
         ) else { return }
-        appState.sharedMapViewport = SharedMapViewport(
-            coordinate: coordinate,
-            zoom: cameraScale / max(0.000_001, fittedCameraScale)
-        )
+        appState.sharedMapViewport = viewport
     }
 
     private func updateCameraSnapshot(in size: CGSize) {
