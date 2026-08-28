@@ -8,6 +8,7 @@ struct RealWorldMapScreen: View {
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
     @State private var visibleRegion = Self.centralLondon
+    @State private var networkZoom = 0.0
     @State private var acceptsCameraUpdates = false
 
     private static let centralLondon = MKCoordinateRegion(
@@ -41,13 +42,15 @@ struct RealWorldMapScreen: View {
                             }
                             .onMapCameraChange(frequency: .continuous) { context in
                                 visibleRegion = context.region
-                                guard appState.mapPresentationMode == .realWorld,
-                                      acceptsCameraUpdates else { return }
-                                appState.sharedMapViewport = SharedMapProjection.viewport(
+                                let viewport = SharedMapProjection.viewport(
                                     from: context.rect,
                                     graph: graph,
                                     size: viewportProxy.size
                                 )
+                                networkZoom = viewport.zoom
+                                guard appState.mapPresentationMode == .realWorld,
+                                      acceptsCameraUpdates else { return }
+                                appState.sharedMapViewport = viewport
                             }
                             .simultaneousGesture(
                                 SpatialTapGesture()
@@ -187,11 +190,23 @@ struct RealWorldMapScreen: View {
 
     @MapContentBuilder
     private func stationAnnotations(graph: TubeGraph) -> some MapContent {
-        ForEach(displayStations(graph: graph)) { station in
-            Annotation(station.name, coordinate: station.coordinate, anchor: .center) {
-                let selected = appState.selectedStationID == station.id
-                let networkZoom = CGFloat(appState.sharedMapViewport?.zoom ?? 4)
-                let markerDiameter = max(5, min(11, 3 + networkZoom * 2))
+        ForEach(displayStations(graph: graph).filter {
+            RealWorldStationVisibilityPolicy.showsRoundel(
+                at: networkZoom,
+                isSelected: $0.id == appState.selectedStationID
+            )
+        }) { station in
+            let selected = appState.selectedStationID == station.id
+            let showsName = RealWorldStationVisibilityPolicy.showsName(
+                at: networkZoom,
+                isSelected: selected
+            )
+            Annotation(
+                showsName ? station.name : "",
+                coordinate: station.coordinate,
+                anchor: .center
+            ) {
+                let markerDiameter = max(5, min(11, 3 + CGFloat(networkZoom) * 2))
                 ZStack {
                     if selected {
                         Circle()
@@ -374,8 +389,13 @@ private struct RealWorldTrainCanvas: View {
 
                 for train in trains {
                     guard let path = pathsBySegmentID[train.segmentID],
+                          let progress = LiveTrainMarkerPolicy.projectedProgress(
+                              for: train,
+                              at: timeline.date,
+                              stationBoard: appState.authoritativeStationBoardSnapshot
+                          ),
                           let coordinate = path.coordinate(
-                              at: train.projectedProgress(at: timeline.date),
+                              at: progress,
                               previousStationID: train.previousStationID,
                               nextStationID: train.nextStationID
                           ),
@@ -712,6 +732,22 @@ enum RealWorldStationDisplay {
                     }.first
             }
             .sorted { $0.name < $1.name }
+    }
+}
+
+enum RealWorldStationVisibilityPolicy {
+    /// The fitted Beck-to-real-world viewport is approximately 4.1 on an
+    /// iPhone. Keeping both thresholds above that value leaves the overview
+    /// clear, while separate thresholds reveal roundels before station names.
+    static let roundelMinimumZoom = 5.5
+    static let nameMinimumZoom = 6.25
+
+    static func showsRoundel(at zoom: Double, isSelected: Bool = false) -> Bool {
+        isSelected || zoom >= roundelMinimumZoom
+    }
+
+    static func showsName(at zoom: Double, isSelected: Bool = false) -> Bool {
+        isSelected || zoom >= nameMinimumZoom
     }
 }
 

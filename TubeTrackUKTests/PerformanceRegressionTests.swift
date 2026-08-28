@@ -183,6 +183,26 @@ struct PerformanceRegressionTests {
         #expect(train.secondsToNextStation == 65)
     }
 
+    @Test func futureScheduledTramDoesNotBecomeAPhysicalMarker() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let resolution = TramVehicleRouteResolver.resolve(
+            vehicleID: "future-2530",
+            predictions: [
+                tramPrediction(
+                    stationID: "940GZZCRBIR",
+                    seconds: LiveTrainMarkerPolicy.maximumLightRailSecondsToNearestStation + 1,
+                    destinationName: "Beckenham Junction",
+                    destinationStationID: "940GZZCRBEK"
+                ),
+            ],
+            repository: repository,
+            previousContext: nil,
+            now: Date(timeIntervalSince1970: 2_000)
+        )
+
+        #expect(resolution == nil)
+    }
+
     @Test func tramResolverFollowsTheOneWayCroydonLoop() throws {
         let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
         let resolution = TramVehicleRouteResolver.resolve(

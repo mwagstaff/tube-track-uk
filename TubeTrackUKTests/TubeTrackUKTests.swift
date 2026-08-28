@@ -696,6 +696,66 @@ struct TubeTrackUKTests {
         #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_500)) == 1)
     }
 
+    @Test func markerPolicyRemovesAProjectionAfterItsArrivalWindow() {
+        let train = markerTrain(seconds: 100)
+
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: Date(timeIntervalSince1970: 1_109),
+            stationBoard: nil
+        ) == 1)
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: Date(timeIntervalSince1970: 1_111),
+            stationBoard: nil
+        ) == nil)
+    }
+
+    @Test func selectedStationBoardSuppressesMarkersItDoesNotReport() {
+        let train = markerTrain(vehicleID: "old-tram", seconds: 60)
+        let board = LiveTrainStationBoardSnapshot(
+            stationID: "arena",
+            arrivals: [markerBoardArrival(vehicleID: "next-tram", seconds: 720)],
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: Date(timeIntervalSince1970: 1_000),
+            stationBoard: board
+        ) == nil)
+    }
+
+    @Test func selectedStationBoardRejectsAnImplausibleETAConflict() {
+        let train = markerTrain(vehicleID: "2562", seconds: 30)
+        let board = LiveTrainStationBoardSnapshot(
+            stationID: "arena",
+            arrivals: [markerBoardArrival(vehicleID: " 2562 ", seconds: 720)],
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: Date(timeIntervalSince1970: 1_000),
+            stationBoard: board
+        ) == nil)
+    }
+
+    @Test func selectedStationBoardKeepsAConsistentMatchingMarker() {
+        let train = markerTrain(vehicleID: "2562", seconds: 60)
+        let board = LiveTrainStationBoardSnapshot(
+            stationID: "arena",
+            arrivals: [markerBoardArrival(vehicleID: "2562", seconds: 75)],
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: Date(timeIntervalSince1970: 1_000),
+            stationBoard: board
+        ) == train.progress)
+    }
+
     @Test func activeTrainCountsKeepAllLineTotalsWhenAFilteredLineRefreshes() {
         func train(_ id: String, lineID: TubeLineID) -> LiveTubeTrain {
             LiveTubeTrain(
@@ -889,6 +949,46 @@ struct TubeTrackUKTests {
         TfLStatusEntry(
             id: 1, statusSeverity: 6, statusSeverityDescription: "Severe Delays",
             reason: reason, validityPeriods: nil, disruption: nil
+        )
+    }
+
+    private func markerTrain(
+        vehicleID: String = "2562",
+        seconds: Int
+    ) -> LiveTubeTrain {
+        LiveTubeTrain(
+            id: "tram:\(vehicleID)",
+            vehicleID: vehicleID,
+            lineID: .tram,
+            destination: "George Street Crossover",
+            direction: "outbound",
+            previousStationID: "harrington-road",
+            nextStationID: "arena",
+            segmentID: "tram:harrington-road:arena",
+            progress: 0.25,
+            secondsToNextStation: seconds,
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+    }
+
+    private func markerBoardArrival(
+        vehicleID: String?,
+        seconds: Int
+    ) -> TfLArrivalPrediction {
+        TfLArrivalPrediction(
+            id: "board:\(vehicleID ?? "unknown")",
+            vehicleId: vehicleID,
+            lineId: TubeLineID.tram.rawValue,
+            stationName: "Arena",
+            naptanId: "arena",
+            platformName: "Westbound Platform",
+            direction: "outbound",
+            destinationName: "George Street Crossover",
+            destinationNaptanId: nil,
+            towards: "George Street Crossover",
+            expectedArrival: Date(timeIntervalSince1970: 1_000 + Double(seconds)),
+            timeToStation: seconds,
+            currentLocation: nil
         )
     }
 

@@ -4,15 +4,21 @@ struct UnifiedMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("statusPanelExpanded") private var statusExpanded = false
+    @AppStorage("closestStationPanelHidden") private var closestStationPanelHidden = false
     @State private var layoutProgress: CGFloat = 0
     @State private var morphGeometry: MapMorphGeometry?
     @State private var geometryGraphID: String?
     @State private var resetToken = 0
     @State private var transitionTask: Task<Void, Never>?
+    @State private var restorePulseTask: Task<Void, Never>?
+    @State private var restoreIconPulses = false
 
     var body: some View {
         ZStack {
-            BeckMapScreen(resetToken: resetToken)
+            BeckMapScreen(
+                resetToken: resetToken,
+                contentVerticalBias: closestStationPanelHidden ? 0 : 84
+            )
                 .opacity(beckRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .beck)
 
@@ -37,6 +43,11 @@ struct UnifiedMapScreen: View {
                     .tint(.tubeBlue)
 
                 HStack {
+                    if closestStationPanelHidden {
+                        closestStationRestoreButton
+                            .transition(.scale(scale: 0.78).combined(with: .opacity))
+                    }
+
                     Spacer()
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
                         Text("© OpenStreetMap contributors")
@@ -46,11 +57,11 @@ struct UnifiedMapScreen: View {
                             .glassEffect(.regular, in: .capsule)
                     }
                     .foregroundStyle(.primary)
+                    .opacity(realWorldChromeOpacity)
+                    .allowsHitTesting(appState.mapPresentationMode == .realWorld)
+                    .accessibilityHidden(appState.mapPresentationMode != .realWorld)
                 }
                 .padding(.horizontal, 12)
-                .opacity(realWorldChromeOpacity)
-                .allowsHitTesting(appState.mapPresentationMode == .realWorld)
-                .accessibilityHidden(appState.mapPresentationMode != .realWorld)
             }
         }
         .overlay(alignment: .bottom) {
@@ -58,6 +69,9 @@ struct UnifiedMapScreen: View {
         }
         .onAppear {
             layoutProgress = appState.mapPresentationMode == .realWorld ? 1 : 0
+            if closestStationPanelHidden {
+                triggerRestoreIconPulse()
+            }
         }
         .onChange(of: appState.mapPresentationMode) { _, mode in
             transitionTask?.cancel()
@@ -81,6 +95,15 @@ struct UnifiedMapScreen: View {
         }
         .onDisappear {
             transitionTask?.cancel()
+            restorePulseTask?.cancel()
+        }
+        .onChange(of: closestStationPanelHidden) { _, hidden in
+            if hidden {
+                triggerRestoreIconPulse()
+            } else {
+                restorePulseTask?.cancel()
+                restoreIconPulses = false
+            }
         }
         .task(id: appState.graph?.generatedAt) {
             guard let graph = appState.graph else {
@@ -118,6 +141,55 @@ struct UnifiedMapScreen: View {
             : Double(max(0, min(1, (layoutProgress - 0.58) * 2.4)))
     }
 
+    private var closestStationRestoreButton: some View {
+        Button {
+            setClosestStationPanel(hidden: false)
+        } label: {
+            Image(systemName: "location.fill")
+                .font(.headline.weight(.bold))
+                .foregroundStyle(Color.tubeBlue)
+                .frame(width: 48, height: 48)
+                .contentShape(.circle)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .circle)
+        .overlay {
+            Circle()
+                .stroke(Color.tubeBlue.opacity(restoreIconPulses ? 0 : 0.55), lineWidth: 2)
+                .scaleEffect(restoreIconPulses ? 1.48 : 0.84)
+                .allowsHitTesting(false)
+        }
+        .accessibilityLabel("Show closest station")
+        .accessibilityHint("Restores live departures above the Map tab bar")
+    }
+
+    private func setClosestStationPanel(hidden: Bool) {
+        if reduceMotion {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                closestStationPanelHidden = hidden
+            }
+        } else {
+            withAnimation(.smooth(duration: hidden ? 0.24 : 0.32)) {
+                closestStationPanelHidden = hidden
+            }
+        }
+    }
+
+    private func triggerRestoreIconPulse() {
+        restorePulseTask?.cancel()
+        restoreIconPulses = false
+        guard !reduceMotion else { return }
+        restorePulseTask = Task { @MainActor in
+            await Task.yield()
+            guard !Task.isCancelled, closestStationPanelHidden else { return }
+            withAnimation(.easeOut(duration: 0.62).repeatCount(3, autoreverses: false)) {
+                restoreIconPulses = true
+            }
+        }
+    }
+
     private var bottomOverlay: some View {
         VStack(spacing: 9) {
             if appState.showLiveTrains {
@@ -150,9 +222,18 @@ struct UnifiedMapScreen: View {
             } else {
                 MapStatusDock(expanded: $statusExpanded)
             }
+
+            if !closestStationPanelHidden {
+                ClosestStationMapSection {
+                    setClosestStationPanel(hidden: true)
+                }
+                .padding(.horizontal, 12)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .animation(.smooth(duration: 0.35), value: appState.showLiveTrains)
         .animation(.smooth(duration: 0.35), value: appState.selectedStationID)
+        .animation(.smooth(duration: 0.32), value: closestStationPanelHidden)
         .safeAreaPadding(.bottom, 4)
     }
 }

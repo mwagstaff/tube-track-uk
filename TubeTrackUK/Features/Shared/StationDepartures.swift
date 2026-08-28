@@ -501,7 +501,7 @@ private struct StationLinePicker: View {
     }
 }
 
-private struct StationLinePill: View {
+struct StationLinePill: View {
     let lineID: TubeLineID
     let selected: Bool
     let action: () -> Void

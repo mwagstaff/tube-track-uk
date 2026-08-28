@@ -130,6 +130,7 @@ final class TubeAppState {
     var liveTrains: [LiveTubeTrain] = []
     var activeTrainCounts = ActiveTrainCounts()
     var stationArrivals: [TfLArrivalPrediction] = []
+    private(set) var stationArrivalsUpdatedAt: Date?
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
     var nearbyArrivalsByStationID: [String: [TfLArrivalPrediction]] = [:]
@@ -231,6 +232,19 @@ final class TubeAppState {
             plannedWorksForSelectedDate,
             overlappingAny: selectedDisruptionTimeWindows,
             on: selectedDisruptionDate
+        )
+    }
+
+    var authoritativeStationBoardSnapshot: LiveTrainStationBoardSnapshot? {
+        guard let selectedStationID,
+              let stationArrivalsUpdatedAt,
+              stationArrivalsError == nil else {
+            return nil
+        }
+        return LiveTrainStationBoardSnapshot(
+            stationID: selectedStationID,
+            arrivals: stationArrivals,
+            updatedAt: stationArrivalsUpdatedAt
         )
     }
 
@@ -444,6 +458,7 @@ final class TubeAppState {
         selectedDisruptionID = nil
         selectedEngineeringWorkID = nil
         stationArrivals = []
+        stationArrivalsUpdatedAt = nil
         stationArrivalsError = nil
         if selectedTab == .map {
             requestStationArrivals(for: station.id)
@@ -456,6 +471,7 @@ final class TubeAppState {
         cancelStationArrivalsRefresh()
         selectedStationID = nil
         stationArrivals = []
+        stationArrivalsUpdatedAt = nil
         stationArrivalsError = nil
     }
 
@@ -602,6 +618,7 @@ final class TubeAppState {
         liveTrains.removeAll(keepingCapacity: false)
         activeTrainCounts = ActiveTrainCounts()
         stationArrivals.removeAll(keepingCapacity: false)
+        stationArrivalsUpdatedAt = nil
         nearbyArrivalsByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsLoadingStationIDs.removeAll(keepingCapacity: false)
         nearbyArrivalsErrorsByStationID.removeAll(keepingCapacity: false)
@@ -818,6 +835,7 @@ final class TubeAppState {
                 return
             }
             stationArrivals = arrivals
+            stationArrivalsUpdatedAt = .now
             stationArrivalsError = nil
         } catch {
             guard !Task.isCancelled,

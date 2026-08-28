@@ -300,8 +300,12 @@ struct MapMorphTransitionLayer: View, @preconcurrency Animatable {
         var icon = context.resolve(Image(systemName: "tram.fill"))
         icon.shading = .color(.white)
         for train in appState.liveTrains {
-            guard let segment = geometry.segmentsByID[train.segmentID] else { continue }
-            let routeProgress = train.projectedProgress(at: date)
+            guard let segment = geometry.segmentsByID[train.segmentID],
+                  let routeProgress = LiveTrainMarkerPolicy.projectedProgress(
+                      for: train,
+                      at: date,
+                      stationBoard: appState.authoritativeStationBoardSnapshot
+                  ) else { continue }
             let pointIndex = min(
                 segment.beckPoints.index(before: segment.beckPoints.endIndex),
                 Int((Double(segment.beckPoints.count - 1) * routeProgress).rounded())

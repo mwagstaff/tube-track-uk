@@ -43,7 +43,7 @@ struct LiveStatusDock: View {
         }
         if appState.currentIssueCount > 0 {
             let count = appState.currentIssueCount
-            return ("exclamationmark.triangle.fill", .red, "\(count) disruption\(count == 1 ? "" : "s")", nil)
+            return ("exclamationmark.triangle.fill", .red, "\(count) issue\(count == 1 ? "" : "s")", nil)
         }
         let overnight = !appState.statuses.isEmpty && appState.statuses.allSatisfy {
             $0.lineStatuses.allSatisfy(\.isOvernightClosure)
@@ -419,37 +419,8 @@ struct LiveStatusPanel: View {
                 } else {
                     plannedWorksContent
                 }
-
-                disruptionHighlightAction
             }
         }
-    }
-
-    private var disruptionHighlightAction: some View {
-        Button {
-            withAnimation(.smooth(duration: 0.3)) {
-                appState.toggleDisruptionHighlighting()
-                expanded = false
-            }
-        } label: {
-            Label(
-                appState.disruptionDisplayMode == .issues
-                    ? "Show normal line colours"
-                    : "Highlight disrupted lines",
-                systemImage: appState.disruptionDisplayMode == .issues
-                    ? "arrow.uturn.backward.circle.fill"
-                    : "exclamationmark.triangle.fill"
-            )
-            .font(.headline)
-            .frame(maxWidth: .infinity, minHeight: 50)
-        }
-        .buttonStyle(.borderedProminent)
-        .tint(.tubeBlue)
-        .accessibilityHint(
-            appState.disruptionDisplayMode == .issues
-                ? "Restores normal line colours and closes this panel"
-                : "Highlights disrupted lines, fades working lines, and closes this panel"
-        )
     }
 
     @ViewBuilder

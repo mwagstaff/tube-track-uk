@@ -16,6 +16,7 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
 struct BeckMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     let resetToken: Int
+    let contentVerticalBias: CGFloat
     @State private var document: BeckMapDocument?
     @State private var renderCache: BeckMapCanvas.RenderCache?
     @State private var documentLoadError: String?
@@ -47,6 +48,7 @@ struct BeckMapScreen: View {
                         : [],
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
+                    contentVerticalBias: contentVerticalBias,
                     stationSelectionGeneration: appState.stationSelectionGeneration,
                     onStationTap: { stationID in
                         guard let station = graph.stationsByID[stationID] else { return }
@@ -199,6 +201,7 @@ private struct BeckMapCanvas: View {
     let liveTrains: [LiveTubeTrain]
     let referenceOverlayVisible: Bool
     let resetToken: Int
+    let contentVerticalBias: CGFloat
     let stationSelectionGeneration: Int
     let onStationTap: (String) -> Void
     let onDisruptionTap: (String) -> Void
@@ -230,6 +233,7 @@ private struct BeckMapCanvas: View {
         liveTrains: [LiveTubeTrain],
         referenceOverlayVisible: Bool,
         resetToken: Int,
+        contentVerticalBias: CGFloat,
         stationSelectionGeneration: Int,
         onStationTap: @escaping (String) -> Void,
         onDisruptionTap: @escaping (String) -> Void,
@@ -242,6 +246,7 @@ private struct BeckMapCanvas: View {
         self.liveTrains = liveTrains
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
+        self.contentVerticalBias = contentVerticalBias
         self.stationSelectionGeneration = stationSelectionGeneration
         self.onStationTap = onStationTap
         self.onDisruptionTap = onDisruptionTap
@@ -314,6 +319,14 @@ private struct BeckMapCanvas: View {
                 withAnimation(.smooth(duration: 0.5)) {
                     resetCamera(in: proxy.size)
                 }
+                publishViewport(in: proxy.size)
+            }
+            .onChange(of: contentVerticalBias) { oldBias, newBias in
+                let delta = newBias - oldBias
+                withAnimation(.smooth(duration: 0.32)) {
+                    cameraOffset.height -= delta
+                }
+                updateCameraSnapshot(in: proxy.size)
                 publishViewport(in: proxy.size)
             }
             .onChange(of: appState.mapPresentationMode) { _, mode in
@@ -525,8 +538,13 @@ private struct BeckMapCanvas: View {
 
         for train in liveTrains {
             guard let path = renderCache.trainPathsBySegmentID[train.segmentID],
+                  let progress = LiveTrainMarkerPolicy.projectedProgress(
+                      for: train,
+                      at: date,
+                      stationBoard: appState.authoritativeStationBoardSnapshot
+                  ),
                   let artworkPoint = path.point(
-                      progress: train.projectedProgress(at: date),
+                      progress: progress,
                       previousStationID: train.previousStationID,
                       nextStationID: train.nextStationID
                   ) else { continue }
@@ -855,7 +873,7 @@ private struct BeckMapCanvas: View {
         cameraScale = fittedScale
         cameraOffset = CGSize(
             width: size.width / 2 - fittingBounds.midX * cameraScale,
-            height: size.height / 2 - fittingBounds.midY * cameraScale
+            height: size.height / 2 - fittingBounds.midY * cameraScale - contentVerticalBias
         )
         updateCameraSnapshot(in: size)
     }

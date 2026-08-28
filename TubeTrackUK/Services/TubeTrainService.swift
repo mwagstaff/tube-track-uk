@@ -157,6 +157,9 @@ enum TramVehicleRouteResolver {
             return TramObservation(prediction: prediction, stationID: stationID, seconds: seconds)
         }
         guard let nearest = usable.min(by: observationOrder) else { return nil }
+        guard nearest.seconds <= LiveTrainMarkerPolicy.maximumLightRailSecondsToNearestStation else {
+            return nil
+        }
 
         // TfL can briefly return stale predictions for the same vehicle after a
         // destination changes. Route matching only one coherent journey avoids
@@ -394,7 +397,7 @@ enum DLRPredictionResolver {
                   let stationID = prediction.naptanId,
                   let destinationStationID = prediction.destinationNaptanId,
                   let seconds = prediction.timeToStation,
-                  seconds >= 0 else {
+                  (0 ... LiveTrainMarkerPolicy.maximumLightRailSecondsToNearestStation).contains(seconds) else {
                 return nil
             }
             let key = DLRPredictionKey(

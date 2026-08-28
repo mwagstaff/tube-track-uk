@@ -55,6 +55,32 @@ struct MapActionButtons: View {
     var body: some View {
         HStack(spacing: 8) {
             Button {
+                withAnimation(.smooth(duration: 0.3)) {
+                    appState.toggleDisruptionHighlighting()
+                }
+            } label: {
+                Image(systemName: AppTab.works.symbol)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(
+                        appState.disruptionDisplayMode == .issues ? .orange : .primary
+                    )
+            }
+            .mapDockButtonStyle()
+            .accessibilityLabel(
+                appState.disruptionDisplayMode == .issues
+                    ? "Show normal line colours"
+                    : "Highlight disrupted lines"
+            )
+            .accessibilityValue(
+                appState.disruptionDisplayMode == .issues
+                    ? "Disrupted lines highlighted"
+                    : "Normal line colours"
+            )
+            .accessibilityAddTraits(
+                appState.disruptionDisplayMode == .issues ? .isSelected : []
+            )
+
+            Button {
                 appState.mapPresentationMode = destinationMode
             } label: {
                 Image(systemName: appState.mapPresentationMode.switchActionSymbol)
