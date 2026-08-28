@@ -130,6 +130,7 @@ struct BeckMapRepository {
 
         try validateIdentifier(document.identifier, kind: "document")
         try validateUnique(document.paths.map(\.id), kind: "path")
+        try validateUnique((document.waterways ?? []).map(\.id), kind: "waterway")
         try validateUnique(document.segments.map(\.id), kind: "segment")
         try validateUnique(document.stationMarkers.map(\.stationID), kind: "station marker")
         try validateUnique(document.labels.map(\.id), kind: "label")
@@ -145,6 +146,25 @@ struct BeckMapRepository {
         let markerIDs = Set(document.stationMarkers.map(\.stationID))
         let graphStations = graph.stationsByID
         let graphSegments = graph.segmentsByID
+
+        for waterway in document.waterways ?? [] {
+            try validateIdentifier(waterway.name, kind: "waterway name")
+            guard let path = pathsByID[waterway.pathID] else {
+                throw invalid(.missingWaterwayPath(
+                    waterwayID: waterway.id,
+                    pathID: waterway.pathID
+                ))
+            }
+            try validatePositive(
+                waterway.strokeWidth,
+                context: "waterway \(waterway.id) stroke width"
+            )
+            try validatePositive(
+                waterway.outlineWidth,
+                context: "waterway \(waterway.id) outline width"
+            )
+            try validateOctilinearWaterway(path, waterwayID: waterway.id)
+        }
 
         for segment in document.segments {
             try validateIdentifier(segment.fromStationID, kind: "segment station")
@@ -373,6 +393,35 @@ struct BeckMapRepository {
         }
     }
 
+    private func validateOctilinearWaterway(
+        _ path: BeckMapPathRecord,
+        waterwayID: String
+    ) throws {
+        guard case let .move(start) = path.commands.first else { return }
+        var previous = start
+        for (index, command) in path.commands.dropFirst().enumerated() {
+            guard case let .line(destination) = command else {
+                throw invalid(.waterwayUsesNonLinearCommand(
+                    waterwayID: waterwayID,
+                    commandIndex: index + 1
+                ))
+            }
+            let deltaX = abs(destination.x - previous.x)
+            let deltaY = abs(destination.y - previous.y)
+            let tolerance = 0.5
+            let isHorizontal = deltaY <= tolerance
+            let isVertical = deltaX <= tolerance
+            let isDiagonal = abs(deltaX - deltaY) <= tolerance
+            guard isHorizontal || isVertical || isDiagonal else {
+                throw invalid(.waterwayUsesNonOctilinearSegment(
+                    waterwayID: waterwayID,
+                    commandIndex: index + 1
+                ))
+            }
+            previous = destination
+        }
+    }
+
     private func validate(
         route: BeckMapRouteRecord,
         segmentsByID: [String: BeckMapSegmentRecord],
@@ -583,6 +632,9 @@ enum BeckMapValidationIssue: Equatable, Sendable {
     case nonFiniteValue(context: String)
     case nonPositiveValue(context: String, value: Double)
     case missingPath(segmentID: String, pathID: String)
+    case missingWaterwayPath(waterwayID: String, pathID: String)
+    case waterwayUsesNonLinearCommand(waterwayID: String, commandIndex: Int)
+    case waterwayUsesNonOctilinearSegment(waterwayID: String, commandIndex: Int)
     case segmentHasIdenticalEndpoints(segmentID: String)
     case segmentPathEndpointMismatch(
         segmentID: String,
@@ -633,6 +685,12 @@ enum BeckMapValidationIssue: Equatable, Sendable {
             "\(context) must be positive, found \(value)"
         case let .missingPath(segmentID, pathID):
             "segment \(segmentID) references missing path \(pathID)"
+        case let .missingWaterwayPath(waterwayID, pathID):
+            "waterway \(waterwayID) references missing path \(pathID)"
+        case let .waterwayUsesNonLinearCommand(waterwayID, commandIndex):
+            "waterway \(waterwayID) uses a non-linear command at index \(commandIndex)"
+        case let .waterwayUsesNonOctilinearSegment(waterwayID, commandIndex):
+            "waterway \(waterwayID) uses a non-octilinear segment at index \(commandIndex)"
         case let .segmentHasIdenticalEndpoints(segmentID):
             "segment \(segmentID) has identical endpoints"
         case let .segmentPathEndpointMismatch(segmentID, endpoint, stationID, expected, actual):

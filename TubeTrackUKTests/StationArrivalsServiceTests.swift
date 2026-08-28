@@ -4,6 +4,56 @@ import Testing
 
 @Suite(.serialized)
 struct StationArrivalsServiceTests {
+    @Test func freshArrivalsAreReusedWithoutAnotherNetworkRequest() async throws {
+        let path = "/StopPoint/940GZZLUVIC/Arrivals"
+        let service = makeService(responses: [
+            path: fixture([
+                prediction(
+                    id: "victoria",
+                    line: .victoria,
+                    stationID: "940GZZLUVIC",
+                    platform: "Southbound - Platform 4",
+                    direction: "outbound",
+                    destination: "Brixton",
+                    seconds: 120
+                ),
+            ]),
+        ])
+
+        _ = try await service.fetch(stationIDs: ["940GZZLUVIC"])
+        _ = try await service.fetch(stationIDs: ["940GZZLUVIC"])
+
+        #expect(StationArrivalsURLProtocol.requestCount(for: path) == 1)
+    }
+
+    @Test func failedRefreshReturnsThePreviousDepartureSnapshot() async throws {
+        let path = "/StopPoint/940GZZLUVIC/Arrivals"
+        let service = makeService(responses: [
+            path: fixture([
+                prediction(
+                    id: "cached-victoria",
+                    line: .victoria,
+                    stationID: "940GZZLUVIC",
+                    platform: "Southbound - Platform 4",
+                    direction: "outbound",
+                    destination: "Brixton",
+                    seconds: 120
+                ),
+            ]),
+        ])
+        let first = try await service.fetch(stationIDs: ["940GZZLUVIC"])
+        StationArrivalsURLProtocol.prepare(responses: [:])
+
+        let fallback = try await service.fetch(
+            stationIDs: ["940GZZLUVIC"],
+            forceRefresh: true
+        )
+
+        #expect(first.map(\.id) == ["cached-victoria"])
+        #expect(fallback.map(\.id) == ["cached-victoria"])
+        #expect(StationArrivalsURLProtocol.requestCount(for: path) == 1)
+    }
+
     @Test func beckenhamJunctionResolvesItsDestinationFromTheTimetable() async throws {
         let service = makeService(responses: [
             "/StopPoint/940GZZCRBEK/Arrivals": fixture([

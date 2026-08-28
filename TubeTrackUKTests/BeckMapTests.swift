@@ -37,6 +37,13 @@ struct BeckMapTests {
         #expect(BeckMapPalette.dark.labelBorderWidth > 0)
     }
 
+    @Test func thamesPaletteStaysDistinctBehindRoutesInBothAppearances() {
+        #expect(BeckMapPalette.light.waterwayFill != BeckMapPalette.light.background)
+        #expect(BeckMapPalette.light.waterwayOutline != BeckMapPalette.light.waterwayFill)
+        #expect(BeckMapPalette.dark.waterwayFill != BeckMapPalette.dark.background)
+        #expect(BeckMapPalette.dark.waterwayOutline != BeckMapPalette.dark.waterwayFill)
+    }
+
     @Test func measuredLabelBoundsKeepEqualPaddingForEveryAlignment() {
         let textSize = CGSize(width: 103, height: 19)
         let horizontalPadding: CGFloat = 9

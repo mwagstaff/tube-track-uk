@@ -2,11 +2,16 @@ import Foundation
 import Observation
 import SwiftUI
 
+enum TfLDepartureWaitingCopy {
+    static let title = "Waiting for TfL data"
+    static let message = "Waiting for departures data from TfL. Should be arriving shortly."
+}
+
 enum AppTab: String, CaseIterable, Identifiable {
     case map
     case nearMe
     case works
-    case about
+    case profile
 
     var id: Self { self }
 
@@ -15,7 +20,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .map: "Map"
         case .nearMe: "Near Me"
         case .works: "Works"
-        case .about: "About"
+        case .profile: "Profile"
         }
     }
 
@@ -24,7 +29,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .map: "map"
         case .nearMe: "location.fill"
         case .works: "wrench.and.screwdriver"
-        case .about: "info.circle"
+        case .profile: "person.crop.circle"
         }
     }
 }
@@ -87,11 +92,13 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
 @Observable
 final class TubeAppState {
     private static let appearanceModeKey = "appearanceMode"
+    private static let nearbyArrivalsStaleLifetime: TimeInterval = 5 * 60
 
     var selectedTab: AppTab = .map {
         didSet {
             guard selectedTab != oldValue else { return }
             updateSelectedStationArrivalsVisibility()
+            updateLiveTrainPollingVisibility()
         }
     }
     var mapPresentationMode: MapPresentationMode = .beck
@@ -134,6 +141,7 @@ final class TubeAppState {
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
     var nearbyArrivalsByStationID: [String: [TfLArrivalPrediction]] = [:]
+    var nearbyArrivalsUpdatedAtByStationID: [String: Date] = [:]
     var nearbyArrivalsLoadingStationIDs: Set<String> = []
     var nearbyArrivalsErrorsByStationID: [String: String] = [:]
     var statusUpdatedAt: Date?
@@ -145,10 +153,13 @@ final class TubeAppState {
     var isRefreshingWorks = false
     var statusError: String?
     var worksError: String?
+    private(set) var isTfLAPIKeyConfigured = false
+    private(set) var hasUserProvidedTfLAPIKey = false
 
+    @ObservationIgnored private var tflClient: TfLClient?
     @ObservationIgnored private var statusService: TubeStatusService?
     @ObservationIgnored private var worksService: EngineeringWorksService?
-    @ObservationIgnored private var trainService: TubeTrainService?
+    @ObservationIgnored private var trainService: (any LiveTrainFetching)?
     @ObservationIgnored private var stationArrivalsService: StationArrivalsService?
     @ObservationIgnored private var stationArrivalsTask: Task<Void, Never>?
     @ObservationIgnored private var stationArrivalsPollingTask: Task<Void, Never>?
@@ -157,14 +168,23 @@ final class TubeAppState {
     @ObservationIgnored private var statusPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainPollingTask: Task<Void, Never>?
     @ObservationIgnored private var trainRefreshTask: Task<Void, Never>?
+    @ObservationIgnored private var trainRetryTask: Task<Void, Never>?
     @ObservationIgnored private var trainRefreshFilter: Set<TubeLineID>?
+    @ObservationIgnored private var liveTrainRetryAfter: Date?
     @ObservationIgnored private var trainRefreshGeneration: UInt = 0
     @ObservationIgnored private var appIsActive = true
     @ObservationIgnored private var started = false
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let apiKeyStore: any TfLAPIKeyStoring
 
-    init(defaults: UserDefaults = .standard) {
+    init(
+        defaults: UserDefaults = .standard,
+        trainService: (any LiveTrainFetching)? = nil,
+        apiKeyStore: any TfLAPIKeyStoring = KeychainTfLAPIKeyStore()
+    ) {
         self.defaults = defaults
+        self.trainService = trainService
+        self.apiKeyStore = apiKeyStore
         appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
             .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
 
@@ -315,11 +335,24 @@ final class TubeAppState {
             let loadedGraph = try TubeGraph.bundled()
             graph = loadedGraph
             let repository = TubeNetworkRepository(graph: loadedGraph)
-            let client = TfLClient()
+            let bundledConfiguration = TfLConfiguration.app
+            let storedAPIKey = try? await apiKeyStore.load()
+            hasUserProvidedTfLAPIKey = storedAPIKey != nil
+            let activeAPIKey = storedAPIKey ?? bundledConfiguration.apiKey
+            isTfLAPIKeyConfigured = activeAPIKey != nil
+            let client = TfLClient(
+                configuration: TfLConfiguration(
+                    baseURL: bundledConfiguration.baseURL,
+                    apiKey: activeAPIKey
+                )
+            )
+            tflClient = client
             let cache = SnapshotCache()
             statusService = TubeStatusService(client: client, cache: cache, repository: repository)
             worksService = EngineeringWorksService(client: client, cache: cache, repository: repository)
-            trainService = TubeTrainService(client: client, repository: repository)
+            if trainService == nil {
+                trainService = TubeTrainService(client: client, repository: repository)
+            }
             stationArrivalsService = StationArrivalsService(client: client)
             isLoadingGraph = false
             await refreshStatus()
@@ -327,11 +360,30 @@ final class TubeAppState {
             await refreshWorks()
             guard appIsActive, !Task.isCancelled else { return }
             startStatusPolling()
-            if showLiveTrains { startTrainPolling() }
+            updateLiveTrainPollingVisibility()
         } catch {
             isLoadingGraph = false
             statusError = error.localizedDescription
         }
+    }
+
+    func saveTfLAPIKey(_ apiKey: String) async throws {
+        let normalizedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedKey.isEmpty else {
+            throw TfLAPIKeyValidationError.empty
+        }
+        try await apiKeyStore.save(normalizedKey)
+        await tflClient?.setAPIKey(normalizedKey)
+        hasUserProvidedTfLAPIKey = true
+        isTfLAPIKeyConfigured = true
+    }
+
+    func removeTfLAPIKey() async throws {
+        try await apiKeyStore.save(nil)
+        let bundledAPIKey = TfLConfiguration.app.apiKey
+        await tflClient?.setAPIKey(bundledAPIKey)
+        hasUserProvidedTfLAPIKey = false
+        isTfLAPIKeyConfigured = bundledAPIKey != nil
     }
 
     func refreshStatus() async {
@@ -365,12 +417,12 @@ final class TubeAppState {
         }
     }
 
-    func refreshWorks() async {
+    func refreshWorks(forceRefresh: Bool = false) async {
         guard let worksService, !isRefreshingWorks else { return }
         isRefreshingWorks = true
         defer { isRefreshingWorks = false }
         do {
-            let snapshot = try await worksService.fetch()
+            let snapshot = try await worksService.fetch(forceRefresh: forceRefresh)
             engineeringWorks = snapshot.works
             worksUpdatedAt = snapshot.fetchedAt
             isUsingCachedWorks = snapshot.cached
@@ -387,7 +439,7 @@ final class TubeAppState {
         showLiveTrains = enabled
         if enabled {
             isLoadingLiveTrains = liveTrains.isEmpty
-            startTrainPolling()
+            updateLiveTrainPollingVisibility()
         } else {
             trainPollingTask?.cancel()
             trainPollingTask = nil
@@ -401,7 +453,7 @@ final class TubeAppState {
         let newFilter = lineID.map { Set([$0]) } ?? []
         guard newFilter != trainLineFilter else { return }
         trainLineFilter = newFilter
-        if showLiveTrains {
+        if showLiveTrains, selectedTab == .map {
             requestTrainRefresh()
         }
     }
@@ -481,7 +533,10 @@ final class TubeAppState {
         await refreshTask?.value
     }
 
-    func refreshNearbyArrivals(for stations: [TubeStation]) async {
+    func refreshNearbyArrivals(
+        for stations: [TubeStation],
+        forceRefresh: Bool = false
+    ) async {
         guard let graph, let stationArrivalsService else { return }
 
         let stationIDs = Set(stations.map(\.id))
@@ -502,13 +557,15 @@ final class TubeAppState {
             for request in requests {
                 group.addTask {
                     do {
-                        let arrivals = try await stationArrivalsService.fetch(
-                            stationIDs: request.stopIDs
+                        let snapshot = try await stationArrivalsService.fetchSnapshot(
+                            stationIDs: request.stopIDs,
+                            forceRefresh: forceRefresh
                         )
                         return NearbyArrivalsResult(
                             stationID: request.station.id,
                             generation: request.generation,
-                            arrivals: arrivals,
+                            arrivals: snapshot.arrivals,
+                            fetchedAt: snapshot.fetchedAt,
                             errorDescription: nil
                         )
                     } catch {
@@ -516,7 +573,8 @@ final class TubeAppState {
                             stationID: request.station.id,
                             generation: request.generation,
                             arrivals: [],
-                            errorDescription: error.localizedDescription
+                            fetchedAt: nil,
+                            errorDescription: TfLDepartureWaitingCopy.message
                         )
                     }
                 }
@@ -527,9 +585,15 @@ final class TubeAppState {
                       !Task.isCancelled else { continue }
                 nearbyArrivalsLoadingStationIDs.remove(result.stationID)
                 if let errorDescription = result.errorDescription {
+                    if let updatedAt = nearbyArrivalsUpdatedAtByStationID[result.stationID],
+                       Date.now.timeIntervalSince(updatedAt) >= Self.nearbyArrivalsStaleLifetime {
+                        nearbyArrivalsByStationID[result.stationID] = nil
+                        nearbyArrivalsUpdatedAtByStationID[result.stationID] = nil
+                    }
                     nearbyArrivalsErrorsByStationID[result.stationID] = errorDescription
                 } else {
                     nearbyArrivalsByStationID[result.stationID] = result.arrivals
+                    nearbyArrivalsUpdatedAtByStationID[result.stationID] = result.fetchedAt
                     nearbyArrivalsErrorsByStationID[result.stationID] = nil
                 }
             }
@@ -595,7 +659,7 @@ final class TubeAppState {
         appIsActive = active
         if active {
             startStatusPolling(refreshImmediately: true)
-            if showLiveTrains { startTrainPolling() }
+            updateLiveTrainPollingVisibility()
             updateSelectedStationArrivalsVisibility()
         } else {
             statusPollingTask?.cancel()
@@ -620,6 +684,7 @@ final class TubeAppState {
         stationArrivals.removeAll(keepingCapacity: false)
         stationArrivalsUpdatedAt = nil
         nearbyArrivalsByStationID.removeAll(keepingCapacity: false)
+        nearbyArrivalsUpdatedAtByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsLoadingStationIDs.removeAll(keepingCapacity: false)
         nearbyArrivalsErrorsByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsGenerationByStationID.removeAll(keepingCapacity: false)
@@ -666,7 +731,7 @@ final class TubeAppState {
                 await self?.refreshStatus()
             }
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(30))
+                try? await Task.sleep(for: .seconds(60))
                 guard !Task.isCancelled else { return }
                 await self?.refreshStatus()
             }
@@ -674,7 +739,10 @@ final class TubeAppState {
     }
 
     private func startTrainPolling() {
-        guard appIsActive, trainPollingTask == nil, trainService != nil else { return }
+        guard appIsActive,
+              selectedTab == .map,
+              trainPollingTask == nil,
+              trainService != nil else { return }
         trainPollingTask = Task { [weak self] in
             await self?.refreshTrains()
             while !Task.isCancelled {
@@ -686,7 +754,10 @@ final class TubeAppState {
     }
 
     private func requestTrainRefresh() {
-        guard showLiveTrains, let trainService else { return }
+        guard showLiveTrains,
+              selectedTab == .map,
+              trainRetryTask == nil,
+              let trainService else { return }
 
         let requestedFilter = trainLineFilter
         if trainRefreshTask != nil, trainRefreshFilter == requestedFilter {
@@ -711,6 +782,7 @@ final class TubeAppState {
             } catch {
                 guard !Task.isCancelled else { return }
                 self?.handleTrainRefreshFailure(
+                    error,
                     requestedFilter: requestedFilter,
                     generation: generation
                 )
@@ -728,6 +800,7 @@ final class TubeAppState {
               requestedFilter == trainLineFilter else {
             return
         }
+        cancelScheduledTrainRetry()
         liveTrains = trains
         activeTrainCounts.update(
             with: trains,
@@ -739,12 +812,19 @@ final class TubeAppState {
     }
 
     private func handleTrainRefreshFailure(
+        _ error: Error,
         requestedFilter: Set<TubeLineID>,
         generation: UInt
     ) {
         guard generation == trainRefreshGeneration,
               showLiveTrains,
               requestedFilter == trainLineFilter else {
+            return
+        }
+
+        if case let TfLClientError.rateLimited(retryAfter) = error {
+            isLoadingLiveTrains = liveTrains.isEmpty
+            scheduleTrainRetry(after: retryAfter)
             return
         }
 
@@ -764,7 +844,9 @@ final class TubeAppState {
         guard generation == trainRefreshGeneration else { return }
         trainRefreshTask = nil
         trainRefreshFilter = nil
-        isLoadingLiveTrains = false
+        isLoadingLiveTrains = showLiveTrains
+            && liveTrains.isEmpty
+            && trainRetryTask != nil
     }
 
     private func cancelTrainRefresh() {
@@ -772,7 +854,43 @@ final class TubeAppState {
         trainRefreshTask?.cancel()
         trainRefreshTask = nil
         trainRefreshFilter = nil
+        cancelScheduledTrainRetry()
         isLoadingLiveTrains = false
+    }
+
+    private func scheduleTrainRetry(after retryAfter: Date?) {
+        cancelScheduledTrainRetry()
+        let retryDate = (retryAfter ?? Date.now.addingTimeInterval(60))
+            .addingTimeInterval(0.5)
+        liveTrainRetryAfter = retryDate
+        trainRetryTask = Task { [weak self] in
+            let delay = max(0, retryDate.timeIntervalSinceNow)
+            do {
+                try await Task.sleep(for: .seconds(delay))
+            } catch {
+                return
+            }
+            guard !Task.isCancelled else { return }
+            self?.resumeTrainRefresh(after: retryDate)
+        }
+    }
+
+    private func resumeTrainRefresh(after retryDate: Date) {
+        guard liveTrainRetryAfter == retryDate else { return }
+        trainRetryTask = nil
+        liveTrainRetryAfter = nil
+        guard appIsActive, selectedTab == .map, showLiveTrains else {
+            isLoadingLiveTrains = false
+            return
+        }
+        isLoadingLiveTrains = liveTrains.isEmpty
+        requestTrainRefresh()
+    }
+
+    private func cancelScheduledTrainRetry() {
+        trainRetryTask?.cancel()
+        trainRetryTask = nil
+        liveTrainRetryAfter = nil
     }
 
     private func requestStationArrivals(for stationID: String) {
@@ -843,7 +961,7 @@ final class TubeAppState {
                   selectedStationID == stationID else {
                 return
             }
-            stationArrivalsError = error.localizedDescription
+            stationArrivalsError = TfLDepartureWaitingCopy.message
         }
     }
 
@@ -863,6 +981,17 @@ final class TubeAppState {
     private func cancelStationArrivalsPolling() {
         stationArrivalsPollingTask?.cancel()
         stationArrivalsPollingTask = nil
+    }
+
+    private func updateLiveTrainPollingVisibility() {
+        guard appIsActive, selectedTab == .map, showLiveTrains else {
+            trainPollingTask?.cancel()
+            trainPollingTask = nil
+            cancelTrainRefresh()
+            return
+        }
+        isLoadingLiveTrains = liveTrains.isEmpty
+        startTrainPolling()
     }
 
     private func updateSelectedStationArrivalsVisibility() {
@@ -911,6 +1040,7 @@ private struct NearbyArrivalsResult: Sendable {
     let stationID: String
     let generation: UInt
     let arrivals: [TfLArrivalPrediction]
+    let fetchedAt: Date?
     let errorDescription: String?
 }
 

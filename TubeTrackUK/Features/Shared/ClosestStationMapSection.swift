@@ -184,8 +184,12 @@ private struct ClosestStationMapPanel: View {
     private func departures(now: Date) -> some View {
         if appState.nearbyArrivalsLoadingStationIDs.contains(station.id), arrivals.isEmpty {
             compactMessage("Loading live departures…", systemImage: nil, showsProgress: true)
-        } else if let error = appState.nearbyArrivalsErrorsByStationID[station.id], arrivals.isEmpty {
-            compactMessage(error, systemImage: "wifi.exclamationmark")
+        } else if appState.nearbyArrivalsErrorsByStationID[station.id] != nil, arrivals.isEmpty {
+            compactMessage(
+                TfLDepartureWaitingCopy.message,
+                systemImage: nil,
+                showsProgress: true
+            )
         } else if selectedGroups.isEmpty {
             compactMessage("No imminent departures reported.", systemImage: "clock")
         } else {

@@ -8,6 +8,7 @@ struct NearMeScreen: View {
     @Environment(\.openURL) private var openURL
     @State private var locationProvider = UserLocationProvider()
     @State private var visibleStationCount = Self.stationBatchSize
+    @State private var visibleStationIDs: Set<String> = []
 
     var body: some View {
         NavigationStack {
@@ -47,6 +48,7 @@ struct NearMeScreen: View {
                 return
             }
             visibleStationCount = Self.stationBatchSize
+            visibleStationIDs.removeAll(keepingCapacity: true)
             let stations = nearbyStations.map(\.station)
             guard !stations.isEmpty else { return }
             await appState.refreshNearbyArrivals(for: stations)
@@ -54,7 +56,7 @@ struct NearMeScreen: View {
         .task(id: nearbyArrivalsPollingTaskID) {
             guard appState.selectedTab == .nearMe,
                   appState.isViewingLiveStatus,
-                  !nearbyStations.isEmpty else {
+                  !visibleNearbyStations.isEmpty else {
                 return
             }
 
@@ -70,7 +72,7 @@ struct NearMeScreen: View {
                     return
                 }
                 await appState.refreshNearbyArrivals(
-                    for: nearbyStations.map(\.station)
+                    for: visibleNearbyStations.map(\.station)
                 )
             }
         }
@@ -85,6 +87,13 @@ struct NearMeScreen: View {
         Array(allNearbyStations.prefix(visibleStationCount))
     }
 
+    private var visibleNearbyStations: [NearbyStation] {
+        NearMeArrivalRefreshPolicy.visibleStations(
+            from: nearbyStations,
+            visibleStationIDs: visibleStationIDs
+        )
+    }
+
     private var initialStationTaskID: String {
         let stationIDs = allNearbyStations
             .prefix(Self.stationBatchSize)
@@ -94,7 +103,7 @@ struct NearMeScreen: View {
     }
 
     private var nearbyArrivalsPollingTaskID: String {
-        let stationIDs = nearbyStations.map(\.id).joined(separator: ":")
+        let stationIDs = visibleStationIDs.sorted().joined(separator: ":")
         return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned")"
     }
 
@@ -120,6 +129,9 @@ struct NearMeScreen: View {
                         rank: index + 1,
                         graph: graph
                     )
+                    .onScrollVisibilityChange(threshold: 0.2) { isVisible in
+                        updateStationVisibility(nearby, isVisible: isVisible)
+                    }
                 }
 
                 if hasMoreStations {
@@ -141,9 +153,12 @@ struct NearMeScreen: View {
         .refreshable {
             locationProvider.requestLocation()
             if appState.isViewingLiveStatus {
-                await appState.refreshNearbyArrivals(for: nearbyStations.map(\.station))
+                await appState.refreshNearbyArrivals(
+                    for: stationsForManualRefresh,
+                    forceRefresh: true
+                )
             } else {
-                await appState.refreshWorks()
+                await appState.refreshWorks(forceRefresh: true)
             }
         }
     }
@@ -198,11 +213,14 @@ struct NearMeScreen: View {
         locationProvider.requestLocation()
         Task {
             if appState.isViewingLiveStatus {
-                let stations = nearbyStations.map(\.station)
+                let stations = stationsForManualRefresh
                 guard !stations.isEmpty else { return }
-                await appState.refreshNearbyArrivals(for: stations)
+                await appState.refreshNearbyArrivals(
+                    for: stations,
+                    forceRefresh: true
+                )
             } else {
-                await appState.refreshWorks()
+                await appState.refreshWorks(forceRefresh: true)
             }
         }
     }
@@ -214,15 +232,31 @@ struct NearMeScreen: View {
             previousCount + Self.stationBatchSize,
             allNearbyStations.count
         )
-        let newlyVisibleStations = allNearbyStations[previousCount..<nextCount].map(\.station)
-
         withAnimation(.smooth(duration: 0.3)) {
             visibleStationCount = nextCount
         }
-        if appState.isViewingLiveStatus {
+    }
+
+    private var stationsForManualRefresh: [TubeStation] {
+        NearMeArrivalRefreshPolicy.stationsForManualRefresh(
+            from: nearbyStations,
+            visibleStationIDs: visibleStationIDs,
+            fallbackCount: Self.stationBatchSize
+        )
+    }
+
+    private func updateStationVisibility(
+        _ nearbyStation: NearbyStation,
+        isVisible: Bool
+    ) {
+        if isVisible {
+            let inserted = visibleStationIDs.insert(nearbyStation.id).inserted
+            guard inserted, appState.isViewingLiveStatus else { return }
             Task {
-                await appState.refreshNearbyArrivals(for: newlyVisibleStations)
+                await appState.refreshNearbyArrivals(for: [nearbyStation.station])
             }
+        } else {
+            visibleStationIDs.remove(nearbyStation.id)
         }
     }
 }

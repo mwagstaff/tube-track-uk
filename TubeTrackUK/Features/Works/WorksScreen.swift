@@ -57,7 +57,7 @@ struct WorksScreen: View {
                     .padding(.vertical, 7)
                     .background(.bar)
             }
-            .refreshable { await appState.refreshWorks() }
+            .refreshable { await appState.refreshWorks(forceRefresh: true) }
             .sheet(item: $selectedWork) { WorkDetailView(work: $0) }
         }
     }
@@ -123,7 +123,7 @@ struct WorksScreen: View {
         } description: {
             Text(appState.worksError ?? "No TfL engineering work matches these filters in the next 60 days.")
         } actions: {
-            Button("Refresh") { Task { await appState.refreshWorks() } }
+            Button("Refresh") { Task { await appState.refreshWorks(forceRefresh: true) } }
                 .buttonStyle(.borderedProminent)
         }
     }

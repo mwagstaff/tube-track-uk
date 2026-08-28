@@ -209,6 +209,7 @@ private struct BeckMapCanvas: View {
 
     private var renderedSegments: [RenderedSegment] { renderCache.renderedSegments }
     private var renderedLineGroups: [RenderedLineGroup] { renderCache.renderedLineGroups }
+    private var renderedWaterways: [RenderedWaterway] { renderCache.renderedWaterways }
     private var renderedLabels: [RenderedLabel] { renderCache.renderedLabels }
     private var artworkBounds: CGRect { renderCache.artworkBounds }
     private var debugReferenceImage: UIImage? { renderCache.debugReferenceImage }
@@ -415,6 +416,30 @@ private struct BeckMapCanvas: View {
         }
 
         let issuesActive = !traceMode && presentation.emphasizesIssues
+        // Context belongs below the transport network. The waterway geometry
+        // is authored as straight octilinear sections; rounded stroke joins
+        // soften corners without turning the route itself into a smooth curve.
+        for waterway in renderedWaterways {
+            mapContext.stroke(
+                waterway.path,
+                with: .color(palette.waterwayOutline),
+                style: StrokeStyle(
+                    lineWidth: waterway.strokeWidth + waterway.outlineWidth * 2,
+                    lineCap: .butt,
+                    lineJoin: .round
+                )
+            )
+            mapContext.stroke(
+                waterway.path,
+                with: .color(palette.waterwayFill),
+                style: StrokeStyle(
+                    lineWidth: waterway.strokeWidth,
+                    lineCap: .butt,
+                    lineJoin: .round
+                )
+            )
+        }
+
         // Preserve the document's line-layer order, but render each parallel
         // rail line in two passes. Drawing every coloured outer before any
         // paper inset keeps branch joins open instead of allowing a later
@@ -1246,10 +1271,18 @@ private struct BeckMapCanvas: View {
 
     private static func makeArtworkBounds(
         document: BeckMapDocument,
-        renderedSegments: [RenderedSegment]
+        renderedSegments: [RenderedSegment],
+        renderedWaterways: [RenderedWaterway]
     ) -> CGRect {
         var bounds = renderedSegments.reduce(into: CGRect.null) { partial, segment in
             partial = partial.union(segment.path.boundingRect)
+        }
+
+        for waterway in renderedWaterways {
+            let expansion = waterway.strokeWidth / 2 + waterway.outlineWidth
+            bounds = bounds.union(
+                waterway.path.boundingRect.insetBy(dx: -expansion, dy: -expansion)
+            )
         }
 
         for marker in document.stationMarkers {
@@ -1346,6 +1379,7 @@ private struct BeckMapCanvas: View {
     struct RenderCache {
         let renderedSegments: [RenderedSegment]
         let renderedLineGroups: [RenderedLineGroup]
+        let renderedWaterways: [RenderedWaterway]
         let trainPathsBySegmentID: [String: BeckMapTrainPath]
         let renderedLabels: [RenderedLabel]
         let artworkBounds: CGRect
@@ -1395,6 +1429,20 @@ private struct BeckMapCanvas: View {
                 )
             }
 
+            self.renderedWaterways = (document.waterways ?? []).compactMap { waterway in
+                guard let commands = paths[waterway.pathID] else { return nil }
+                return RenderedWaterway(
+                    id: waterway.id,
+                    name: waterway.name,
+                    path: BeckMapCanvas.makePath(
+                        commands: commands,
+                        translation: .zero
+                    ),
+                    strokeWidth: CGFloat(waterway.strokeWidth),
+                    outlineWidth: CGFloat(waterway.outlineWidth)
+                )
+            }
+
             let stationAnchors = Dictionary(
                 uniqueKeysWithValues: document.stationMarkers.map {
                     ($0.stationID, CGPoint($0.anchor))
@@ -1427,7 +1475,8 @@ private struct BeckMapCanvas: View {
             }
             self.artworkBounds = BeckMapCanvas.makeArtworkBounds(
                 document: document,
-                renderedSegments: renderedSegments
+                renderedSegments: renderedSegments,
+                renderedWaterways: renderedWaterways
             )
             self.debugReferenceImage = loadsDebugReference
                 ? BeckMapCanvas.loadDebugReference(for: document)
@@ -1446,6 +1495,14 @@ private struct BeckMapCanvas: View {
     struct RenderedLineGroup {
         let lineID: TubeLineID
         let segments: [RenderedSegment]
+    }
+
+    struct RenderedWaterway {
+        let id: String
+        let name: String
+        let path: Path
+        let strokeWidth: CGFloat
+        let outlineWidth: CGFloat
     }
 
     struct RenderedLabel {

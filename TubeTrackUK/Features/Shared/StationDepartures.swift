@@ -370,20 +370,23 @@ struct StationDeparturesSection: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
         } else if let errorMessage, arrivals.isEmpty {
-            Label {
+            HStack(alignment: .top, spacing: 10) {
+                ProgressView()
+                    .controlSize(.small)
+                    .tint(Color.tubeBlue)
+                    .padding(.top, 2)
+                    .accessibilityHidden(true)
+
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Departures unavailable")
+                    Text(TfLDepartureWaitingCopy.title)
                         .font(.subheadline.weight(.semibold))
                     Text(errorMessage)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
                 }
-            } icon: {
-                Image(systemName: "wifi.exclamationmark")
-                    .foregroundStyle(.orange)
             }
             .padding(.vertical, 3)
+            .accessibilityElement(children: .combine)
         } else if selectedGroups.isEmpty {
             Text(emptyStateMessage)
                 .font(.subheadline)

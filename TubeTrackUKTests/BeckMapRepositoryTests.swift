@@ -32,6 +32,16 @@ struct BeckMapRepositoryTests {
         #expect(document.stationMarkers.count == graph.stations.count)
         #expect(document.labels.count >= 330)
         #expect(document.lineCoverage == Set(TubeLineID.allCases))
+        let river = try #require(document.waterways?.first { $0.id == "river-thames" })
+        let riverPath = try #require(document.paths.first { $0.id == river.pathID })
+        #expect(river.name == "River Thames")
+        #expect(river.strokeWidth > document.styles.routeStrokeWidth)
+        #expect(riverPath.commands.count >= 20)
+        #expect(riverPath.commands.allSatisfy {
+            if case .move = $0 { return true }
+            if case .line = $0 { return true }
+            return false
+        })
         #expect(Set(graph.segments.map(\.id)).isSubset(of: Set(document.segments.map(\.id))))
         #expect(Set(document.segments.map(\.pathID)).isSubset(of: Set(document.paths.map(\.id))))
         #expect(document.segments.filter { $0.lineID == .dlr }.count == 46)

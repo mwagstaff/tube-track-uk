@@ -14,6 +14,10 @@ struct BeckMapDocument: Codable, Hashable, Sendable {
     let styles: BeckMapStyleRecord
     let debugReference: BeckMapDebugReferenceRecord
     let paths: [BeckMapPathRecord]
+    /// Non-interactive schematic context rendered beneath every rail route.
+    /// Optional so the earlier authored slices remain valid without carrying
+    /// full-map landmarks.
+    var waterways: [BeckMapWaterwayRecord]? = nil
     let segments: [BeckMapSegmentRecord]
     let stationMarkers: [BeckMapStationMarkerRecord]
     let labels: [BeckMapLabelRecord]
@@ -153,6 +157,17 @@ enum BeckMapPathCommand: Codable, Hashable, Sendable {
 struct BeckMapPathRecord: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let commands: [BeckMapPathCommand]
+}
+
+/// An authored waterway centreline. The repository restricts its referenced
+/// path to horizontal, vertical and 45-degree segments so landmarks retain the
+/// same octilinear visual grammar as the rail network.
+struct BeckMapWaterwayRecord: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let name: String
+    let pathID: String
+    let strokeWidth: Double
+    let outlineWidth: Double
 }
 
 enum BeckMapPathDirection: String, Codable, Hashable, Sendable {

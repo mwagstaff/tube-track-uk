@@ -1,7 +1,15 @@
 import Foundation
 
+struct StationArrivalsSnapshot: Sendable {
+    let arrivals: [TfLArrivalPrediction]
+    let fetchedAt: Date
+    let cached: Bool
+}
+
 actor StationArrivalsService {
-    private static let destinationCacheLifetime: TimeInterval = 15 * 60
+    private static let arrivalsFreshLifetime: TimeInterval = 30
+    private static let arrivalsStaleLifetime: TimeInterval = 5 * 60
+    private static let destinationCacheLifetime: TimeInterval = 24 * 60 * 60
     private static let destinationFailureCacheLifetime: TimeInterval = 60
     private static let arrivalDepartureLineIDs: Set<String> = [
         TubeLineID.elizabeth.rawValue,
@@ -15,31 +23,86 @@ actor StationArrivalsService {
 
     private let client: TfLClient
     private var destinationsByLineAndStation: [DepartureDestinationKey: CachedDepartureDestination] = [:]
+    private var arrivalsByStationSet: [String: CachedStationArrivals] = [:]
 
     init(client: TfLClient) {
         self.client = client
     }
 
-    func fetch(stationIDs: [String]) async throws -> [TfLArrivalPrediction] {
-        var predictions: [TfLArrivalPrediction] = []
-        for stationID in Set(stationIDs).sorted() {
-            let arrivals: [TfLArrivalPrediction] = try await client.get("/StopPoint/\(stationID)/Arrivals")
-            predictions.append(
-                contentsOf: try await correctingSelfReferentialDestinations(
-                    in: arrivals,
-                    requestedStationID: stationID
-                )
+    func fetch(
+        stationIDs: [String],
+        forceRefresh: Bool = false
+    ) async throws -> [TfLArrivalPrediction] {
+        try await fetchSnapshot(
+            stationIDs: stationIDs,
+            forceRefresh: forceRefresh
+        ).arrivals
+    }
+
+    func fetchSnapshot(
+        stationIDs: [String],
+        forceRefresh: Bool = false
+    ) async throws -> StationArrivalsSnapshot {
+        let sortedStationIDs = Set(stationIDs).sorted()
+        let cacheKey = sortedStationIDs.joined(separator: ",")
+        let now = Date.now
+        if !forceRefresh,
+           let cached = arrivalsByStationSet[cacheKey],
+           now.timeIntervalSince(cached.fetchedAt) < Self.arrivalsFreshLifetime {
+            return StationArrivalsSnapshot(
+                arrivals: aged(cached, now: now),
+                fetchedAt: cached.fetchedAt,
+                cached: true
             )
         }
 
-        var seenPredictions = Set<TfLArrivalPrediction.DepartureIdentity>()
-        let uniquePredictions = predictions.filter { prediction in
-            TubeLineID(rawValue: prediction.lineId) != nil
-                && seenPredictions.insert(prediction.departureIdentity).inserted
-        }
+        var predictions: [TfLArrivalPrediction] = []
+        do {
+            for stationID in sortedStationIDs {
+                let arrivals: [TfLArrivalPrediction] = try await client.get(
+                    "/StopPoint/\(stationID)/Arrivals",
+                    priority: .foreground,
+                    forceRefresh: forceRefresh
+                )
+                predictions.append(
+                    contentsOf: try await correctingSelfReferentialDestinations(
+                        in: arrivals,
+                        requestedStationID: stationID,
+                        forceRefresh: forceRefresh
+                    )
+                )
+            }
 
-        return coalescedCanaryWharfDLRPlatformFaces(in: uniquePredictions)
-            .sorted(by: arrivesSooner)
+            var seenPredictions = Set<TfLArrivalPrediction.DepartureIdentity>()
+            let uniquePredictions = predictions.filter { prediction in
+                TubeLineID(rawValue: prediction.lineId) != nil
+                    && seenPredictions.insert(prediction.departureIdentity).inserted
+            }
+
+            let result = coalescedCanaryWharfDLRPlatformFaces(in: uniquePredictions)
+                .sorted(by: arrivesSooner)
+            arrivalsByStationSet[cacheKey] = CachedStationArrivals(
+                arrivals: result,
+                fetchedAt: now
+            )
+            pruneArrivalsCache(now: now)
+            return StationArrivalsSnapshot(
+                arrivals: result,
+                fetchedAt: now,
+                cached: false
+            )
+        } catch {
+            try Task.checkCancellation()
+            if let cached = arrivalsByStationSet[cacheKey],
+               now.timeIntervalSince(cached.fetchedAt) < Self.arrivalsStaleLifetime {
+                return StationArrivalsSnapshot(
+                    arrivals: aged(cached, now: now),
+                    fetchedAt: cached.fetchedAt,
+                    cached: true
+                )
+            }
+            throw error
+        }
     }
 
     /// TfL's arrivals feed includes vehicles that terminate at the requested
@@ -49,7 +112,8 @@ actor StationArrivalsService {
     /// and use the timetable only when it exposes one unambiguous destination.
     private func correctingSelfReferentialDestinations(
         in predictions: [TfLArrivalPrediction],
-        requestedStationID: String
+        requestedStationID: String,
+        forceRefresh: Bool
     ) async throws -> [TfLArrivalPrediction] {
         guard let stationID = Self.normalizedID(requestedStationID) else {
             return predictions.map { prediction in
@@ -75,7 +139,8 @@ actor StationArrivalsService {
             if Self.arrivalDepartureLineIDs.contains(lineID),
                let departures = try await arrivalDeparturePredictions(
                    lineID: lineID,
-                   stationID: stationID
+                   stationID: stationID,
+                   forceRefresh: forceRefresh
                ),
                !departures.isEmpty {
                 corrected = predictionsForOtherLines + departures
@@ -131,12 +196,15 @@ actor StationArrivalsService {
 
     private func arrivalDeparturePredictions(
         lineID: String,
-        stationID: String
+        stationID: String,
+        forceRefresh: Bool
     ) async throws -> [TfLArrivalPrediction]? {
         do {
             let entries: [TfLArrivalDeparture] = try await client.get(
                 "/StopPoint/\(stationID)/ArrivalDepartures",
-                queryItems: [URLQueryItem(name: "lineIds", value: lineID)]
+                queryItems: [URLQueryItem(name: "lineIds", value: lineID)],
+                priority: .foreground,
+                forceRefresh: forceRefresh
             )
             let now = Date.now
             return entries.compactMap {
@@ -192,6 +260,31 @@ actor StationArrivalsService {
             destination: destination,
             expiresAt: now.addingTimeInterval(lifetime)
         )
+    }
+
+    private func aged(
+        _ cached: CachedStationArrivals,
+        now: Date
+    ) -> [TfLArrivalPrediction] {
+        let elapsed = max(0, Int(now.timeIntervalSince(cached.fetchedAt)))
+        return cached.arrivals.compactMap { prediction in
+            if let expectedArrival = prediction.expectedArrival,
+               expectedArrival < now.addingTimeInterval(-30) {
+                return nil
+            }
+            if prediction.expectedArrival == nil,
+               let seconds = prediction.timeToStation,
+               seconds + 30 < elapsed {
+                return nil
+            }
+            return prediction.aged(by: elapsed)
+        }
+    }
+
+    private func pruneArrivalsCache(now: Date) {
+        arrivalsByStationSet = arrivalsByStationSet.filter {
+            now.timeIntervalSince($0.value.fetchedAt) < Self.arrivalsStaleLifetime
+        }
     }
 
     private static func normalizedID(_ value: String?) -> String? {
@@ -367,6 +460,11 @@ private struct DepartureDestinationKey: Hashable, Sendable {
 private struct CachedDepartureDestination: Sendable {
     let destination: DepartureDestination?
     let expiresAt: Date
+}
+
+private struct CachedStationArrivals: Sendable {
+    let arrivals: [TfLArrivalPrediction]
+    let fetchedAt: Date
 }
 
 private struct DepartureDestination: Sendable {
@@ -590,6 +688,24 @@ private struct MirroredDLRPlatform {
 }
 
 private extension TfLArrivalPrediction {
+    func aged(by elapsed: Int) -> TfLArrivalPrediction {
+        TfLArrivalPrediction(
+            id: id,
+            vehicleId: vehicleId,
+            lineId: lineId,
+            stationName: stationName,
+            naptanId: naptanId,
+            platformName: platformName,
+            direction: direction,
+            destinationName: destinationName,
+            destinationNaptanId: destinationNaptanId,
+            towards: towards,
+            expectedArrival: expectedArrival,
+            timeToStation: timeToStation.map { max(0, $0 - elapsed) },
+            currentLocation: currentLocation
+        )
+    }
+
     func replacingDestination(_ destination: DepartureDestination?) -> TfLArrivalPrediction {
         TfLArrivalPrediction(
             id: id,

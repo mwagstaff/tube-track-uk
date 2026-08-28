@@ -8,6 +8,28 @@ struct NearbyStation: Identifiable, Sendable {
     var id: String { station.id }
 }
 
+enum NearMeArrivalRefreshPolicy {
+    static func visibleStations(
+        from stations: [NearbyStation],
+        visibleStationIDs: Set<String>
+    ) -> [NearbyStation] {
+        stations.filter { visibleStationIDs.contains($0.id) }
+    }
+
+    static func stationsForManualRefresh(
+        from stations: [NearbyStation],
+        visibleStationIDs: Set<String>,
+        fallbackCount: Int
+    ) -> [TubeStation] {
+        let visible = visibleStations(
+            from: stations,
+            visibleStationIDs: visibleStationIDs
+        ).map(\.station)
+        if !visible.isEmpty { return visible }
+        return stations.prefix(fallbackCount).map(\.station)
+    }
+}
+
 enum NearbyStationFinder {
     static func stationsByDistance(
         to location: CLLocation,

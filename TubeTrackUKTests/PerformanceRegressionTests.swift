@@ -3,11 +3,13 @@ import Testing
 @testable import TubeTrackUK
 
 struct PerformanceRegressionTests {
-    @Test func defaultTfLSessionDoesNotRetainURLCacheData() {
+    @Test func defaultTfLSessionUsesProtocolCachingWithoutPersistentResponseData() throws {
         let configuration = TfLClient.defaultSessionConfiguration()
+        let cache = try #require(configuration.urlCache)
 
-        #expect(configuration.urlCache == nil)
-        #expect(configuration.requestCachePolicy == .reloadIgnoringLocalCacheData)
+        #expect(cache.memoryCapacity == 16 * 1_024 * 1_024)
+        #expect(cache.diskCapacity == 0)
+        #expect(configuration.requestCachePolicy == .useProtocolCachePolicy)
     }
 
     @Test func allLiveTrainLinesAreSplitIntoDeterministicBoundedBatches() {

@@ -1,6 +1,10 @@
 import Foundation
 
-actor TubeTrainService {
+protocol LiveTrainFetching: Sendable {
+    func fetch(lineIDs: Set<TubeLineID>) async throws -> [LiveTubeTrain]
+}
+
+actor TubeTrainService: LiveTrainFetching {
     private let client: TfLClient
     private let repository: TubeNetworkRepository
     private var tramContextsByVehicleID: [String: TramVehicleRouteContext] = [:]
@@ -23,7 +27,10 @@ actor TubeTrainService {
         for batch in TubeTrainRequestBatcher.batches(from: requestedLines) {
             try Task.checkCancellation()
             let pathIDs = batch.map(\.rawValue).joined(separator: ",")
-            let predictions: [TfLLiveTrainPrediction] = try await client.get("/Line/\(pathIDs)/Arrivals")
+            let predictions: [TfLLiveTrainPrediction] = try await client.get(
+                "/Line/\(pathIDs)/Arrivals",
+                priority: .background
+            )
             try Task.checkCancellation()
 
             for prediction in predictions {

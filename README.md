@@ -12,10 +12,12 @@ arrival-prediction data.
 2. Select the `TubeTrackUK` scheme and an iPhone running iOS 26 or later.
 3. Build and run.
 
-The public TfL endpoints currently work without a key for development. For a
-registered key, copy `Configuration/Secrets.example.xcconfig` to
-`Configuration/Secrets.xcconfig` and set `TFL_API_KEY`. The secrets file is
-ignored by Git and is included conditionally by `Shared.xcconfig`.
+The public TfL endpoints work without a key. A user can add a free key in
+Profile → TfL API key; it is stored in the device Keychain and sent using the
+`app_key` query parameter. For a build-time development key, copy
+`Configuration/Secrets.example.xcconfig` to `Configuration/Secrets.xcconfig`
+and set `TFL_API_KEY`. The secrets file is ignored by Git and is included
+conditionally by `Shared.xcconfig`.
 
 ## MVP features
 

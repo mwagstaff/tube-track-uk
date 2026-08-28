@@ -6007,6 +6007,165 @@
         {
           "op": "move",
           "to": {
+            "x": 120,
+            "y": 2370
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 420,
+            "y": 2370
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 420,
+            "y": 2210
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 610,
+            "y": 2020
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1000,
+            "y": 2020
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1125,
+            "y": 2145
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1760,
+            "y": 2145
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1760,
+            "y": 1950
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2100,
+            "y": 1950
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2260,
+            "y": 1790
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2540,
+            "y": 1790
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2600,
+            "y": 1850
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2840,
+            "y": 1850
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2840,
+            "y": 2200
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3100,
+            "y": 2200
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3100,
+            "y": 1900
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3320,
+            "y": 1900
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3320,
+            "y": 2200
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3800,
+            "y": 2200
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3800,
+            "y": 1700
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 3900,
+            "y": 1600
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 4080,
+            "y": 1600
+          }
+        }
+      ],
+      "id": "beck.v1.path.landmark.river-thames"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
             "x": 1681.979,
             "y": 1430.016
           }
@@ -56957,6 +57116,15 @@
     "routeStrokeWidth": 8.3,
     "secondaryLabelFontSize": 16
   },
+  "waterways": [
+    {
+      "id": "river-thames",
+      "name": "River Thames",
+      "outlineWidth": 3,
+      "pathID": "beck.v1.path.landmark.river-thames",
+      "strokeWidth": 18
+    }
+  ],
   "supportedLineIDs": [
     "bakerloo",
     "central",

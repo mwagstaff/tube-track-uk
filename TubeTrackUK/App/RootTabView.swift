@@ -28,9 +28,9 @@ struct RootTabView: View {
                 .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
                 .tag(AppTab.works)
 
-            AboutScreen()
-                .tabItem { Label(AppTab.about.title, systemImage: AppTab.about.symbol) }
-                .tag(AppTab.about)
+            ProfileScreen()
+                .tabItem { Label(AppTab.profile.title, systemImage: AppTab.profile.symbol) }
+                .tag(AppTab.profile)
         }
         .tint(colorScheme == .dark ? .white : .tubeBlue)
         .toolbarBackground(colorScheme == .dark ? Color.black : Color(.systemBackground), for: .tabBar)

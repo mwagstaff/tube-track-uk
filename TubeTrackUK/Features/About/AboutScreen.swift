@@ -8,16 +8,15 @@ struct AboutScreen: View {
     }
 
     var body: some View {
-        NavigationStack {
-            List {
+        List {
                 Section {
                     HStack {
                         Spacer()
                         VStack(spacing: 12) {
                             TubeTrackMark()
-                            Text("Beautiful. Informative. Real-time.")
+                            Text("It's not just the Internet that's a series of tubes.")
                                 .font(.headline)
-                            Text("A modern, independent live view of London’s Tube, rail and tram network.")
+                            Text("A live view of London’s Tube, Overground and tram network.")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .multilineTextAlignment(.center)
@@ -47,14 +46,14 @@ struct AboutScreen: View {
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
                         Label("© OpenStreetMap contributors", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
                     }
-                    Text("The real-world map mode preserves Apple’s map attribution. Rail and tram routes use an offline OSM railway graph so lines and supported train estimates follow mapped track alignments instead of station-to-station chords.")
+                    Text("The real-world map mode preserves Apple’s map attribution. Tube, Overground and tram routes use an offline OSM railway graph so lines and supported train estimates follow mapped track alignments instead of station-to-station chords.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
 
                 Section("Privacy & Independence") {
-                    Label("No account or location required", systemImage: "hand.raised.fill")
-                    Text("TubeTrack UK is independent and is not affiliated with or endorsed by Transport for London.")
+                    Label("No account or personal data required", systemImage: "hand.raised.fill")
+                    Text("TubeTrack UK is independent and is not affiliated with or endorsed by Transport for London. We think TfL is pretty great, though. Thanks for sharing your data! ❤️")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -65,8 +64,8 @@ struct AboutScreen: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
-            }
-            .navigationTitle("About")
         }
+        .navigationTitle("About")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

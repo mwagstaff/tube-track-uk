@@ -13,6 +13,8 @@ struct BeckMapPalette {
     let labelHorizontalPadding: CGFloat
     let labelVerticalPadding: CGFloat
     let labelCornerRadius: CGFloat
+    let waterwayFill: Color
+    let waterwayOutline: Color
     let mutedRoute: Color
     let northernLineCasing: Color?
     let northernLineCasingExpansion: CGFloat
@@ -28,6 +30,16 @@ struct BeckMapPalette {
         labelHorizontalPadding: 0,
         labelVerticalPadding: 0,
         labelCornerRadius: 2,
+        waterwayFill: Color(
+            red: 204.0 / 255.0,
+            green: 239.0 / 255.0,
+            blue: 252.0 / 255.0
+        ),
+        waterwayOutline: Color(
+            red: 25.0 / 255.0,
+            green: 181.0 / 255.0,
+            blue: 241.0 / 255.0
+        ),
         mutedRoute: Color(white: 0.72).opacity(0.48),
         northernLineCasing: nil,
         northernLineCasingExpansion: 0
@@ -47,6 +59,8 @@ struct BeckMapPalette {
         labelHorizontalPadding: 7,
         labelVerticalPadding: 4,
         labelCornerRadius: 999,
+        waterwayFill: Color(red: 0.18, green: 0.39, blue: 0.49),
+        waterwayOutline: Color(red: 0.36, green: 0.75, blue: 0.90),
         mutedRoute: Color(red: 0.82, green: 0.84, blue: 0.86).opacity(0.52),
         northernLineCasing: Color(red: 0.95, green: 0.94, blue: 0.91).opacity(0.92),
         northernLineCasingExpansion: 1.5

@@ -3,6 +3,14 @@ import Testing
 @testable import TubeTrackUK
 
 struct NearMeTests {
+    @Test func departureWaitingCopyMatchesTheAutomaticRetryState() {
+        #expect(TfLDepartureWaitingCopy.title == "Waiting for TfL data")
+        #expect(
+            TfLDepartureWaitingCopy.message
+                == "Waiting for departures data from TfL. Should be arriving shortly."
+        )
+    }
+
     @Test func nearestStationsAreDeduplicatedAndSortedByDistance() {
         let origin = CLLocation(latitude: 51.5000, longitude: -0.1000)
         let stations = [
@@ -21,6 +29,40 @@ struct NearMeTests {
         #expect(allByDistance.map(\.station.id) == ["near-central", "middle", "third", "far"])
         #expect(nearest[0].distance < nearest[1].distance)
         #expect(nearest[1].distance < nearest[2].distance)
+    }
+
+    @Test func arrivalRefreshPolicyPollsOnlyStationsInTheViewport() {
+        let nearby = [
+            NearbyStation(
+                station: station(id: "one", name: "One", latitude: 51.501, hubID: nil),
+                distance: 100
+            ),
+            NearbyStation(
+                station: station(id: "two", name: "Two", latitude: 51.502, hubID: nil),
+                distance: 200
+            ),
+            NearbyStation(
+                station: station(id: "three", name: "Three", latitude: 51.503, hubID: nil),
+                distance: 300
+            ),
+            NearbyStation(
+                station: station(id: "four", name: "Four", latitude: 51.504, hubID: nil),
+                distance: 400
+            ),
+        ]
+
+        let visible = NearMeArrivalRefreshPolicy.visibleStations(
+            from: nearby,
+            visibleStationIDs: ["two", "three"]
+        )
+        let manualFallback = NearMeArrivalRefreshPolicy.stationsForManualRefresh(
+            from: nearby,
+            visibleStationIDs: [],
+            fallbackCount: 3
+        )
+
+        #expect(visible.map(\.id) == ["two", "three"])
+        #expect(manualFallback.map(\.id) == ["one", "two", "three"])
     }
 
     @Test func statusConditionsDistinguishMinorAndMajorDisruptions() {

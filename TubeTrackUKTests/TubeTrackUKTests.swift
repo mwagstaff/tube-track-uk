@@ -838,6 +838,24 @@ struct TubeTrackUKTests {
         #expect(!appState.isLoadingLiveTrains)
     }
 
+    @Test @MainActor func rateLimitedLiveTrainsKeepLoadingAndRetryAutomatically() async throws {
+        let trainService = RateLimitedThenSuccessfulTrainFetcher()
+        let appState = TubeAppState(trainService: trainService)
+
+        appState.setLiveTrains(true)
+
+        #expect(appState.showLiveTrains)
+        #expect(appState.isLoadingLiveTrains)
+
+        try await Task.sleep(for: .milliseconds(150))
+
+        #expect(await trainService.attemptCount == 2)
+        #expect(appState.liveTrains.count == 1)
+        #expect(!appState.isLoadingLiveTrains)
+
+        appState.setLiveTrains(false)
+    }
+
     @Test func mapDockControlsUseTheSharedCompactHeight() {
         #expect(MapDockMetrics.controlSize == 44)
     }
@@ -1090,4 +1108,32 @@ struct TubeTrackUKTests {
         }
     }
 
+}
+
+private actor RateLimitedThenSuccessfulTrainFetcher: LiveTrainFetching {
+    private(set) var attemptCount = 0
+
+    func fetch(lineIDs: Set<TubeLineID>) async throws -> [LiveTubeTrain] {
+        attemptCount += 1
+        if attemptCount == 1 {
+            // The production retry adds a short boundary grace period. A
+            // nearly elapsed window keeps this regression test fast.
+            throw TfLClientError.rateLimited(
+                retryAfter: Date.now.addingTimeInterval(-0.49)
+            )
+        }
+        return [LiveTubeTrain(
+            id: "victoria:test",
+            vehicleID: "test",
+            lineID: .victoria,
+            destination: "Brixton",
+            direction: "southbound",
+            previousStationID: "a",
+            nextStationID: "b",
+            segmentID: "segment",
+            progress: 0.25,
+            secondsToNextStation: 90,
+            updatedAt: .now
+        )]
+    }
 }
