@@ -26,7 +26,7 @@ struct BeckMapTests {
         #expect(summary.count(for: .lines) == 11)
         #expect(summary.goodServiceLineIDs == [.circle])
         #expect(summary.minorDelayLineIDs == [.victoria])
-        #expect(summary.disruptedLineIDs == [.central, .victoria])
+        #expect(summary.disruptedLineIDs == [.central, .district, .victoria])
         #expect(summary.closedLineIDs == [.district])
     }
 

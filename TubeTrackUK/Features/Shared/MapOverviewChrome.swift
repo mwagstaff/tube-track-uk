@@ -40,7 +40,9 @@ struct MapOverviewHeader: View {
                 expanded: effectiveExpanded,
                 headlineOnly: compactForZoom && !zoomedDisruptionsExpanded
             )
-            .opacity(compactForZoom && !zoomedDisruptionsExpanded ? 0.5 : 1)
+            .opacity(
+                zoomedDisruptionsExpanded ? 1 : max(0.5, overviewOpacity)
+            )
         }
         .padding(.horizontal, 14)
         .padding(.top, 6)
@@ -429,6 +431,7 @@ struct MapNetworkStatsCard: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(filter.title), \(value)")
         .accessibilityHint(selected ? "Shows all lines" : "Highlights matching lines on the map")
+        .accessibilityAddTraits(.isButton)
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 

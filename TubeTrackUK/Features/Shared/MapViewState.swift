@@ -99,7 +99,6 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
             return line.id
         })
         let disrupted = Set(disruptions.lazy.map(\.lineID).filter(\.isUnderground))
-            .subtracting(closed)
 
         lineIDs = Set(TubeLineID.undergroundCases)
         goodServiceLineIDs = goodService
