@@ -137,13 +137,36 @@ struct LiveStatusDock: View {
 
 struct MapStatusDock: View {
     @Binding var expanded: Bool
+    let onReset: (() -> Void)?
+    let showsClosestStationRestore: Bool
+    let restoreIconPulses: Bool
+    let onRestoreClosestStation: () -> Void
+
+    init(
+        expanded: Binding<Bool>,
+        onReset: (() -> Void)? = nil,
+        showsClosestStationRestore: Bool = false,
+        restoreIconPulses: Bool = false,
+        onRestoreClosestStation: @escaping () -> Void = {}
+    ) {
+        _expanded = expanded
+        self.onReset = onReset
+        self.showsClosestStationRestore = showsClosestStationRestore
+        self.restoreIconPulses = restoreIconPulses
+        self.onRestoreClosestStation = onRestoreClosestStation
+    }
 
     var body: some View {
         GlassEffectContainer(spacing: 8) {
-            HStack(alignment: .bottom, spacing: 8) {
+            VStack(spacing: 8) {
                 LiveStatusDock(expanded: $expanded)
-                    .layoutPriority(1)
-                MapActionButtons()
+                MapActionButtons(
+                    onReset: onReset,
+                    showsNavigationControls: onReset != nil,
+                    showsClosestStationRestore: showsClosestStationRestore,
+                    restoreIconPulses: restoreIconPulses,
+                    onRestoreClosestStation: onRestoreClosestStation
+                )
                     .fixedSize()
             }
         }
@@ -225,6 +248,7 @@ struct DisruptionDateMenu: View {
     @Environment(TubeAppState.self) private var appState
     @State private var showsCustomDatePicker = false
     @State private var draftDate = Date.now
+    var compact = false
 
     private var today: Date {
         DisruptionDateSelection.today.date()
@@ -272,15 +296,18 @@ struct DisruptionDateMenu: View {
             HStack(spacing: 7) {
                 Image(systemName: "calendar")
                     .foregroundStyle(Color(uiColor: .label))
-                Text(selectionTitle)
-                    .font(.subheadline.weight(.semibold))
-                    .lineLimit(1)
-                    .foregroundStyle(Color(uiColor: .label))
-                Image(systemName: "chevron.up.chevron.down")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(Color(uiColor: .secondaryLabel))
+                if !compact {
+                    Text(selectionTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .foregroundStyle(Color(uiColor: .label))
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(Color(uiColor: .secondaryLabel))
+                }
             }
-            .padding(.horizontal, 12)
+            .padding(.horizontal, compact ? 0 : 12)
+            .frame(width: compact ? 44 : nil)
             .frame(minHeight: 44)
             .contentShape(.capsule)
         }

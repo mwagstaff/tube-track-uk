@@ -16,6 +16,12 @@ struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
 
     var isGoodService: Bool { statusSeverity == 10 || statusSeverity == 18 }
 
+    var isServiceClosed: Bool {
+        statusSeverity == 20
+            || statusSeverityDescription.localizedCaseInsensitiveCompare("Service Closed")
+                == .orderedSame
+    }
+
     var isOvernightClosure: Bool {
         guard statusSeverity == 20 else { return false }
         let text = reason?.lowercased() ?? ""

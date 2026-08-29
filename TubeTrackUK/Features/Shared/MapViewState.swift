@@ -1,5 +1,6 @@
 import CoreGraphics
 import MapKit
+import SwiftUI
 
 enum MapPresentationMode: String, CaseIterable, Identifiable, Sendable {
     case beck
@@ -34,6 +35,91 @@ enum MapPresentationMode: String, CaseIterable, Identifiable, Sendable {
 
     var switchActionSymbol: String {
         toggled.symbol
+    }
+}
+
+enum MapNetworkStatFilter: String, CaseIterable, Identifiable, Sendable {
+    case lines
+    case goodService
+    case minorDelays
+    case disrupted
+    case closed
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .lines: "Lines"
+        case .goodService: "Good service"
+        case .minorDelays: "Minor delays"
+        case .disrupted: "Disrupted"
+        case .closed: "Closed"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .lines: "tram.fill"
+        case .goodService: "circle.fill"
+        case .minorDelays: "circle.fill"
+        case .disrupted: "circle.fill"
+        case .closed: "minus.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .lines: .tubeBlue
+        case .goodService: .green
+        case .minorDelays: .orange
+        case .disrupted: .red
+        case .closed: .gray
+        }
+    }
+}
+
+struct MapNetworkStatusSummary: Equatable, Sendable {
+    let lineIDs: Set<TubeLineID>
+    let goodServiceLineIDs: Set<TubeLineID>
+    let minorDelayLineIDs: Set<TubeLineID>
+    let disruptedLineIDs: Set<TubeLineID>
+    let closedLineIDs: Set<TubeLineID>
+
+    init(statuses: [TfLLineStatus], disruptions: [ResolvedDisruption]) {
+        let undergroundStatuses = statuses.filter(\.id.isUnderground)
+        let closed: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
+            line.lineStatuses.contains { $0.isServiceClosed } ? line.id : nil
+        })
+        let minorDelays: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
+            line.lineStatuses.contains { $0.statusSeverity == 9 } ? line.id : nil
+        })
+        let goodService: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
+            guard !closed.contains(line.id), !line.lineStatuses.isEmpty,
+                  line.lineStatuses.allSatisfy(\.isGoodService) else { return nil }
+            return line.id
+        })
+        let disrupted = Set(disruptions.lazy.map(\.lineID).filter(\.isUnderground))
+            .subtracting(closed)
+
+        lineIDs = Set(TubeLineID.undergroundCases)
+        goodServiceLineIDs = goodService
+        minorDelayLineIDs = minorDelays
+        disruptedLineIDs = disrupted
+        closedLineIDs = closed
+    }
+
+    func lineIDs(for filter: MapNetworkStatFilter) -> Set<TubeLineID> {
+        switch filter {
+        case .lines: lineIDs
+        case .goodService: goodServiceLineIDs
+        case .minorDelays: minorDelayLineIDs
+        case .disrupted: disruptedLineIDs
+        case .closed: closedLineIDs
+        }
+    }
+
+    func count(for filter: MapNetworkStatFilter) -> Int {
+        lineIDs(for: filter).count
     }
 }
 
@@ -75,6 +161,7 @@ struct SharedMapViewport: Equatable, Sendable {
 
 struct BeckMapCameraSnapshot: Equatable, Sendable {
     let scale: Double
+    let fittedScale: Double
     let offsetX: Double
     let offsetY: Double
     let viewportWidth: Double

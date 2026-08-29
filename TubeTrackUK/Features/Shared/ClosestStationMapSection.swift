@@ -38,6 +38,10 @@ struct ClosestStationMapSection: View {
             }
         }
         .task {
+            // Let the launch/foreground photograph complete its reveal before
+            // presenting a first-run system permission sheet above it.
+            try? await Task.sleep(for: .seconds(1.6))
+            guard !Task.isCancelled else { return }
             locationProvider.requestLocation()
         }
         .task(id: closestStation?.id) {

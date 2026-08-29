@@ -4,6 +4,120 @@ import Testing
 @testable import TubeTrackUK
 
 struct BeckMapTests {
+    @Test func networkSummaryDeduplicatesAffectedLinesAndSeparatesClosures() {
+        let statuses = [
+            status(.central, severity: 6, description: "Severe Delays"),
+            status(.circle, severity: 10, description: "Good Service"),
+            status(.district, severity: 20, description: "Service Closed"),
+            status(.victoria, severity: 9, description: "Minor Delays"),
+        ]
+        let disruptions = [
+            disruption("central-one", lineID: .central, segmentID: "central-1"),
+            disruption("central-two", lineID: .central, segmentID: "central-2"),
+            disruption("victoria", lineID: .victoria, segmentID: "victoria-1"),
+            disruption("closed", lineID: .district, segmentID: "district-1"),
+        ]
+
+        let summary = MapNetworkStatusSummary(
+            statuses: statuses,
+            disruptions: disruptions
+        )
+
+        #expect(summary.count(for: .lines) == 11)
+        #expect(summary.goodServiceLineIDs == [.circle])
+        #expect(summary.minorDelayLineIDs == [.victoria])
+        #expect(summary.disruptedLineIDs == [.central, .victoria])
+        #expect(summary.closedLineIDs == [.district])
+    }
+
+    @Test func networkFiltersMuteNonMatchingRoutesAndPreserveSectionPrecision() {
+        let filtered = BeckMapPresentationSnapshot(
+            selectedLineID: nil,
+            selectedStationID: nil,
+            affectedSegmentIDs: ["central-affected"],
+            affectedStationIDs: [],
+            disruptionDisplayMode: .normal,
+            networkFilter: .disrupted,
+            networkFeaturedLineIDs: [.central, .victoria],
+            networkFeaturedSegmentIDs: ["central-affected"],
+            networkSectionLineIDs: [.central],
+            closedLineIDs: [.district]
+        )
+
+        #expect(!filtered.mutesSegment(
+            id: "central-affected", lineID: .central, isAffected: true
+        ))
+        #expect(filtered.mutesSegment(
+            id: "central-normal", lineID: .central, isAffected: false
+        ))
+        #expect(!filtered.mutesSegment(
+            id: "victoria-fallback", lineID: .victoria, isAffected: false
+        ))
+        #expect(filtered.mutesSegment(
+            id: "circle", lineID: .circle, isAffected: false
+        ))
+
+        let defaultView = BeckMapPresentationSnapshot(
+            selectedLineID: nil,
+            selectedStationID: nil,
+            affectedSegmentIDs: [],
+            affectedStationIDs: [],
+            disruptionDisplayMode: .normal,
+            networkFilter: nil,
+            networkFeaturedLineIDs: [],
+            networkFeaturedSegmentIDs: [],
+            networkSectionLineIDs: [],
+            closedLineIDs: [.district]
+        )
+        #expect(defaultView.mutesSegment(
+            id: "district", lineID: .district, isAffected: false
+        ))
+        #expect(!defaultView.mutesSegment(
+            id: "circle", lineID: .circle, isAffected: false
+        ))
+    }
+
+    @Test func overviewChromeFadesRelativeToTheFittedCameraScale() {
+        #expect(BeckMapOverviewVisibilityPolicy.opacity(
+            at: 0.2,
+            fittedScale: 0.2
+        ) == 1)
+        let partiallyVisible = BeckMapOverviewVisibilityPolicy.opacity(
+            at: 0.26,
+            fittedScale: 0.2
+        )
+        #expect(partiallyVisible > 0)
+        #expect(partiallyVisible < 1)
+        #expect(BeckMapOverviewVisibilityPolicy.opacity(
+            at: 0.32,
+            fittedScale: 0.2
+        ) == 0)
+    }
+
+    @Test func reducedMotionSwitchesOverviewChromeWithoutAnIntermediateFade() {
+        #expect(BeckMapOverviewVisibilityPolicy.opacity(
+            at: 0.2,
+            fittedScale: 0.2,
+            reduceMotion: true
+        ) == 1)
+        #expect(BeckMapOverviewVisibilityPolicy.opacity(
+            at: 0.32,
+            fittedScale: 0.2,
+            reduceMotion: true
+        ) == 0)
+    }
+
+    @Test func closestStationAutoHidesAfterAUsefulZoomIncrease() {
+        #expect(!BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+            at: 0.27,
+            fittedScale: 0.2
+        ))
+        #expect(BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+            at: 0.28,
+            fittedScale: 0.2
+        ))
+    }
+
     @Test func darkPalettePreservesEveryCanonicalRouteColour() {
         for lineID in TubeLineID.allCases {
             #expect(
@@ -15,6 +129,44 @@ struct BeckMapTests {
         #expect(
             Color.tubeLine(.tram)
                 == Color(red: 105.0 / 255.0, green: 194.0 / 255.0, blue: 47.0 / 255.0)
+        )
+    }
+
+    private func status(
+        _ lineID: TubeLineID,
+        severity: Int,
+        description: String
+    ) -> TfLLineStatus {
+        TfLLineStatus(
+            id: lineID,
+            name: lineID.displayName,
+            lineStatuses: [
+                TfLStatusEntry(
+                    id: severity,
+                    statusSeverity: severity,
+                    statusSeverityDescription: description,
+                    reason: nil,
+                    validityPeriods: nil,
+                    disruption: nil
+                )
+            ]
+        )
+    }
+
+    private func disruption(
+        _ id: String,
+        lineID: TubeLineID,
+        segmentID: String
+    ) -> ResolvedDisruption {
+        ResolvedDisruption(
+            id: id,
+            lineID: lineID,
+            title: "Disruption",
+            reason: "Testing",
+            severity: 6,
+            affectedStationIDs: [],
+            affectedSegmentIDs: [segmentID],
+            confidence: .exact
         )
     }
 

@@ -105,6 +105,7 @@ final class TubeAppState {
     var sharedMapViewport: SharedMapViewport?
     var beckMapCameraSnapshot: BeckMapCameraSnapshot?
     var disruptionDisplayMode: DisruptionDisplayMode = .normal
+    var selectedMapNetworkStat: MapNetworkStatFilter?
     var disruptionDateSelection: DisruptionDateSelection = .today
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
@@ -275,6 +276,10 @@ final class TubeAppState {
 
     var highlightedDisruptions: [ResolvedDisruption] {
         visibleDisruptions.filter { highlightedDisruptionCategories.contains($0.category) }
+    }
+
+    var mapNetworkStatusSummary: MapNetworkStatusSummary {
+        MapNetworkStatusSummary(statuses: statuses, disruptions: visibleDisruptions)
     }
 
     var activeAffectedSegmentIDs: Set<String> {
@@ -487,6 +492,7 @@ final class TubeAppState {
     }
 
     func toggleDisruptionHighlighting() {
+        selectedMapNetworkStat = nil
         if disruptionDisplayMode == .issues {
             disruptionDisplayMode = .normal
         } else {
@@ -495,6 +501,7 @@ final class TubeAppState {
     }
 
     func enableDisruptionHighlighting() {
+        selectedMapNetworkStat = nil
         disruptionDisplayMode = .issues
         if highlightedDisruptionCategories.isEmpty {
             highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
@@ -601,6 +608,7 @@ final class TubeAppState {
     }
 
     func select(disruption: ResolvedDisruption) {
+        selectedMapNetworkStat = nil
         clearStationSelection()
         selectedDisruptionID = disruption.id
         selectedEngineeringWorkID = engineeringWork(
@@ -612,6 +620,12 @@ final class TubeAppState {
         focusedLineIDs = []
         focusedResolutionConfidence = nil
         disruptionDisplayMode = .issues
+    }
+
+    func toggleMapNetworkStat(_ filter: MapNetworkStatFilter) {
+        clearMapSelection()
+        disruptionDisplayMode = .normal
+        selectedMapNetworkStat = selectedMapNetworkStat == filter ? nil : filter
     }
 
     func focus(on work: EngineeringWork, in tab: AppTab) {

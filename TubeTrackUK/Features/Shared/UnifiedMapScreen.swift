@@ -12,12 +12,17 @@ struct UnifiedMapScreen: View {
     @State private var transitionTask: Task<Void, Never>?
     @State private var restorePulseTask: Task<Void, Never>?
     @State private var restoreIconPulses = false
+    @State private var zoomedDisruptionsExpanded = false
 
     var body: some View {
         ZStack {
             BeckMapScreen(
                 resetToken: resetToken,
-                contentVerticalBias: closestStationPanelHidden ? 0 : 84
+                contentVerticalBias: closestStationPanelHidden ? 0 : 84,
+                onUserZoomIn: {
+                    guard !closestStationPanelHidden else { return }
+                    setClosestStationPanel(hidden: true)
+                }
             )
                 .opacity(beckRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .beck)
@@ -38,16 +43,17 @@ struct UnifiedMapScreen: View {
             }
         }
         .overlay(alignment: .top) {
-            VStack(spacing: 6) {
-                MapToolbar { resetToken += 1 }
-                    .tint(.tubeBlue)
+            ZStack(alignment: .top) {
+                if appState.mapPresentationMode == .beck {
+                    MapOverviewHeader(
+                        disruptionsExpanded: $statusExpanded,
+                        zoomedDisruptionsExpanded: $zoomedDisruptionsExpanded,
+                        overviewOpacity: overviewOpacity,
+                        compactForZoom: compactOverviewForZoom
+                    )
+                }
 
                 HStack {
-                    if closestStationPanelHidden {
-                        closestStationRestoreButton
-                            .transition(.scale(scale: 0.78).combined(with: .opacity))
-                    }
-
                     Spacer()
                     Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
                         Text("© OpenStreetMap contributors")
@@ -62,6 +68,7 @@ struct UnifiedMapScreen: View {
                     .accessibilityHidden(appState.mapPresentationMode != .realWorld)
                 }
                 .padding(.horizontal, 12)
+                .padding(.top, 6)
             }
         }
         .overlay(alignment: .bottom) {
@@ -105,6 +112,11 @@ struct UnifiedMapScreen: View {
                 restoreIconPulses = false
             }
         }
+        .onChange(of: compactOverviewForZoom) { _, compact in
+            if !compact {
+                zoomedDisruptionsExpanded = false
+            }
+        }
         .task(id: appState.graph?.generatedAt) {
             guard let graph = appState.graph else {
                 morphGeometry = nil
@@ -141,26 +153,27 @@ struct UnifiedMapScreen: View {
             : Double(max(0, min(1, (layoutProgress - 0.58) * 2.4)))
     }
 
-    private var closestStationRestoreButton: some View {
-        Button {
-            setClosestStationPanel(hidden: false)
-        } label: {
-            Image(systemName: "location.fill")
-                .font(.headline.weight(.bold))
-                .foregroundStyle(Color.tubeBlue)
-                .frame(width: 48, height: 48)
-                .contentShape(.circle)
+    private var overviewOpacity: Double {
+        guard appState.mapPresentationMode == .beck,
+              let camera = appState.beckMapCameraSnapshot else {
+            return appState.mapPresentationMode == .beck ? 1 : 0
         }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .circle)
-        .overlay {
-            Circle()
-                .stroke(Color.tubeBlue.opacity(restoreIconPulses ? 0 : 0.55), lineWidth: 2)
-                .scaleEffect(restoreIconPulses ? 1.48 : 0.84)
-                .allowsHitTesting(false)
-        }
-        .accessibilityLabel("Show closest station")
-        .accessibilityHint("Restores live departures above the Map tab bar")
+        return BeckMapOverviewVisibilityPolicy.opacity(
+            at: camera.scale,
+            fittedScale: camera.fittedScale,
+            reduceMotion: reduceMotion
+        )
+    }
+
+    private var compactOverviewForZoom: Bool {
+        appState.mapPresentationMode == .beck && overviewOpacity <= 0.5
+    }
+
+    private var hasMapSelection: Bool {
+        appState.selectedStation != nil
+            || appState.selectedEngineeringWork != nil
+            || appState.selectedDisruption != nil
+            || appState.selectedLineID != nil
     }
 
     private func setClosestStationPanel(hidden: Bool) {
@@ -215,12 +228,54 @@ struct UnifiedMapScreen: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            if statusExpanded {
-                LiveStatusPanel(expanded: $statusExpanded)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            if appState.mapPresentationMode == .beck {
+                if !hasMapSelection, !statusExpanded, overviewOpacity > 0.01 {
+                    MapExploreHint()
+                        .opacity(overviewOpacity)
+                        .allowsHitTesting(false)
+                        .transition(.opacity)
+
+                    MapNetworkStatsCard()
+                        .padding(.horizontal, 12)
+                        .opacity(overviewOpacity)
+                        .allowsHitTesting(overviewOpacity > 0.12)
+                        .accessibilityHidden(overviewOpacity <= 0.12)
+                        .transition(.opacity)
+                }
+
+                MapActionButtons(
+                    onReset: { resetToken += 1 },
+                    showsNavigationControls: true,
+                    showsClosestStationRestore: closestStationPanelHidden,
+                    restoreIconPulses: restoreIconPulses,
+                    onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
+                )
+                .padding(.horizontal, 12)
+                .frame(maxWidth: .infinity)
             } else {
-                MapStatusDock(expanded: $statusExpanded)
+                if statusExpanded {
+                    LiveStatusPanel(expanded: $statusExpanded)
+                        .padding(.horizontal, 12)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+
+                    MapActionButtons(
+                        onReset: { resetToken += 1 },
+                        showsNavigationControls: true,
+                        showsClosestStationRestore: closestStationPanelHidden,
+                        restoreIconPulses: restoreIconPulses,
+                        onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
+                    )
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity)
+                } else {
+                    MapStatusDock(
+                        expanded: $statusExpanded,
+                        onReset: { resetToken += 1 },
+                        showsClosestStationRestore: closestStationPanelHidden,
+                        restoreIconPulses: restoreIconPulses,
+                        onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
+                    )
+                }
             }
 
             if !closestStationPanelHidden {

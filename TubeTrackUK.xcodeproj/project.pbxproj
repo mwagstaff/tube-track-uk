@@ -22,9 +22,22 @@
 		A10000000000000000000040 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A10000000000000000000051 /* Exceptions for "TubeTrackUK" folder in "TubeTrackUK" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Images,
+			);
+			target = A10000000000000000000010 /* TubeTrackUK */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A10000000000000000000004 /* TubeTrackUK */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A10000000000000000000051 /* Exceptions for "TubeTrackUK" folder in "TubeTrackUK" target */,
+			);
 			path = TubeTrackUK;
 			sourceTree = "<group>";
 		};
@@ -90,6 +103,7 @@
 				A10000000000000000000012 /* Sources */,
 				A10000000000000000000011 /* Frameworks */,
 				A10000000000000000000013 /* Resources */,
+				A10000000000000000000050 /* Copy Background Images */,
 			);
 			buildRules = (
 			);
@@ -183,6 +197,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A10000000000000000000050 /* Copy Background Images */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/TubeTrackUK/Images",
+				"$(SRCROOT)/Tools/copy_background_images.zsh",
+			);
+			name = "Copy Background Images";
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/BackgroundImages/manifest.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/zsh;
+			shellScript = "/bin/zsh \"$SRCROOT/Tools/copy_background_images.zsh\" \"$SRCROOT/TubeTrackUK/Images\" \"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/BackgroundImages\" \"$DERIVED_FILE_DIR/OptimizedBackgroundImages-2560-q78\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		A10000000000000000000012 /* Sources */ = {

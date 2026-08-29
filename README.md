@@ -70,6 +70,19 @@ For detailed geographic geometry, pass a reproducible OSM PBF containing
 Reviewed OSM geometry for every supported TfL rail line is retained during
 API-only refreshes; TfL route geometry is used as the fallback.
 
+## Background images
+
+Add background photographs anywhere under `TubeTrackUK/Images`. The app target's
+`Copy Background Images` build phase discovers JPEG, PNG, HEIC, HEIF and WebP
+files recursively, converts them to cached JPEGs with a maximum 2,560-pixel edge
+and quality 78, copies only those optimized versions into the built app, and
+generates the manifest used for hourly random rotation. Adding or removing a
+photograph does not require an Xcode project-file change.
+
+Unsplash filenames should retain the
+`artist-name-11_character_photo_ID-unsplash` form. The Profile screen uses this
+to generate the artist credit and link to the photograph automatically.
+
 ## Attribution
 
 Data provided by Transport for London. The real-world view uses Apple MapKit

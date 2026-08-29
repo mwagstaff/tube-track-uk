@@ -32,6 +32,7 @@ struct TfLAPIKeyScreen: View {
         }
         .navigationTitle("TfL API key")
         .navigationBarTitleDisplayMode(.inline)
+        .appBackgroundPage()
         .alert("Couldn’t update API key", isPresented: errorIsPresented) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -50,7 +51,7 @@ struct TfLAPIKeyScreen: View {
     }
 
     private var registrationSection: some View {
-        Section("Get a free key") {
+        Section {
             Text("TfL allows standard access at up to 50 requests per minute. A free API key raises that allowance to up to 500 requests per minute.")
 
             VStack(alignment: .leading, spacing: 10) {
@@ -63,6 +64,8 @@ struct TfLAPIKeyScreen: View {
             Link(destination: portalURL) {
                 Label("Open TfL API Portal", systemImage: "arrow.up.right.square")
             }
+        } header: {
+            AppBackgroundSectionHeader(title: "Get a free key")
         }
     }
 
@@ -83,7 +86,9 @@ struct TfLAPIKeyScreen: View {
             }
             .disabled(!canSave)
         } header: {
-            Text(appState.isTfLAPIKeyConfigured ? "Replace key" : "API key")
+            AppBackgroundSectionHeader(
+                title: appState.isTfLAPIKeyConfigured ? "Replace key" : "API key"
+            )
         } footer: {
             Text("TubeTrack UK sends app_key with API requests. An app_id is not required.")
         }

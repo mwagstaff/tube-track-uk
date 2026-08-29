@@ -7,9 +7,31 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let affectedSegmentIDs: Set<String>
     let affectedStationIDs: Set<String>
     let disruptionDisplayMode: DisruptionDisplayMode
+    let networkFilter: MapNetworkStatFilter?
+    let networkFeaturedLineIDs: Set<TubeLineID>
+    let networkFeaturedSegmentIDs: Set<String>
+    let networkSectionLineIDs: Set<TubeLineID>
+    let closedLineIDs: Set<TubeLineID>
 
     var emphasizesIssues: Bool {
-        disruptionDisplayMode == .issues
+        disruptionDisplayMode == .issues || networkFilter == .disrupted
+    }
+
+    func mutesSegment(id: String, lineID: TubeLineID, isAffected: Bool) -> Bool {
+        if let networkFilter {
+            switch networkFilter {
+            case .lines:
+                return false
+            case .disrupted:
+                guard networkFeaturedLineIDs.contains(lineID) else { return true }
+                guard networkSectionLineIDs.contains(lineID) else { return false }
+                return !networkFeaturedSegmentIDs.contains(id)
+            case .goodService, .minorDelays, .closed:
+                return !networkFeaturedLineIDs.contains(lineID)
+            }
+        }
+        if closedLineIDs.contains(lineID) { return true }
+        return disruptionDisplayMode.mutesSegment(isAffected: isAffected)
     }
 }
 
@@ -17,6 +39,7 @@ struct BeckMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     let resetToken: Int
     let contentVerticalBias: CGFloat
+    let onUserZoomIn: () -> Void
     @State private var document: BeckMapDocument?
     @State private var renderCache: BeckMapCanvas.RenderCache?
     @State private var documentLoadError: String?
@@ -49,6 +72,7 @@ struct BeckMapScreen: View {
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
                     contentVerticalBias: contentVerticalBias,
+                    onUserZoomIn: onUserZoomIn,
                     stationSelectionGeneration: appState.stationSelectionGeneration,
                     onStationTap: { stationID in
                         guard let station = graph.stationsByID[stationID] else { return }
@@ -144,8 +168,23 @@ struct BeckMapScreen: View {
     ) -> BeckMapPresentationSnapshot {
         let projector = BeckMapAffectedSegmentProjector(document: document, graph: graph)
         let affectedSegmentIDs: Set<String>
+        let networkSummary = appState.mapNetworkStatusSummary
+        let networkFilter = appState.selectedMapNetworkStat
+        let networkFeaturedLineIDs = networkFilter.map(networkSummary.lineIDs(for:)) ?? []
+        var networkFeaturedSegmentIDs: Set<String> = []
+        var networkSectionLineIDs: Set<TubeLineID> = []
 
-        if appState.hasFocusedMapSection {
+        if networkFilter == .disrupted {
+            for disruption in appState.visibleDisruptions
+                where networkFeaturedLineIDs.contains(disruption.lineID) {
+                let projectedIDs = projector.projectedSegmentIDs(for: disruption)
+                networkFeaturedSegmentIDs.formUnion(projectedIDs)
+                if !projectedIDs.isEmpty {
+                    networkSectionLineIDs.insert(disruption.lineID)
+                }
+            }
+            affectedSegmentIDs = networkFeaturedSegmentIDs
+        } else if appState.hasFocusedMapSection {
             let lineIDs = appState.focusedLineIDs.isEmpty
                 ? Set(appState.selectedLineID.map { [$0] } ?? [])
                 : appState.focusedLineIDs
@@ -169,7 +208,12 @@ struct BeckMapScreen: View {
             selectedStationID: appState.selectedStationID,
             affectedSegmentIDs: affectedSegmentIDs,
             affectedStationIDs: appState.activeAffectedStationIDs,
-            disruptionDisplayMode: appState.disruptionDisplayMode
+            disruptionDisplayMode: appState.disruptionDisplayMode,
+            networkFilter: networkFilter,
+            networkFeaturedLineIDs: networkFeaturedLineIDs,
+            networkFeaturedSegmentIDs: networkFeaturedSegmentIDs,
+            networkSectionLineIDs: networkSectionLineIDs,
+            closedLineIDs: networkSummary.closedLineIDs
         )
     }
 
@@ -202,6 +246,7 @@ private struct BeckMapCanvas: View {
     let referenceOverlayVisible: Bool
     let resetToken: Int
     let contentVerticalBias: CGFloat
+    let onUserZoomIn: () -> Void
     let stationSelectionGeneration: Int
     let onStationTap: (String) -> Void
     let onDisruptionTap: (String) -> Void
@@ -235,6 +280,7 @@ private struct BeckMapCanvas: View {
         referenceOverlayVisible: Bool,
         resetToken: Int,
         contentVerticalBias: CGFloat,
+        onUserZoomIn: @escaping () -> Void,
         stationSelectionGeneration: Int,
         onStationTap: @escaping (String) -> Void,
         onDisruptionTap: @escaping (String) -> Void,
@@ -248,6 +294,7 @@ private struct BeckMapCanvas: View {
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
         self.contentVerticalBias = contentVerticalBias
+        self.onUserZoomIn = onUserZoomIn
         self.stationSelectionGeneration = stationSelectionGeneration
         self.onStationTap = onStationTap
         self.onDisruptionTap = onDisruptionTap
@@ -456,7 +503,11 @@ private struct BeckMapCanvas: View {
                         || presentation.selectedLineID == segment.lineID
                     let muted = !traceMode && (
                         !selected
-                            || presentation.disruptionDisplayMode.mutesSegment(isAffected: affected)
+                            || presentation.mutesSegment(
+                                id: segment.id,
+                                lineID: segment.lineID,
+                                isAffected: affected
+                            )
                     )
                     guard !muted else { continue }
                     mapContext.stroke(
@@ -477,7 +528,11 @@ private struct BeckMapCanvas: View {
                     || presentation.selectedLineID == segment.lineID
                 let muted = !traceMode && (
                     !selected
-                        || presentation.disruptionDisplayMode.mutesSegment(isAffected: affected)
+                        || presentation.mutesSegment(
+                            id: segment.id,
+                            lineID: segment.lineID,
+                            isAffected: affected
+                        )
                 )
                 mapContext.stroke(
                     segment.path,
@@ -1005,6 +1060,13 @@ private struct BeckMapCanvas: View {
             isPinching = true
             guard let startScale = pinchStartScale, let mapPoint = pinchMapPoint else { return }
             let nextScale = min(maximumCameraScale, max(minimumCameraScale, startScale * magnification))
+            if nextScale > cameraScale,
+               BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+                   at: nextScale,
+                   fittedScale: fittedCameraScale
+               ) {
+                onUserZoomIn()
+            }
             cameraScale = nextScale
             cameraOffset = CGSize(
                 width: location.x - mapPoint.x * nextScale,
@@ -1076,6 +1138,7 @@ private struct BeckMapCanvas: View {
     private func updateCameraSnapshot(in size: CGSize) {
         appState.beckMapCameraSnapshot = BeckMapCameraSnapshot(
             scale: cameraScale,
+            fittedScale: fittedCameraScale,
             offsetX: cameraOffset.width,
             offsetY: cameraOffset.height,
             viewportWidth: size.width,
@@ -2023,6 +2086,35 @@ enum BeckMapLabelVisibilityPolicy {
         case .network, .local, .minor:
             14
         }
+    }
+}
+
+enum BeckMapOverviewVisibilityPolicy {
+    static let fullyVisibleMaximumZoomRatio: Double = 1.08
+    static let hiddenZoomRatio: Double = 1.55
+    static let closestStationAutoHideZoomRatio: Double = 1.38
+
+    static func opacity(
+        at cameraScale: Double,
+        fittedScale: Double,
+        reduceMotion: Bool = false
+    ) -> Double {
+        let zoomRatio = cameraScale / max(0.000_001, fittedScale)
+        if reduceMotion {
+            return zoomRatio < hiddenZoomRatio ? 1 : 0
+        }
+        guard zoomRatio > fullyVisibleMaximumZoomRatio else { return 1 }
+        guard zoomRatio < hiddenZoomRatio else { return 0 }
+        let fadeProgress = (zoomRatio - fullyVisibleMaximumZoomRatio)
+            / (hiddenZoomRatio - fullyVisibleMaximumZoomRatio)
+        return 1 - fadeProgress
+    }
+
+    static func shouldHideClosestStation(
+        at cameraScale: Double,
+        fittedScale: Double
+    ) -> Bool {
+        cameraScale / max(0.000_001, fittedScale) >= closestStationAutoHideZoomRatio
     }
 }
 
