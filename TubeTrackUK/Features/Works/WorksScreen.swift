@@ -1,36 +1,95 @@
 import SwiftUI
 
-private enum WorksPeriod: String, CaseIterable, Identifiable {
-    case all = "All dates"
-    case weekend = "This weekend"
-    case thirtyDays = "Next 30 days"
+enum WorksDateSelection: Equatable, Sendable {
+    case today
+    case tomorrow
+    case saturday
+    case sunday
+    case custom(Date)
 
-    var id: Self { self }
+    func date(
+        relativeTo referenceDate: Date = .now,
+        calendar: Calendar = LondonRailDate.calendar
+    ) -> Date {
+        let today = calendar.startOfDay(for: referenceDate)
+        switch self {
+        case .today:
+            return today
+        case .tomorrow:
+            return calendar.date(byAdding: .day, value: 1, to: today) ?? today
+        case .saturday:
+            return next(
+                weekday: 7,
+                from: referenceDate,
+                calendar: calendar
+            )
+        case .sunday:
+            return next(
+                weekday: 1,
+                from: referenceDate,
+                calendar: calendar
+            )
+        case let .custom(date):
+            return calendar.startOfDay(for: date)
+        }
+    }
+
+    private func next(
+        weekday: Int,
+        from referenceDate: Date,
+        calendar: Calendar
+    ) -> Date {
+        let today = calendar.startOfDay(for: referenceDate)
+        let currentWeekday = calendar.component(.weekday, from: today)
+        let inclusiveOffset = (weekday - currentWeekday + 7) % 7
+        let dayOffset = inclusiveOffset == 0 ? 7 : inclusiveOffset
+        return calendar.date(byAdding: .day, value: dayOffset, to: today) ?? today
+    }
+}
+
+private struct WorksQuickDate: Identifiable {
+    let title: String
+    let selection: WorksDateSelection
+
+    var id: String { title }
 }
 
 struct WorksScreen: View {
     @Environment(TubeAppState.self) private var appState
-    @State private var period: WorksPeriod = .all
+    @State private var dateSelection: WorksDateSelection = .today
     @State private var selectedLine: TubeLineID?
     @State private var selectedWork: EngineeringWork?
+    @State private var showsDatePicker = false
+    @State private var draftDate = Date.now
 
-    private var filteredWorks: [EngineeringWork] {
-        appState.engineeringWorks.filter { work in
-            let matchesLine = selectedLine.map { work.lineIDs.contains($0) } ?? true
-            return matchesLine && matchesPeriod(work)
-        }
+    private var selectedDate: Date {
+        dateSelection.date()
     }
 
-    private var groupedWorks: [(date: Date, works: [EngineeringWork])] {
-        let calendar = LondonRailDate.calendar
-        let groups = Dictionary(grouping: filteredWorks) { calendar.startOfDay(for: $0.startDate) }
-        return groups.keys.sorted().map { ($0, groups[$0, default: []].sorted { $0.startDate < $1.startDate }) }
+    private var quickDates: [WorksQuickDate] {
+        [
+            WorksQuickDate(title: "Today", selection: .today),
+            WorksQuickDate(title: "Tomorrow", selection: .tomorrow),
+            WorksQuickDate(title: "Saturday", selection: .saturday),
+            WorksQuickDate(title: "Sunday", selection: .sunday),
+        ]
+    }
+
+    private var filteredWorks: [EngineeringWork] {
+        LondonRailDate.works(
+            appState.engineeringWorks,
+            overlapping: selectedDate
+        )
+        .filter { work in
+            selectedLine.map { work.lineIDs.contains($0) } ?? true
+        }
+        .sorted { $0.startDate < $1.startDate }
     }
 
     var body: some View {
         NavigationStack {
             Group {
-                if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
+                if appState.isRefreshingWorks && filteredWorks.isEmpty {
                     ProgressView("Loading planned works…")
                 } else if filteredWorks.isEmpty {
                     emptyState
@@ -43,48 +102,73 @@ struct WorksScreen: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Menu {
-                        Picker("Date range", selection: $period) {
-                            ForEach(WorksPeriod.allCases) { Text($0.rawValue).tag($0) }
-                        }
+                    Button {
+                        draftDate = selectedDate
+                        showsDatePicker = true
                     } label: {
-                        Label("Filter works", systemImage: "line.3.horizontal.decrease.circle")
+                        Label("Choose date", systemImage: "calendar")
                     }
                 }
             }
             .safeAreaInset(edge: .top, spacing: 0) {
-                lineFilter
-                    .padding(.vertical, 7)
-                    .background(.bar)
+                VStack(spacing: 0) {
+                    lineFilter
+                    quickDateFilter
+                }
+                .padding(.vertical, 7)
+                .background(.bar)
             }
-            .refreshable { await appState.refreshWorks(forceRefresh: true) }
+            .refreshable {
+                await appState.refreshWorks(
+                    through: selectedDate,
+                    forceRefresh: true
+                )
+            }
             .sheet(item: $selectedWork) { WorkDetailView(work: $0) }
+            .sheet(isPresented: $showsDatePicker) {
+                customDatePicker
+            }
+            .task(id: selectedDate) {
+                await appState.refreshWorks(through: selectedDate)
+            }
+            .onAppear {
+                resetPastSelectionIfNeeded()
+            }
         }
     }
 
     private var worksList: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 14, pinnedViews: .sectionHeaders) {
-                ForEach(groupedWorks, id: \.date) { group in
-                    Section {
-                        ForEach(group.works) { work in
-                            Button { selectedWork = work } label: { WorkCard(work: work) }
-                                .buttonStyle(.plain)
-                        }
-                    } header: {
-                        Text(LondonRailDate.formatted(group.date, dateFormat: "EEEE d MMMM"))
-                            .font(.subheadline.weight(.bold))
-                            .textCase(.uppercase)
-                            .foregroundStyle(.secondary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.vertical, 7)
-                            .background(Color(.systemGroupedBackground))
+                Section {
+                    ForEach(filteredWorks) { work in
+                        Button { selectedWork = work } label: { WorkCard(work: work) }
+                            .buttonStyle(.plain)
                     }
+                } header: {
+                    Text(LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM"))
+                        .font(.subheadline.weight(.bold))
+                        .textCase(.uppercase)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.vertical, 7)
+                        .background(Color(.systemGroupedBackground))
                 }
             }
             .padding(16)
         }
         .scrollIndicators(.hidden)
+    }
+
+    private var quickDateFilter: some View {
+        HStack(spacing: 8) {
+            ForEach(quickDates) { quickDate in
+                quickDateButton(quickDate)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
     }
 
     private var lineFilter: some View {
@@ -117,33 +201,105 @@ struct WorksScreen: View {
         .buttonStyle(.plain)
     }
 
+    private func quickDateButton(_ quickDate: WorksQuickDate) -> some View {
+        let selected = dateSelection == quickDate.selection
+        let date = quickDate.selection.date()
+
+        return Button {
+            withAnimation(.easeInOut(duration: 0.2)) {
+                dateSelection = quickDate.selection
+            }
+        } label: {
+            VStack(spacing: 1) {
+                Text(quickDate.title)
+                    .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Text(LondonRailDate.formatted(date, dateFormat: "d MMM"))
+                    .font(.caption2)
+                    .opacity(selected ? 0.85 : 0.65)
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background {
+                Capsule(style: .continuous)
+                    .fill(selected ? Color.tubeBlue : Color.secondary.opacity(0.13))
+            }
+            .clipShape(Capsule(style: .continuous))
+            .contentShape(.capsule)
+            .foregroundStyle(selected ? .white : .primary)
+        }
+        .frame(maxWidth: .infinity)
+        .buttonStyle(.plain)
+        .accessibilityLabel(
+            "\(quickDate.title), \(LondonRailDate.formatted(date, dateFormat: "EEEE d MMMM yyyy"))"
+        )
+        .accessibilityValue(selected ? "Selected" : "Not selected")
+        .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
     private var emptyState: some View {
         ContentUnavailableView {
-            Label(appState.worksError == nil ? "No planned works" : "Works unavailable", systemImage: appState.worksError == nil ? "checkmark.circle" : "wifi.slash")
+            Label(
+                appState.worksError == nil ? "No planned works" : "Works unavailable",
+                systemImage: appState.worksError == nil ? "checkmark.circle" : "wifi.slash"
+            )
         } description: {
-            Text(appState.worksError ?? "No TfL engineering work matches these filters in the next 60 days.")
+            Text(appState.worksError ?? emptyStateDescription)
         } actions: {
-            Button("Refresh") { Task { await appState.refreshWorks(forceRefresh: true) } }
-                .buttonStyle(.borderedProminent)
+            Button("Refresh") {
+                Task {
+                    await appState.refreshWorks(
+                        through: selectedDate,
+                        forceRefresh: true
+                    )
+                }
+            }
+            .buttonStyle(.borderedProminent)
         }
     }
 
-    private func matchesPeriod(_ work: EngineeringWork) -> Bool {
-        switch period {
-        case .all:
-            return true
-        case .thirtyDays:
-            let end = LondonRailDate.calendar.date(byAdding: .day, value: 30, to: .now) ?? .now
-            return work.startDate <= end && work.endDate >= .now
-        case .weekend:
-            let calendar = LondonRailDate.calendar
-            let today = calendar.startOfDay(for: .now)
-            let weekday = calendar.component(.weekday, from: today)
-            let daysToSaturday = (7 - weekday + 7) % 7
-            let saturday = calendar.date(byAdding: .day, value: daysToSaturday, to: today) ?? today
-            let monday = calendar.date(byAdding: .day, value: 2, to: saturday) ?? saturday
-            return work.startDate < monday && work.endDate > saturday
+    private var emptyStateDescription: String {
+        let date = LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM")
+        if let selectedLine {
+            return "No TfL engineering work is reported for the \(selectedLine.displayName) line on \(date)."
         }
+        return "No TfL engineering work is reported for \(date)."
+    }
+
+    private var customDatePicker: some View {
+        NavigationStack {
+            DatePicker(
+                "Works date",
+                selection: $draftDate,
+                in: LondonRailDate.startOfDay(for: .now)...Date.distantFuture,
+                displayedComponents: .date
+            )
+            .datePickerStyle(.graphical)
+            .padding()
+            .navigationTitle("Choose a date")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { showsDatePicker = false }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        dateSelection = .custom(draftDate)
+                        showsDatePicker = false
+                    }
+                }
+            }
+        }
+        .environment(\.calendar, LondonRailDate.calendar)
+        .environment(\.timeZone, LondonRailDate.timeZone)
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
+    }
+
+    private func resetPastSelectionIfNeeded() {
+        let today = LondonRailDate.startOfDay(for: .now)
+        guard selectedDate < today else { return }
+        dateSelection = .today
     }
 }
 

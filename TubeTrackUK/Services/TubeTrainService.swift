@@ -69,11 +69,16 @@ actor TubeTrainService: LiveTrainFetching {
 
         var trains: [LiveTubeTrain] = nearestByVehicle.values.compactMap { nearest in
             let prediction = nearest.prediction
+            let resolvedDirection = LiveTrainDirection.resolved(
+                direction: prediction.direction,
+                platformName: prediction.platformName
+            )
             guard let previousStationID = repository.neighboringStation(
                       for: nearest.nextStationID,
                       on: nearest.lineID,
-                      direction: prediction.direction,
-                      destinationStationID: prediction.destinationNaptanId
+                      direction: resolvedDirection,
+                      destinationStationID: prediction.destinationNaptanId,
+                      currentLocation: prediction.currentLocation
                   ),
                   let segment = repository.segment(
                       between: previousStationID,
@@ -93,7 +98,7 @@ actor TubeTrainService: LiveTrainFetching {
                 vehicleID: nearest.vehicleID,
                 lineID: nearest.lineID,
                 destination: prediction.destinationName ?? prediction.towards,
-                direction: prediction.direction,
+                direction: resolvedDirection,
                 previousStationID: previousStationID,
                 nextStationID: nearest.nextStationID,
                 segmentID: segment.id,
@@ -255,7 +260,10 @@ enum TramVehicleRouteResolver {
             vehicleID: vehicleID,
             lineID: .tram,
             destination: nearest.prediction.destinationName ?? nearest.prediction.towards,
-            direction: nearest.prediction.direction ?? nearest.prediction.platformName,
+            direction: LiveTrainDirection.resolved(
+                direction: nearest.prediction.direction,
+                platformName: nearest.prediction.platformName
+            ),
             previousStationID: proposal.previousStationID,
             nextStationID: proposal.nextStationID,
             segmentID: segment.id,
@@ -511,7 +519,10 @@ enum DLRPredictionResolver {
                     vehicleID: "DLR-\(absoluteArrivalSlot)",
                     lineID: .dlr,
                     destination: observation.prediction.destinationName ?? observation.prediction.towards,
-                    direction: observation.prediction.direction ?? observation.prediction.platformName,
+                    direction: LiveTrainDirection.resolved(
+                        direction: observation.prediction.direction,
+                        platformName: observation.prediction.platformName
+                    ),
                     previousStationID: proposal.previousStationID,
                     nextStationID: proposal.nextStationID,
                     segmentID: segment.id,

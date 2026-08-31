@@ -36,14 +36,22 @@ enum MapPresentationMode: String, CaseIterable, Identifiable, Sendable {
     var switchActionSymbol: String {
         toggled.symbol
     }
+
+    var toggleNoticeMessage: String {
+        switch self {
+        case .beck: "Toggling network view"
+        case .realWorld: "Toggling map view"
+        }
+    }
 }
 
 enum MapNetworkStatFilter: String, CaseIterable, Identifiable, Sendable {
     case lines
     case goodService
     case minorDelays
-    case disrupted
+    case majorIssues
     case closed
+    case disrupted
 
     var id: Self { self }
 
@@ -52,8 +60,9 @@ enum MapNetworkStatFilter: String, CaseIterable, Identifiable, Sendable {
         case .lines: "Lines"
         case .goodService: "Good service"
         case .minorDelays: "Minor delays"
-        case .disrupted: "Disrupted"
+        case .majorIssues: "Major issues"
         case .closed: "Closed"
+        case .disrupted: "Disrupted"
         }
     }
 
@@ -62,8 +71,9 @@ enum MapNetworkStatFilter: String, CaseIterable, Identifiable, Sendable {
         case .lines: "tram.fill"
         case .goodService: "circle.fill"
         case .minorDelays: "circle.fill"
-        case .disrupted: "circle.fill"
+        case .majorIssues: "circle.fill"
         case .closed: "minus.circle.fill"
+        case .disrupted: "exclamationmark.circle.fill"
         }
     }
 
@@ -72,8 +82,18 @@ enum MapNetworkStatFilter: String, CaseIterable, Identifiable, Sendable {
         case .lines: .tubeBlue
         case .goodService: .green
         case .minorDelays: .orange
-        case .disrupted: .red
+        case .majorIssues: .red
         case .closed: .gray
+        case .disrupted: .red
+        }
+    }
+
+    var representsDisruptedLines: Bool {
+        switch self {
+        case .minorDelays, .majorIssues, .closed, .disrupted:
+            true
+        case .lines, .goodService:
+            false
         }
     }
 }
@@ -82,29 +102,39 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
     let lineIDs: Set<TubeLineID>
     let goodServiceLineIDs: Set<TubeLineID>
     let minorDelayLineIDs: Set<TubeLineID>
-    let disruptedLineIDs: Set<TubeLineID>
+    let majorIssueLineIDs: Set<TubeLineID>
     let closedLineIDs: Set<TubeLineID>
+    let disruptedLineIDs: Set<TubeLineID>
 
-    init(statuses: [TfLLineStatus], disruptions: [ResolvedDisruption]) {
-        let undergroundStatuses = statuses.filter(\.id.isUnderground)
-        let closed: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
+    init(
+        statuses: [TfLLineStatus],
+        disruptions: [ResolvedDisruption],
+        isViewingLiveStatus: Bool = true
+    ) {
+        let allLineIDs = Set(TubeLineID.allCases)
+        let disrupted = Set(disruptions.map(\.lineID))
+        let networkStatuses = statuses.filter { TubeLineID.allCases.contains($0.id) }
+        let liveClosed: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
             line.lineStatuses.contains { $0.isServiceClosed } ? line.id : nil
         })
-        let minorDelays: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
+        let liveMinorDelays: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
             line.lineStatuses.contains { $0.statusSeverity == 9 } ? line.id : nil
         })
-        let goodService: Set<TubeLineID> = Set(undergroundStatuses.compactMap { line in
-            guard !closed.contains(line.id), !line.lineStatuses.isEmpty,
+        let liveGoodService: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
+            guard !liveClosed.contains(line.id), !line.lineStatuses.isEmpty,
                   line.lineStatuses.allSatisfy(\.isGoodService) else { return nil }
             return line.id
         })
-        let disrupted = Set(disruptions.lazy.map(\.lineID).filter(\.isUnderground))
+        let liveMajorIssues = Set(disruptions.lazy.filter(\.isMajorIssue).map(\.lineID))
 
-        lineIDs = Set(TubeLineID.undergroundCases)
-        goodServiceLineIDs = goodService
-        minorDelayLineIDs = minorDelays
+        lineIDs = allLineIDs
+        goodServiceLineIDs = isViewingLiveStatus
+            ? liveGoodService
+            : allLineIDs.subtracting(disrupted)
+        minorDelayLineIDs = isViewingLiveStatus ? liveMinorDelays : []
+        majorIssueLineIDs = isViewingLiveStatus ? liveMajorIssues : []
+        closedLineIDs = isViewingLiveStatus ? liveClosed : []
         disruptedLineIDs = disrupted
-        closedLineIDs = closed
     }
 
     func lineIDs(for filter: MapNetworkStatFilter) -> Set<TubeLineID> {
@@ -112,13 +142,115 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
         case .lines: lineIDs
         case .goodService: goodServiceLineIDs
         case .minorDelays: minorDelayLineIDs
-        case .disrupted: disruptedLineIDs
+        case .majorIssues: majorIssueLineIDs
         case .closed: closedLineIDs
+        case .disrupted: disruptedLineIDs
         }
     }
 
     func count(for filter: MapNetworkStatFilter) -> Int {
         lineIDs(for: filter).count
+    }
+}
+
+struct MapDisruptionLineGroups: Equatable, Sendable {
+    let majorIssues: [ResolvedDisruption]
+    let minorDelays: [ResolvedDisruption]
+
+    init(disruptions: [ResolvedDisruption]) {
+        let representatives = Dictionary(grouping: disruptions, by: \.lineID)
+            .values
+            .compactMap { disruptions -> ResolvedDisruption? in
+                let ordered = disruptions.sorted {
+                    if $0.severity != $1.severity { return $0.severity < $1.severity }
+                    return $0.title.localizedStandardCompare($1.title) == .orderedAscending
+                }
+                return ordered.first(where: \.isMajorIssue) ?? ordered.first
+            }
+
+        majorIssues = representatives
+            .filter(\.isMajorIssue)
+            .sorted(by: Self.sortByLineName)
+        minorDelays = representatives
+            .filter(\.isMinorDelay)
+            .sorted(by: Self.sortByLineName)
+    }
+
+    var all: [ResolvedDisruption] {
+        majorIssues + minorDelays
+    }
+
+    private static func sortByLineName(
+        _ left: ResolvedDisruption,
+        _ right: ResolvedDisruption
+    ) -> Bool {
+        left.lineID.displayName.localizedStandardCompare(right.lineID.displayName)
+            == .orderedAscending
+    }
+}
+
+enum MapNetworkRouteStyling {
+    static func mutesSegment(
+        lineID: TubeLineID,
+        isAffected: Bool,
+        isFeaturedSection: Bool,
+        selectedFilter: MapNetworkStatFilter?,
+        featuredLineIDs: Set<TubeLineID>,
+        sectionLineIDs: Set<TubeLineID>,
+        closedLineIDs: Set<TubeLineID>,
+        disruptionDisplayMode: DisruptionDisplayMode
+    ) -> Bool {
+        if let selectedFilter {
+            switch selectedFilter {
+            case .lines:
+                return false
+            case .majorIssues, .disrupted:
+                guard featuredLineIDs.contains(lineID) else { return true }
+                guard sectionLineIDs.contains(lineID) else { return false }
+                return !isFeaturedSection
+            case .goodService, .minorDelays, .closed:
+                return !featuredLineIDs.contains(lineID)
+            }
+        }
+        if closedLineIDs.contains(lineID) { return true }
+        return disruptionDisplayMode.mutesSegment(isAffected: isAffected)
+    }
+}
+
+struct MapDisruptionFocus: Equatable, Sendable {
+    let lineIDs: Set<TubeLineID>
+    let segmentIDs: Set<String>
+    let stationIDs: Set<String>
+    let confidence: ResolutionConfidence
+
+    init(disruption: ResolvedDisruption, graph: TubeGraph?) {
+        lineIDs = [disruption.lineID]
+
+        guard let graph else {
+            segmentIDs = disruption.affectedSegmentIDs
+            stationIDs = disruption.affectedStationIDs
+            confidence = disruption.confidence
+            return
+        }
+
+        let matchingSegmentIDs = Set(disruption.affectedSegmentIDs.filter {
+            graph.segmentsByID[$0]?.lineID == disruption.lineID
+        })
+        let fallsBackToWholeLine = matchingSegmentIDs.isEmpty
+        let focusedSegmentIDs = fallsBackToWholeLine
+            ? Set(graph.segments(for: disruption.lineID).map(\.id))
+            : matchingSegmentIDs
+        let segmentStationIDs = Set(focusedSegmentIDs.flatMap { segmentID -> [String] in
+            guard let segment = graph.segmentsByID[segmentID] else { return [] }
+            return [segment.fromStationID, segment.toStationID]
+        })
+        let matchingAffectedStationIDs = Set(disruption.affectedStationIDs.filter {
+            graph.stationsByID[$0]?.lineIDs.contains(disruption.lineID) == true
+        })
+
+        segmentIDs = focusedSegmentIDs
+        stationIDs = segmentStationIDs.union(matchingAffectedStationIDs)
+        confidence = fallsBackToWholeLine ? .lineOnly : disruption.confidence
     }
 }
 
@@ -155,6 +287,88 @@ struct SharedMapViewport: Equatable, Sendable {
         mapPointWidth = max(1, visibleMapRect.width)
         mapPointHeight = max(1, visibleMapRect.height)
         self.zoom = max(0.2, min(24, zoom))
+    }
+}
+
+struct MapLocationFocusRequest: Equatable, Sendable {
+    let id: Int
+    let latitude: Double
+    let longitude: Double
+    let snappedStationID: String?
+
+    var coordinate: CLLocationCoordinate2D {
+        CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+    }
+}
+
+enum TrainMapFocusPolicy {
+    static let geographicLatitudeDelta = 0.025
+    static let geographicLongitudeDelta = 0.04
+    static let schematicFocusScale: CGFloat = 1.65
+
+    static func geographicRegion(
+        centeredAt coordinate: CLLocationCoordinate2D,
+        currentSpan: MKCoordinateSpan
+    ) -> MKCoordinateRegion {
+        MKCoordinateRegion(
+            center: coordinate,
+            span: MKCoordinateSpan(
+                latitudeDelta: min(
+                    currentSpan.latitudeDelta,
+                    geographicLatitudeDelta
+                ),
+                longitudeDelta: min(
+                    currentSpan.longitudeDelta,
+                    geographicLongitudeDelta
+                )
+            )
+        )
+    }
+
+    static func schematicScale(
+        currentScale: CGFloat,
+        minimumScale: CGFloat,
+        maximumScale: CGFloat
+    ) -> CGFloat {
+        min(
+            maximumScale,
+            max(currentScale, max(minimumScale, schematicFocusScale))
+        )
+    }
+
+    static func schematicAnchor(in size: CGSize) -> CGPoint {
+        CGPoint(x: size.width / 2, y: size.height * 0.56)
+    }
+}
+
+enum MapLocationFocusPolicy {
+    static func request(
+        for location: CLLocation,
+        in graph: TubeGraph,
+        id: Int
+    ) -> MapLocationFocusRequest? {
+        let coordinate = location.coordinate
+        let networkBounds = SharedMapProjection.geographicBounds(for: graph)
+        if networkBounds.contains(MKMapPoint(coordinate)) {
+            return MapLocationFocusRequest(
+                id: id,
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude,
+                snappedStationID: nil
+            )
+        }
+
+        guard let nearestStation = NearbyStationFinder.nearestStations(
+            to: location,
+            in: graph.stations,
+            limit: 1
+        ).first?.station else { return nil }
+        return MapLocationFocusRequest(
+            id: id,
+            latitude: nearestStation.latitude,
+            longitude: nearestStation.longitude,
+            snappedStationID: nearestStation.id
+        )
     }
 }
 

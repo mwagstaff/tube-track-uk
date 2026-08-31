@@ -3,6 +3,42 @@ import Testing
 @testable import TubeTrackUK
 
 struct NearMeTests {
+    @Test func mapLocationFocusKeepsLocationsInsideTheNetworkBoundary() throws {
+        let graph = try TubeGraph.bundled()
+        let location = CLLocation(latitude: 51.5033, longitude: -0.1147)
+
+        let request = try #require(MapLocationFocusPolicy.request(
+            for: location,
+            in: graph,
+            id: 7
+        ))
+
+        #expect(request.id == 7)
+        #expect(request.snappedStationID == nil)
+        #expect(request.latitude == location.coordinate.latitude)
+        #expect(request.longitude == location.coordinate.longitude)
+    }
+
+    @Test func mapLocationFocusSnapsOutsideLocationsToTheNearestStation() throws {
+        let graph = try TubeGraph.bundled()
+        let location = CLLocation(latitude: 55.9533, longitude: -3.1883)
+        let nearest = try #require(NearbyStationFinder.nearestStations(
+            to: location,
+            in: graph.stations,
+            limit: 1
+        ).first?.station)
+
+        let request = try #require(MapLocationFocusPolicy.request(
+            for: location,
+            in: graph,
+            id: 8
+        ))
+
+        #expect(request.snappedStationID == nearest.id)
+        #expect(request.latitude == nearest.latitude)
+        #expect(request.longitude == nearest.longitude)
+    }
+
     @Test func departureWaitingCopyMatchesTheAutomaticRetryState() {
         #expect(TfLDepartureWaitingCopy.title == "Waiting for TfL data")
         #expect(
@@ -172,6 +208,26 @@ struct NearMeTests {
         #expect(appState.selectedEngineeringWorkID == plannedWork.id)
         #expect(appState.focusedLineIDs == [.district])
         #expect(appState.focusedSegmentIDs == ["district-work-segment"])
+    }
+
+    @Test @MainActor func closestStationRouteOpensNearMeWithAConsumableFocus() {
+        let appState = TubeAppState()
+        let closestStation = station(
+            id: "closest",
+            name: "Closest",
+            latitude: 51.501,
+            hubID: nil
+        )
+
+        appState.showNearMe(focusedOn: closestStation)
+
+        let generation = appState.nearMeFocusGeneration
+        #expect(appState.selectedTab == .nearMe)
+        #expect(appState.nearMeFocusedStationID == closestStation.id)
+
+        appState.consumeNearMeFocus(generation: generation)
+
+        #expect(appState.nearMeFocusedStationID == nil)
     }
 
     private func station(

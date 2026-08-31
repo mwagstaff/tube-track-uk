@@ -141,8 +141,10 @@ final class AppBackgroundImageStore {
 
     @discardableResult
     func appDidBecomeActive(at now: Date = Date()) -> Bool {
-        let returnedFromBackground = inactiveAt != nil
-        if returnedFromBackground {
+        let shouldRevealMapBackground = inactiveAt.map {
+            now.timeIntervalSince($0) > interval
+        } ?? false
+        if shouldRevealMapBackground {
             mapRevealGeneration += 1
         }
         inactiveAt = nil
@@ -152,7 +154,7 @@ final class AppBackgroundImageStore {
         if startsTimer, rotationTask == nil || rotationTask?.isCancelled == true {
             startRotationTimer()
         }
-        return returnedFromBackground
+        return shouldRevealMapBackground
     }
 
     func appDidBecomeInactive(at now: Date = Date()) {

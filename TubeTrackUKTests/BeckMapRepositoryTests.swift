@@ -1372,6 +1372,44 @@ struct BeckMapRepositoryTests {
         ))
     }
 
+    @Test func compactStationLabelsAppearBeforeTheOldHighZoomThresholds() {
+        #expect(BeckMapLabelVisibilityPolicy.shows(.network, at: 0.18))
+        #expect(BeckMapLabelVisibilityPolicy.shows(.local, at: 0.3))
+        #expect(BeckMapLabelVisibilityPolicy.shows(.minor, at: 0.42))
+        #expect(BeckMapLabelVisibilityPolicy.minorMinimumCameraScale < 0.5)
+    }
+
+    @Test func stationLabelFontsGrowContinuouslyWithAvailableZoomSpace() {
+        for tier in [
+            BeckMapLabelVisibilityTier.overview,
+            .network,
+            .local,
+            .minor,
+        ] {
+            let compact = BeckMapLabelVisibilityPolicy.fontSize(
+                for: tier,
+                at: BeckMapLabelVisibilityPolicy.fontGrowthStartCameraScale
+            )
+            let intermediate = BeckMapLabelVisibilityPolicy.fontSize(
+                for: tier,
+                at: 0.6
+            )
+            let fullSize = BeckMapLabelVisibilityPolicy.fontSize(
+                for: tier,
+                at: BeckMapLabelVisibilityPolicy.fullSizeFontCameraScale
+            )
+
+            #expect(compact < intermediate)
+            #expect(intermediate < fullSize)
+            #expect(BeckMapLabelVisibilityPolicy.fontSize(for: tier, at: 0.1) == compact)
+            #expect(BeckMapLabelVisibilityPolicy.fontSize(for: tier, at: 2) == fullSize)
+        }
+
+        #expect(BeckMapLabelVisibilityPolicy.fontSize(for: .minor, at: 0.42) < 10)
+        #expect(BeckMapLabelVisibilityPolicy.fontSize(for: .overview, at: 0.42)
+            > BeckMapLabelVisibilityPolicy.fontSize(for: .minor, at: 0.42))
+    }
+
     @Test func reportedHighZoomStationsHaveAuthoredLabels() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)

@@ -1,3 +1,4 @@
+import CoreLocation
 import Foundation
 
 struct LiveTubeTrain: Identifiable, Codable, Hashable, Sendable {
@@ -22,6 +23,262 @@ struct LiveTubeTrain: Identifiable, Codable, Hashable, Sendable {
             progress + remainingProgress * elapsed / Double(secondsToNextStation)
         )
     }
+
+    func remainingSecondsToNextStation(at date: Date) -> Int {
+        guard progress < LiveTrainMarkerPolicy.arrivalProgressThreshold else {
+            return 0
+        }
+        let elapsedSeconds = max(0, Int(date.timeIntervalSince(updatedAt)))
+        return max(0, secondsToNextStation - elapsedSeconds)
+    }
+
+    func estimatedNextStopArrival(at date: Date) -> Date {
+        date.addingTimeInterval(Double(remainingSecondsToNextStation(at: date)))
+    }
+
+    func rebased(
+        progress: Double,
+        secondsToNextStation: Int,
+        updatedAt: Date,
+        retainingRouteFrom routeSource: LiveTubeTrain? = nil
+    ) -> LiveTubeTrain {
+        let routeSource = routeSource ?? self
+        return LiveTubeTrain(
+            id: id,
+            vehicleID: vehicleID,
+            lineID: lineID,
+            destination: routeSource.destination,
+            direction: routeSource.direction,
+            previousStationID: routeSource.previousStationID,
+            nextStationID: routeSource.nextStationID,
+            segmentID: routeSource.segmentID,
+            progress: min(1, max(0, progress)),
+            secondsToNextStation: max(1, secondsToNextStation),
+            updatedAt: updatedAt
+        )
+    }
+
+}
+
+enum LiveTrainDirection {
+    static func resolved(direction: String?, platformName: String?) -> String? {
+        cardinalDisplayName(for: platformName)
+            ?? cardinalDisplayName(for: direction)
+            ?? displayName(for: direction)
+            ?? displayName(for: platformName)
+    }
+
+    static func displayName(for value: String?) -> String? {
+        cardinalDisplayName(for: value) ?? generalDisplayName(for: value)
+    }
+
+    private static func cardinalDisplayName(for value: String?) -> String? {
+        guard let normalized = normalized(value) else { return nil }
+
+        if normalized.contains("northbound") { return "Northbound" }
+        if normalized.contains("southbound") { return "Southbound" }
+        if normalized.contains("eastbound") { return "Eastbound" }
+        if normalized.contains("westbound") { return "Westbound" }
+        if normalized.contains("anti clockwise") || normalized.contains("anticlockwise") {
+            return "Anti-clockwise"
+        }
+        if normalized.contains("counterclockwise") || normalized.contains("counter clockwise") {
+            return "Anti-clockwise"
+        }
+        if normalized.contains("clockwise") { return "Clockwise" }
+        return nil
+    }
+
+    private static func generalDisplayName(for value: String?) -> String? {
+        guard let normalized = normalized(value) else { return nil }
+        if normalized.contains("inbound") { return "Inbound" }
+        if normalized.contains("outbound") { return "Outbound" }
+        return nil
+    }
+
+    private static func normalized(_ value: String?) -> String? {
+        guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !value.isEmpty else {
+            return nil
+        }
+        return value.lowercased()
+            .replacingOccurrences(of: "-", with: " ")
+            .replacingOccurrences(of: "_", with: " ")
+    }
+}
+
+enum LiveTrainSnapshotReconciler {
+    static let continuityLifetime: TimeInterval = 75
+    static let missingSnapshotGrace: TimeInterval = 45
+    static let maximumCorrectionDuration: TimeInterval = 30
+    static let maximumDisplaySpeedMetresPerSecond = 160.0 / 3.6
+    static let fallbackCorrectionDuration: TimeInterval = 30
+
+    static func reconcile(
+        previous: [LiveTubeTrain],
+        incoming: [LiveTubeTrain],
+        at date: Date,
+        segmentsByID: [String: TubeSegment],
+        requestedLineIDs: Set<TubeLineID> = []
+    ) -> [LiveTubeTrain] {
+        let previousByID = Dictionary(uniqueKeysWithValues: previous.map { ($0.id, $0) })
+        let incomingIDs = Set(incoming.map(\.id))
+        var output = incoming.map { train in
+            guard let previousTrain = previousByID[train.id],
+                  isFresh(previousTrain, at: date) else {
+                return train
+            }
+            return reconcile(
+                previous: previousTrain,
+                incoming: train,
+                at: date,
+                segmentsByID: segmentsByID
+            )
+        }
+
+        for train in previous where !incomingIDs.contains(train.id) {
+            guard requestedLineIDs.isEmpty || requestedLineIDs.contains(train.lineID),
+                  date.timeIntervalSince(train.updatedAt) <= missingSnapshotGrace else {
+                continue
+            }
+            output.append(retainedMissingTrain(train, at: date))
+        }
+
+        return output.sorted { $0.id < $1.id }
+    }
+
+    static func isContinuousJourney(
+        from previous: LiveTubeTrain,
+        to incoming: LiveTubeTrain,
+        at date: Date
+    ) -> Bool {
+        guard previous.id == incoming.id, isFresh(previous, at: date) else {
+            return false
+        }
+        return isSameLeg(previous, incoming) || isConnectedLeg(previous, incoming)
+    }
+
+    private static func reconcile(
+        previous: LiveTubeTrain,
+        incoming: LiveTubeTrain,
+        at date: Date,
+        segmentsByID: [String: TubeSegment]
+    ) -> LiveTubeTrain {
+        let displayedProgress = previous.projectedProgress(at: date)
+
+        if isSameLeg(previous, incoming) {
+            if displayedProgress >= LiveTrainMarkerPolicy.arrivalProgressThreshold {
+                return incoming.rebased(
+                    progress: 1,
+                    secondsToNextStation: incoming.secondsToNextStation,
+                    updatedAt: incoming.updatedAt
+                )
+            }
+            let minimumSeconds = correctionDuration(
+                segment: segmentsByID[incoming.segmentID],
+                remainingProgress: 1 - displayedProgress
+            )
+            return incoming.rebased(
+                progress: displayedProgress,
+                secondsToNextStation: max(incoming.secondsToNextStation, minimumSeconds),
+                updatedAt: incoming.updatedAt
+            )
+        }
+
+        if isConnectedLeg(previous, incoming) {
+            guard displayedProgress >= LiveTrainMarkerPolicy.arrivalProgressThreshold else {
+                let minimumSeconds = correctionDuration(
+                    segment: segmentsByID[previous.segmentID],
+                    remainingProgress: 1 - displayedProgress
+                )
+                return previous.rebased(
+                    progress: displayedProgress,
+                    secondsToNextStation: minimumSeconds,
+                    updatedAt: incoming.updatedAt
+                )
+            }
+            let minimumSeconds = correctionDuration(
+                segment: segmentsByID[incoming.segmentID],
+                remainingProgress: 1
+            )
+            return incoming.rebased(
+                progress: 0,
+                secondsToNextStation: max(incoming.secondsToNextStation, minimumSeconds),
+                updatedAt: incoming.updatedAt
+            )
+        }
+
+        // A fresh vehicle ID that suddenly moves to an unrelated section is
+        // usually a feed correction or identifier reuse. Hold the old marker
+        // briefly instead of visibly teleporting it across the network.
+        return retainedMissingTrain(previous, at: date)
+    }
+
+    private static func retainedMissingTrain(
+        _ train: LiveTubeTrain,
+        at date: Date
+    ) -> LiveTubeTrain {
+        let displayedProgress = train.projectedProgress(at: date)
+        guard displayedProgress >= LiveTrainMarkerPolicy.arrivalProgressThreshold else {
+            return train
+        }
+        return train.rebased(
+            progress: 1,
+            secondsToNextStation: train.secondsToNextStation,
+            updatedAt: train.updatedAt
+        )
+    }
+
+    private static func isFresh(_ train: LiveTubeTrain, at date: Date) -> Bool {
+        let age = date.timeIntervalSince(train.updatedAt)
+        return age >= 0 && age <= continuityLifetime
+    }
+
+    private static func isSameLeg(
+        _ previous: LiveTubeTrain,
+        _ incoming: LiveTubeTrain
+    ) -> Bool {
+        previous.lineID == incoming.lineID
+            && previous.segmentID == incoming.segmentID
+            && previous.previousStationID == incoming.previousStationID
+            && previous.nextStationID == incoming.nextStationID
+    }
+
+    private static func isConnectedLeg(
+        _ previous: LiveTubeTrain,
+        _ incoming: LiveTubeTrain
+    ) -> Bool {
+        previous.lineID == incoming.lineID
+            && previous.nextStationID == incoming.previousStationID
+    }
+
+    private static func correctionDuration(
+        segment: TubeSegment?,
+        remainingProgress: Double
+    ) -> Int {
+        let clampedProgress = min(1, max(0, remainingProgress))
+        let rawDuration: TimeInterval
+        if let segment {
+            rawDuration = segmentLength(segment) * clampedProgress
+                / maximumDisplaySpeedMetresPerSecond
+        } else {
+            rawDuration = fallbackCorrectionDuration * clampedProgress
+        }
+        return max(1, Int(ceil(min(maximumCorrectionDuration, rawDuration))))
+    }
+
+    private static func segmentLength(_ segment: TubeSegment) -> CLLocationDistance {
+        zip(segment.geographicPoints, segment.geographicPoints.dropFirst())
+            .reduce(0) { distance, pair in
+                distance + CLLocation(
+                    latitude: pair.0.latitude,
+                    longitude: pair.0.longitude
+                ).distance(from: CLLocation(
+                    latitude: pair.1.latitude,
+                    longitude: pair.1.longitude
+                ))
+            }
+    }
 }
 
 /// The stop-specific departure board is the strongest live signal available
@@ -41,7 +298,10 @@ enum LiveTrainMarkerPolicy {
     /// does not constrain heavy-rail lines with longer inter-station runs.
     static let maximumLightRailSecondsToNearestStation = 5 * 60
 
+    static let arrivalProgressThreshold = 0.98
+
     private static let arrivalGrace: TimeInterval = 10
+    private static let stationLatchLifetime: TimeInterval = 45
     private static let stationBoardLifetime: TimeInterval = 75
     private static let maximumBoardSkew: TimeInterval = 90
 
@@ -51,7 +311,10 @@ enum LiveTrainMarkerPolicy {
         stationBoard: LiveTrainStationBoardSnapshot?
     ) -> Double? {
         let elapsed = max(0, date.timeIntervalSince(train.updatedAt))
-        guard elapsed <= Double(train.secondsToNextStation) + arrivalGrace else {
+        let projectionLifetime = train.progress >= arrivalProgressThreshold
+            ? max(stationLatchLifetime, Double(train.secondsToNextStation) + arrivalGrace)
+            : Double(train.secondsToNextStation) + arrivalGrace
+        guard elapsed <= projectionLifetime else {
             return nil
         }
 

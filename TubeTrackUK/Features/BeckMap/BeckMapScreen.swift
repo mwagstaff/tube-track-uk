@@ -1,6 +1,20 @@
 import SwiftUI
 import UIKit
 
+private enum BeckMapCameraEasing {
+    case smoothStep
+    case easeOutQuart
+
+    func value(at progress: Double) -> Double {
+        switch self {
+        case .smoothStep:
+            progress * progress * (3 - 2 * progress)
+        case .easeOutQuart:
+            1 - pow(1 - progress, 4)
+        }
+    }
+}
+
 struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let selectedLineID: TubeLineID?
     let selectedStationID: String?
@@ -14,30 +28,27 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let closedLineIDs: Set<TubeLineID>
 
     var emphasizesIssues: Bool {
-        disruptionDisplayMode == .issues || networkFilter == .disrupted
+        disruptionDisplayMode == .issues
     }
 
     func mutesSegment(id: String, lineID: TubeLineID, isAffected: Bool) -> Bool {
-        if let networkFilter {
-            switch networkFilter {
-            case .lines:
-                return false
-            case .disrupted:
-                guard networkFeaturedLineIDs.contains(lineID) else { return true }
-                guard networkSectionLineIDs.contains(lineID) else { return false }
-                return !networkFeaturedSegmentIDs.contains(id)
-            case .goodService, .minorDelays, .closed:
-                return !networkFeaturedLineIDs.contains(lineID)
-            }
-        }
-        if closedLineIDs.contains(lineID) { return true }
-        return disruptionDisplayMode.mutesSegment(isAffected: isAffected)
+        MapNetworkRouteStyling.mutesSegment(
+            lineID: lineID,
+            isAffected: isAffected,
+            isFeaturedSection: networkFeaturedSegmentIDs.contains(id),
+            selectedFilter: networkFilter,
+            featuredLineIDs: networkFeaturedLineIDs,
+            sectionLineIDs: networkSectionLineIDs,
+            closedLineIDs: closedLineIDs,
+            disruptionDisplayMode: disruptionDisplayMode
+        )
     }
 }
 
 struct BeckMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     let resetToken: Int
+    let locationFocusRequest: MapLocationFocusRequest?
     let contentVerticalBias: CGFloat
     let onUserZoomIn: () -> Void
     @State private var document: BeckMapDocument?
@@ -71,6 +82,7 @@ struct BeckMapScreen: View {
                         : [],
                     referenceOverlayVisible: referenceOverlayVisible,
                     resetToken: resetToken,
+                    locationFocusRequest: locationFocusRequest,
                     contentVerticalBias: contentVerticalBias,
                     onUserZoomIn: onUserZoomIn,
                     stationSelectionGeneration: appState.stationSelectionGeneration,
@@ -174,9 +186,10 @@ struct BeckMapScreen: View {
         var networkFeaturedSegmentIDs: Set<String> = []
         var networkSectionLineIDs: Set<TubeLineID> = []
 
-        if networkFilter == .disrupted {
+        if networkFilter == .majorIssues || networkFilter == .disrupted {
             for disruption in appState.visibleDisruptions
-                where networkFeaturedLineIDs.contains(disruption.lineID) {
+                where (networkFilter == .disrupted || disruption.isMajorIssue)
+                    && networkFeaturedLineIDs.contains(disruption.lineID) {
                 let projectedIDs = projector.projectedSegmentIDs(for: disruption)
                 networkFeaturedSegmentIDs.formUnion(projectedIDs)
                 if !projectedIDs.isEmpty {
@@ -236,6 +249,7 @@ struct BeckMapScreen: View {
 private struct BeckMapCanvas: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .caption) private var labelTypeScale: CGFloat = 1
 
     let document: BeckMapDocument
@@ -245,6 +259,7 @@ private struct BeckMapCanvas: View {
     let liveTrains: [LiveTubeTrain]
     let referenceOverlayVisible: Bool
     let resetToken: Int
+    let locationFocusRequest: MapLocationFocusRequest?
     let contentVerticalBias: CGFloat
     let onUserZoomIn: () -> Void
     let stationSelectionGeneration: Int
@@ -255,6 +270,7 @@ private struct BeckMapCanvas: View {
     private var renderedSegments: [RenderedSegment] { renderCache.renderedSegments }
     private var renderedLineGroups: [RenderedLineGroup] { renderCache.renderedLineGroups }
     private var renderedWaterways: [RenderedWaterway] { renderCache.renderedWaterways }
+    private var renderedStationMarkers: [RenderedStationMarker] { renderCache.renderedStationMarkers }
     private var renderedLabels: [RenderedLabel] { renderCache.renderedLabels }
     private var artworkBounds: CGRect { renderCache.artworkBounds }
     private var debugReferenceImage: UIImage? { renderCache.debugReferenceImage }
@@ -279,6 +295,7 @@ private struct BeckMapCanvas: View {
         liveTrains: [LiveTubeTrain],
         referenceOverlayVisible: Bool,
         resetToken: Int,
+        locationFocusRequest: MapLocationFocusRequest?,
         contentVerticalBias: CGFloat,
         onUserZoomIn: @escaping () -> Void,
         stationSelectionGeneration: Int,
@@ -293,6 +310,7 @@ private struct BeckMapCanvas: View {
         self.liveTrains = liveTrains
         self.referenceOverlayVisible = referenceOverlayVisible
         self.resetToken = resetToken
+        self.locationFocusRequest = locationFocusRequest
         self.contentVerticalBias = contentVerticalBias
         self.onUserZoomIn = onUserZoomIn
         self.stationSelectionGeneration = stationSelectionGeneration
@@ -315,8 +333,33 @@ private struct BeckMapCanvas: View {
 
                 if !liveTrains.isEmpty, !isReferenceOverlayActive {
                     TimelineView(.periodic(from: .now, by: 1)) { timeline in
-                        Canvas { context, size in
-                            drawTrains(context: &context, size: size, date: timeline.date)
+                        GeometryReader { viewport in
+                            ZStack {
+                                Canvas { context, size in
+                                    drawTrains(
+                                        context: &context,
+                                        size: size,
+                                        date: timeline.date
+                                    )
+                                }
+
+                                if let train = appState.selectedTrain,
+                                   let markerPoint = trainScreenPoint(
+                                       for: train,
+                                       at: timeline.date
+                                   ),
+                                   CGRect(origin: .zero, size: viewport.size).contains(markerPoint),
+                                   let nextStopName = appState.graph?
+                                       .stationsByID[train.nextStationID]?.name {
+                                    TrainMapCalloutOverlay(
+                                        train: train,
+                                        nextStopName: nextStopName,
+                                        date: timeline.date,
+                                        markerPoint: markerPoint,
+                                        viewportSize: viewport.size
+                                    )
+                                }
+                            }
                         }
                     }
                     .allowsHitTesting(false)
@@ -369,6 +412,11 @@ private struct BeckMapCanvas: View {
                 }
                 publishViewport(in: proxy.size)
             }
+            .onChange(of: locationFocusRequest?.id) { _, _ in
+                guard appState.mapPresentationMode == .beck,
+                      let locationFocusRequest else { return }
+                focus(on: locationFocusRequest, in: proxy.size)
+            }
             .onChange(of: contentVerticalBias) { oldBias, newBias in
                 let delta = newBias - oldBias
                 withAnimation(.smooth(duration: 0.32)) {
@@ -380,20 +428,27 @@ private struct BeckMapCanvas: View {
             .onChange(of: appState.mapPresentationMode) { _, mode in
                 guard mode == .beck else { return }
                 applySharedViewport(in: proxy.size)
+                if appState.selectedDisruption != nil {
+                    focus(on: presentation.affectedStationIDs, in: proxy.size)
+                }
             }
             .onChange(of: presentation.affectedStationIDs) { _, stationIDs in
                 if presentation.emphasizesIssues {
                     focus(on: stationIDs, in: proxy.size)
                 }
             }
-            .onChange(of: presentation.emphasizesIssues) { _, emphasizesIssues in
-                if emphasizesIssues {
-                    focus(on: presentation.affectedStationIDs, in: proxy.size)
-                }
+            .onChange(of: appState.disruptionSelectionGeneration) { _, _ in
+                guard appState.mapPresentationMode == .beck else { return }
+                focus(on: presentation.affectedStationIDs, in: proxy.size)
             }
             .onChange(of: stationSelectionGeneration) { _, _ in
                 guard let stationID = presentation.selectedStationID else { return }
                 focus(on: [stationID], in: proxy.size)
+            }
+            .onChange(of: appState.trainSelectionGeneration) { _, _ in
+                guard appState.mapPresentationMode == .beck,
+                      let train = appState.selectedTrain else { return }
+                focus(on: train, at: .now, in: proxy.size)
             }
         }
         .onDisappear {
@@ -404,6 +459,16 @@ private struct BeckMapCanvas: View {
     private var stationAccessibilityRepresentation: some View {
         ScrollView {
             LazyVStack {
+                if !liveTrains.isEmpty {
+                    Section("Estimated live trains") {
+                        ForEach(liveTrains) { train in
+                            Button(trainAccessibilityLabel(for: train)) {
+                                appState.select(train: train)
+                            }
+                        }
+                    }
+                }
+
                 ForEach(document.stationMarkers) { marker in
                     Button("\(marker.name), \(marker.lineIDs.map(\.displayName).joined(separator: ", "))") {
                         onStationTap(marker.stationID)
@@ -412,6 +477,13 @@ private struct BeckMapCanvas: View {
             }
         }
         .accessibilityLabel("Interactive London rail map")
+    }
+
+    private func trainAccessibilityLabel(for train: LiveTubeTrain) -> String {
+        let destination = train.destination ?? "unknown destination"
+        let nextStop = appState.graph?.stationsByID[train.nextStationID]?.name
+            ?? "unknown next stop"
+        return "Train to \(destination), next stop \(nextStop)"
     }
 
     private var isReferenceOverlayActive: Bool {
@@ -492,26 +564,34 @@ private struct BeckMapCanvas: View {
         // paper inset keeps branch joins open instead of allowing a later
         // segment's outer stroke to plug an earlier segment's paper centre.
         for lineGroup in renderedLineGroups {
+            let lineSelected = presentation.selectedLineID == nil
+                || presentation.selectedLineID == lineGroup.lineID
+            var uniformMuted: Bool?
+            var hasMixedMuting = false
+            for segment in lineGroup.segments {
+                let affected = presentation.affectedSegmentIDs.contains(segment.id)
+                let muted = !traceMode && (
+                    !lineSelected
+                        || presentation.mutesSegment(
+                            id: segment.id,
+                            lineID: segment.lineID,
+                            isAffected: affected
+                        )
+                )
+                if let uniformMuted, uniformMuted != muted {
+                    hasMixedMuting = true
+                    break
+                }
+                uniformMuted = muted
+            }
             if let casing = palette.northernLineCasing,
                let casingWidth = palette.casingWidth(
                    for: lineGroup.lineID,
                    routeWidth: document.styles.routeStrokeWidth
                ) {
-                for segment in lineGroup.segments {
-                    let affected = presentation.affectedSegmentIDs.contains(segment.id)
-                    let selected = presentation.selectedLineID == nil
-                        || presentation.selectedLineID == segment.lineID
-                    let muted = !traceMode && (
-                        !selected
-                            || presentation.mutesSegment(
-                                id: segment.id,
-                                lineID: segment.lineID,
-                                isAffected: affected
-                            )
-                    )
-                    guard !muted else { continue }
+                if !hasMixedMuting, uniformMuted == false {
                     mapContext.stroke(
-                        segment.path,
+                        lineGroup.combinedPath,
                         with: .color(casing),
                         style: StrokeStyle(
                             lineWidth: casingWidth,
@@ -519,24 +599,35 @@ private struct BeckMapCanvas: View {
                             lineJoin: .round
                         )
                     )
+                } else if hasMixedMuting {
+                    for segment in lineGroup.segments {
+                        let affected = presentation.affectedSegmentIDs.contains(segment.id)
+                        let muted = !traceMode && (
+                            !lineSelected
+                                || presentation.mutesSegment(
+                                    id: segment.id,
+                                    lineID: segment.lineID,
+                                    isAffected: affected
+                                )
+                        )
+                        guard !muted else { continue }
+                        mapContext.stroke(
+                            segment.path,
+                            with: .color(casing),
+                            style: StrokeStyle(
+                                lineWidth: casingWidth,
+                                lineCap: .round,
+                                lineJoin: .round
+                            )
+                        )
+                    }
                 }
             }
 
-            for segment in lineGroup.segments {
-                let affected = presentation.affectedSegmentIDs.contains(segment.id)
-                let selected = presentation.selectedLineID == nil
-                    || presentation.selectedLineID == segment.lineID
-                let muted = !traceMode && (
-                    !selected
-                        || presentation.mutesSegment(
-                            id: segment.id,
-                            lineID: segment.lineID,
-                            isAffected: affected
-                        )
-                )
+            if !hasMixedMuting, let muted = uniformMuted {
                 mapContext.stroke(
-                    segment.path,
-                    with: .color(palette.routeColor(for: segment.lineID, muted: muted)),
+                    lineGroup.combinedPath,
+                    with: .color(palette.routeColor(for: lineGroup.lineID, muted: muted)),
                     style: StrokeStyle(
                         lineWidth: lineGroup.lineID.usesParallelSchematicStroke
                             ? document.styles.parallelRouteOuterStrokeWidth(for: lineGroup.lineID)
@@ -545,19 +636,40 @@ private struct BeckMapCanvas: View {
                         lineJoin: .round
                     )
                 )
-            }
-            if lineGroup.lineID.usesParallelSchematicStroke {
+            } else {
                 for segment in lineGroup.segments {
+                    let affected = presentation.affectedSegmentIDs.contains(segment.id)
+                    let muted = !traceMode && (
+                        !lineSelected
+                            || presentation.mutesSegment(
+                                id: segment.id,
+                                lineID: segment.lineID,
+                                isAffected: affected
+                            )
+                    )
                     mapContext.stroke(
                         segment.path,
-                        with: .color(palette.paper),
+                        with: .color(palette.routeColor(for: segment.lineID, muted: muted)),
                         style: StrokeStyle(
-                            lineWidth: document.styles.parallelRouteInnerStrokeWidth(for: lineGroup.lineID),
+                            lineWidth: lineGroup.lineID.usesParallelSchematicStroke
+                                ? document.styles.parallelRouteOuterStrokeWidth(for: lineGroup.lineID)
+                                : document.styles.routeStrokeWidth,
                             lineCap: .round,
                             lineJoin: .round
                         )
                     )
                 }
+            }
+            if lineGroup.lineID.usesParallelSchematicStroke {
+                mapContext.stroke(
+                    lineGroup.combinedPath,
+                    with: .color(palette.paper),
+                    style: StrokeStyle(
+                        lineWidth: document.styles.parallelRouteInnerStrokeWidth(for: lineGroup.lineID),
+                        lineCap: .round,
+                        lineJoin: .round
+                    )
+                )
             }
         }
 
@@ -617,31 +729,65 @@ private struct BeckMapCanvas: View {
         trainIcon.shading = .color(.white)
 
         for train in liveTrains {
-            guard let path = renderCache.trainPathsBySegmentID[train.segmentID],
-                  let progress = LiveTrainMarkerPolicy.projectedProgress(
-                      for: train,
-                      at: date,
-                      stationBoard: appState.authoritativeStationBoardSnapshot
-                  ),
-                  let artworkPoint = path.point(
-                      progress: progress,
-                      previousStationID: train.previousStationID,
-                      nextStationID: train.nextStationID
-                  ) else { continue }
-
-            let point = screenPoint(artworkPoint)
+            guard let point = trainScreenPoint(for: train, at: date) else { continue }
             guard visibleBounds.contains(point) else { continue }
-            let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
-            let marker = Path(roundedRect: markerRect, cornerRadius: 6)
+            let selected = train.id == appState.selectedTrainID
+            let diameter: CGFloat = selected ? 24 : 20
+            let markerRect = CGRect(
+                x: point.x - diameter / 2,
+                y: point.y - diameter / 2,
+                width: diameter,
+                height: diameter
+            )
+            if selected {
+                let halo = Path(ellipseIn: markerRect.insetBy(dx: -5, dy: -5))
+                context.fill(
+                    halo,
+                    with: .color(Color.tubeLine(train.lineID).opacity(0.18))
+                )
+            }
+            let marker = Path(roundedRect: markerRect, cornerRadius: 7)
             context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
-            context.stroke(marker, with: .color(.white), lineWidth: 1.5)
-            context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
+            context.stroke(
+                marker,
+                with: .color(.white),
+                lineWidth: selected ? 2.5 : 1.5
+            )
+            context.draw(trainIcon, in: markerRect.insetBy(dx: 5, dy: 5))
         }
+    }
+
+    private func trainScreenPoint(
+        for train: LiveTubeTrain,
+        at date: Date
+    ) -> CGPoint? {
+        guard let artworkPoint = trainArtworkPoint(for: train, at: date) else {
+            return nil
+        }
+        return screenPoint(artworkPoint)
+    }
+
+    private func trainArtworkPoint(
+        for train: LiveTubeTrain,
+        at date: Date
+    ) -> CGPoint? {
+        guard let path = renderCache.trainPathsBySegmentID[train.segmentID],
+              let progress = LiveTrainMarkerPolicy.projectedProgress(
+                  for: train,
+                  at: date,
+                  stationBoard: appState.authoritativeStationBoardSnapshot
+              ),
+              let artworkPoint = path.point(
+                  progress: progress,
+                  previousStationID: train.previousStationID,
+                  nextStationID: train.nextStationID
+              ) else { return nil }
+        return artworkPoint
     }
 
     private func drawStationMarkers(context: inout GraphicsContext) {
         let issuesActive = presentation.emphasizesIssues && !presentation.affectedSegmentIDs.isEmpty
-        for marker in document.stationMarkers {
+        for marker in renderedStationMarkers {
             let affected = issuesActive && presentation.affectedStationIDs.contains(marker.stationID)
             let selected = presentation.selectedStationID == marker.stationID
             let outline = affected ? Color.red : selected ? Color.blue : palette.stationOutline
@@ -665,10 +811,7 @@ private struct BeckMapCanvas: View {
 
             for primitive in marker.primitives {
                 switch primitive {
-                case let .connector(connector):
-                    var path = Path()
-                    path.move(to: CGPoint(connector.start))
-                    path.addLine(to: CGPoint(connector.end))
+                case let .connector(connector, path):
                     context.stroke(
                         path,
                         with: .color(outline),
@@ -679,10 +822,7 @@ private struct BeckMapCanvas: View {
                         with: .color(palette.paper),
                         style: StrokeStyle(lineWidth: connector.width - 2.2, lineCap: .round)
                     )
-                case let .walkingConnector(connector):
-                    var path = Path()
-                    path.move(to: CGPoint(connector.start))
-                    path.addLine(to: CGPoint(connector.end))
+                case let .walkingConnector(connector, path):
                     context.stroke(
                         path,
                         with: .color(outline),
@@ -692,14 +832,7 @@ private struct BeckMapCanvas: View {
                             dash: [8, 5]
                         )
                     )
-                case let .circle(circle):
-                    let rect = CGRect(
-                        x: circle.centre.x - circle.radius,
-                        y: circle.centre.y - circle.radius,
-                        width: circle.radius * 2,
-                        height: circle.radius * 2
-                    )
-                    let path = Path(ellipseIn: rect)
+                case let .circle(circle, path):
                     context.fill(
                         path,
                         with: .color(affected ? Color.red.opacity(0.16) : palette.paper)
@@ -709,10 +842,7 @@ private struct BeckMapCanvas: View {
                         with: .color(outline),
                         lineWidth: circle.outlineWidth + (selected ? 1.8 : 0)
                     )
-                case let .tick(tick):
-                    var path = Path()
-                    path.move(to: CGPoint(tick.start))
-                    path.addLine(to: CGPoint(tick.end))
+                case let .tick(tick, path):
                     context.stroke(
                         path,
                         with: .color(affected ? .red : .tubeLine(tick.lineID)),
@@ -978,23 +1108,73 @@ private struct BeckMapCanvas: View {
         )
     }
 
+    private func focus(on request: MapLocationFocusRequest, in size: CGSize) {
+        if let stationID = request.snappedStationID {
+            focus(on: [stationID], in: size)
+            return
+        }
+        guard let graph = appState.graph,
+              let artworkPoint = SharedMapProjection.artworkPoint(
+                for: request.coordinate,
+                document: document,
+                graph: graph
+              ) else { return }
+        let nextScale = min(maximumCameraScale, max(minimumCameraScale, 1.65))
+        animateCamera(
+            toScale: nextScale,
+            offset: CGSize(
+                width: size.width / 2 - artworkPoint.x * nextScale,
+                height: size.height / 2 - artworkPoint.y * nextScale - 28
+            ),
+            viewportSize: size
+        )
+    }
+
+    private func focus(on train: LiveTubeTrain, at date: Date, in size: CGSize) {
+        guard let artworkPoint = trainArtworkPoint(for: train, at: date) else { return }
+        let nextScale = TrainMapFocusPolicy.schematicScale(
+            currentScale: cameraScale,
+            minimumScale: minimumCameraScale,
+            maximumScale: maximumCameraScale
+        )
+        let anchor = TrainMapFocusPolicy.schematicAnchor(in: size)
+        animateCamera(
+            toScale: nextScale,
+            offset: CGSize(
+                width: anchor.x - artworkPoint.x * nextScale,
+                height: anchor.y - artworkPoint.y * nextScale
+            ),
+            viewportSize: size,
+            duration: 0.45,
+            easing: .easeOutQuart
+        )
+    }
+
     private func animateCamera(
         toScale targetScale: CGFloat,
         offset targetOffset: CGSize,
         viewportSize: CGSize,
-        duration: TimeInterval = 2
+        duration: TimeInterval = 2,
+        easing: BeckMapCameraEasing = .smoothStep
     ) {
         cameraTransitionTask?.cancel()
+
+        if reduceMotion {
+            cameraScale = targetScale
+            cameraOffset = targetOffset
+            updateCameraSnapshot(in: viewportSize)
+            publishViewport(in: viewportSize)
+            return
+        }
 
         let startScale = cameraScale
         let startOffset = cameraOffset
         let startTime = ProcessInfo.processInfo.systemUptime
-
         cameraTransitionTask = Task { @MainActor in
             while !Task.isCancelled {
                 let elapsed = ProcessInfo.processInfo.systemUptime - startTime
                 let progress = min(1, max(0, elapsed / duration))
-                let easedProgress = progress * progress * (3 - 2 * progress)
+                let easedProgress = easing.value(at: progress)
 
                 cameraScale = startScale + (targetScale - startScale) * CGFloat(easedProgress)
                 cameraOffset = CGSize(
@@ -1033,7 +1213,9 @@ private struct BeckMapCanvas: View {
             let start = panStartOffset ?? cameraOffset
             panStartOffset = start
             cameraOffset = CGSize(width: start.width + translation.width, height: start.height + translation.height)
-            updateCameraSnapshot(in: size)
+            // Panning changes only the offset. The outer map chrome depends on
+            // zoom, so publishing this through shared app state every frame
+            // needlessly invalidates the whole map screen.
         case .ended:
             isPanning = false
             panStartOffset = nil
@@ -1147,6 +1329,19 @@ private struct BeckMapCanvas: View {
     }
 
     private func selectMapFeature(at location: CGPoint) {
+        if let train = LiveTrainHitTesting.nearest(
+            to: location,
+            candidates: liveTrains.compactMap { train in
+                guard let point = trainScreenPoint(for: train, at: .now) else { return nil }
+                return (train, point)
+            }
+        ) {
+            withAnimation(.smooth(duration: 0.25)) {
+                appState.select(train: train)
+            }
+            return
+        }
+
         let nearest = document.stationMarkers.min {
             distance(screenPoint($0.anchor), location) < distance(screenPoint($1.anchor), location)
         }
@@ -1201,6 +1396,16 @@ private struct BeckMapCanvas: View {
 
     private func distance(_ start: CGPoint, _ end: CGPoint) -> CGFloat {
         hypot(start.x - end.x, start.y - end.y)
+    }
+
+    private static func makeLinePath(
+        from start: BeckMapPoint,
+        to end: BeckMapPoint
+    ) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(start))
+        path.addLine(to: CGPoint(end))
+        return path
     }
 
     private static func makePath(
@@ -1443,6 +1648,7 @@ private struct BeckMapCanvas: View {
         let renderedSegments: [RenderedSegment]
         let renderedLineGroups: [RenderedLineGroup]
         let renderedWaterways: [RenderedWaterway]
+        let renderedStationMarkers: [RenderedStationMarker]
         let trainPathsBySegmentID: [String: BeckMapTrainPath]
         let renderedLabels: [RenderedLabel]
         let artworkBounds: CGRect
@@ -1486,9 +1692,15 @@ private struct BeckMapCanvas: View {
             }
             let segmentsByLineID = Dictionary(grouping: renderedSegments, by: \.lineID)
             self.renderedLineGroups = orderedLineIDs.map { lineID in
-                RenderedLineGroup(
+                let segments = segmentsByLineID[lineID, default: []]
+                var combinedPath = Path()
+                for segment in segments {
+                    combinedPath.addPath(segment.path)
+                }
+                return RenderedLineGroup(
                     lineID: lineID,
-                    segments: segmentsByLineID[lineID, default: []]
+                    segments: segments,
+                    combinedPath: combinedPath
                 )
             }
 
@@ -1503,6 +1715,51 @@ private struct BeckMapCanvas: View {
                     ),
                     strokeWidth: CGFloat(waterway.strokeWidth),
                     outlineWidth: CGFloat(waterway.outlineWidth)
+                )
+            }
+
+            self.renderedStationMarkers = document.stationMarkers.map { marker in
+                RenderedStationMarker(
+                    stationID: marker.stationID,
+                    anchor: marker.anchor,
+                    primitives: marker.primitives.map { primitive in
+                        switch primitive {
+                        case let .connector(connector):
+                            return .connector(
+                                connector,
+                                BeckMapCanvas.makeLinePath(
+                                    from: connector.start,
+                                    to: connector.end
+                                )
+                            )
+                        case let .walkingConnector(connector):
+                            return .walkingConnector(
+                                connector,
+                                BeckMapCanvas.makeLinePath(
+                                    from: connector.start,
+                                    to: connector.end
+                                )
+                            )
+                        case let .circle(circle):
+                            return .circle(
+                                circle,
+                                Path(ellipseIn: CGRect(
+                                    x: circle.centre.x - circle.radius,
+                                    y: circle.centre.y - circle.radius,
+                                    width: circle.radius * 2,
+                                    height: circle.radius * 2
+                                ))
+                            )
+                        case let .tick(tick):
+                            return .tick(
+                                tick,
+                                BeckMapCanvas.makeLinePath(
+                                    from: tick.start,
+                                    to: tick.end
+                                )
+                            )
+                        }
+                    }
                 )
             }
 
@@ -1558,6 +1815,7 @@ private struct BeckMapCanvas: View {
     struct RenderedLineGroup {
         let lineID: TubeLineID
         let segments: [RenderedSegment]
+        let combinedPath: Path
     }
 
     struct RenderedWaterway {
@@ -1566,6 +1824,19 @@ private struct BeckMapCanvas: View {
         let path: Path
         let strokeWidth: CGFloat
         let outlineWidth: CGFloat
+    }
+
+    struct RenderedStationMarker {
+        let stationID: String
+        let anchor: BeckMapPoint
+        let primitives: [RenderedStationPrimitive]
+    }
+
+    enum RenderedStationPrimitive {
+        case connector(BeckMapLinePrimitive, Path)
+        case walkingConnector(BeckMapLinePrimitive, Path)
+        case circle(BeckMapCirclePrimitive, Path)
+        case tick(BeckMapTickPrimitive, Path)
     }
 
     struct RenderedLabel {
@@ -2056,9 +2327,15 @@ enum BeckMapLabelVisibilityPolicy {
     // scale therefore tracks actual station spacing more reliably than a ratio
     // to the device-dependent fit scale.
     static let overviewMinimumCameraScale: CGFloat = 0.1
-    static let networkMinimumCameraScale: CGFloat = 0.24
-    static let localMinimumCameraScale: CGFloat = 0.5
-    static let minorMinimumCameraScale: CGFloat = 0.9
+    static let networkMinimumCameraScale: CGFloat = 0.18
+    static let localMinimumCameraScale: CGFloat = 0.3
+    static let minorMinimumCameraScale: CGFloat = 0.42
+
+    // Labels enter the layout compactly, then grow as the additional map
+    // spacing created by zooming makes room for them. Collision resolution
+    // remains authoritative, so denser tiers never obscure higher priorities.
+    static let fontGrowthStartCameraScale: CGFloat = 0.3
+    static let fullSizeFontCameraScale: CGFloat = 0.95
 
     static func shows(
         _ tier: BeckMapLabelVisibilityTier,
@@ -2080,12 +2357,26 @@ enum BeckMapLabelVisibilityPolicy {
         for tier: BeckMapLabelVisibilityTier,
         at cameraScale: CGFloat
     ) -> CGFloat {
-        switch tier {
+        let range: ClosedRange<CGFloat> = switch tier {
         case .overview:
-            15
-        case .network, .local, .minor:
-            14
+            12.5 ... 15
+        case .network:
+            10.5 ... 14
+        case .local:
+            9.5 ... 14
+        case .minor:
+            9 ... 13.5
         }
+
+        guard cameraScale > fontGrowthStartCameraScale else {
+            return range.lowerBound
+        }
+        guard cameraScale < fullSizeFontCameraScale else {
+            return range.upperBound
+        }
+        let progress = (cameraScale - fontGrowthStartCameraScale)
+            / (fullSizeFontCameraScale - fontGrowthStartCameraScale)
+        return range.lowerBound + (range.upperBound - range.lowerBound) * progress
     }
 }
 
@@ -2115,6 +2406,13 @@ enum BeckMapOverviewVisibilityPolicy {
         fittedScale: Double
     ) -> Bool {
         cameraScale / max(0.000_001, fittedScale) >= closestStationAutoHideZoomRatio
+    }
+
+    static func shouldShowReset(
+        at cameraScale: Double,
+        fittedScale: Double
+    ) -> Bool {
+        cameraScale / max(0.000_001, fittedScale) > fullyVisibleMaximumZoomRatio
     }
 }
 

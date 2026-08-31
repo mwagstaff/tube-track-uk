@@ -6,6 +6,7 @@ struct NearMeScreen: View {
 
     @Environment(TubeAppState.self) private var appState
     @Environment(\.openURL) private var openURL
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var locationProvider = UserLocationProvider()
     @State private var visibleStationCount = Self.stationBatchSize
     @State private var visibleStationIDs: Set<String> = []
@@ -112,55 +113,87 @@ struct NearMeScreen: View {
     }
 
     private func stationList(graph: TubeGraph) -> some View {
-        ScrollView {
-            LazyVStack(alignment: .leading, spacing: 14) {
-                disruptionDateControl
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVStack(alignment: .leading, spacing: 14) {
+                    disruptionDateControl
 
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("Closest stations")
-                        .font(.title3.weight(.bold))
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Closest stations")
+                            .font(.title3.weight(.bold))
+                    }
+                    .padding(.horizontal, 4)
+                    .padding(.bottom, 3)
+
+                    ForEach(Array(nearbyStations.enumerated()), id: \.element.id) { index, nearby in
+                        NearbyStationCard(
+                            nearbyStation: nearby,
+                            rank: index + 1,
+                            graph: graph
+                        )
+                        .id(nearby.id)
+                        .onScrollVisibilityChange(threshold: 0.2) { isVisible in
+                            updateStationVisibility(nearby, isVisible: isVisible)
+                        }
+                    }
+
+                    if hasMoreStations {
+                        LoadMoreStationsTrigger {
+                            revealNextBatch()
+                        }
+                        .id(visibleStationCount)
+                    } else {
+                        Text("Distances are straight-line estimates from your current location.")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 6)
+                    }
                 }
-                .padding(.horizontal, 4)
-                .padding(.bottom, 3)
-
-                ForEach(Array(nearbyStations.enumerated()), id: \.element.id) { index, nearby in
-                    NearbyStationCard(
-                        nearbyStation: nearby,
-                        rank: index + 1,
-                        graph: graph
+                .padding(.horizontal, 14)
+                .padding(.vertical, 16)
+            }
+            .refreshable {
+                locationProvider.requestLocation()
+                if appState.isViewingLiveStatus {
+                    await appState.refreshNearbyArrivals(
+                        for: stationsForManualRefresh,
+                        forceRefresh: true
                     )
-                    .onScrollVisibilityChange(threshold: 0.2) { isVisible in
-                        updateStationVisibility(nearby, isVisible: isVisible)
-                    }
-                }
-
-                if hasMoreStations {
-                    LoadMoreStationsTrigger {
-                        revealNextBatch()
-                    }
-                    .id(visibleStationCount)
                 } else {
-                    Text("Distances are straight-line estimates from your current location.")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.vertical, 6)
+                    await appState.refreshWorks(forceRefresh: true)
                 }
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 16)
-        }
-        .refreshable {
-            locationProvider.requestLocation()
-            if appState.isViewingLiveStatus {
-                await appState.refreshNearbyArrivals(
-                    for: stationsForManualRefresh,
-                    forceRefresh: true
-                )
-            } else {
-                await appState.refreshWorks(forceRefresh: true)
+            .task(id: appState.nearMeFocusGeneration) {
+                await applyNearMeFocus(using: proxy)
             }
         }
+    }
+
+    private func applyNearMeFocus(using proxy: ScrollViewProxy) async {
+        guard appState.selectedTab == .nearMe,
+              let stationID = appState.nearMeFocusedStationID else { return }
+
+        let generation = appState.nearMeFocusGeneration
+        guard let stationIndex = allNearbyStations.firstIndex(where: { $0.id == stationID }) else {
+            appState.consumeNearMeFocus(generation: generation)
+            return
+        }
+
+        if stationIndex >= visibleStationCount {
+            visibleStationCount = stationIndex + 1
+            await Task.yield()
+        }
+
+        await Task.yield()
+        if reduceMotion {
+            proxy.scrollTo(stationID, anchor: .top)
+        } else {
+            withAnimation(.smooth(duration: 0.35)) {
+                proxy.scrollTo(stationID, anchor: .top)
+            }
+        }
+        appState.consumeNearMeFocus(generation: generation)
     }
 
     private var disruptionDateControl: some View {

@@ -63,4 +63,12 @@ struct ResolvedDisruption: Identifiable, Codable, Hashable, Sendable {
         default: .other
         }
     }
+
+    var isMinorDelay: Bool {
+        category == .minorDelays
+    }
+
+    var isMajorIssue: Bool {
+        !isMinorDelay
+    }
 }

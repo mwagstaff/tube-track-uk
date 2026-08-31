@@ -1,24 +1,32 @@
+import CoreLocation
 import SwiftUI
 
 struct UnifiedMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @AppStorage("statusPanelExpanded") private var statusExpanded = false
-    @AppStorage("closestStationPanelHidden") private var closestStationPanelHidden = false
+    @State private var statusExpanded = false
+    @Binding var closestStationPanelHidden: Bool
     @State private var layoutProgress: CGFloat = 0
     @State private var morphGeometry: MapMorphGeometry?
     @State private var geometryGraphID: String?
     @State private var resetToken = 0
+    @State private var locationFocusGeneration = 0
+    @State private var locationFocusRequest: MapLocationFocusRequest?
     @State private var transitionTask: Task<Void, Never>?
-    @State private var restorePulseTask: Task<Void, Never>?
-    @State private var restoreIconPulses = false
+    @State private var toastDismissTask: Task<Void, Never>?
+    @State private var actionNotice: MapActionNotice?
     @State private var zoomedDisruptionsExpanded = false
+    @State private var realWorldResetAvailable = false
+    @State private var realWorldOverviewOpacity = 1.0
+    @State private var showsExploreHint = true
+    @State private var exploreHintOpacity = 1.0
 
     var body: some View {
         ZStack {
             BeckMapScreen(
                 resetToken: resetToken,
-                contentVerticalBias: closestStationPanelHidden ? 0 : 84,
+                locationFocusRequest: locationFocusRequest,
+                contentVerticalBias: 36,
                 onUserZoomIn: {
                     guard !closestStationPanelHidden else { return }
                     setClosestStationPanel(hidden: true)
@@ -27,7 +35,12 @@ struct UnifiedMapScreen: View {
                 .opacity(beckRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .beck)
 
-            RealWorldMapScreen(resetToken: resetToken)
+            RealWorldMapScreen(
+                resetToken: resetToken,
+                locationFocusRequest: locationFocusRequest,
+                onResetAvailabilityChange: { realWorldResetAvailable = $0 },
+                onOverviewOpacityChange: { realWorldOverviewOpacity = $0 }
+            )
                 .opacity(realWorldRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .realWorld)
 
@@ -44,41 +57,31 @@ struct UnifiedMapScreen: View {
         }
         .overlay(alignment: .top) {
             ZStack(alignment: .top) {
-                if appState.mapPresentationMode == .beck {
-                    MapOverviewHeader(
-                        disruptionsExpanded: $statusExpanded,
-                        zoomedDisruptionsExpanded: $zoomedDisruptionsExpanded,
-                        overviewOpacity: overviewOpacity,
-                        compactForZoom: compactOverviewForZoom
-                    )
-                }
-
-                HStack {
-                    Spacer()
-                    Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
-                        Text("© OpenStreetMap contributors")
-                            .font(.caption2.weight(.medium))
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 5)
-                            .glassEffect(.regular, in: .capsule)
+                MapOverviewHeader(
+                    disruptionsExpanded: $statusExpanded,
+                    zoomedDisruptionsExpanded: $zoomedDisruptionsExpanded,
+                    overviewOpacity: overviewOpacity,
+                    compactForZoom: compactOverviewForZoom,
+                    onSelectDisruption: {
+                        setClosestStationPanel(hidden: true)
                     }
-                    .foregroundStyle(.primary)
-                    .opacity(realWorldChromeOpacity)
-                    .allowsHitTesting(appState.mapPresentationMode == .realWorld)
-                    .accessibilityHidden(appState.mapPresentationMode != .realWorld)
-                }
-                .padding(.horizontal, 12)
-                .padding(.top, 6)
+                )
+                .opacity(activeMapChromeOpacity)
+                .allowsHitTesting(activeMapChromeOpacity > 0.1)
+                .zIndex(4)
             }
         }
         .overlay(alignment: .bottom) {
             bottomOverlay
         }
+        .overlay(alignment: .bottom) {
+            compactOpenStreetMapAttribution
+        }
+        .overlay(alignment: .top) {
+            actionToast
+        }
         .onAppear {
             layoutProgress = appState.mapPresentationMode == .realWorld ? 1 : 0
-            if closestStationPanelHidden {
-                triggerRestoreIconPulse()
-            }
         }
         .onChange(of: appState.mapPresentationMode) { _, mode in
             transitionTask?.cancel()
@@ -102,20 +105,20 @@ struct UnifiedMapScreen: View {
         }
         .onDisappear {
             transitionTask?.cancel()
-            restorePulseTask?.cancel()
-        }
-        .onChange(of: closestStationPanelHidden) { _, hidden in
-            if hidden {
-                triggerRestoreIconPulse()
-            } else {
-                restorePulseTask?.cancel()
-                restoreIconPulses = false
-            }
+            toastDismissTask?.cancel()
         }
         .onChange(of: compactOverviewForZoom) { _, compact in
             if !compact {
                 zoomedDisruptionsExpanded = false
             }
+        }
+        .onChange(of: appState.disruptionSelectionGeneration) { _, _ in
+            guard appState.selectedDisruption != nil else { return }
+            setClosestStationPanel(hidden: true)
+        }
+        .onChange(of: appState.selectedTrainID) { _, trainID in
+            guard trainID != nil else { return }
+            setClosestStationPanel(hidden: true)
         }
         .task(id: appState.graph?.generatedAt) {
             guard let graph = appState.graph else {
@@ -136,6 +139,22 @@ struct UnifiedMapScreen: View {
                 geometryGraphID = nil
             }
         }
+        .task {
+            showsExploreHint = true
+            exploreHintOpacity = 1
+
+            do {
+                try await Task.sleep(for: .seconds(3.5))
+                withAnimation(.linear(duration: 3.5)) {
+                    exploreHintOpacity = 0
+                }
+                try await Task.sleep(for: .seconds(3.5))
+                guard !Task.isCancelled else { return }
+                showsExploreHint = false
+            } catch {
+                // The view disappeared before the hint finished fading.
+            }
+        }
     }
 
     private var beckRendererOpacity: Double {
@@ -154,25 +173,45 @@ struct UnifiedMapScreen: View {
     }
 
     private var overviewOpacity: Double {
-        guard appState.mapPresentationMode == .beck,
-              let camera = appState.beckMapCameraSnapshot else {
-            return appState.mapPresentationMode == .beck ? 1 : 0
+        switch appState.mapPresentationMode {
+        case .beck:
+            guard let camera = appState.beckMapCameraSnapshot else { return 1 }
+            return BeckMapOverviewVisibilityPolicy.opacity(
+                at: camera.scale,
+                fittedScale: camera.fittedScale,
+                reduceMotion: reduceMotion
+            )
+        case .realWorld:
+            return realWorldOverviewOpacity
         }
-        return BeckMapOverviewVisibilityPolicy.opacity(
-            at: camera.scale,
-            fittedScale: camera.fittedScale,
-            reduceMotion: reduceMotion
-        )
     }
 
     private var compactOverviewForZoom: Bool {
         appState.mapPresentationMode == .beck && overviewOpacity <= 0.5
     }
 
+    private var activeMapChromeOpacity: Double {
+        appState.mapPresentationMode == .beck ? beckRendererOpacity : realWorldChromeOpacity
+    }
+
+    private var showsMapReset: Bool {
+        switch appState.mapPresentationMode {
+        case .beck:
+            guard let camera = appState.beckMapCameraSnapshot else { return false }
+            return BeckMapOverviewVisibilityPolicy.shouldShowReset(
+                at: camera.scale,
+                fittedScale: camera.fittedScale
+            )
+        case .realWorld:
+            return realWorldResetAvailable
+        }
+    }
+
     private var hasMapSelection: Bool {
         appState.selectedStation != nil
             || appState.selectedEngineeringWork != nil
             || appState.selectedDisruption != nil
+            || appState.selectedTrain != nil
             || appState.selectedLineID != nil
     }
 
@@ -190,105 +229,223 @@ struct UnifiedMapScreen: View {
         }
     }
 
-    private func triggerRestoreIconPulse() {
-        restorePulseTask?.cancel()
-        restoreIconPulses = false
-        guard !reduceMotion else { return }
-        restorePulseTask = Task { @MainActor in
-            await Task.yield()
-            guard !Task.isCancelled, closestStationPanelHidden else { return }
-            withAnimation(.easeOut(duration: 0.62).repeatCount(3, autoreverses: false)) {
-                restoreIconPulses = true
-            }
-        }
+    private func resetMapView() {
+        realWorldResetAvailable = false
+        zoomedDisruptionsExpanded = false
+        setClosestStationPanel(hidden: false)
+        appState.clearMapSelection()
+        appState.selectedMapNetworkStat = nil
+        appState.disruptionDisplayMode = .normal
+        resetToken += 1
     }
 
     private var bottomOverlay: some View {
-        VStack(spacing: 9) {
-            if appState.showLiveTrains {
-                TrainFilterBar()
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+        GeometryReader { proxy in
+            bottomOverlayContent(availableSize: proxy.size)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
+        }
+    }
 
-            if let station = appState.selectedStation {
-                StationDetailCard(station: station)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let work = appState.selectedEngineeringWork {
+    @ViewBuilder
+    private var compactOpenStreetMapAttribution: some View {
+        if appState.mapPresentationMode == .realWorld {
+            OpenStreetMapAttribution()
+                .opacity((1 - overviewOpacity) * realWorldChromeOpacity)
+                .allowsHitTesting(overviewOpacity < 0.88)
+                .accessibilityHidden(overviewOpacity >= 0.88)
+                .padding(.horizontal, 12)
+                .safeAreaPadding(.bottom, 6)
+                .zIndex(3)
+        }
+    }
+
+    private func bottomOverlayContent(availableSize: CGSize) -> some View {
+        let contentColumnWidth = MapDockMetrics.contentColumnWidth(
+            for: availableSize.width
+        )
+
+        return VStack(spacing: 9) {
+            if appState.selectedDisruption == nil,
+               let work = appState.selectedEngineeringWork {
                 PlannedWorkDetailCard(work: work)
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let disruption = appState.selectedDisruption {
-                DisruptionDetailCard(disruption: disruption)
-                    .padding(.horizontal, 12)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-            } else if let lineID = appState.selectedLineID {
+            } else if appState.selectedDisruption == nil,
+                      let lineID = appState.selectedLineID {
                 LineDetailCard(lineID: lineID)
                     .padding(.horizontal, 12)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
 
-            if appState.mapPresentationMode == .beck {
-                if !hasMapSelection, !statusExpanded, overviewOpacity > 0.01 {
-                    MapExploreHint()
-                        .opacity(overviewOpacity)
-                        .allowsHitTesting(false)
-                        .transition(.opacity)
+            if showsExploreHint,
+               !hasMapSelection,
+               !statusExpanded,
+               overviewOpacity > 0.01 {
+                MapExploreHint()
+                    .opacity(overviewOpacity * exploreHintOpacity)
+                    .allowsHitTesting(false)
+                    .transition(.opacity)
+            }
 
-                    MapNetworkStatsCard()
-                        .padding(.horizontal, 12)
-                        .opacity(overviewOpacity)
-                        .allowsHitTesting(overviewOpacity > 0.12)
-                        .accessibilityHidden(overviewOpacity <= 0.12)
-                        .transition(.opacity)
+            HStack(alignment: .bottom, spacing: MapDockMetrics.columnSpacing) {
+                VStack(spacing: 9) {
+                    if let station = appState.selectedStation {
+                        StationDetailCard(station: station)
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    } else if let disruption = appState.selectedDisruption {
+                        DisruptionDetailCard(
+                            disruption: disruption,
+                            onClose: resetMapView
+                        )
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+
+                    if appState.mapPresentationMode == .realWorld,
+                       overviewOpacity > 0.01 {
+                        OpenStreetMapAttribution()
+                            .padding(.top, exploreStatsSpacing(for: availableSize.height))
+                            .opacity(overviewOpacity * realWorldChromeOpacity)
+                            .allowsHitTesting(overviewOpacity > 0.12)
+                            .accessibilityHidden(overviewOpacity <= 0.12)
+                    }
+
+                    if !hasMapSelection, !statusExpanded, overviewOpacity > 0.01 {
+                        MapNetworkStatsCard()
+                            .padding(
+                                .top,
+                                appState.mapPresentationMode == .realWorld
+                                    ? 0
+                                    : exploreStatsSpacing(for: availableSize.height)
+                            )
+                            .opacity(overviewOpacity)
+                            .allowsHitTesting(overviewOpacity > 0.12)
+                            .accessibilityHidden(overviewOpacity <= 0.12)
+                            .transition(.opacity)
+                    }
+
+                    if appState.selectedDisruption == nil,
+                       appState.selectedTrain == nil,
+                       !closestStationPanelHidden,
+                       supportingContentOpacity > 0.01 {
+                        ClosestStationMapSection()
+                        .opacity(supportingContentOpacity)
+                        .allowsHitTesting(supportingContentOpacity > 0.12)
+                        .accessibilityHidden(supportingContentOpacity <= 0.12)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
+
+                    if appState.showLiveTrains {
+                        TrainFilterBar()
+                            .transition(.move(edge: .bottom).combined(with: .opacity))
+                    }
                 }
+                .frame(width: contentColumnWidth)
 
                 MapActionButtons(
-                    onReset: { resetToken += 1 },
-                    showsNavigationControls: true,
-                    showsClosestStationRestore: closestStationPanelHidden,
-                    restoreIconPulses: restoreIconPulses,
-                    onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
+                    showsReset: showsMapReset,
+                    onReset: resetMapView,
+                    onFocusUserLocation: focusMap(on:),
+                    onAction: showActionNotice(_:)
                 )
-                .padding(.horizontal, 12)
-                .frame(maxWidth: .infinity)
-            } else {
-                if statusExpanded {
-                    LiveStatusPanel(expanded: $statusExpanded)
-                        .padding(.horizontal, 12)
-                        .transition(.move(edge: .bottom).combined(with: .opacity))
-
-                    MapActionButtons(
-                        onReset: { resetToken += 1 },
-                        showsNavigationControls: true,
-                        showsClosestStationRestore: closestStationPanelHidden,
-                        restoreIconPulses: restoreIconPulses,
-                        onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
-                    )
-                    .padding(.horizontal, 12)
-                    .frame(maxWidth: .infinity)
-                } else {
-                    MapStatusDock(
-                        expanded: $statusExpanded,
-                        onReset: { resetToken += 1 },
-                        showsClosestStationRestore: closestStationPanelHidden,
-                        restoreIconPulses: restoreIconPulses,
-                        onRestoreClosestStation: { setClosestStationPanel(hidden: false) }
-                    )
-                }
+                .fixedSize()
             }
-
-            if !closestStationPanelHidden {
-                ClosestStationMapSection {
-                    setClosestStationPanel(hidden: true)
-                }
-                .padding(.horizontal, 12)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
+            .padding(.horizontal, MapDockMetrics.horizontalPadding)
         }
         .animation(.smooth(duration: 0.35), value: appState.showLiveTrains)
+        .animation(.smooth(duration: 0.25), value: appState.selectedTrainID)
         .animation(.smooth(duration: 0.35), value: appState.selectedStationID)
+        .animation(
+            reduceMotion ? nil : .smooth(duration: 0.32),
+            value: appState.selectedDisruptionID
+        )
         .animation(.smooth(duration: 0.32), value: closestStationPanelHidden)
         .safeAreaPadding(.bottom, 4)
+    }
+
+    private func exploreStatsSpacing(for availableHeight: CGFloat) -> CGFloat {
+        if availableHeight >= 850 { return 16 }
+        if availableHeight >= 700 { return 12 }
+        return 8
+    }
+
+    private var supportingContentOpacity: Double {
+        appState.mapPresentationMode == .realWorld ? overviewOpacity : 1
+    }
+
+    private func focusMap(on location: CLLocation) {
+        guard let graph = appState.graph else { return }
+        locationFocusGeneration += 1
+        guard let request = MapLocationFocusPolicy.request(
+            for: location,
+            in: graph,
+            id: locationFocusGeneration
+        ) else { return }
+        locationFocusRequest = request
+        setClosestStationPanel(hidden: true)
+    }
+
+    @ViewBuilder
+    private var actionToast: some View {
+        if let actionNotice {
+            Label(actionNotice.message, systemImage: actionNotice.symbol)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .frame(minHeight: 40)
+                .glassEffect(.regular.tint(Color.tubeBlue), in: .capsule)
+                .shadow(color: .black.opacity(0.14), radius: 8, y: 4)
+                .padding(.top, actionToastTopPadding)
+                .transition(
+                    reduceMotion
+                        ? .opacity
+                        : .opacity.combined(with: .scale(scale: 0.94))
+                )
+                .id(actionNotice.id)
+                .allowsHitTesting(false)
+                .accessibilityElement(children: .combine)
+        }
+    }
+
+    private var actionToastTopPadding: CGFloat {
+        if statusExpanded { return 352 }
+        return compactOverviewForZoom ? 92 : 174
+    }
+
+    private func showActionNotice(_ notice: MapActionNotice) {
+        toastDismissTask?.cancel()
+
+        withAnimation(
+            reduceMotion
+                ? nil
+                : .timingCurve(0.16, 1, 0.3, 1, duration: 0.22)
+        ) {
+            actionNotice = notice
+        }
+
+        toastDismissTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(1.6))
+            guard !Task.isCancelled, actionNotice?.id == notice.id else { return }
+            withAnimation(
+                reduceMotion
+                    ? nil
+                    : .timingCurve(0.7, 0, 0.84, 1, duration: 0.16)
+            ) {
+                actionNotice = nil
+            }
+        }
+    }
+
+}
+
+private struct OpenStreetMapAttribution: View {
+    var body: some View {
+        Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
+            Text("© OpenStreetMap contributors")
+                .font(.caption2.weight(.medium))
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
+                .glassEffect(.regular, in: .capsule)
+        }
+        .foregroundStyle(.primary)
     }
 }

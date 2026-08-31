@@ -30,12 +30,6 @@ final class UserLocationProvider: NSObject, @preconcurrency CLLocationManagerDel
         requestInitiated = true
         authorizationStatus = manager.authorizationStatus
 
-        guard CLLocationManager.locationServicesEnabled() else {
-            isRequesting = false
-            errorMessage = "Location Services are turned off on this iPhone."
-            return
-        }
-
         switch authorizationStatus {
         case .notDetermined:
             isRequesting = true
@@ -77,6 +71,10 @@ final class UserLocationProvider: NSObject, @preconcurrency CLLocationManagerDel
         isRequesting = false
         if let locationError = error as? CLError, locationError.code == .denied {
             authorizationStatus = manager.authorizationStatus
+            if authorizationStatus == .authorizedAlways
+                || authorizationStatus == .authorizedWhenInUse {
+                errorMessage = "Location Services are turned off on this iPhone."
+            }
             return
         }
         errorMessage = "We couldn’t determine your location. Please try again."

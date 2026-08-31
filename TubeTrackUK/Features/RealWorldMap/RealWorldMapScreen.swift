@@ -3,13 +3,21 @@ import SwiftUI
 
 struct RealWorldMapScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let resetToken: Int
+    let locationFocusRequest: MapLocationFocusRequest?
+    let onResetAvailabilityChange: (Bool) -> Void
+    let onOverviewOpacityChange: (Double) -> Void
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
     @State private var visibleRegion = Self.centralLondon
     @State private var networkZoom = 0.0
     @State private var acceptsCameraUpdates = false
+    @State private var resetAvailable = false
+    @State private var overviewOpacity = 1.0
+    @State private var fittedNetworkZoom: Double?
+    @State private var recapturesOverviewZoom = false
 
     private static let centralLondon = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 51.5078, longitude: -0.1278),
@@ -48,14 +56,19 @@ struct RealWorldMapScreen: View {
                                     size: viewportProxy.size
                                 )
                                 networkZoom = viewport.zoom
-                                guard appState.mapPresentationMode == .realWorld,
-                                      acceptsCameraUpdates else { return }
+                                guard appState.mapPresentationMode == .realWorld else { return }
+                                let overviewZoom = calibratedOverviewZoom(
+                                    for: viewport.zoom
+                                )
+                                updateResetAvailability(at: overviewZoom)
+                                updateOverviewOpacity(at: overviewZoom)
+                                guard acceptsCameraUpdates else { return }
                                 appState.sharedMapViewport = viewport
                             }
                             .simultaneousGesture(
                                 SpatialTapGesture()
                                     .onEnded { value in
-                                        handleLineTap(
+                                        handleMapTap(
                                             at: value.location,
                                             proxy: proxy,
                                             graph: graph,
@@ -76,7 +89,11 @@ struct RealWorldMapScreen: View {
                     .onChange(of: appState.mapPresentationMode) { _, mode in
                         acceptsCameraUpdates = false
                         guard mode == .realWorld else { return }
+                        calibrateOverviewZoomFromBeckMap()
                         applySharedViewport(in: viewportProxy.size)
+                        if appState.selectedDisruption != nil {
+                            focus(on: appState.activeAffectedStationIDs)
+                        }
                         Task { @MainActor in
                             await Task.yield()
                             guard appState.mapPresentationMode == .realWorld else { return }
@@ -85,7 +102,10 @@ struct RealWorldMapScreen: View {
                     }
                     .onChange(of: resetToken) { _, _ in
                         guard appState.mapPresentationMode == .realWorld else { return }
+                        recapturesOverviewZoom = true
                         resetCamera()
+                        setResetAvailable(false)
+                        setOverviewOpacity(1)
                     }
                 }
             } else {
@@ -96,7 +116,12 @@ struct RealWorldMapScreen: View {
             guard !stations.isEmpty else { return }
             focus(on: stations)
         }
-        .onChange(of: appState.selectedDisruptionID) { _, _ in
+        .onChange(of: locationFocusRequest?.id) { _, _ in
+            guard appState.mapPresentationMode == .realWorld,
+                  let locationFocusRequest else { return }
+            focus(on: locationFocusRequest.coordinate)
+        }
+        .onChange(of: appState.disruptionSelectionGeneration) { _, _ in
             focus(on: appState.activeAffectedStationIDs)
         }
         .onChange(of: appState.selectedStationID) { _, stationID in
@@ -105,6 +130,16 @@ struct RealWorldMapScreen: View {
         .onChange(of: appState.stationSelectionGeneration) { _, _ in
             guard let stationID = appState.selectedStationID else { return }
             focus(on: [stationID])
+        }
+        .onChange(of: appState.trainSelectionGeneration) { _, _ in
+            guard appState.mapPresentationMode == .realWorld,
+                  let train = appState.selectedTrain,
+                  let renderData else { return }
+            focus(on: train, renderData: renderData, at: .now)
+        }
+        .onChange(of: reduceMotion) { _, _ in
+            guard appState.mapPresentationMode == .realWorld else { return }
+            updateOverviewOpacity(at: calibratedOverviewZoom(for: networkZoom))
         }
         .onAppear {
             guard appState.mapPresentationMode == .realWorld else { return }
@@ -131,7 +166,24 @@ struct RealWorldMapScreen: View {
 
     @MapContentBuilder
     private func tubeOverlays(renderData: RealWorldMapRenderData) -> some MapContent {
-        let affectedSegmentIDs = appState.activeAffectedSegmentIDs
+        let networkSummary = appState.mapNetworkStatusSummary
+        let networkFilter = appState.selectedMapNetworkStat
+        let featuredLineIDs = networkFilter.map(networkSummary.lineIDs(for:)) ?? []
+        let filtersDisruptedSections = networkFilter == .majorIssues
+            || networkFilter == .disrupted
+        let filteredDisruptions = filtersDisruptedSections
+            ? appState.visibleDisruptions.filter {
+                (networkFilter == .disrupted || $0.isMajorIssue)
+                    && featuredLineIDs.contains($0.lineID)
+            }
+            : []
+        let featuredSegmentIDs = Set(filteredDisruptions.flatMap(\.affectedSegmentIDs))
+        let sectionLineIDs = Set(filteredDisruptions.compactMap { disruption in
+            disruption.affectedSegmentIDs.isEmpty ? nil : disruption.lineID
+        })
+        let affectedSegmentIDs = filtersDisruptedSections
+            ? featuredSegmentIDs
+            : appState.activeAffectedSegmentIDs
         let displayMode = appState.disruptionDisplayMode
         let selectedLineID = appState.selectedLineID
         let unaffectedSegmentIDs = Set(renderData.segments.map(\.id))
@@ -140,7 +192,16 @@ struct RealWorldMapScreen: View {
         let affectedPolylines = renderData.polylines(covering: affectedSegmentIDs)
 
         ForEach(unaffectedPolylines) { polyline in
-            let muted = displayMode.mutesSegment(isAffected: false)
+            let muted = MapNetworkRouteStyling.mutesSegment(
+                lineID: polyline.lineID,
+                isAffected: false,
+                isFeaturedSection: !featuredSegmentIDs.isDisjoint(with: polyline.segmentIDs),
+                selectedFilter: networkFilter,
+                featuredLineIDs: featuredLineIDs,
+                sectionLineIDs: sectionLineIDs,
+                closedLineIDs: networkSummary.closedLineIDs,
+                disruptionDisplayMode: displayMode
+            )
                 || (selectedLineID != nil && selectedLineID != polyline.lineID)
             MapPolyline(polyline.overlay)
                 .stroke(
@@ -151,7 +212,16 @@ struct RealWorldMapScreen: View {
         }
 
         ForEach(affectedPolylines) { polyline in
-            let muted = displayMode.mutesSegment(isAffected: true)
+            let muted = MapNetworkRouteStyling.mutesSegment(
+                lineID: polyline.lineID,
+                isAffected: true,
+                isFeaturedSection: !featuredSegmentIDs.isDisjoint(with: polyline.segmentIDs),
+                selectedFilter: networkFilter,
+                featuredLineIDs: featuredLineIDs,
+                sectionLineIDs: sectionLineIDs,
+                closedLineIDs: networkSummary.closedLineIDs,
+                disruptionDisplayMode: displayMode
+            )
             MapPolyline(polyline.overlay)
                 .stroke(
                     muted ? Color.secondary.opacity(0.24) : .tubeLine(polyline.lineID),
@@ -289,9 +359,108 @@ struct RealWorldMapScreen: View {
         }
     }
 
+    private func handleMapTap(
+        at location: CGPoint,
+        proxy: MapProxy,
+        graph: TubeGraph,
+        renderData: RealWorldMapRenderData
+    ) {
+        if appState.showLiveTrains,
+           let train = train(
+               at: location,
+               date: .now,
+               proxy: proxy,
+               renderData: renderData
+           ) {
+            withAnimation(.smooth(duration: 0.25)) {
+                appState.select(train: train)
+            }
+            return
+        }
+
+        appState.selectedTrainID = nil
+        handleLineTap(
+            at: location,
+            proxy: proxy,
+            graph: graph,
+            renderData: renderData
+        )
+    }
+
+    private func train(
+        at location: CGPoint,
+        date: Date,
+        proxy: MapProxy,
+        renderData: RealWorldMapRenderData
+    ) -> LiveTubeTrain? {
+        let candidates = appState.liveTrains.compactMap { train
+            -> (train: LiveTubeTrain, point: CGPoint)? in
+            guard let path = renderData.pathsBySegmentID[train.segmentID],
+                  let progress = LiveTrainMarkerPolicy.projectedProgress(
+                      for: train,
+                      at: date,
+                      stationBoard: appState.authoritativeStationBoardSnapshot
+                  ),
+                  let coordinate = path.coordinate(
+                      at: progress,
+                      previousStationID: train.previousStationID,
+                      nextStationID: train.nextStationID
+                  ),
+                  let point = proxy.convert(coordinate, to: .local) else { return nil }
+            return (train, point)
+        }
+        return LiveTrainHitTesting.nearest(to: location, candidates: candidates)
+    }
+
     private func resetCamera() {
         position = .region(Self.centralLondon)
         appState.clearMapSelection()
+    }
+
+    private func calibrateOverviewZoomFromBeckMap() {
+        guard let viewport = appState.sharedMapViewport,
+              let camera = appState.beckMapCameraSnapshot else {
+            fittedNetworkZoom = nil
+            return
+        }
+        // The geographic graph contains outlying stations, so its raw fitted zoom
+        // is not the visible Tube-map overview. Remove the Beck camera's current
+        // zoom to recover the equivalent fitted geographic baseline.
+        let beckZoom = camera.scale / max(0.000_001, camera.fittedScale)
+        fittedNetworkZoom = viewport.zoom / max(0.000_001, beckZoom)
+    }
+
+    private func calibratedOverviewZoom(for networkZoom: Double) -> Double {
+        if recapturesOverviewZoom || fittedNetworkZoom == nil {
+            fittedNetworkZoom = max(0.000_001, networkZoom)
+            recapturesOverviewZoom = false
+        }
+        return networkZoom / max(0.000_001, fittedNetworkZoom ?? networkZoom)
+    }
+
+    private func updateResetAvailability(at overviewZoom: Double) {
+        setResetAvailable(RealWorldMapOverviewVisibilityPolicy.shouldShowReset(
+            at: overviewZoom
+        ))
+    }
+
+    private func updateOverviewOpacity(at overviewZoom: Double) {
+        setOverviewOpacity(RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: overviewZoom,
+            reduceMotion: reduceMotion
+        ))
+    }
+
+    private func setOverviewOpacity(_ opacity: Double) {
+        guard abs(opacity - overviewOpacity) > 0.001 else { return }
+        overviewOpacity = opacity
+        onOverviewOpacityChange(opacity)
+    }
+
+    private func setResetAvailable(_ available: Bool) {
+        guard available != resetAvailable else { return }
+        resetAvailable = available
+        onResetAvailabilityChange(available)
     }
 
     private func applySharedViewport(in size: CGSize) {
@@ -322,6 +491,75 @@ struct RealWorldMapScreen: View {
         withAnimation(.easeInOut(duration: 2.0)) { position = .region(region) }
     }
 
+    private func focus(on coordinate: CLLocationCoordinate2D) {
+        let region = MKCoordinateRegion(
+            center: coordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.012, longitudeDelta: 0.02)
+        )
+        withAnimation(.easeInOut(duration: 0.8)) {
+            position = .region(region)
+        }
+        setResetAvailable(true)
+    }
+
+    private func focus(
+        on train: LiveTubeTrain,
+        renderData: RealWorldMapRenderData,
+        at date: Date
+    ) {
+        guard let path = renderData.pathsBySegmentID[train.segmentID],
+              let progress = LiveTrainMarkerPolicy.projectedProgress(
+                  for: train,
+                  at: date,
+                  stationBoard: appState.authoritativeStationBoardSnapshot
+              ),
+              let coordinate = path.coordinate(
+                  at: progress,
+                  previousStationID: train.previousStationID,
+                  nextStationID: train.nextStationID
+              ) else { return }
+        let region = TrainMapFocusPolicy.geographicRegion(
+            centeredAt: coordinate,
+            currentSpan: visibleRegion.span
+        )
+
+        if reduceMotion {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                position = .region(region)
+            }
+        } else {
+            withAnimation(.timingCurve(0.25, 1, 0.5, 1, duration: 0.45)) {
+                position = .region(region)
+            }
+        }
+        setResetAvailable(true)
+    }
+
+}
+
+enum RealWorldMapOverviewVisibilityPolicy {
+    static let fullyVisibleMaximumZoomRatio = 1.08
+    static let hiddenZoomRatio = 1.55
+
+    static func opacity(
+        at networkZoomRatio: Double,
+        reduceMotion: Bool = false
+    ) -> Double {
+        if reduceMotion {
+            return networkZoomRatio < hiddenZoomRatio ? 1 : 0
+        }
+        guard networkZoomRatio > fullyVisibleMaximumZoomRatio else { return 1 }
+        guard networkZoomRatio < hiddenZoomRatio else { return 0 }
+        let fadeProgress = (networkZoomRatio - fullyVisibleMaximumZoomRatio)
+            / (hiddenZoomRatio - fullyVisibleMaximumZoomRatio)
+        return 1 - fadeProgress
+    }
+
+    static func shouldShowReset(at networkZoomRatio: Double) -> Bool {
+        networkZoomRatio > fullyVisibleMaximumZoomRatio
+    }
 }
 
 enum RealWorldLineHitTesting {
@@ -382,40 +620,124 @@ private struct RealWorldTrainCanvas: View {
         let trains = appState.liveTrains
 
         TimelineView(.periodic(from: .now, by: 1)) { timeline in
-            Canvas { context, size in
-                let visibleBounds = CGRect(origin: .zero, size: size).insetBy(dx: -12, dy: -12)
-                var trainIcon = context.resolve(Image(systemName: "tram.fill"))
-                trainIcon.shading = .color(.white)
+            GeometryReader { viewport in
+                ZStack {
+                    Canvas { context, size in
+                        let visibleBounds = CGRect(origin: .zero, size: size)
+                            .insetBy(dx: -12, dy: -12)
+                        var trainIcon = context.resolve(Image(systemName: "tram.fill"))
+                        trainIcon.shading = .color(.white)
 
-                for train in trains {
-                    guard let path = pathsBySegmentID[train.segmentID],
-                          let progress = LiveTrainMarkerPolicy.projectedProgress(
-                              for: train,
-                              at: timeline.date,
-                              stationBoard: appState.authoritativeStationBoardSnapshot
-                          ),
-                          let coordinate = path.coordinate(
-                              at: progress,
-                              previousStationID: train.previousStationID,
-                              nextStationID: train.nextStationID
-                          ),
-                          visibleRegion.containsExpanded(coordinate),
-                          let point = proxy.convert(coordinate, to: .local),
-                          visibleBounds.contains(point) else { continue }
+                        for train in trains {
+                            guard let point = markerPoint(
+                                for: train,
+                                at: timeline.date,
+                                visibleBounds: visibleBounds
+                            ) else { continue }
 
-                    let markerRect = CGRect(x: point.x - 10, y: point.y - 10, width: 20, height: 20)
-                    let marker = Path(roundedRect: markerRect, cornerRadius: 6)
-                    context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
-                    context.stroke(marker, with: .color(.white), lineWidth: 1.5)
-                    context.draw(trainIcon, in: markerRect.insetBy(dx: 4.5, dy: 4.5))
+                            let selected = train.id == appState.selectedTrainID
+                            let diameter: CGFloat = selected ? 24 : 20
+                            let markerRect = CGRect(
+                                x: point.x - diameter / 2,
+                                y: point.y - diameter / 2,
+                                width: diameter,
+                                height: diameter
+                            )
+                            if selected {
+                                let halo = Path(ellipseIn: markerRect.insetBy(dx: -5, dy: -5))
+                                context.fill(
+                                    halo,
+                                    with: .color(Color.tubeLine(train.lineID).opacity(0.18))
+                                )
+                            }
+                            let marker = Path(roundedRect: markerRect, cornerRadius: 7)
+                            context.fill(marker, with: .color(Color.tubeLine(train.lineID)))
+                            context.stroke(
+                                marker,
+                                with: .color(.white),
+                                lineWidth: selected ? 2.5 : 1.5
+                            )
+                            context.draw(trainIcon, in: markerRect.insetBy(dx: 5, dy: 5))
+                        }
+                    }
+                    .allowsHitTesting(false)
+
+                    ForEach(trains) { train in
+                        if let point = markerPoint(
+                            for: train,
+                            at: timeline.date,
+                            visibleBounds: CGRect(origin: .zero, size: viewport.size)
+                        ) {
+                            Button {
+                                withAnimation(.smooth(duration: 0.25)) {
+                                    appState.select(train: train)
+                                }
+                            } label: {
+                                Color.clear
+                                    .frame(width: 44, height: 44)
+                                    .contentShape(.circle)
+                            }
+                            .buttonStyle(.plain)
+                            .position(point)
+                            .accessibilityLabel(accessibilityLabel(for: train))
+                            .accessibilityHint("Shows this train's next stop and arrival time")
+                        }
+                    }
+
+                    if let train = appState.selectedTrain,
+                       let markerPoint = markerPoint(
+                           for: train,
+                           at: timeline.date,
+                           visibleBounds: CGRect(origin: .zero, size: viewport.size)
+                       ),
+                       let nextStopName = appState.graph?.stationsByID[train.nextStationID]?.name {
+                        TrainMapCalloutOverlay(
+                            train: train,
+                            nextStopName: nextStopName,
+                            date: timeline.date,
+                            markerPoint: markerPoint,
+                            viewportSize: viewport.size
+                        )
+                        .allowsHitTesting(false)
+                    }
                 }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .allowsHitTesting(false)
-        .accessibilityElement(children: .ignore)
+        .accessibilityElement(children: .contain)
         .accessibilityLabel("Estimated live train positions")
-        .accessibilityValue("\(trains.count) trains")
+    }
+
+    private func markerPoint(
+        for train: LiveTubeTrain,
+        at date: Date,
+        visibleBounds: CGRect
+    ) -> CGPoint? {
+        guard let path = pathsBySegmentID[train.segmentID],
+              let progress = LiveTrainMarkerPolicy.projectedProgress(
+                  for: train,
+                  at: date,
+                  stationBoard: appState.authoritativeStationBoardSnapshot
+              ),
+              let coordinate = path.coordinate(
+                  at: progress,
+                  previousStationID: train.previousStationID,
+                  nextStationID: train.nextStationID
+              ),
+              visibleRegion.containsExpanded(coordinate),
+              let point = proxy.convert(coordinate, to: .local),
+              visibleBounds.contains(point) else { return nil }
+        return point
+    }
+
+    private func accessibilityLabel(for train: LiveTubeTrain) -> String {
+        let destination = train.destination ?? "unknown destination"
+        let nextStop = appState.graph?.stationsByID[train.nextStationID]?.name
+            ?? "unknown next stop"
+        if let direction = LiveTrainDirection.displayName(for: train.direction) {
+            return "\(direction) train to \(destination), next stop \(nextStop)"
+        }
+        return "Train to \(destination), next stop \(nextStop)"
     }
 }
 

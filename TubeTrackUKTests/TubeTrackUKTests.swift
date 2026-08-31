@@ -1,5 +1,6 @@
 import CoreGraphics
 import Foundation
+import MapKit
 import Testing
 @testable import TubeTrackUK
 
@@ -308,6 +309,69 @@ struct TubeTrackUKTests {
         #expect(DisruptionDisplayMode.issues.mutesSegment(isAffected: false))
     }
 
+    @Test @MainActor func selectingADisruptionFocusesOnlyItsRelevantLineSection() throws {
+        let graph = try TubeGraph.bundled()
+        let centralSegment = try #require(graph.segments(for: .central).first)
+        let victoriaSegment = try #require(graph.segments(for: .victoria).first { segment in
+            graph.stationsByID[segment.fromStationID]?.lineIDs.contains(.central) == false
+                && graph.stationsByID[segment.toStationID]?.lineIDs.contains(.central) == false
+        })
+        let selected = ResolvedDisruption(
+            id: "selected-central-section",
+            lineID: .central,
+            title: "Part suspension",
+            reason: "Affects one Central line section",
+            severity: 5,
+            affectedStationIDs: [
+                centralSegment.fromStationID,
+                centralSegment.toStationID,
+                victoriaSegment.fromStationID,
+                victoriaSegment.toStationID,
+            ],
+            affectedSegmentIDs: [centralSegment.id, victoriaSegment.id],
+            confidence: .exact
+        )
+        let appState = TubeAppState()
+        appState.graph = graph
+        appState.disruptions = [selected]
+
+        appState.select(disruption: selected)
+
+        #expect(appState.focusedLineIDs == [.central])
+        #expect(appState.focusedSegmentIDs == [centralSegment.id])
+        #expect(appState.focusedStationIDs == [
+            centralSegment.fromStationID,
+            centralSegment.toStationID,
+        ])
+        #expect(appState.activeAffectedSegmentIDs == [centralSegment.id])
+        #expect(appState.activeAffectedStationIDs == appState.focusedStationIDs)
+        #expect(appState.disruptionSelectionGeneration == 1)
+
+        appState.select(disruption: selected)
+        #expect(appState.disruptionSelectionGeneration == 2)
+    }
+
+    @Test func disruptionWithoutAResolvedSectionFocusesItsRelevantLine() throws {
+        let graph = try TubeGraph.bundled()
+        let disruption = ResolvedDisruption(
+            id: "line-only",
+            lineID: .victoria,
+            title: "Severe delays",
+            reason: "Whole line affected",
+            severity: 6,
+            affectedStationIDs: [],
+            affectedSegmentIDs: [],
+            confidence: .lineOnly
+        )
+
+        let focus = MapDisruptionFocus(disruption: disruption, graph: graph)
+
+        #expect(focus.lineIDs == [.victoria])
+        #expect(focus.segmentIDs == Set(graph.segments(for: .victoria).map(\.id)))
+        #expect(!focus.stationIDs.isEmpty)
+        #expect(focus.confidence == .lineOnly)
+    }
+
     @Test @MainActor func enablingDisruptionHighlightsPreservesAnExistingCategoryChoice() {
         let appState = TubeAppState()
         appState.disruptionDisplayMode = .normal
@@ -335,6 +399,33 @@ struct TubeTrackUKTests {
 
         appState.toggleDisruptionHighlighting()
         #expect(appState.disruptionDisplayMode == .normal)
+    }
+
+    @Test @MainActor func disruptedStatsKeepTheWorksControlSelected() {
+        let appState = TubeAppState()
+
+        appState.selectedMapNetworkStat = .minorDelays
+        #expect(appState.isViewingDisruptedLines)
+
+        appState.selectedMapNetworkStat = .majorIssues
+        #expect(appState.isViewingDisruptedLines)
+
+        appState.selectedMapNetworkStat = .goodService
+        #expect(!appState.isViewingDisruptedLines)
+
+        appState.disruptionDisplayMode = .issues
+        #expect(appState.isViewingDisruptedLines)
+    }
+
+    @Test @MainActor func worksControlClearsAnActiveDisruptionFilter() {
+        let appState = TubeAppState()
+        appState.selectedMapNetworkStat = .minorDelays
+
+        appState.toggleDisruptionHighlighting()
+
+        #expect(appState.selectedMapNetworkStat == nil)
+        #expect(appState.disruptionDisplayMode == .normal)
+        #expect(!appState.isViewingDisruptedLines)
     }
 
     @Test func dataFreshnessUsesStableCopyInsteadOfACountdown() {
@@ -578,6 +669,7 @@ struct TubeTrackUKTests {
         appState.disruptions = [disruption(id: "live", severity: 6, segmentID: "live-segment")]
         appState.engineeringWorks = [plannedWork]
         appState.select(disruption: appState.disruptions[0])
+        appState.selectedMapNetworkStat = .majorIssues
 
         #expect(appState.disruptionDateSelection == .today)
         #expect(appState.visibleDisruptions.map(\.id) == ["live"])
@@ -586,10 +678,21 @@ struct TubeTrackUKTests {
 
         #expect(appState.selectedDisruptionID == nil)
         #expect(appState.selectedEngineeringWorkID == nil)
+        #expect(appState.selectedMapNetworkStat == nil)
+        #expect(appState.disruptionDisplayMode == .normal)
         #expect(appState.selectedEngineeringWorks.map(\.id) == ["weekend-work"])
         #expect(appState.visibleDisruptions.count == 1)
         #expect(appState.visibleDisruptions[0].category == .closures)
         #expect(appState.activeAffectedSegmentIDs == plannedWork.affectedSegmentIDs)
+
+        appState.toggleMapNetworkStat(.disrupted)
+        #expect(appState.selectedMapNetworkStat == .disrupted)
+
+        appState.setDisruptionDateSelection(.today)
+
+        #expect(appState.isViewingLiveStatus)
+        #expect(appState.selectedMapNetworkStat == nil)
+        #expect(appState.visibleDisruptions.map(\.id) == ["live"])
     }
 
     @Test func engineeringWorksBuilderKeepsEveryPlannedValidityPeriodAndUniqueID() throws {
@@ -696,6 +799,374 @@ struct TubeTrackUKTests {
         #expect(train.projectedProgress(at: Date(timeIntervalSince1970: 1_500)) == 1)
     }
 
+    @Test func trainNextStopETACountsDownAndNeverBecomesNegative() {
+        let train = markerTrain(seconds: 125)
+
+        #expect(train.remainingSecondsToNextStation(
+            at: Date(timeIntervalSince1970: 1_060)
+        ) == 65)
+        #expect(train.estimatedNextStopArrival(
+            at: Date(timeIntervalSince1970: 1_060)
+        ) == Date(timeIntervalSince1970: 1_125))
+        #expect(train.remainingSecondsToNextStation(
+            at: Date(timeIntervalSince1970: 1_200)
+        ) == 0)
+    }
+
+    @Test func refreshedTrainNeverMovesBackwardsOnTheSameLeg() throws {
+        let previous = markerTrain(seconds: 100)
+        let refreshedAt = Date(timeIntervalSince1970: 1_050)
+        let incoming = previous.rebased(
+            progress: 0.3,
+            secondsToNextStation: 150,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [incoming],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(train.progress == 0.625)
+        #expect(train.secondsToNextStation == 150)
+    }
+
+    @Test func refreshedArrivalLatchesAtTheStationWhenTheETARestarts() throws {
+        let previous = markerTrain(seconds: 60)
+        let refreshedAt = Date(timeIntervalSince1970: 1_060)
+        let incoming = previous.rebased(
+            progress: 0.4,
+            secondsToNextStation: 60,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [incoming],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(train.progress == 1)
+        #expect(train.remainingSecondsToNextStation(at: refreshedAt) == 0)
+        #expect(LiveTrainMarkerPolicy.projectedProgress(
+            for: train,
+            at: refreshedAt.addingTimeInterval(30),
+            stationBoard: nil
+        ) == 1)
+    }
+
+    @Test func refreshedTrainUsesAPhysicallyPlausibleForwardCorrection() throws {
+        let previous = markerTrain(seconds: 100)
+        let refreshedAt = Date(timeIntervalSince1970: 1_050)
+        let incoming = previous.rebased(
+            progress: 0.95,
+            secondsToNextStation: 1,
+            updatedAt: refreshedAt
+        )
+        let segment = TubeSegment(
+            id: previous.segmentID,
+            lineID: previous.lineID,
+            fromStationID: previous.previousStationID,
+            toStationID: previous.nextStationID,
+            schematicPoints: [],
+            geographicPoints: [
+                GeographicPoint(latitude: 51.50, longitude: -0.12),
+                GeographicPoint(latitude: 51.51, longitude: -0.12),
+            ]
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [incoming],
+            at: refreshedAt,
+            segmentsByID: [segment.id: segment]
+        ).first)
+
+        #expect(train.progress == 0.625)
+        #expect(train.secondsToNextStation >= 9)
+    }
+
+    @Test func nextLegBeginsAtTheSharedStationRatherThanJumpingDownTrack() throws {
+        let previous = markerTrain(seconds: 60)
+        let refreshedAt = Date(timeIntervalSince1970: 1_060)
+        let incoming = LiveTubeTrain(
+            id: previous.id,
+            vehicleID: previous.vehicleID,
+            lineID: previous.lineID,
+            destination: "Cockfosters",
+            direction: previous.direction,
+            previousStationID: previous.nextStationID,
+            nextStationID: "cockfosters",
+            segmentID: "tram:arena:cockfosters",
+            progress: 0.7,
+            secondsToNextStation: 20,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [incoming],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(train.segmentID == incoming.segmentID)
+        #expect(train.previousStationID == previous.nextStationID)
+        #expect(train.progress == 0)
+    }
+
+    @Test func terminusReversalStartsFromThePlatform() throws {
+        let previous = LiveTubeTrain(
+            id: "piccadilly:123",
+            vehicleID: "123",
+            lineID: .piccadilly,
+            destination: "Cockfosters",
+            direction: "northbound",
+            previousStationID: "oakwood",
+            nextStationID: "cockfosters",
+            segmentID: "piccadilly:cockfosters:oakwood",
+            progress: 0.25,
+            secondsToNextStation: 60,
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        )
+        let refreshedAt = Date(timeIntervalSince1970: 1_060)
+        let reversed = LiveTubeTrain(
+            id: previous.id,
+            vehicleID: previous.vehicleID,
+            lineID: previous.lineID,
+            destination: "Heathrow Terminal 5",
+            direction: "southbound",
+            previousStationID: "cockfosters",
+            nextStationID: "oakwood",
+            segmentID: previous.segmentID,
+            progress: 0.65,
+            secondsToNextStation: 30,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [reversed],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(train.previousStationID == "cockfosters")
+        #expect(train.nextStationID == "oakwood")
+        #expect(train.progress == 0)
+    }
+
+    @Test func reusedVehicleIDDoesNotTeleportToAnUnrelatedLeg() throws {
+        let previous = markerTrain(seconds: 100)
+        let refreshedAt = Date(timeIntervalSince1970: 1_050)
+        let unrelated = LiveTubeTrain(
+            id: previous.id,
+            vehicleID: previous.vehicleID,
+            lineID: previous.lineID,
+            destination: "New Addington",
+            direction: previous.direction,
+            previousStationID: "coombe-lane",
+            nextStationID: "gravel-hill",
+            segmentID: "tram:coombe-lane:gravel-hill",
+            progress: 0.6,
+            secondsToNextStation: 30,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [unrelated],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(!LiveTrainSnapshotReconciler.isContinuousJourney(
+            from: previous,
+            to: unrelated,
+            at: refreshedAt
+        ))
+        #expect(train.segmentID == previous.segmentID)
+        #expect(train.projectedProgress(at: refreshedAt) == 0.625)
+    }
+
+    @Test func nextLegWaitsForTheDisplayedTrainToReachTheSharedStation() throws {
+        let previous = markerTrain(seconds: 100)
+        let refreshedAt = Date(timeIntervalSince1970: 1_050)
+        let incoming = LiveTubeTrain(
+            id: previous.id,
+            vehicleID: previous.vehicleID,
+            lineID: previous.lineID,
+            destination: "Cockfosters",
+            direction: previous.direction,
+            previousStationID: previous.nextStationID,
+            nextStationID: "cockfosters",
+            segmentID: "tram:arena:cockfosters",
+            progress: 0.6,
+            secondsToNextStation: 20,
+            updatedAt: refreshedAt
+        )
+
+        let train = try #require(LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [incoming],
+            at: refreshedAt,
+            segmentsByID: [:]
+        ).first)
+
+        #expect(train.segmentID == previous.segmentID)
+        #expect(train.progress == 0.625)
+        #expect(train.secondsToNextStation > 1)
+    }
+
+    @Test func oneMissingTrainSnapshotIsRetainedWithoutFlicker() {
+        let previous = markerTrain(seconds: 100)
+
+        let retained = LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [],
+            at: Date(timeIntervalSince1970: 1_030),
+            segmentsByID: [:]
+        )
+        let expired = LiveTrainSnapshotReconciler.reconcile(
+            previous: [previous],
+            incoming: [],
+            at: Date(timeIntervalSince1970: 1_046),
+            segmentsByID: [:]
+        )
+
+        #expect(retained.map(\.id) == [previous.id])
+        #expect(expired.isEmpty)
+    }
+
+    @Test func liveTrainLocationTextPlacesOpposingKensalTrainsOnDifferentSides() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let kensalGreenID = "940GZZLUKSL"
+
+        let southboundPrevious = repository.neighboringStation(
+            for: kensalGreenID,
+            on: .bakerloo,
+            direction: nil,
+            currentLocation: "Between Willesden Junction and Kensal Green"
+        )
+        let northboundPrevious = repository.neighboringStation(
+            for: kensalGreenID,
+            on: .bakerloo,
+            direction: "outbound",
+            destinationStationID: "940GZZLUSGP",
+            currentLocation: "North of Queen's Park"
+        )
+
+        #expect(southboundPrevious == "940GZZLUWJN")
+        #expect(northboundPrevious == "940GZZLUQPS")
+        #expect(southboundPrevious != northboundPrevious)
+    }
+
+    @Test func platformDirectionResolvesThePreviousStationWhenLocationIsMissing() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let kensalGreenID = "940GZZLUKSL"
+
+        #expect(repository.neighboringStation(
+            for: kensalGreenID,
+            on: .bakerloo,
+            direction: "Southbound - Platform 1"
+        ) == "940GZZLUWJN")
+        #expect(repository.neighboringStation(
+            for: kensalGreenID,
+            on: .bakerloo,
+            direction: "Northbound - Platform 2"
+        ) == "940GZZLUQPS")
+    }
+
+    @Test func liveTrainDirectionPrefersPassengerFacingPlatformDirection() {
+        #expect(LiveTrainDirection.resolved(
+            direction: "outbound",
+            platformName: "Northbound - Platform 2"
+        ) == "Northbound")
+        #expect(LiveTrainDirection.resolved(
+            direction: nil,
+            platformName: "Southbound - Platform 1"
+        ) == "Southbound")
+        #expect(LiveTrainDirection.displayName(for: "Eastbound - Platform 3") == "Eastbound")
+        #expect(LiveTrainDirection.displayName(for: "outbound") == "Outbound")
+        #expect(LiveTrainDirection.displayName(for: "Platform 4") == nil)
+    }
+
+    @Test func liveTrainHitTestingChoosesTheNearestMarkerWithinItsTapTarget() {
+        let first = markerTrain(vehicleID: "first", seconds: 60)
+        let second = markerTrain(vehicleID: "second", seconds: 60)
+        let candidates = [
+            (train: first, point: CGPoint(x: 40, y: 40)),
+            (train: second, point: CGPoint(x: 58, y: 40)),
+        ]
+
+        #expect(LiveTrainHitTesting.nearest(
+            to: CGPoint(x: 55, y: 42),
+            candidates: candidates
+        )?.id == second.id)
+        #expect(LiveTrainHitTesting.nearest(
+            to: CGPoint(x: 120, y: 120),
+            candidates: candidates
+        ) == nil)
+    }
+
+    @Test func trainCalloutLayoutStaysOnScreenAndPointsBackToTheMarker() {
+        let layout = TrainMapCalloutLayout.resolve(
+            markerPoint: CGPoint(x: 10, y: 500),
+            calloutSize: CGSize(width: 300, height: 140),
+            viewportSize: CGSize(width: 390, height: 844)
+        )
+
+        #expect(layout.placement == .above)
+        #expect(layout.calloutCenter.x == 162)
+        #expect(layout.calloutCenter.y == 418)
+        #expect(layout.arrowOffset == -120)
+    }
+
+    @Test func trainMapFocusZoomsInWithoutZoomingBackOut() {
+        let coordinate = CLLocationCoordinate2D(latitude: 51.6517, longitude: -0.1496)
+        let overview = TrainMapFocusPolicy.geographicRegion(
+            centeredAt: coordinate,
+            currentSpan: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.15)
+        )
+        let alreadyClose = TrainMapFocusPolicy.geographicRegion(
+            centeredAt: coordinate,
+            currentSpan: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.015)
+        )
+
+        #expect(overview.center.latitude == coordinate.latitude)
+        #expect(overview.center.longitude == coordinate.longitude)
+        #expect(overview.span.latitudeDelta == 0.025)
+        #expect(overview.span.longitudeDelta == 0.04)
+        #expect(alreadyClose.span.latitudeDelta == 0.01)
+        #expect(alreadyClose.span.longitudeDelta == 0.015)
+        #expect(TrainMapFocusPolicy.schematicScale(
+            currentScale: 0.4,
+            minimumScale: 0.2,
+            maximumScale: 3.8
+        ) == 1.65)
+        #expect(TrainMapFocusPolicy.schematicScale(
+            currentScale: 2.1,
+            minimumScale: 0.2,
+            maximumScale: 3.8
+        ) == 2.1)
+    }
+
+    @Test @MainActor func repeatedTrainTapsEachRequestCameraFocus() {
+        let appState = TubeAppState()
+        let train = markerTrain(seconds: 60)
+
+        appState.select(train: train)
+        let firstGeneration = appState.trainSelectionGeneration
+        appState.select(train: train)
+
+        #expect(firstGeneration == 1)
+        #expect(appState.trainSelectionGeneration == 2)
+        #expect(appState.selectedTrainID == train.id)
+    }
+
     @Test func markerPolicyRemovesAProjectionAfterItsArrivalWindow() {
         let train = markerTrain(seconds: 100)
 
@@ -796,6 +1267,8 @@ struct TubeTrackUKTests {
         #expect(counts.count(for: .tram) == 1)
         #expect(counts.count(for: .victoria) == 0)
         #expect(counts.total == 2)
+        #expect(counts.activeLineCount() == 2)
+        #expect(counts.activeLineCount(excluding: [.dlr]) == 1)
     }
 
     @Test @MainActor func memoryWarningDropsSupplementalLiveData() {
@@ -847,7 +1320,10 @@ struct TubeTrackUKTests {
         #expect(appState.showLiveTrains)
         #expect(appState.isLoadingLiveTrains)
 
-        try await Task.sleep(for: .milliseconds(150))
+        for _ in 0 ..< 20 {
+            if await trainService.attemptCount >= 2 { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
 
         #expect(await trainService.attemptCount == 2)
         #expect(appState.liveTrains.count == 1)
@@ -858,6 +1334,8 @@ struct TubeTrackUKTests {
 
     @Test func mapDockControlsUseTheSharedCompactHeight() {
         #expect(MapDockMetrics.controlSize == 44)
+        #expect(MapDockMetrics.contentColumnWidth(for: 390) == 314)
+        #expect(MapDockMetrics.contentColumnWidth(for: 60) == 0)
     }
 
     @Test func beckMapTrainPathRespectsTravelAndAuthoredDirections() throws {

@@ -5,8 +5,6 @@ struct ClosestStationMapSection: View {
     @Environment(TubeAppState.self) private var appState
     @State private var locationProvider = UserLocationProvider()
 
-    let onHide: () -> Void
-
     private var closestStation: NearbyStation? {
         guard let graph = appState.graph,
               let location = locationProvider.location else { return nil }
@@ -22,8 +20,7 @@ struct ClosestStationMapSection: View {
             if let graph = appState.graph, let closestStation {
                 ClosestStationMapPanel(
                     nearbyStation: closestStation,
-                    graph: graph,
-                    onHide: onHide
+                    graph: graph
                 )
                 .id(closestStation.id)
             } else {
@@ -32,8 +29,7 @@ struct ClosestStationMapSection: View {
                     needsPermission: locationProvider.needsSettingsPermission,
                     errorMessage: locationProvider.errorMessage,
                     onRetry: locationProvider.requestLocation,
-                    onOpenNearMe: { appState.selectedTab = .nearMe },
-                    onHide: onHide
+                    onOpenNearMe: { appState.selectedTab = .nearMe }
                 )
             }
         }
@@ -70,7 +66,6 @@ private struct ClosestStationMapPanel: View {
 
     let nearbyStation: NearbyStation
     let graph: TubeGraph
-    let onHide: () -> Void
 
     private var station: TubeStation { nearbyStation.station }
 
@@ -122,7 +117,14 @@ private struct ClosestStationMapPanel: View {
         }
         .padding(12)
         .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .contentShape(.rect(cornerRadius: 20))
+        .onTapGesture {
+            openNearMe()
+        }
         .accessibilityElement(children: .contain)
+        .accessibilityAction(named: "Open in Near Me") {
+            openNearMe()
+        }
         .onAppear {
             reconcileSelection()
         }
@@ -156,16 +158,10 @@ private struct ClosestStationMapPanel: View {
 
             Spacer(minLength: 8)
 
-            Button(action: onHide) {
-                Image(systemName: "chevron.down")
-                    .font(.subheadline.weight(.bold))
-                    .frame(width: 44, height: 44)
-                    .contentShape(.circle)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel("Hide closest station")
-            .accessibilityHint("Moves this section to a button at the top of the map")
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
         }
     }
 
@@ -251,6 +247,10 @@ private struct ClosestStationMapPanel: View {
             arrivals: arrivals
         )
     }
+
+    private func openNearMe() {
+        appState.showNearMe(focusedOn: station)
+    }
 }
 
 private struct CompactStationDepartureGroupView: View {
@@ -295,7 +295,6 @@ private struct ClosestStationAvailabilityPanel: View {
     let errorMessage: String?
     let onRetry: () -> Void
     let onOpenNearMe: () -> Void
-    let onHide: () -> Void
 
     var body: some View {
         HStack(spacing: 10) {
@@ -328,15 +327,6 @@ private struct ClosestStationAvailabilityPanel: View {
                     .buttonStyle(.bordered)
             }
 
-            Button(action: onHide) {
-                Image(systemName: "chevron.down")
-                    .font(.subheadline.weight(.bold))
-                    .frame(width: 44, height: 44)
-                    .contentShape(.circle)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.secondary)
-            .accessibilityLabel("Hide closest station")
         }
         .padding(12)
         .glassEffect(.regular, in: .rect(cornerRadius: 20))

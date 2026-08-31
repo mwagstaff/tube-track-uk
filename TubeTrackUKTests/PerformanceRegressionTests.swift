@@ -57,6 +57,11 @@ struct PerformanceRegressionTests {
     @Test func mapOptionsExposeStateAwareActionLabels() {
         #expect(MapPresentationMode.beck.switchActionTitle == "Show map view")
         #expect(MapPresentationMode.realWorld.switchActionTitle == "Show line view")
+        #expect(MapPresentationMode.beck.toggled.toggleNoticeMessage == "Toggling map view")
+        #expect(
+            MapPresentationMode.realWorld.toggled.toggleNoticeMessage
+                == "Toggling network view"
+        )
         #expect(AppAppearanceMode.system.actionTitle == "Use system appearance")
         #expect(AppAppearanceMode.light.actionTitle == "Enable light mode")
         #expect(AppAppearanceMode.dark.actionTitle == "Enable dark mode")

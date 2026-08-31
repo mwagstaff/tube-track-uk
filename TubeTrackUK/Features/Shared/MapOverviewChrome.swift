@@ -1,10 +1,12 @@
 import SwiftUI
 
 struct MapOverviewHeader: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Binding var disruptionsExpanded: Bool
     @Binding var zoomedDisruptionsExpanded: Bool
     let overviewOpacity: Double
     let compactForZoom: Bool
+    let onSelectDisruption: () -> Void
 
     private var effectiveExpanded: Binding<Bool> {
         Binding(
@@ -23,29 +25,55 @@ struct MapOverviewHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if !compactForZoom {
-                HStack(spacing: 11) {
-                    TubeTrackMark(compact: true)
-                    Text("TubeTrack UK")
-                        .font(.largeTitle.weight(.bold))
-                        .tracking(-0.7)
-                }
-                .opacity(overviewOpacity)
-                .accessibilityElement(children: .ignore)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityLabel("TubeTrack UK")
-            }
+            if usesCompactTopRow {
+                HStack(spacing: 8) {
+                    MapDisruptionOverviewCard(
+                        expanded: effectiveExpanded,
+                        headlineOnly: true,
+                        compactHeadline: true,
+                        onSelectDisruption: onSelectDisruption
+                    )
+                    .layoutPriority(1)
 
-            MapDisruptionOverviewCard(
-                expanded: effectiveExpanded,
-                headlineOnly: compactForZoom && !zoomedDisruptionsExpanded
-            )
-            .opacity(
-                zoomedDisruptionsExpanded ? 1 : max(0.5, overviewOpacity)
-            )
+                    MapHeaderControls()
+                }
+            } else {
+                HStack(spacing: 8) {
+                    if !compactForZoom {
+                        Text("TubeTrack UK")
+                            .font(.largeTitle.weight(.bold))
+                            .tracking(-0.7)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .layoutPriority(1)
+                            .opacity(overviewOpacity)
+                            .accessibilityElement(children: .ignore)
+                            .accessibilityAddTraits(.isHeader)
+                            .accessibilityLabel("TubeTrack UK")
+                    }
+
+                    Spacer(minLength: 4)
+
+                    MapHeaderControls()
+                }
+                .frame(minHeight: MapDockMetrics.controlSize)
+
+                MapDisruptionOverviewCard(
+                    expanded: effectiveExpanded,
+                    headlineOnly: compactForZoom && !zoomedDisruptionsExpanded,
+                    compactHeadline: false,
+                    onSelectDisruption: onSelectDisruption
+                )
+            }
         }
         .padding(.horizontal, 14)
         .padding(.top, 6)
+    }
+
+    private var usesCompactTopRow: Bool {
+        compactForZoom
+            && !effectiveExpanded.wrappedValue
+            && !dynamicTypeSize.isAccessibilitySize
     }
 }
 
@@ -54,43 +82,47 @@ struct MapDisruptionOverviewCard: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var expanded: Bool
     let headlineOnly: Bool
+    let compactHeadline: Bool
+    let onSelectDisruption: () -> Void
+
+    private var lineGroups: MapDisruptionLineGroups {
+        MapDisruptionLineGroups(disruptions: appState.visibleDisruptions)
+    }
 
     private var lineEntries: [ResolvedDisruption] {
-        Dictionary(
-            grouping: appState.visibleDisruptions.filter(\.lineID.isUnderground),
-            by: \.lineID
-        )
-            .compactMap { _, disruptions in disruptions.first }
-            .sorted {
-                $0.lineID.displayName.localizedStandardCompare($1.lineID.displayName)
-                    == .orderedAscending
-            }
+        lineGroups.all
     }
 
     var body: some View {
         VStack(spacing: 0) {
-            if headlineOnly {
+            if expanded {
+                headlineRow
+            } else {
                 Button {
                     expanded = true
                 } label: {
-                    headlineRow
+                    VStack(spacing: 0) {
+                        headlineRow
+                        if !headlineOnly {
+                            collapsedLinePills
+                        }
+                    }
                 }
                 .buttonStyle(.plain)
+                .contentShape(.rect)
                 .accessibilityHint("Shows current disruptions")
-            } else {
-                headlineRow
             }
 
             if !headlineOnly, expanded {
                 expandedContent
                     .transition(.opacity.combined(with: .move(edge: .top)))
-            } else if !headlineOnly {
-                collapsedContent
-                    .transition(.opacity)
             }
         }
         .frame(maxWidth: .infinity)
-        .glassEffect(.regular, in: .rect(cornerRadius: 24))
+        .glassEffect(
+            .regular,
+            in: .rect(cornerRadius: compactHeadline ? 18 : 24)
+        )
         .animation(
             reduceMotion ? nil : .spring(duration: 0.42, bounce: 0.12),
             value: expanded
@@ -100,18 +132,26 @@ struct MapDisruptionOverviewCard: View {
     }
 
     private var headlineRow: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: compactHeadline ? 8 : 12) {
                 Image(systemName: headlineSymbol)
-                    .font(.headline.weight(.bold))
+                    .font((compactHeadline ? Font.subheadline : .headline).weight(.bold))
                     .foregroundStyle(headlineColor)
-                    .frame(width: 40, height: 40)
+                    .frame(
+                        width: compactHeadline ? 32 : 40,
+                        height: compactHeadline ? 32 : 40
+                    )
                     .background(headlineColor.opacity(0.13), in: .circle)
                     .symbolEffect(.pulse, isActive: appState.isRefreshingDisruptionData)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(headline)
-                        .font(.headline.weight(.bold))
+                        .font(
+                            (compactHeadline ? Font.subheadline : .headline)
+                                .weight(.bold)
+                        )
                         .foregroundStyle(.primary)
+                        .lineLimit(compactHeadline ? 1 : nil)
+                        .minimumScaleFactor(compactHeadline ? 0.78 : 1)
                     if expanded {
                         Text("Live status and planned engineering work")
                             .font(.caption)
@@ -123,60 +163,69 @@ struct MapDisruptionOverviewCard: View {
 
                 if expanded {
                     DisruptionDateMenu(compact: true)
-                } else if headlineOnly {
+                } else {
                     Image(systemName: "chevron.down")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(.secondary)
-                        .frame(width: 32, height: 32)
+                        .frame(
+                            width: compactHeadline ? 24 : 32,
+                            height: compactHeadline ? 32 : 32
+                        )
                 }
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
+        .padding(.horizontal, compactHeadline ? 10 : 14)
+        .padding(.vertical, compactHeadline ? 6 : 12)
+        .frame(maxWidth: .infinity)
         .contentShape(.rect)
     }
 
-    private var collapsedContent: some View {
+    private var collapsedLinePills: some View {
         VStack(spacing: 0) {
-            if lineEntries.isEmpty {
-                HStack(spacing: 10) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text(emptyMessage)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 11)
-            } else {
-                VStack(spacing: 9) {
-                    ForEach(lineEntries.prefix(2)) { disruption in
-                        compactRow(disruption)
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 12)
-            }
-
             Divider()
                 .padding(.horizontal, 14)
 
-            Button {
-                expanded = true
-            } label: {
-                HStack(spacing: 7) {
-                    Text("View all disruptions")
-                        .font(.subheadline.weight(.semibold))
-                    Image(systemName: "chevron.down")
-                        .font(.caption.weight(.bold))
+            if lineEntries.isEmpty {
+                Text(emptyMessage)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+            } else {
+                HStack(spacing: collapsedPillSpacing) {
+                    ForEach(lineEntries) { disruption in
+                        Capsule()
+                            .fill(Color.tubeLine(disruption.lineID))
+                            .overlay {
+                                Capsule()
+                                    .stroke(.primary.opacity(0.16), lineWidth: 0.5)
+                            }
+                            .frame(width: collapsedPillWidth, height: 6)
+                            .accessibilityHidden(true)
+                    }
                 }
-                .foregroundStyle(Color.tubeBlue)
                 .frame(maxWidth: .infinity)
-                .frame(minHeight: 46)
-                .contentShape(.rect)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 11)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(affectedLinesAccessibilityLabel)
             }
-            .buttonStyle(.plain)
         }
+    }
+
+    private var collapsedPillSpacing: CGFloat {
+        lineEntries.count > 12 ? 4 : 6
+    }
+
+    private var collapsedPillWidth: CGFloat {
+        guard !lineEntries.isEmpty else { return 0 }
+        let availableWidth: CGFloat = 292
+        let gaps = CGFloat(max(0, lineEntries.count - 1)) * collapsedPillSpacing
+        return min(24, max(10, (availableWidth - gaps) / CGFloat(lineEntries.count)))
+    }
+
+    private var affectedLinesAccessibilityLabel: String {
+        "Affected lines: " + lineEntries.map(\.lineID.displayName).joined(separator: ", ")
     }
 
     private var expandedContent: some View {
@@ -200,7 +249,14 @@ struct MapDisruptionOverviewCard: View {
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 8) {
-                            ForEach(lineEntries) { disruption in
+                            ForEach(lineGroups.majorIssues) { disruption in
+                                expandedRow(disruption)
+                            }
+                            if !lineGroups.majorIssues.isEmpty,
+                               !lineGroups.minorDelays.isEmpty {
+                                minorDelaySeparator
+                            }
+                            ForEach(lineGroups.minorDelays) { disruption in
                                 expandedRow(disruption)
                             }
                         }
@@ -228,27 +284,24 @@ struct MapDisruptionOverviewCard: View {
         .padding(.bottom, 4)
     }
 
-    private func compactRow(_ disruption: ResolvedDisruption) -> some View {
-        HStack(spacing: 11) {
-            Capsule()
-                .fill(Color.tubeLine(disruption.lineID))
-                .frame(width: 38, height: 5)
-            Text(disruption.lineID.displayName)
-                .font(.subheadline.weight(.semibold))
-                .lineLimit(1)
-            Text("•")
+    private var minorDelaySeparator: some View {
+        HStack(spacing: 8) {
+            Divider()
+            Text("Minor delays")
+                .font(.caption2.weight(.medium))
                 .foregroundStyle(.tertiary)
-            Text(disruption.title)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
-            Spacer(minLength: 0)
+                .fixedSize()
+            Divider()
         }
+        .frame(height: 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Minor delays")
     }
 
     private func expandedRow(_ disruption: ResolvedDisruption) -> some View {
         Button {
             withAnimation(.smooth(duration: 0.35)) {
+                onSelectDisruption()
                 appState.select(disruption: disruption)
                 expanded = false
             }
@@ -265,7 +318,7 @@ struct MapDisruptionOverviewCard: View {
                         Spacer(minLength: 8)
                         Text(disruption.title)
                             .font(.caption.weight(.semibold))
-                            .foregroundStyle(.red)
+                            .foregroundStyle(disruption.isMinorDelay ? .orange : .red)
                             .lineLimit(1)
                     }
                     Text(disruption.reason)
@@ -312,7 +365,7 @@ struct MapDisruptionOverviewCard: View {
 
     private var emptyMessage: String {
         if appState.isViewingLiveStatus {
-            return "All Underground lines are reporting normally."
+            return "All supported London rail lines are reporting normally."
         }
         return "No planned work matches the selected date and times."
     }
@@ -359,6 +412,8 @@ struct MapExploreHint: View {
 }
 
 struct MapNetworkStatsCard: View {
+    private static let statHeight: CGFloat = 82
+
     @Environment(TubeAppState.self) private var appState
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -374,7 +429,7 @@ struct MapNetworkStatsCard: View {
                 stats
             }
         }
-        .padding(.vertical, 10)
+        .padding(.vertical, 6)
         .frame(maxWidth: .infinity)
         .glassEffect(.regular, in: .rect(cornerRadius: 22))
         .accessibilityElement(children: .contain)
@@ -382,13 +437,29 @@ struct MapNetworkStatsCard: View {
 
     private var stats: some View {
         HStack(spacing: 0) {
-            ForEach(Array(MapNetworkStatFilter.allCases.enumerated()), id: \.element) {
+            ForEach(Array(visibleFilters.enumerated()), id: \.element) {
                 index, filter in
                 if index > 0 { divider }
                 stat(filter)
             }
+
+            if !appState.isViewingLiveStatus {
+                divider
+                returnToTodayButton
+            }
         }
-        .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? 540 : 0)
+        .frame(minWidth: dynamicTypeSize.isAccessibilitySize ? accessibilityWidth : 0)
+    }
+
+    private var visibleFilters: [MapNetworkStatFilter] {
+        if appState.isViewingLiveStatus {
+            return [.lines, .goodService, .minorDelays, .majorIssues, .closed]
+        }
+        return [.lines, .goodService, .disrupted]
+    }
+
+    private var accessibilityWidth: CGFloat {
+        CGFloat(visibleFilters.count + (appState.isViewingLiveStatus ? 0 : 1)) * 108
     }
 
     private func stat(_ filter: MapNetworkStatFilter) -> some View {
@@ -400,7 +471,7 @@ struct MapNetworkStatsCard: View {
                 appState.toggleMapNetworkStat(filter)
             }
         } label: {
-            VStack(spacing: 3) {
+            VStack(spacing: 4) {
                 Image(systemName: filter.symbol)
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(filter.color)
@@ -412,10 +483,16 @@ struct MapNetworkStatsCard: View {
                     .foregroundStyle(selected ? .primary : .secondary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.75)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(height: 28, alignment: .top)
             }
-            .padding(.horizontal, 3)
-            .frame(maxWidth: .infinity, minHeight: 58)
+            .offset(y: filter == .lines ? 4 : 0)
+            .padding(.horizontal, 4)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: Self.statHeight,
+                maxHeight: Self.statHeight
+            )
             .background {
                 RoundedRectangle(cornerRadius: 13)
                     .fill(filter.color.opacity(selected ? 0.13 : 0))
@@ -423,7 +500,7 @@ struct MapNetworkStatsCard: View {
                         RoundedRectangle(cornerRadius: 13)
                             .stroke(filter.color.opacity(selected ? 0.42 : 0), lineWidth: 1)
                     }
-                    .padding(.horizontal, 3)
+                    .padding(4)
             }
             .contentShape(.rect)
         }
@@ -435,8 +512,41 @@ struct MapNetworkStatsCard: View {
         .accessibilityAddTraits(selected ? .isSelected : [])
     }
 
+    private var returnToTodayButton: some View {
+        Button {
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.26)) {
+                appState.setDisruptionDateSelection(.today)
+            }
+        } label: {
+            VStack(spacing: 5) {
+                Label("Return to today", systemImage: "calendar.badge.clock")
+                    .labelStyle(.iconOnly)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(Color.tubeBlue)
+                Text("Today")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(Color.tubeBlue)
+            }
+            .padding(.horizontal, 3)
+            .frame(maxWidth: .infinity, minHeight: 58)
+            .background {
+                RoundedRectangle(cornerRadius: 13)
+                    .fill(Color.tubeBlue.opacity(0.08))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 13)
+                            .stroke(Color.tubeBlue.opacity(0.18), lineWidth: 1)
+                    }
+                    .padding(.horizontal, 3)
+            }
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Return to today")
+        .accessibilityHint("Shows current service status and restores the live statistics")
+    }
+
     private var divider: some View {
         Divider()
-            .frame(height: 52)
+            .frame(height: Self.statHeight - 20)
     }
 }

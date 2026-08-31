@@ -9,13 +9,21 @@ struct BeckMapTests {
             status(.central, severity: 6, description: "Severe Delays"),
             status(.circle, severity: 10, description: "Good Service"),
             status(.district, severity: 20, description: "Service Closed"),
+            status(.dlr, severity: 20, description: "Service Closed"),
+            status(.lioness, severity: 20, description: "Service Closed"),
             status(.victoria, severity: 9, description: "Minor Delays"),
         ]
         let disruptions = [
             disruption("central-one", lineID: .central, segmentID: "central-1"),
             disruption("central-two", lineID: .central, segmentID: "central-2"),
-            disruption("victoria", lineID: .victoria, segmentID: "victoria-1"),
+            disruption(
+                "victoria",
+                lineID: .victoria,
+                segmentID: "victoria-1",
+                severity: 9
+            ),
             disruption("closed", lineID: .district, segmentID: "district-1"),
+            disruption("dlr", lineID: .dlr, segmentID: "dlr-1"),
         ]
 
         let summary = MapNetworkStatusSummary(
@@ -23,11 +31,38 @@ struct BeckMapTests {
             disruptions: disruptions
         )
 
-        #expect(summary.count(for: .lines) == 11)
+        #expect(summary.count(for: .lines) == 20)
         #expect(summary.goodServiceLineIDs == [.circle])
         #expect(summary.minorDelayLineIDs == [.victoria])
-        #expect(summary.disruptedLineIDs == [.central, .district, .victoria])
-        #expect(summary.closedLineIDs == [.district])
+        #expect(summary.majorIssueLineIDs == [.central, .district, .dlr])
+        #expect(summary.count(for: .majorIssues) == 3)
+        #expect(summary.closedLineIDs == [.district, .dlr, .lioness])
+    }
+
+    @Test func plannedNetworkSummaryCountsEveryUnaffectedLineAsGoodService() {
+        let statuses = [
+            status(.district, severity: 20, description: "Service Closed"),
+            status(.circle, severity: 9, description: "Minor Delays"),
+        ]
+        let disruptions = [
+            disruption("central-one", lineID: .central, segmentID: "central-1"),
+            disruption("central-two", lineID: .central, segmentID: "central-2"),
+            disruption("dlr", lineID: .dlr, segmentID: "dlr-1"),
+        ]
+
+        let summary = MapNetworkStatusSummary(
+            statuses: statuses,
+            disruptions: disruptions,
+            isViewingLiveStatus: false
+        )
+
+        #expect(summary.count(for: .lines) == 20)
+        #expect(summary.disruptedLineIDs == [.central, .dlr])
+        #expect(summary.count(for: .disrupted) == 2)
+        #expect(summary.count(for: .goodService) == 18)
+        #expect(summary.minorDelayLineIDs.isEmpty)
+        #expect(summary.majorIssueLineIDs.isEmpty)
+        #expect(summary.closedLineIDs.isEmpty)
     }
 
     @Test func networkFiltersMuteNonMatchingRoutesAndPreserveSectionPrecision() {
@@ -37,13 +72,14 @@ struct BeckMapTests {
             affectedSegmentIDs: ["central-affected"],
             affectedStationIDs: [],
             disruptionDisplayMode: .normal,
-            networkFilter: .disrupted,
+            networkFilter: .majorIssues,
             networkFeaturedLineIDs: [.central, .victoria],
             networkFeaturedSegmentIDs: ["central-affected"],
             networkSectionLineIDs: [.central],
-            closedLineIDs: [.district]
+            closedLineIDs: [.district, .dlr]
         )
 
+        #expect(!filtered.emphasizesIssues)
         #expect(!filtered.mutesSegment(
             id: "central-affected", lineID: .central, isAffected: true
         ))
@@ -67,14 +103,61 @@ struct BeckMapTests {
             networkFeaturedLineIDs: [],
             networkFeaturedSegmentIDs: [],
             networkSectionLineIDs: [],
-            closedLineIDs: [.district]
+            closedLineIDs: [.district, .dlr]
         )
         #expect(defaultView.mutesSegment(
             id: "district", lineID: .district, isAffected: false
         ))
+        #expect(defaultView.mutesSegment(
+            id: "dlr", lineID: .dlr, isAffected: false
+        ))
         #expect(!defaultView.mutesSegment(
             id: "circle", lineID: .circle, isAffected: false
         ))
+
+        #expect(!MapNetworkRouteStyling.mutesSegment(
+            lineID: .central,
+            isAffected: true,
+            isFeaturedSection: true,
+            selectedFilter: .disrupted,
+            featuredLineIDs: [.central],
+            sectionLineIDs: [.central],
+            closedLineIDs: [],
+            disruptionDisplayMode: .normal
+        ))
+        #expect(MapNetworkRouteStyling.mutesSegment(
+            lineID: .central,
+            isAffected: false,
+            isFeaturedSection: false,
+            selectedFilter: .disrupted,
+            featuredLineIDs: [.central],
+            sectionLineIDs: [.central],
+            closedLineIDs: [],
+            disruptionDisplayMode: .normal
+        ))
+        #expect(MapNetworkRouteStyling.mutesSegment(
+            lineID: .circle,
+            isAffected: false,
+            isFeaturedSection: false,
+            selectedFilter: .disrupted,
+            featuredLineIDs: [.central],
+            sectionLineIDs: [.central],
+            closedLineIDs: [],
+            disruptionDisplayMode: .normal
+        ))
+    }
+
+    @Test func disruptionOverviewGroupsMajorIssuesBeforeAlphabeticalMinorDelays() {
+        let groups = MapDisruptionLineGroups(disruptions: [
+            disruption("victoria-minor", lineID: .victoria, segmentID: "v-1", severity: 9),
+            disruption("central-major", lineID: .central, segmentID: "c-1", severity: 6),
+            disruption("bakerloo-major", lineID: .bakerloo, segmentID: "b-1", severity: 5),
+            disruption("central-minor", lineID: .central, segmentID: "c-2", severity: 9),
+        ])
+
+        #expect(groups.majorIssues.map(\.lineID) == [.bakerloo, .central])
+        #expect(groups.minorDelays.map(\.lineID) == [.victoria])
+        #expect(groups.all.map(\.lineID) == [.bakerloo, .central, .victoria])
     }
 
     @Test func overviewChromeFadesRelativeToTheFittedCameraScale() {
@@ -107,6 +190,39 @@ struct BeckMapTests {
         ) == 0)
     }
 
+    @Test func realWorldOverviewChromeFadesRelativeToTheFittedNetwork() {
+        #expect(RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: 1
+        ) == 1)
+
+        let partiallyVisible = RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: 1.3
+        )
+        #expect(partiallyVisible > 0)
+        #expect(partiallyVisible < 1)
+
+        #expect(RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: 1.55
+        ) == 0)
+    }
+
+    @Test func reducedMotionSwitchesRealWorldOverviewWithoutAnIntermediateFade() {
+        #expect(RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: 1.3,
+            reduceMotion: true
+        ) == 1)
+
+        #expect(RealWorldMapOverviewVisibilityPolicy.opacity(
+            at: 1.55,
+            reduceMotion: true
+        ) == 0)
+    }
+
+    @Test func realWorldResetAppearsAtTheSameZoomThresholdAsTheFade() {
+        #expect(!RealWorldMapOverviewVisibilityPolicy.shouldShowReset(at: 1.08))
+        #expect(RealWorldMapOverviewVisibilityPolicy.shouldShowReset(at: 1.081))
+    }
+
     @Test func closestStationAutoHidesAfterAUsefulZoomIncrease() {
         #expect(!BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
             at: 0.27,
@@ -114,6 +230,17 @@ struct BeckMapTests {
         ))
         #expect(BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
             at: 0.28,
+            fittedScale: 0.2
+        ))
+    }
+
+    @Test func resetControlAppearsOnlyBeyondTheOpeningZoom() {
+        #expect(!BeckMapOverviewVisibilityPolicy.shouldShowReset(
+            at: 0.216,
+            fittedScale: 0.2
+        ))
+        #expect(BeckMapOverviewVisibilityPolicy.shouldShowReset(
+            at: 0.218,
             fittedScale: 0.2
         ))
     }
@@ -156,14 +283,15 @@ struct BeckMapTests {
     private func disruption(
         _ id: String,
         lineID: TubeLineID,
-        segmentID: String
+        segmentID: String,
+        severity: Int = 6
     ) -> ResolvedDisruption {
         ResolvedDisruption(
             id: id,
             lineID: lineID,
             title: "Disruption",
             reason: "Testing",
-            severity: 6,
+            severity: severity,
             affectedStationIDs: [],
             affectedSegmentIDs: [segmentID],
             confidence: .exact

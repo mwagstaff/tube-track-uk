@@ -785,11 +785,11 @@
       "visibilityTier": "minor"
     },
     {
-      "alignment": "leading",
+      "alignment": "centre",
       "id": "label.910GKLBRNHR",
       "position": {
-        "x": 1666.02,
-        "y": 1236.703
+        "x": 1349.0,
+        "y": 1287.0
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5677,6 +5677,9 @@
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "940GZZDLWHM"
+      ],
       "id": "label.940GZZLUWHM",
       "position": {
         "x": 3211.053,
@@ -5859,6 +5862,10 @@
     },
     {
       "alignment": "leading",
+      "associatedStationIDs": [
+        "910GWCHAPEL",
+        "910GWCHAPXR"
+      ],
       "id": "label.940GZZLUWPL",
       "position": {
         "x": 2716.0,
@@ -10354,7 +10361,7 @@
         {
           "op": "line",
           "to": {
-            "x": 3254.07,
+            "x": 3280.781,
             "y": 1549.594
           }
         }
@@ -10366,22 +10373,8 @@
         {
           "op": "move",
           "to": {
-            "x": 3254.07,
+            "x": 3280.781,
             "y": 1549.594
-          }
-        },
-        {
-          "op": "line",
-          "to": {
-            "x": 3266.36,
-            "y": 1549.594
-          }
-        },
-        {
-          "op": "line",
-          "to": {
-            "x": 3277.016,
-            "y": 1549.578
           }
         },
         {
@@ -14380,7 +14373,7 @@
           },
           "op": "cubic",
           "to": {
-            "x": 3254.412,
+            "x": 3280.781,
             "y": 1541.254
           }
         }
@@ -14392,7 +14385,7 @@
         {
           "op": "move",
           "to": {
-            "x": 3254.412,
+            "x": 3280.781,
             "y": 1541.254
           }
         },
@@ -16007,18 +16000,32 @@
           }
         },
         {
+          "op": "line",
+          "to": {
+            "x": 1618.0,
+            "y": 1254.708
+          }
+        },
+        {
           "control1": {
-            "x": 1710.687,
-            "y": 1254.705
+            "x": 1600.0,
+            "y": 1254.708
           },
           "control2": {
-            "x": 1673.823,
-            "y": 1254.704
+            "x": 1578.0,
+            "y": 1305.0
           },
           "op": "cubic",
           "to": {
-            "x": 1650.02,
-            "y": 1254.703
+            "x": 1562.0,
+            "y": 1305.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1349.0,
+            "y": 1305.0
           }
         }
       ],
@@ -16181,22 +16188,36 @@
         {
           "op": "move",
           "to": {
-            "x": 1650.02,
-            "y": 1254.703
+            "x": 1349.0,
+            "y": 1305.0
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1228.0,
+            "y": 1305.0
           }
         },
         {
           "control1": {
-            "x": 1500.02,
-            "y": 1254.703
+            "x": 1218.0,
+            "y": 1305.0
           },
           "control2": {
-            "x": 1222.907,
-            "y": 1276.111
+            "x": 1213.985,
+            "y": 1304.111
           },
           "op": "cubic",
           "to": {
-            "x": 1172.907,
+            "x": 1207.985,
+            "y": 1298.111
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1185.985,
             "y": 1276.111
           }
         }
@@ -16208,20 +16229,49 @@
         {
           "op": "move",
           "to": {
-            "x": 1172.907,
+            "x": 1185.985,
             "y": 1276.111
           }
         },
         {
           "control1": {
-            "x": 1164.907,
-            "y": 1268.111
+            "x": 1166.026,
+            "y": 1256.151
           },
           "control2": {
-            "x": 1155.547,
-            "y": 1244.085
+            "x": 1166.266,
+            "y": 1256.391
           },
           "op": "cubic",
+          "to": {
+            "x": 1166.266,
+            "y": 1256.391
+          }
+        },
+        {
+          "control1": {
+            "x": 1160.375,
+            "y": 1250.5
+          },
+          "control2": {
+            "x": 1155.563,
+            "y": 1238.86
+          },
+          "op": "cubic",
+          "to": {
+            "x": 1155.563,
+            "y": 1230.531
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1155.547,
+            "y": 1230.531
+          }
+        },
+        {
+          "op": "line",
           "to": {
             "x": 1155.547,
             "y": 1230.085
@@ -17480,22 +17530,7 @@
         {
           "op": "line",
           "to": {
-            "x": 1087.313,
-            "y": 1174.922
-          }
-        },
-        {
-          "control1": {
-            "x": 1082.232,
-            "y": 1174.922
-          },
-          "control2": {
-            "x": 1075.543,
-            "y": 1177.264
-          },
-          "op": "cubic",
-          "to": {
-            "x": 1113.547,
+            "x": 1155.547,
             "y": 1175.222
           }
         }
@@ -17507,18 +17542,25 @@
         {
           "op": "move",
           "to": {
+            "x": 1155.547,
+            "y": 1175.222
+          }
+        },
+        {
+          "op": "line",
+          "to": {
             "x": 1113.547,
             "y": 1175.222
           }
         },
         {
           "control1": {
-            "x": 1069.54,
-            "y": 1181.326
+            "x": 1095.0,
+            "y": 1175.222
           },
           "control2": {
-            "x": 1068.445,
-            "y": 1182.208
+            "x": 1076.0,
+            "y": 1176.0
           },
           "op": "cubic",
           "to": {
@@ -18065,18 +18107,25 @@
         {
           "op": "move",
           "to": {
-            "x": 1113.543,
-            "y": 1175.225
+            "x": 1155.547,
+            "y": 1175.222
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1113.547,
+            "y": 1175.222
           }
         },
         {
           "control1": {
-            "x": 1069.538,
-            "y": 1181.328
+            "x": 1095.0,
+            "y": 1175.222
           },
           "control2": {
-            "x": 1068.444,
-            "y": 1182.209
+            "x": 1076.0,
+            "y": 1176.0
           },
           "op": "cubic",
           "to": {
@@ -24758,7 +24807,7 @@
           "op": "line",
           "to": {
             "x": 2704.938,
-            "y": 1567.005
+            "y": 1545.0
           }
         }
       ],
@@ -24770,7 +24819,7 @@
           "op": "move",
           "to": {
             "x": 2704.938,
-            "y": 1567.005
+            "y": 1545.0
           }
         },
         {
@@ -30347,7 +30396,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.district.eastern-fan.v1.2",
       "toPort": {
-        "x": 3254.07,
+        "x": 3280.781,
         "y": 1549.594
       },
       "toStationID": "940GZZLUWHM",
@@ -31178,7 +31227,7 @@
     },
     {
       "fromPort": {
-        "x": 3254.07,
+        "x": 3280.781,
         "y": 1549.594
       },
       "fromStationID": "940GZZLUWHM",
@@ -33247,7 +33296,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.eastern-fan.v1.2",
       "toPort": {
-        "x": 3254.412,
+        "x": 3280.781,
         "y": 1541.254
       },
       "toStationID": "940GZZLUWHM",
@@ -33658,7 +33707,7 @@
     },
     {
       "fromPort": {
-        "x": 3254.412,
+        "x": 3280.781,
         "y": 1541.254
       },
       "fromStationID": "940GZZLUWHM",
@@ -34478,7 +34527,7 @@
     },
     {
       "fromPort": {
-        "x": 1172.907,
+        "x": 1185.985,
         "y": 1276.111
       },
       "fromStationID": "910GQPRK",
@@ -34518,8 +34567,8 @@
     },
     {
       "fromPort": {
-        "x": 1650.02,
-        "y": 1254.703
+        "x": 1349.0,
+        "y": 1305.0
       },
       "fromStationID": "910GKLBRNHR",
       "id": "lioness:910GKLBRNHR:910GQPRK",
@@ -34527,7 +34576,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.lioness.euston-watford.official.v1.2",
       "toPort": {
-        "x": 1172.907,
+        "x": 1185.985,
         "y": 1276.111
       },
       "toStationID": "910GQPRK",
@@ -34547,8 +34596,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.lioness.euston-watford.official.v1.1",
       "toPort": {
-        "x": 1650.02,
-        "y": 1254.703
+        "x": 1349.0,
+        "y": 1305.0
       },
       "toStationID": "910GKLBRNHR",
       "translation": {
@@ -35378,8 +35427,8 @@
     },
     {
       "fromPort": {
-        "x": 1113.543,
-        "y": 1175.225
+        "x": 1155.547,
+        "y": 1175.222
       },
       "fromStationID": "910GWLSDJHL",
       "id": "mildmay:910GACTNCTL:910GWLSDJHL",
@@ -35847,7 +35896,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.16",
       "toPort": {
-        "x": 1113.547,
+        "x": 1155.547,
         "y": 1175.222
       },
       "toStationID": "910GWLSDJHL",
@@ -35878,7 +35927,7 @@
     },
     {
       "fromPort": {
-        "x": 1113.547,
+        "x": 1155.547,
         "y": 1175.222
       },
       "fromStationID": "910GWLSDJHL",
@@ -40379,7 +40428,7 @@
     {
       "fromPort": {
         "x": 2704.938,
-        "y": 1567.005
+        "y": 1545.0
       },
       "fromStationID": "910GWCHAPEL",
       "id": "windrush:910GSHADWEL:910GWCHAPEL",
@@ -40408,7 +40457,7 @@
       "pathID": "beck.v1.path.windrush.highbury-west-croydon.official.v1.5",
       "toPort": {
         "x": 2704.938,
-        "y": 1567.005
+        "y": 1545.0
       },
       "toStationID": "910GWCHAPEL",
       "translation": {
@@ -42127,29 +42176,19 @@
       "name": "Harlesden",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 1130.171
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 1130.171
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 1130.171
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHARLSDN"
@@ -42513,29 +42552,19 @@
       "name": "Harrow & Wealdstone",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 784.931
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 784.931
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 784.931
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GHROW"
@@ -42782,29 +42811,19 @@
       "name": "Kensal Green",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 1230.085
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 1230.085
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 1230.085
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GKENSLG"
@@ -42850,8 +42869,8 @@
     },
     {
       "anchor": {
-        "x": 1650.02,
-        "y": 1254.703
+        "x": 1349.0,
+        "y": 1305.0
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -42863,13 +42882,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1650.02,
-              "y": 1247.703
+              "x": 1349.0,
+              "y": 1298.0
             },
             "lineID": "lioness",
             "start": {
-              "x": 1650.02,
-              "y": 1261.703
+              "x": 1349.0,
+              "y": 1312.0
             },
             "width": 3.2
           }
@@ -42918,29 +42937,19 @@
       "name": "Kenton",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 874.14
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 874.14
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 874.14
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GKTON"
@@ -43323,29 +43332,19 @@
       "name": "North Wembley",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 1010.184
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 1010.184
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 1010.184
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GNWEMBLY"
@@ -43967,29 +43966,19 @@
       "name": "South Kenton",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 934.802
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 934.802
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 934.802
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSKENTON"
@@ -44191,29 +44180,19 @@
       "name": "Stonebridge Park",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 1090.027
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 1090.027
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 1090.027
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GSTNBGPK"
@@ -44672,7 +44651,7 @@
     {
       "anchor": {
         "x": 2704.938,
-        "y": 1567.005
+        "y": 1545.0
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -44681,24 +44660,10 @@
       "name": "Whitechapel",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 2704.938,
-              "y": 1567.005
-            },
-            "start": {
-              "x": 2735.05,
-              "y": 1516.281
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 2704.938,
-              "y": 1567.005
+              "y": 1545.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -44955,48 +44920,9 @@
       "name": "Willesden Junction",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 1155.547,
-              "y": 1175.222
-            },
-            "start": {
-              "x": 1142.469,
-              "y": 1175.222
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
-              "x": 1113.547,
-              "y": 1175.222
-            },
-            "start": {
-              "x": 1155.547,
-              "y": 1175.222
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 1155.547,
-              "y": 1175.222
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1113.547,
               "y": 1175.222
             },
             "outlineWidth": 3.5,
@@ -45087,29 +45013,19 @@
       "name": "Wembley Central",
       "primitives": [
         {
-          "connector": {
+          "kind": "tick",
+          "tick": {
             "end": {
-              "x": 1155.547,
+              "x": 1162.547,
               "y": 1049.883
             },
+            "lineID": "lioness",
             "start": {
-              "x": 1142.469,
+              "x": 1148.547,
               "y": 1049.883
             },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1155.547,
-              "y": 1049.883
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
+            "width": 3.2
+          }
         }
       ],
       "stationID": "910GWMBY"
@@ -56196,8 +56112,8 @@
         {
           "connector": {
             "end": {
-              "x": 3254.241,
-              "y": 1545.424
+              "x": 3280.781,
+              "y": 1545.945
             },
             "start": {
               "x": 3229.053,
@@ -56221,8 +56137,8 @@
         {
           "circle": {
             "centre": {
-              "x": 3254.241,
-              "y": 1545.424
+              "x": 3280.781,
+              "y": 1545.945
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -56671,7 +56587,7 @@
     },
     {
       "anchor": {
-        "x": 2705.0,
+        "x": 2704.938,
         "y": 1545.0
       },
       "hitRadius": 24,
@@ -56684,25 +56600,11 @@
         {
           "connector": {
             "end": {
-              "x": 2704.707,
-              "y": 1549.594
-            },
-            "start": {
-              "x": 2705.0,
-              "y": 1545.0
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
-          "connector": {
-            "end": {
               "x": 2735.05,
               "y": 1516.281
             },
             "start": {
-              "x": 2705.0,
+              "x": 2704.938,
               "y": 1545.0
             },
             "width": 7.5
@@ -56712,7 +56614,7 @@
         {
           "circle": {
             "centre": {
-              "x": 2705.0,
+              "x": 2704.938,
               "y": 1545.0
             },
             "outlineWidth": 3.5,

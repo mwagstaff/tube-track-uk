@@ -13,7 +13,8 @@ struct AboutScreen: View {
                     HStack {
                         Spacer()
                         VStack(spacing: 12) {
-                            TubeTrackMark()
+                            Text("TubeTrack UK")
+                                .font(.headline.weight(.bold))
                             Text("It's not just the Internet that's a series of tubes.")
                                 .font(.headline)
                             Text("A live view of London’s Tube, Overground and tram network.")

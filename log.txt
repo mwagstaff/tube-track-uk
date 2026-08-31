@@ -1,0 +1,23 @@
+Failed to locate resource named "default.csv"
+CAMetalLayer ignoring invalid setDrawableSize width=0.000000 height=0.000000
+Connection error: Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service named com.apple.PerfPowerTelemetryClientRegistrationService was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction." UserInfo={NSDebugDescription=The connection to service named com.apple.PerfPowerTelemetryClientRegistrationService was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction.}
+(+[PPSClientDonation isRegisteredSubsystem:category:]) Permission denied: Maps / SpringfieldUsage
+(+[PPSClientDonation sendEventWithIdentifier:payload:]) Invalid inputs: payload={
+    isSPR = 0;
+}
+ This method can cause UI unresponsiveness if invoked on the main thread. Instead, consider waiting for the `-locationManagerDidChangeAuthorization:` callback and checking `authorizationStatus` first.
+[TubeTrack] disruption=waterloo-city segments=1 confidence=inferred
+[TubeTrack] disruption=dlr segments=1 confidence=exact
+[TubeTrack] disruption=northern segments=8 confidence=exact
+[TubeTrack] disruption=windrush segments=6 confidence=exact
+[TubeTrack] disruption=bakerloo segments=24 confidence=lineOnly
+[TubeTrack] disruption=circle segments=36 confidence=lineOnly
+[TubeTrack] disruption=hammersmith-city segments=28 confidence=lineOnly
+[TubeTrack] disruption=metropolitan segments=13 confidence=exact
+[TubeTrack] disruption=metropolitan segments=8 confidence=exact
+Connection error: Error Domain=NSCocoaErrorDomain Code=4099 "The connection to service named com.apple.PerfPowerTelemetryClientRegistrationService was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction." UserInfo={NSDebugDescription=The connection to service named com.apple.PerfPowerTelemetryClientRegistrationService was invalidated: Connection init failed at lookup with error 159 - Sandbox restriction.}
+(+[PPSClientDonation isRegisteredSubsystem:category:]) Permission denied: Maps / SpringfieldUsage
+(+[PPSClientDonation sendEventWithIdentifier:payload:]) Invalid inputs: payload={
+    isSPR = 1;
+}
+{"msg":"#Warning Error reading file", "file":"\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist", "error":"Error Domain=NSCocoaErrorDomain Code=257 \"The file “com.apple.CoreMotion.plist” couldn’t be opened because you don’t have permission to view it.\" UserInfo={NSFilePath=\/\/private\/var\/Managed Preferences\/mobile\/com.apple.CoreMotion.plist, NSURL=file:\/\/\/\/private\/var\/Managed%20Preferences\/mobile\/com.apple.CoreMotion.plist, NSUnderlyingError=0x11e45d530 {Error Domain=NSPOSIXErrorDomain Code=1 \"Operation not permitted\"}}"}

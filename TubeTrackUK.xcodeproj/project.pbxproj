@@ -22,22 +22,9 @@
 		A10000000000000000000040 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A10000000000000000000051 /* Exceptions for "TubeTrackUK" folder in "TubeTrackUK" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Images,
-			);
-			target = A10000000000000000000010 /* TubeTrackUK */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A10000000000000000000004 /* TubeTrackUK */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				A10000000000000000000051 /* Exceptions for "TubeTrackUK" folder in "TubeTrackUK" target */,
-			);
 			path = TubeTrackUK;
 			sourceTree = "<group>";
 		};

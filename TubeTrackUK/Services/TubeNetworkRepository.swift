@@ -2,10 +2,12 @@ import Foundation
 
 struct TubeNetworkRepository: Sendable {
     let graph: TubeGraph
+    private let stationsByID: [String: TubeStation]
     private let segmentsByConnection: [SegmentConnection: TubeSegment]
 
     init(graph: TubeGraph) {
         self.graph = graph
+        self.stationsByID = graph.stationsByID
         self.segmentsByConnection = graph.segments.reduce(into: [:]) { result, segment in
             let connection = SegmentConnection(
                 lineID: segment.lineID,
@@ -108,10 +110,18 @@ struct TubeNetworkRepository: Sendable {
         for stationID: String,
         on lineID: TubeLineID,
         direction: String?,
-        destinationStationID: String? = nil
+        destinationStationID: String? = nil,
+        currentLocation: String? = nil
     ) -> String? {
         guard let line = graph.line(lineID) else { return nil }
-        let isInbound = direction?.lowercased() == "inbound"
+        if let currentLocation,
+           let locationNeighbor = neighboringStationMentioned(
+               in: currentLocation,
+               for: stationID,
+               on: line
+           ) {
+            return locationNeighbor
+        }
         let routes = line.routes.sorted { left, right in
             let leftMatches = destinationStationID.map(left.contains) ?? false
             let rightMatches = destinationStationID.map(right.contains) ?? false
@@ -125,12 +135,81 @@ struct TubeNetworkRepository: Sendable {
                 if destinationIndex > index, index > 0 { return route[index - 1] }
                 if destinationIndex < index, index + 1 < route.count { return route[index + 1] }
             }
-            if isInbound, index + 1 < route.count { return route[index + 1] }
-            if !isInbound, index > 0 { return route[index - 1] }
+            switch routeTravelOrder(for: direction, along: route) {
+            case .increasing where index > 0:
+                return route[index - 1]
+            case .decreasing where index + 1 < route.count:
+                return route[index + 1]
+            default:
+                break
+            }
             if index > 0 { return route[index - 1] }
             if index + 1 < route.count { return route[index + 1] }
         }
         return nil
+    }
+
+    private func neighboringStationMentioned(
+        in currentLocation: String,
+        for stationID: String,
+        on line: TubeGraphLine
+    ) -> String? {
+        let neighboringIDs = Set(line.routes.flatMap { route -> [String] in
+            guard let index = route.firstIndex(of: stationID) else { return [] }
+            var ids: [String] = []
+            if index > 0 { ids.append(route[index - 1]) }
+            if index + 1 < route.count { ids.append(route[index + 1]) }
+            return ids
+        })
+        let normalizedLocation = normalize(currentLocation)
+        let matches = neighboringIDs.compactMap { stationID -> String? in
+            guard let station = stationsByID[stationID],
+                  normalizedLocation.contains(normalize(station.name)) else {
+                return nil
+            }
+            return stationID
+        }
+        return matches.count == 1 ? matches[0] : nil
+    }
+
+    private func routeTravelOrder(
+        for direction: String?,
+        along route: [String]
+    ) -> RouteTravelOrder? {
+        guard let direction = direction?.lowercased() else { return nil }
+        if direction.contains("inbound") { return .decreasing }
+        if direction.contains("outbound") { return .increasing }
+
+        guard let firstID = route.first,
+              let lastID = route.last,
+              let first = stationsByID[firstID],
+              let last = stationsByID[lastID] else {
+            return nil
+        }
+
+        let axisDelta: Double
+        let travelsTowardPositiveAxis: Bool
+        if direction.contains("northbound") {
+            axisDelta = last.latitude - first.latitude
+            travelsTowardPositiveAxis = true
+        } else if direction.contains("southbound") {
+            axisDelta = last.latitude - first.latitude
+            travelsTowardPositiveAxis = false
+        } else if direction.contains("eastbound") {
+            axisDelta = last.longitude - first.longitude
+            travelsTowardPositiveAxis = true
+        } else if direction.contains("westbound") {
+            axisDelta = last.longitude - first.longitude
+            travelsTowardPositiveAxis = false
+        } else {
+            return nil
+        }
+
+        guard abs(axisDelta) > 0.000_1 else { return nil }
+        let routeAdvancesTowardPositiveAxis = axisDelta > 0
+        return routeAdvancesTowardPositiveAxis == travelsTowardPositiveAxis
+            ? .increasing
+            : .decreasing
     }
 
     private func normalize(_ value: String) -> String {
@@ -141,6 +220,11 @@ struct TubeNetworkRepository: Sendable {
             .replacingOccurrences(of: ".", with: "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
     }
+}
+
+private enum RouteTravelOrder {
+    case increasing
+    case decreasing
 }
 
 private struct SegmentConnection: Hashable, Sendable {

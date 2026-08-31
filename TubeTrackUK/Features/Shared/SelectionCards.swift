@@ -113,9 +113,9 @@ enum StationDisruptionLookup {
 }
 
 struct DisruptionDetailCard: View {
-    @Environment(TubeAppState.self) private var appState
     @State private var presentedDisruption: ResolvedDisruption?
     let disruption: ResolvedDisruption
+    let onClose: () -> Void
 
     var body: some View {
         GlassPanel {
@@ -124,7 +124,7 @@ struct DisruptionDetailCard: View {
                     LineBadge(lineID: disruption.lineID)
                     Spacer()
                     Button("Close", systemImage: "xmark.circle.fill") {
-                        appState.clearMapSelection()
+                        onClose()
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
@@ -139,23 +139,36 @@ struct DisruptionDetailCard: View {
                     .foregroundStyle(.secondary)
                     .lineLimit(4)
 
-                HStack {
-                    Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
-                        presentedDisruption = disruption
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        disruptionDetailsButton
+                        Spacer(minLength: 0)
+                        disruptionConfidenceLabel
                     }
-                    .font(.caption.weight(.semibold))
 
-                    Spacer()
-
-                    Text(disruption.confidence.userDescription)
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
+                    VStack(alignment: .leading, spacing: 6) {
+                        disruptionDetailsButton
+                        disruptionConfidenceLabel
+                    }
                 }
             }
         }
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
         }
+    }
+
+    private var disruptionDetailsButton: some View {
+        Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
+            presentedDisruption = disruption
+        }
+        .font(.caption.weight(.semibold))
+    }
+
+    private var disruptionConfidenceLabel: some View {
+        Text(disruption.confidence.userDescription)
+            .font(.caption2)
+            .foregroundStyle(.tertiary)
     }
 }
 
@@ -261,6 +274,303 @@ private struct DisruptionDetailSheet: View {
     }
 }
 
+struct TrainMapCalloutOverlay: View {
+    let train: LiveTubeTrain
+    let nextStopName: String
+    let date: Date
+    let markerPoint: CGPoint
+    let viewportSize: CGSize
+
+    @State private var calloutSize = CGSize(width: 292, height: 142)
+
+    var body: some View {
+        let layout = TrainMapCalloutLayout.resolve(
+            markerPoint: markerPoint,
+            calloutSize: calloutSize,
+            viewportSize: viewportSize
+        )
+
+        TrainMapCallout(
+            train: train,
+            nextStopName: nextStopName,
+            date: date,
+            arrowOffset: layout.arrowOffset,
+            placement: layout.placement
+        )
+        .frame(width: min(300, max(220, viewportSize.width - 24)))
+        .fixedSize(horizontal: false, vertical: true)
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newSize in
+            calloutSize = newSize
+        }
+        .position(layout.calloutCenter)
+        .transition(.scale(scale: 0.94, anchor: .bottom).combined(with: .opacity))
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private struct TrainMapCallout: View {
+    let train: LiveTubeTrain
+    let nextStopName: String
+    let date: Date
+    let arrowOffset: CGFloat
+    let placement: TrainCalloutPlacement
+
+    private var destinationName: String {
+        guard let destination = train.destination?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !destination.isEmpty else {
+            return "Destination unavailable"
+        }
+        return destination
+    }
+
+    private var remainingSeconds: Int {
+        train.remainingSecondsToNextStation(at: date)
+    }
+
+    private var directionName: String? {
+        LiveTrainDirection.displayName(for: train.direction)
+    }
+
+    private var lineName: String {
+        let name = train.lineID.displayName
+        guard train.lineID.isUnderground else { return name }
+        return "\(name) line"
+    }
+
+    private var lineHeaderForeground: Color {
+        switch train.lineID {
+        case .circle, .hammersmithCity, .jubilee, .victoria, .waterlooCity,
+             .dlr, .tram, .lioness, .mildmay, .suffragette:
+            .black
+        case .bakerloo, .central, .district, .metropolitan, .northern,
+             .piccadilly, .elizabeth, .liberty, .weaver,
+             .windrush:
+            .white
+        }
+    }
+
+    private var relativeETA: String {
+        if remainingSeconds < 30 { return "Due" }
+        let minutes = Int(ceil(Double(remainingSeconds) / 60))
+        return "\(minutes) min"
+    }
+
+    var body: some View {
+        Group {
+            if placement == .above {
+                VStack(spacing: -1) {
+                    bubble
+                    pointer(rotation: .degrees(180))
+                }
+            } else {
+                VStack(spacing: -1) {
+                    pointer(rotation: .zero)
+                    bubble
+                }
+            }
+        }
+        .shadow(color: .black.opacity(0.16), radius: 10, y: 4)
+        .accessibilityLabel(accessibilitySummary)
+        .accessibilityValue("Next stop \(nextStopName), \(relativeETA)")
+    }
+
+    private var accessibilitySummary: String {
+        guard let directionName else {
+            return "\(lineName), destination \(destinationName)"
+        }
+        return "\(lineName), destination \(destinationName), direction \(directionName)"
+    }
+
+    private var bubble: some View {
+        VStack(spacing: 0) {
+            Text(lineName)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(lineHeaderForeground)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 9)
+                .background(
+                    Color.tubeLine(train.lineID),
+                    in: UnevenRoundedRectangle(
+                        topLeadingRadius: 18,
+                        bottomLeadingRadius: 0,
+                        bottomTrailingRadius: 0,
+                        topTrailingRadius: 18
+                    )
+                )
+
+            VStack(alignment: .leading, spacing: 11) {
+                HStack(alignment: .top, spacing: 8) {
+                    Image(systemName: "tram.fill")
+                        .foregroundStyle(Color.tubeLine(train.lineID))
+                        .padding(.top, 4)
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 8) {
+                            Text("Destination")
+                                .foregroundStyle(.secondary)
+                            Text(destinationName)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .foregroundStyle(Color.tubeLine(train.lineID))
+                                .background(
+                                    Color.tubeLine(train.lineID).opacity(0.12),
+                                    in: .capsule
+                                )
+                        }
+
+                        if let directionName {
+                            HStack(spacing: 8) {
+                                Text("Direction")
+                                    .foregroundStyle(.secondary)
+                                Text(directionName)
+                                    .fontWeight(.semibold)
+                                    .foregroundStyle(Color.tubeLine(train.lineID))
+                            }
+                        }
+                    }
+                }
+                .font(.subheadline)
+
+                Divider()
+
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Next stop")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(nextStopName)
+                            .font(.subheadline.weight(.semibold))
+                            .lineLimit(2)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(
+                            train.estimatedNextStopArrival(at: date),
+                            format: .dateTime.hour().minute()
+                        )
+                        .font(.caption.monospacedDigit())
+                        .foregroundStyle(.secondary)
+                        Text(relativeETA)
+                            .font(.title3.weight(.bold).monospacedDigit())
+                            .foregroundStyle(Color.tubeLine(train.lineID))
+                    }
+                }
+
+            }
+            .padding(15)
+        }
+        .background(.regularMaterial, in: .rect(cornerRadius: 18))
+        .clipShape(.rect(cornerRadius: 18))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(.primary.opacity(0.18), lineWidth: 1)
+        }
+    }
+
+    private func pointer(rotation: Angle) -> some View {
+        TrainCalloutPointer()
+            .fill(.regularMaterial)
+            .overlay {
+                TrainCalloutPointer()
+                    .stroke(.primary.opacity(0.18), lineWidth: 1)
+            }
+            .frame(width: 24, height: 14)
+            .rotationEffect(rotation)
+            .offset(x: arrowOffset)
+            .zIndex(1)
+    }
+}
+
+private struct TrainCalloutPointer: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
+        path.addLine(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+        path.closeSubpath()
+        return path
+    }
+}
+
+enum TrainCalloutPlacement: Equatable {
+    case above
+    case below
+}
+
+struct TrainMapCalloutLayout: Equatable {
+    let calloutCenter: CGPoint
+    let arrowOffset: CGFloat
+    let placement: TrainCalloutPlacement
+
+    static func resolve(
+        markerPoint: CGPoint,
+        calloutSize: CGSize,
+        viewportSize: CGSize
+    ) -> Self {
+        let horizontalMargin: CGFloat = 12
+        let topClearance: CGFloat = 104
+        let bottomClearance: CGFloat = 12
+        let markerGap: CGFloat = 12
+        let halfWidth = calloutSize.width / 2
+        let halfHeight = calloutSize.height / 2
+        let minimumX = horizontalMargin + halfWidth
+        let maximumX = max(minimumX, viewportSize.width - horizontalMargin - halfWidth)
+        let centreX = min(maximumX, max(minimumX, markerPoint.x))
+        let fitsAbove = markerPoint.y - markerGap - calloutSize.height >= topClearance
+        let placement: TrainCalloutPlacement = fitsAbove ? .above : .below
+        let proposedY = placement == .above
+            ? markerPoint.y - markerGap - halfHeight
+            : markerPoint.y + markerGap + halfHeight
+        let minimumY = topClearance + halfHeight
+        let maximumY = max(minimumY, viewportSize.height - bottomClearance - halfHeight)
+        let centreY = min(maximumY, max(minimumY, proposedY))
+        let maximumArrowOffset = max(0, halfWidth - 30)
+        let arrowOffset = min(
+            maximumArrowOffset,
+            max(-maximumArrowOffset, markerPoint.x - centreX)
+        )
+
+        return Self(
+            calloutCenter: CGPoint(x: centreX, y: centreY),
+            arrowOffset: arrowOffset,
+            placement: placement
+        )
+    }
+}
+
+enum LiveTrainHitTesting {
+    static let hitRadius: CGFloat = 30
+
+    static func nearest(
+        to location: CGPoint,
+        candidates: [(train: LiveTubeTrain, point: CGPoint)]
+    ) -> LiveTubeTrain? {
+        candidates
+            .map { candidate in
+                (
+                    train: candidate.train,
+                    distance: hypot(
+                        candidate.point.x - location.x,
+                        candidate.point.y - location.y
+                    )
+                )
+            }
+            .filter { $0.distance <= hitRadius }
+            .min { $0.distance < $1.distance }?
+            .train
+    }
+}
+
 struct TrainFilterBar: View {
     @Environment(TubeAppState.self) private var appState
 
@@ -270,7 +580,7 @@ struct TrainFilterBar: View {
                 Button {
                     appState.setTrainFilter(nil)
                 } label: {
-                    Text("All")
+                    Text("All (\(appState.activeTrainCounts.total))")
                         .font(.caption.weight(.semibold))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
@@ -297,18 +607,26 @@ struct TrainFilterBar: View {
                     .buttonStyle(.plain)
                 }
 
-                Text("\(appState.activeTrainCounts.total) active trains")
+                Text(activeTrainSummary)
                     .font(.caption2.weight(.medium))
                     .foregroundStyle(.secondary)
                     .fixedSize()
                     .padding(.leading, 3)
-                    .accessibilityLabel(
-                        "\(appState.activeTrainCounts.total) active trains across all lines"
-                    )
+                    .accessibilityLabel(activeTrainSummary)
             }
             .padding(.horizontal, 12)
         }
         .scrollIndicators(.hidden)
+    }
+
+    private var activeTrainSummary: String {
+        let trainCount = appState.activeTrainCounts.total
+        let activeLineCount = appState.activeTrainCounts.activeLineCount(
+            excluding: appState.mapNetworkStatusSummary.closedLineIDs
+        )
+        let trainNoun = trainCount == 1 ? "train" : "trains"
+        let lineNoun = activeLineCount == 1 ? "line" : "lines"
+        return "\(trainCount) active \(trainNoun) across \(activeLineCount) active \(lineNoun)"
     }
 }
 

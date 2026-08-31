@@ -137,36 +137,12 @@ struct LiveStatusDock: View {
 
 struct MapStatusDock: View {
     @Binding var expanded: Bool
-    let onReset: (() -> Void)?
-    let showsClosestStationRestore: Bool
-    let restoreIconPulses: Bool
-    let onRestoreClosestStation: () -> Void
-
-    init(
-        expanded: Binding<Bool>,
-        onReset: (() -> Void)? = nil,
-        showsClosestStationRestore: Bool = false,
-        restoreIconPulses: Bool = false,
-        onRestoreClosestStation: @escaping () -> Void = {}
-    ) {
-        _expanded = expanded
-        self.onReset = onReset
-        self.showsClosestStationRestore = showsClosestStationRestore
-        self.restoreIconPulses = restoreIconPulses
-        self.onRestoreClosestStation = onRestoreClosestStation
-    }
 
     var body: some View {
         GlassEffectContainer(spacing: 8) {
             VStack(spacing: 8) {
                 LiveStatusDock(expanded: $expanded)
-                MapActionButtons(
-                    onReset: onReset,
-                    showsNavigationControls: onReset != nil,
-                    showsClosestStationRestore: showsClosestStationRestore,
-                    restoreIconPulses: restoreIconPulses,
-                    onRestoreClosestStation: onRestoreClosestStation
-                )
+                MapActionButtons()
                     .fixedSize()
             }
         }
