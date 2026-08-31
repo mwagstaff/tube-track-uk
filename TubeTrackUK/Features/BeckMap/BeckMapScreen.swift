@@ -378,7 +378,9 @@ private struct BeckMapCanvas: View {
                             in: proxy.size
                         )
                     },
-                    onTap: selectMapFeature(at:)
+                    onTap: { location in
+                        selectMapFeature(at: location, viewport: proxy.size)
+                    }
                 )
                 .accessibilityHidden(true)
             }
@@ -884,28 +886,35 @@ private struct BeckMapCanvas: View {
             let selected = label.represents(stationID: selectedStationID)
             let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
             let tier = label.effectiveVisibilityTier
-            let weight: Font.Weight = tier == .overview ? .semibold : .medium
+            let weight: AppFontWeight = selected || tier == .overview ? .semibold : .medium
             let fontSize = BeckMapLabelVisibilityPolicy.fontSize(
                 for: tier,
                 at: cameraScale
             ) * min(1.6, max(1, labelTypeScale))
-            var text = context.resolve(Text(label.text).font(.system(
-                size: fontSize,
-                weight: weight
-            )))
-            text.shading = .color(palette.ink)
+            var text = context.resolve(
+                Text(label.text).font(
+                    AppTypography.fixedBody(size: fontSize, weight: weight)
+                )
+            )
+            text.shading = .color(selected ? .white : palette.ink)
             let measuredTextSize = text.measure(in: CGSize(
                 width: CGFloat.infinity,
                 height: CGFloat.infinity
             ))
             let documentPadding = CGFloat(document.styles.labelPadding)
+            let horizontalPadding = selected
+                ? max(7, palette.labelHorizontalPadding)
+                : palette.labelHorizontalPadding
+            let verticalPadding = selected
+                ? max(4, palette.labelVerticalPadding)
+                : palette.labelVerticalPadding
             let boundsByAlignment = Dictionary(uniqueKeysWithValues:
                 [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
                     (alignment, BeckMapLabelBounds.backgroundBounds(
                         textSize: measuredTextSize,
                         alignment: alignment,
-                        horizontalPadding: documentPadding + palette.labelHorizontalPadding,
-                        verticalPadding: documentPadding + palette.labelVerticalPadding
+                        horizontalPadding: documentPadding + horizontalPadding,
+                        verticalPadding: documentPadding + verticalPadding
                     ))
                 }
             )
@@ -941,8 +950,14 @@ private struct BeckMapCanvas: View {
             markerBlockers: markerFrames,
             lineBlockers: lineBlockers
         )
+        let selectedLabelIDs = Set(visibleLabels.compactMap { renderedLabel in
+            renderedLabel.label.represents(stationID: selectedStationID)
+                ? renderedLabel.label.id
+                : nil
+        })
         for placement in placements {
             guard let text = resolvedTextByLabelID[placement.labelID] else { continue }
+            let selected = selectedLabelIDs.contains(placement.labelID)
 
             let anchor: UnitPoint
             switch placement.alignment {
@@ -963,13 +978,24 @@ private struct BeckMapCanvas: View {
             )
             let backgroundPath = Path(
                 roundedRect: placement.backgroundBounds,
-                cornerRadius: min(
-                    palette.labelCornerRadius,
-                    placement.backgroundBounds.height / 2
-                )
+                cornerRadius: selected
+                    ? placement.backgroundBounds.height / 2
+                    : min(
+                        palette.labelCornerRadius,
+                        placement.backgroundBounds.height / 2
+                    )
             )
-            labelContext.fill(backgroundPath, with: .color(palette.labelSurface))
-            if palette.labelBorderWidth > 0 {
+            labelContext.fill(
+                backgroundPath,
+                with: .color(selected ? Color.tubeBlue : palette.labelSurface)
+            )
+            if selected {
+                labelContext.stroke(
+                    backgroundPath,
+                    with: .color(Color.white.opacity(0.9)),
+                    lineWidth: 1.25
+                )
+            } else if palette.labelBorderWidth > 0 {
                 labelContext.stroke(
                     backgroundPath,
                     with: .color(palette.labelBorder),
@@ -1328,7 +1354,7 @@ private struct BeckMapCanvas: View {
         )
     }
 
-    private func selectMapFeature(at location: CGPoint) {
+    private func selectMapFeature(at location: CGPoint, viewport: CGSize) {
         if let train = LiveTrainHitTesting.nearest(
             to: location,
             candidates: liveTrains.compactMap { train in
@@ -1342,17 +1368,126 @@ private struct BeckMapCanvas: View {
             return
         }
 
+        let labelPlacements = stationLabelPlacements(in: viewport)
+        if let labelID = StationLabelHitTester.labelID(
+            at: location,
+            placements: labelPlacements,
+            minimumHitSize: 28
+        ), let stationID = renderedLabels.first(where: {
+            $0.label.id == labelID
+        })?.label.stationID {
+            onStationTap(stationID)
+            return
+        }
+
         let nearest = document.stationMarkers.min {
             distance(screenPoint($0.anchor), location) < distance(screenPoint($1.anchor), location)
         }
         if let nearest,
            distance(screenPoint(nearest.anchor), location) <= max(24, nearest.hitRadius * cameraScale) {
             onStationTap(nearest.stationID)
+        } else if let labelID = StationLabelHitTester.labelID(
+            at: location,
+            placements: labelPlacements,
+            minimumHitSize: 44
+        ), let stationID = renderedLabels.first(where: {
+            $0.label.id == labelID
+        })?.label.stationID {
+            onStationTap(stationID)
         } else if let disruptionID = disruptionID(at: location) {
             onDisruptionTap(disruptionID)
         } else {
             onBackgroundTap()
         }
+    }
+
+    private func stationLabelPlacements(in viewport: CGSize) -> [StationLabelPlacement] {
+        if document.geometryStatus != .authored,
+           cameraScale < max(0.48, minimumCameraScale) {
+            return []
+        }
+
+        let selectedStationID = presentation.selectedStationID
+        let visibleLabels = renderedLabels.filter { renderedLabel in
+            let label = renderedLabel.label
+            return label.represents(stationID: selectedStationID)
+                || BeckMapLabelVisibilityPolicy.shows(
+                    label.effectiveVisibilityTier,
+                    at: cameraScale
+                )
+        }
+        guard !visibleLabels.isEmpty else { return [] }
+
+        let viewportRect = StationLabelLayoutEngine.availableViewport(in: viewport)
+        let markerFrames = markerExclusionFrames()
+        let markerFramesByStationID = Dictionary(grouping: markerFrames, by: \.stationID)
+            .mapValues { blockers in
+                blockers.reduce(into: CGRect.null) { bounds, blocker in
+                    bounds = bounds.union(blocker.frame)
+                }
+            }
+        let documentPadding = CGFloat(document.styles.labelPadding)
+        let layoutInputs = visibleLabels.map { renderedLabel in
+            let label = renderedLabel.label
+            let selected = label.represents(stationID: selectedStationID)
+            let tier = label.effectiveVisibilityTier
+            let weight: AppFontWeight = selected || tier == .overview ? .semibold : .medium
+            let fontSize = BeckMapLabelVisibilityPolicy.fontSize(
+                for: tier,
+                at: cameraScale
+            ) * min(1.6, max(1, labelTypeScale))
+            let measuredTextSize = BeckMapLabelTextMeasurer.size(
+                for: label.text,
+                font: AppTypography.fixedBodyUIFont(size: fontSize, weight: weight)
+            )
+            let horizontalPadding = selected
+                ? max(7, palette.labelHorizontalPadding)
+                : palette.labelHorizontalPadding
+            let verticalPadding = selected
+                ? max(4, palette.labelVerticalPadding)
+                : palette.labelVerticalPadding
+            let boundsByAlignment = Dictionary(uniqueKeysWithValues:
+                [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
+                    (alignment, BeckMapLabelBounds.backgroundBounds(
+                        textSize: measuredTextSize,
+                        alignment: alignment,
+                        horizontalPadding: documentPadding + horizontalPadding,
+                        verticalPadding: documentPadding + verticalPadding
+                    ))
+                }
+            )
+            let representedStationIDs = [label.stationID] + (label.associatedStationIDs ?? [])
+            let targetMarkerFrame = representedStationIDs.compactMap {
+                markerFramesByStationID[$0]
+            }.reduce(into: CGRect.null) { frame, markerFrame in
+                frame = frame.union(markerFrame)
+            }
+            let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
+            return StationLabelLayoutInput(
+                id: label.id,
+                priority: label.priority,
+                tier: tier,
+                selected: selected,
+                stationScreenPosition: screenAnchor,
+                markerFrame: targetMarkerFrame.isNull
+                    ? CGRect(x: screenAnchor.x - 6, y: screenAnchor.y - 6, width: 12, height: 12)
+                    : targetMarkerFrame,
+                preferredAlignment: label.alignment,
+                screenOffset: CGVector(
+                    dx: renderedLabel.artworkOffset.dx * cameraScale,
+                    dy: renderedLabel.artworkOffset.dy * cameraScale
+                ),
+                rotation: renderedLabel.rotation,
+                boundsByAlignment: boundsByAlignment
+            )
+        }
+
+        return StationLabelLayoutEngine.layout(
+            inputs: layoutInputs,
+            viewport: viewportRect,
+            markerBlockers: markerFrames,
+            lineBlockers: lineExclusionBlockers(in: viewportRect)
+        )
     }
 
     private func disruptionID(at screenLocation: CGPoint) -> String? {
@@ -2222,6 +2357,59 @@ struct StationLabelPlacement {
     let rotation: CGAffineTransform
     let backgroundBounds: CGRect
     let collisionFrame: CGRect
+}
+
+enum BeckMapLabelTextMeasurer {
+    static func size(for text: String, font: UIFont) -> CGSize {
+        let bounds = (text as NSString).boundingRect(
+            with: CGSize(
+                width: CGFloat.greatestFiniteMagnitude,
+                height: CGFloat.greatestFiniteMagnitude
+            ),
+            options: [.usesLineFragmentOrigin, .usesFontLeading],
+            attributes: [.font: font],
+            context: nil
+        )
+        return CGSize(width: ceil(bounds.width), height: ceil(bounds.height))
+    }
+}
+
+enum StationLabelHitTester {
+    static func labelID(
+        at point: CGPoint,
+        placements: [StationLabelPlacement],
+        minimumHitSize: CGFloat
+    ) -> String? {
+        placements
+            .compactMap { placement -> (id: String, distance: CGFloat)? in
+                let localPoint = CGPoint(
+                    x: point.x - placement.position.x,
+                    y: point.y - placement.position.y
+                ).applying(placement.rotation.inverted())
+                let horizontalExpansion = max(
+                    0,
+                    (minimumHitSize - placement.backgroundBounds.width) / 2
+                )
+                let verticalExpansion = max(
+                    0,
+                    (minimumHitSize - placement.backgroundBounds.height) / 2
+                )
+                let hitBounds = placement.backgroundBounds.insetBy(
+                    dx: -horizontalExpansion,
+                    dy: -verticalExpansion
+                )
+                guard hitBounds.contains(localPoint) else { return nil }
+                return (
+                    placement.labelID,
+                    hypot(
+                        localPoint.x - placement.backgroundBounds.midX,
+                        localPoint.y - placement.backgroundBounds.midY
+                    )
+                )
+            }
+            .min(by: { $0.distance < $1.distance })?
+            .id
+    }
 }
 
 enum StationLabelLayoutEngine {

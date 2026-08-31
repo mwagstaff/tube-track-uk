@@ -356,6 +356,33 @@ struct BeckMapTests {
         #expect(leading.maxY == 15.5)
     }
 
+    @Test func stationLabelHitTestingUsesVisibleAndAccessibleBounds() {
+        let placement = StationLabelPlacement(
+            labelID: "bank-label",
+            position: CGPoint(x: 100, y: 80),
+            alignment: .centre,
+            rotation: .identity,
+            backgroundBounds: CGRect(x: -30, y: -8, width: 60, height: 16),
+            collisionFrame: CGRect(x: 66, y: 69, width: 68, height: 22)
+        )
+
+        #expect(StationLabelHitTester.labelID(
+            at: CGPoint(x: 100, y: 80),
+            placements: [placement],
+            minimumHitSize: 28
+        ) == "bank-label")
+        #expect(StationLabelHitTester.labelID(
+            at: CGPoint(x: 100, y: 98),
+            placements: [placement],
+            minimumHitSize: 44
+        ) == "bank-label")
+        #expect(StationLabelHitTester.labelID(
+            at: CGPoint(x: 100, y: 108),
+            placements: [placement],
+            minimumHitSize: 44
+        ) == nil)
+    }
+
     @Test func parallelRouteStrokeWidthsMatchOfficialArtworkProportions() {
         let styles = BeckMapStyleRecord(
             routeStrokeWidth: 9,

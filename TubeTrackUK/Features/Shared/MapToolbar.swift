@@ -120,7 +120,7 @@ struct MapActionButtons: View {
                 }
             } label: {
                 Image(systemName: AppTab.works.symbol)
-                    .font(.subheadline.weight(.semibold))
+                    .font(.appSubheadline(.semibold))
                     .foregroundStyle(worksSelected ? .white : .primary)
             }
             .mapDockButtonStyle(isSelected: worksSelected, tint: .orange)
@@ -317,7 +317,7 @@ private extension View {
         tint: Color = .clear
     ) -> some View {
         self
-            .font(.headline)
+            .font(.appHeadline())
             .frame(width: MapDockMetrics.controlSize, height: MapDockMetrics.controlSize)
             .contentShape(.circle)
             .buttonStyle(.plain)

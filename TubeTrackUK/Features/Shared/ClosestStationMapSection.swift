@@ -136,21 +136,21 @@ private struct ClosestStationMapPanel: View {
     private var header: some View {
         HStack(spacing: 10) {
             Image(systemName: "location.fill")
-                .font(.subheadline.weight(.bold))
+                .font(.appSubheadline(.bold))
                 .foregroundStyle(.white)
                 .frame(width: 32, height: 32)
                 .background(Color.tubeBlue, in: .circle)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Closest station")
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .foregroundStyle(.secondary)
                 HStack(alignment: .firstTextBaseline, spacing: 7) {
                     Text(station.name)
-                        .font(.headline)
+                        .font(.appHeadline())
                         .lineLimit(1)
                     Text(NearbyDistanceFormatter.string(from: nearbyStation.distance))
-                        .font(.caption.weight(.medium))
+                        .font(.appCaption(.medium))
                         .foregroundStyle(.secondary)
                         .lineLimit(1)
                 }
@@ -159,7 +159,7 @@ private struct ClosestStationMapPanel: View {
             Spacer(minLength: 8)
 
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.bold))
+                .font(.appCaption(.bold))
                 .foregroundStyle(.secondary)
                 .accessibilityHidden(true)
         }
@@ -219,7 +219,7 @@ private struct ClosestStationMapPanel: View {
                     .foregroundStyle(.secondary)
             }
             Text(message)
-                .font(.caption)
+                .font(.appCaption())
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
         }
@@ -266,7 +266,7 @@ private struct CompactStationDepartureGroupView: View {
                 Text(group.direction)
                     .foregroundStyle(.secondary)
             }
-            .font(.caption)
+            .font(.appCaption())
             .lineLimit(1)
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isHeader)
@@ -282,7 +282,7 @@ private struct CompactStationDepartureGroupView: View {
                         .foregroundStyle(Color.departureAccent)
                         .fixedSize(horizontal: true, vertical: false)
                 }
-                .font(.caption)
+                .font(.appCaption())
                 .accessibilityElement(children: .combine)
             }
         }
@@ -308,9 +308,9 @@ private struct ClosestStationAvailabilityPanel: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text("Closest station")
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                 Text(statusMessage)
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
@@ -319,11 +319,11 @@ private struct ClosestStationAvailabilityPanel: View {
 
             if needsPermission {
                 Button("Open") { onOpenNearMe() }
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .buttonStyle(.bordered)
             } else if errorMessage != nil {
                 Button("Retry") { onRetry() }
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .buttonStyle(.bordered)
             }
 

@@ -41,7 +41,7 @@ struct MapOverviewHeader: View {
                 HStack(spacing: 8) {
                     if !compactForZoom {
                         Text("TubeTrack UK")
-                            .font(.largeTitle.weight(.bold))
+                            .font(.appLargeTitle(.bold))
                             .tracking(-0.7)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
@@ -133,8 +133,12 @@ struct MapDisruptionOverviewCard: View {
 
     private var headlineRow: some View {
         HStack(spacing: compactHeadline ? 8 : 12) {
-                Image(systemName: headlineSymbol)
-                    .font((compactHeadline ? Font.subheadline : .headline).weight(.bold))
+            Image(systemName: headlineSymbol)
+                    .font(
+                        compactHeadline
+                            ? .appSubheadline(.bold)
+                            : .appHeadline(.bold)
+                    )
                     .foregroundStyle(headlineColor)
                     .frame(
                         width: compactHeadline ? 32 : 40,
@@ -146,15 +150,16 @@ struct MapDisruptionOverviewCard: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(headline)
                         .font(
-                            (compactHeadline ? Font.subheadline : .headline)
-                                .weight(.bold)
+                            compactHeadline
+                                ? .appSubheadline(.bold)
+                                : .appHeadline(.bold)
                         )
                         .foregroundStyle(.primary)
                         .lineLimit(compactHeadline ? 1 : nil)
                         .minimumScaleFactor(compactHeadline ? 0.78 : 1)
                     if expanded {
                         Text("Live status and planned engineering work")
-                            .font(.caption)
+                            .font(.appCaption())
                             .foregroundStyle(.secondary)
                     }
                 }
@@ -165,7 +170,7 @@ struct MapDisruptionOverviewCard: View {
                     DisruptionDateMenu(compact: true)
                 } else {
                     Image(systemName: "chevron.down")
-                        .font(.caption.weight(.bold))
+                        .font(.appCaption(.bold))
                         .foregroundStyle(.secondary)
                         .frame(
                             width: compactHeadline ? 24 : 32,
@@ -186,7 +191,7 @@ struct MapDisruptionOverviewCard: View {
 
             if lineEntries.isEmpty {
                 Text(emptyMessage)
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, 16)
@@ -274,7 +279,7 @@ struct MapDisruptionOverviewCard: View {
                 expanded = false
             } label: {
                 Label("Show less", systemImage: "chevron.up")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.appSubheadline(.semibold))
                     .foregroundStyle(Color.tubeBlue)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .contentShape(.rect)
@@ -288,7 +293,7 @@ struct MapDisruptionOverviewCard: View {
         HStack(spacing: 8) {
             Divider()
             Text("Minor delays")
-                .font(.caption2.weight(.medium))
+                .font(.appCaption2(.medium))
                 .foregroundStyle(.tertiary)
                 .fixedSize()
             Divider()
@@ -314,22 +319,22 @@ struct MapDisruptionOverviewCard: View {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(disruption.lineID.displayName)
-                            .font(.subheadline.weight(.bold))
+                            .font(.appSubheadline(.bold))
                         Spacer(minLength: 8)
                         Text(disruption.title)
-                            .font(.caption.weight(.semibold))
+                            .font(.appCaption(.semibold))
                             .foregroundStyle(disruption.isMinorDelay ? .orange : .red)
                             .lineLimit(1)
                     }
                     Text(disruption.reason)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                         .multilineTextAlignment(.leading)
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
+                    .font(.appCaption(.bold))
                     .foregroundStyle(.tertiary)
                     .padding(.top, 3)
             }
@@ -388,17 +393,17 @@ struct MapExploreHint: View {
                 Circle()
                     .stroke(Color.tubeBlue.opacity(0.18), lineWidth: 1.5)
                 Image(systemName: "hand.pinch")
-                    .font(.title3.weight(.medium))
+                    .font(.appTitle3(.medium))
                     .foregroundStyle(Color.tubeBlue)
             }
             .frame(width: 43, height: 43)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text("Pinch to explore the network")
-                    .font(.subheadline.weight(.bold))
+                    .font(.appSubheadline(.bold))
                     .foregroundStyle(Color.tubeBlue)
                 Text("Tap any station for departures and status")
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -473,13 +478,13 @@ struct MapNetworkStatsCard: View {
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: filter.symbol)
-                    .font(.caption2.weight(.bold))
+                    .font(.appCaption2(.bold))
                     .foregroundStyle(filter.color)
                     .frame(height: 12)
                 Text(value, format: .number)
-                    .font(.title3.weight(.bold).monospacedDigit())
+                    .font(.appTitle3(.bold).monospacedDigit())
                 Text(filter.title)
-                    .font(.caption2)
+                    .font(.appCaption2())
                     .foregroundStyle(selected ? .primary : .secondary)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -521,10 +526,10 @@ struct MapNetworkStatsCard: View {
             VStack(spacing: 5) {
                 Label("Return to today", systemImage: "calendar.badge.clock")
                     .labelStyle(.iconOnly)
-                    .font(.title3.weight(.semibold))
+                    .font(.appTitle3(.semibold))
                     .foregroundStyle(Color.tubeBlue)
                 Text("Today")
-                    .font(.caption2.weight(.semibold))
+                    .font(.appCaption2(.semibold))
                     .foregroundStyle(Color.tubeBlue)
             }
             .padding(.horizontal, 3)

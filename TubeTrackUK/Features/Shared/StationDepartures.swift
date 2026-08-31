@@ -364,7 +364,7 @@ struct StationDeparturesSection: View {
             HStack(spacing: 9) {
                 ProgressView()
                 Text("Loading live departures…")
-                    .font(.subheadline)
+                    .font(.appSubheadline())
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -379,9 +379,9 @@ struct StationDeparturesSection: View {
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(TfLDepartureWaitingCopy.title)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.appSubheadline(.semibold))
                     Text(errorMessage)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                 }
             }
@@ -389,7 +389,7 @@ struct StationDeparturesSection: View {
             .accessibilityElement(children: .combine)
         } else if selectedGroups.isEmpty {
             Text(emptyStateMessage)
-                .font(.subheadline)
+                .font(.appSubheadline())
                 .foregroundStyle(.secondary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.vertical, 6)
@@ -468,7 +468,7 @@ private struct StationLinePicker: View {
                     onShowStatus(selectedLineID)
                 } label: {
                     Image(systemName: statusPresentation(for: condition).symbol)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.appSubheadline(.semibold))
                         .foregroundStyle(statusPresentation(for: condition).color)
                         .frame(width: 44, height: 44)
                         .background(Color(uiColor: .tertiarySystemFill), in: .circle)
@@ -516,11 +516,11 @@ struct StationLinePill: View {
                 Text(lineID.displayName)
                     .lineLimit(1)
                 Image(systemName: "checkmark")
-                    .font(.caption2.weight(.bold))
+                    .font(.appCaption2(.bold))
                     .opacity(selected ? 1 : 0)
                     .accessibilityHidden(true)
             }
-            .font(.caption.weight(.semibold))
+            .font(.appCaption(.semibold))
             .foregroundStyle(selected ? Color.white : Color.primary)
             .padding(.horizontal, 10)
             .padding(.vertical, 7)
@@ -559,17 +559,17 @@ private struct StationDepartureWarningView: View {
         } label: {
             HStack(alignment: .top, spacing: 9) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .font(.subheadline)
+                    .font(.appSubheadline())
                     .foregroundStyle(.red)
                     .padding(.top, 1)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(warning.title)
-                        .font(.caption.weight(.semibold))
+                        .font(.appCaption(.semibold))
                         .foregroundStyle(.primary)
                         .lineLimit(1)
                     Text(warning.detail)
-                        .font(.caption2)
+                        .font(.appCaption2())
                         .foregroundStyle(.secondary)
                         .lineLimit(2)
                 }
@@ -578,7 +578,7 @@ private struct StationDepartureWarningView: View {
 
                 if action != nil {
                     Image(systemName: "chevron.right")
-                        .font(.caption2.weight(.bold))
+                        .font(.appCaption2(.bold))
                         .foregroundStyle(.secondary)
                         .padding(.top, 8)
                 }
@@ -609,9 +609,9 @@ private struct StationDepartureGroupView: View {
             HStack(spacing: 7) {
                 TubeLineDot(lineID: group.lineID, size: 9)
                 Text(group.lineID.displayName)
-                    .font(.subheadline.weight(.bold))
+                    .font(.appSubheadline(.bold))
                 Text(group.direction)
-                    .font(.subheadline)
+                    .font(.appSubheadline())
                     .foregroundStyle(.secondary)
             }
             .accessibilityElement(children: .combine)
@@ -631,7 +631,7 @@ private struct StationDepartureGroupView: View {
                         Text(isExpanded ? "Show fewer departures" : "View all departures")
                         Image(systemName: isExpanded ? "chevron.up" : "chevron.down")
                     }
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
                     .contentShape(.rect)
                 }
@@ -649,11 +649,11 @@ private struct StationDepartureGroupView: View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             VStack(alignment: .leading, spacing: 2) {
                 Text(StationDepartureMetadata.destinationLabel(for: arrival))
-                    .font(.subheadline.weight(.medium))
+                    .font(.appSubheadline(.medium))
                     .lineLimit(2)
                 if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
                     Text(platform)
-                        .font(.caption2)
+                        .font(.appCaption2())
                         .foregroundStyle(.secondary)
                 }
             }
@@ -664,7 +664,7 @@ private struct StationDepartureGroupView: View {
                     now: now
                 )
             )
-            .font(.subheadline.weight(.bold))
+            .font(.appSubheadline(.bold))
             .monospacedDigit()
             .foregroundStyle(Color.departureAccent)
             .lineLimit(1)
@@ -742,12 +742,12 @@ private struct LineStatusDetailSheet: View {
         let presentation = presentation(for: entry)
         return VStack(alignment: .leading, spacing: 10) {
             Label(entry.statusSeverityDescription, systemImage: presentation.symbol)
-                .font(.headline)
+                .font(.appHeadline())
                 .foregroundStyle(presentation.color)
 
             if let reason = entry.reason, !reason.isEmpty {
                 Text(reason)
-                    .font(.body)
+                    .font(.appBody())
                     .fixedSize(horizontal: false, vertical: true)
                     .textSelection(.enabled)
             } else {
@@ -756,7 +756,7 @@ private struct LineStatusDetailSheet: View {
                         ? "TfL is reporting normal service."
                         : "No additional details were reported."
                 )
-                .font(.body)
+                .font(.appBody())
                 .foregroundStyle(.secondary)
             }
         }

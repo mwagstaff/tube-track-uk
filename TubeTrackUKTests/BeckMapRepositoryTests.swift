@@ -48,7 +48,7 @@ struct BeckMapRepositoryTests {
         #expect(document.segments.filter { $0.lineID == .elizabeth }.count == 42)
         #expect(document.segments.filter {
             [.liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush].contains($0.lineID)
-        }.count == 111)
+        }.count == 112)
         #expect(document.segments.contains {
             $0.id == BeckMapRepository.supplementalHeathrowSegmentID
         })
@@ -236,12 +236,13 @@ struct BeckMapRepositoryTests {
             )
         }
 
-        // Shared rail records resolve to a single physical roundel. Hackney
-        // Downs retains one for its out-of-station link to Hackney Central.
+        // Shared rail records normally resolve to one physical roundel. TfL
+        // gives Hackney Downs two Weaver branch ports plus Hackney Central's
+        // connected roundel.
         #expect(circles(try marker("910GROMFORD")).count == 1)
         let hackneyDowns = try marker("910GHAKNYNM")
-        #expect(circles(hackneyDowns).count == 1)
-        #expect(connectors(hackneyDowns).isEmpty)
+        #expect(circles(hackneyDowns).count == 3)
+        #expect(connectors(hackneyDowns).count == 2)
 
         // These Underground interchanges use roundels, not ordinary ticks.
         for stationID in [
@@ -268,14 +269,14 @@ struct BeckMapRepositoryTests {
             #expect(links.allSatisfy { length($0) <= maximumLength })
         }
 
-        // Queen's Park is one shared elbow, rather than two disconnected
-        // stations hundreds of artwork units apart.
+        // Queen's Park keeps the official small separation between the
+        // Bakerloo and Lioness traces while retaining one shared roundel.
         let queensBakerloo = try port("940GZZLUQPS", .bakerloo)
         let queensLioness = try port("910GQPRK", .lioness)
-        #expect(hypot(
+        #expect(abs(hypot(
             queensBakerloo.x - queensLioness.x,
             queensBakerloo.y - queensLioness.y
-        ) < 0.1)
+        ) - 13.078) < 0.001)
         #expect(circles(try marker("940GZZLUQPS")).count == 1)
         #expect(circles(try marker("910GQPRK")).count == 1)
         #expect(circles(try marker("940GZZLUQPS")) == circles(try marker("910GQPRK")))
@@ -285,11 +286,11 @@ struct BeckMapRepositoryTests {
         ] {
             let segment = try #require(document.segments.first { $0.id == segmentID })
             let path = try #require(document.paths.first { $0.id == segment.pathID })
-            #expect(path.commands.count == 2)
+            #expect(path.commands.count >= 4)
             #expect(path.commands.count {
                 if case .cubic = $0 { return true }
                 return false
-            } == 1)
+            } >= 1)
         }
 
         let kensalToWillesden = try #require(document.segments.first {

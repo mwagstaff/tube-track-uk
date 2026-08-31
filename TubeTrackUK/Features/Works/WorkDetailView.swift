@@ -23,9 +23,9 @@ struct WorkDetailView: View {
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text(work.title)
-                            .font(.title2.bold())
+                            .font(.appTitle2(.bold))
                         Text(work.detail)
-                            .font(.body)
+                            .font(.appBody())
                             .foregroundStyle(.secondary)
                     }
 
@@ -51,15 +51,15 @@ struct WorkDetailView: View {
                             Divider()
                             LabeledContent("Map resolution", value: work.confidence.userDescription)
                         }
-                        .font(.subheadline)
+                        .font(.appSubheadline())
                     }
 
                     if !affectedStationNames.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("Affected stations").font(.headline)
+                            Text("Affected stations").font(.appHeadline())
                             ForEach(affectedStationNames, id: \.self) { name in
                                 Label(name, systemImage: "smallcircle.filled.circle")
-                                    .font(.subheadline)
+                                    .font(.appSubheadline())
                             }
                         }
                     }

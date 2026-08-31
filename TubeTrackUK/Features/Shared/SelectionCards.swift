@@ -40,15 +40,11 @@ struct StationDetailCard: View {
     var body: some View {
         GlassPanel {
             VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top) {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text(station.name)
-                            .font(.headline)
-                        Text(stationKindDescription)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                HStack(alignment: .top, spacing: 4) {
+                    Text(station.name)
+                        .font(.appHeadline())
                     Spacer()
+                    StationDirectionsButton(station: station)
                     Button("Close", systemImage: "xmark.circle.fill") {
                         if let onClose {
                             onClose()
@@ -58,7 +54,7 @@ struct StationDetailCard: View {
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
-                    .font(.title2)
+                    .font(.appTitle2())
                     .frame(width: 44, height: 44)
                     .contentShape(.rect)
                     .buttonStyle(.plain)
@@ -81,15 +77,6 @@ struct StationDetailCard: View {
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
         }
-    }
-
-    private var stationKindDescription: String {
-        if station.interchange || lineIDs.count > 1 { return "Interchange station" }
-        if lineIDs.contains(.tram), lineIDs.allSatisfy({ $0 == .tram }) {
-            return "Tram stop"
-        }
-        if lineIDs.allSatisfy(\.isUnderground) { return "Underground station" }
-        return "Rail station"
     }
 
     private func showStationIssue() {
@@ -131,11 +118,11 @@ struct DisruptionDetailCard: View {
                 }
 
                 Label(disruption.title, systemImage: "exclamationmark.triangle.fill")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.appSubheadline(.semibold))
                     .foregroundStyle(.red)
 
                 Text(disruption.reason)
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
                     .lineLimit(4)
 
@@ -162,12 +149,12 @@ struct DisruptionDetailCard: View {
         Button("Read full disruption", systemImage: "doc.text.magnifyingglass") {
             presentedDisruption = disruption
         }
-        .font(.caption.weight(.semibold))
+        .font(.appCaption(.semibold))
     }
 
     private var disruptionConfidenceLabel: some View {
         Text(disruption.confidence.userDescription)
-            .font(.caption2)
+            .font(.appCaption2())
             .foregroundStyle(.tertiary)
     }
 }
@@ -198,11 +185,11 @@ struct PlannedWorkDetailCard: View {
                 }
 
                 Label(work.title, systemImage: "wrench.and.screwdriver.fill")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.appSubheadline(.semibold))
                     .foregroundStyle(.orange)
 
                 Text(work.detail)
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
                     .lineLimit(4)
 
@@ -210,12 +197,12 @@ struct PlannedWorkDetailCard: View {
                     Button("View details", systemImage: "doc.text.magnifyingglass") {
                         presentsDetails = true
                     }
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
 
                     Spacer(minLength: 8)
 
                     Label(validityLabel, systemImage: "calendar")
-                        .font(.caption2)
+                        .font(.appCaption2())
                         .foregroundStyle(.tertiary)
                 }
             }
@@ -245,17 +232,17 @@ private struct DisruptionDetailSheet: View {
                     LineBadge(lineID: disruption.lineID)
 
                     Label(disruption.title, systemImage: "exclamationmark.triangle.fill")
-                        .font(.headline)
+                        .font(.appHeadline())
                         .foregroundStyle(.red)
 
                     Text(disruption.reason)
-                        .font(.body)
+                        .font(.appBody())
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                         .textSelection(.enabled)
 
                     Label(disruption.confidence.userDescription, systemImage: "map")
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -387,7 +374,7 @@ private struct TrainMapCallout: View {
     private var bubble: some View {
         VStack(spacing: 0) {
             Text(lineName)
-                .font(.subheadline.weight(.bold))
+                .font(.appSubheadline(.bold))
                 .foregroundStyle(lineHeaderForeground)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -437,17 +424,17 @@ private struct TrainMapCallout: View {
                         }
                     }
                 }
-                .font(.subheadline)
+                .font(.appSubheadline())
 
                 Divider()
 
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Next stop")
-                            .font(.caption)
+                            .font(.appCaption())
                             .foregroundStyle(.secondary)
                         Text(nextStopName)
-                            .font(.subheadline.weight(.semibold))
+                            .font(.appSubheadline(.semibold))
                             .lineLimit(2)
                     }
 
@@ -458,10 +445,10 @@ private struct TrainMapCallout: View {
                             train.estimatedNextStopArrival(at: date),
                             format: .dateTime.hour().minute()
                         )
-                        .font(.caption.monospacedDigit())
+                        .font(.appCaption().monospacedDigit())
                         .foregroundStyle(.secondary)
                         Text(relativeETA)
-                            .font(.title3.weight(.bold).monospacedDigit())
+                            .font(.appTitle3(.bold).monospacedDigit())
                             .foregroundStyle(Color.tubeLine(train.lineID))
                     }
                 }
@@ -581,7 +568,7 @@ struct TrainFilterBar: View {
                     appState.setTrainFilter(nil)
                 } label: {
                     Text("All (\(appState.activeTrainCounts.total))")
-                        .font(.caption.weight(.semibold))
+                        .font(.appCaption(.semibold))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 8)
                         .background(appState.trainLineFilter.isEmpty ? Color.blue : Color.secondary.opacity(0.16), in: .capsule)
@@ -608,7 +595,7 @@ struct TrainFilterBar: View {
                 }
 
                 Text(activeTrainSummary)
-                    .font(.caption2.weight(.medium))
+                    .font(.appCaption2(.medium))
                     .foregroundStyle(.secondary)
                     .fixedSize()
                     .padding(.leading, 3)
@@ -655,12 +642,12 @@ struct LineDetailCard: View {
                     status?.statusSeverityDescription ?? "Status updating",
                     systemImage: status?.isGoodService == true ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
                 )
-                .font(.subheadline.weight(.semibold))
+                .font(.appSubheadline(.semibold))
                 .foregroundStyle(status?.isGoodService == true ? .green : .orange)
 
                 if let reason = status?.reason {
                     Text(reason)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                         .lineLimit(3)
                 }
@@ -671,7 +658,7 @@ struct LineDetailCard: View {
                         appState.setLiveTrains(true)
                     } label: {
                         Label("Show estimated live trains", systemImage: "tram.fill")
-                            .font(.caption.weight(.semibold))
+                            .font(.appCaption(.semibold))
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)

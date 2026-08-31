@@ -594,7 +594,7 @@
       "id": "label.910GHAKNYNM",
       "position": {
         "x": 2815.172,
-        "y": 1157.422
+        "y": 1202.895
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -23904,6 +23904,13 @@
           "op": "move",
           "to": {
             "x": 2831.172,
+            "y": 1220.895
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2831.172,
             "y": 1175.422
           }
         },
@@ -24198,6 +24205,47 @@
         {
           "op": "move",
           "to": {
+            "x": 2724.905,
+            "y": 1379.344
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2744.905,
+            "y": 1379.344
+          }
+        },
+        {
+          "control1": {
+            "x": 2806.905,
+            "y": 1379.344
+          },
+          "control2": {
+            "x": 2857.172,
+            "y": 1329.077
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2857.172,
+            "y": 1267.077
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2857.172,
+            "y": 1220.895
+          }
+        }
+      ],
+      "id": "beck.v1.path.weaver.liverpool-chingford-bypass.official.v1.0"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
             "x": 2789.872,
             "y": 1379.344
           }
@@ -24244,18 +24292,10 @@
           }
         },
         {
-          "control1": {
-            "x": 2831.134,
-            "y": 1254.19
-          },
-          "control2": {
-            "x": 2831.162,
-            "y": 1195.614
-          },
-          "op": "cubic",
+          "op": "line",
           "to": {
             "x": 2831.172,
-            "y": 1175.422
+            "y": 1220.895
           }
         }
       ],
@@ -24266,24 +24306,24 @@
         {
           "op": "move",
           "to": {
-            "x": 2831.172,
-            "y": 1175.422
+            "x": 2857.172,
+            "y": 1220.895
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 2840.5,
+            "x": 2857.172,
             "y": 1175.422
           }
         },
         {
           "control1": {
-            "x": 2848.5,
+            "x": 2857.172,
             "y": 1175.422
           },
           "control2": {
-            "x": 2856.2,
+            "x": 2857.172,
             "y": 1172.2
           },
           "op": "cubic",
@@ -27829,9 +27869,7 @@
       "lineID": "weaver",
       "segmentIDs": [
         "weaver:910GBTHNLGR:910GLIVST",
-        "weaver:910GBTHNLGR:910GCAMHTH",
-        "weaver:910GCAMHTH:910GLONFLDS",
-        "weaver:910GHAKNYNM:910GLONFLDS",
+        "weaver:910GBTHNLGR:910GHAKNYNM",
         "weaver:910GCLAPTON:910GHAKNYNM",
         "weaver:910GCLAPTON:910GSTJMSST",
         "weaver:910GSTJMSST:910GWLTWCEN",
@@ -27842,8 +27880,6 @@
       "stationIDs": [
         "910GLIVST",
         "910GBTHNLGR",
-        "910GCAMHTH",
-        "910GLONFLDS",
         "910GHAKNYNM",
         "910GCLAPTON",
         "910GSTJMSST",
@@ -39527,6 +39563,26 @@
     },
     {
       "fromPort": {
+        "x": 2724.905,
+        "y": 1379.344
+      },
+      "fromStationID": "910GBTHNLGR",
+      "id": "weaver:910GBTHNLGR:910GHAKNYNM",
+      "lineID": "weaver",
+      "pathDirection": "forward",
+      "pathID": "beck.v1.path.weaver.liverpool-chingford-bypass.official.v1.0",
+      "toPort": {
+        "x": 2857.172,
+        "y": 1220.895
+      },
+      "toStationID": "910GHAKNYNM",
+      "translation": {
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "fromPort": {
         "x": 2444.88,
         "y": 1426.488
       },
@@ -39607,8 +39663,8 @@
     },
     {
       "fromPort": {
-        "x": 2831.172,
-        "y": 1175.422
+        "x": 2857.172,
+        "y": 1220.895
       },
       "fromStationID": "910GHAKNYNM",
       "id": "weaver:910GCLAPTON:910GHAKNYNM",
@@ -39697,7 +39753,7 @@
       "pathID": "beck.v1.path.weaver.liverpool-chingford.official.v1.3",
       "toPort": {
         "x": 2831.172,
-        "y": 1175.422
+        "y": 1220.895
       },
       "toStationID": "910GHAKNYNM",
       "translation": {
@@ -39708,7 +39764,7 @@
     {
       "fromPort": {
         "x": 2831.172,
-        "y": 1175.422
+        "y": 1220.895
       },
       "fromStationID": "910GHAKNYNM",
       "id": "weaver:910GHAKNYNM:910GRCTRYRD",
@@ -42113,19 +42169,69 @@
     {
       "anchor": {
         "x": 2831.172,
-        "y": 1175.422
+        "y": 1220.895
       },
-      "hitRadius": 14,
+      "hitRadius": 36,
       "lineIDs": [
         "weaver"
       ],
       "name": "Hackney Downs",
       "primitives": [
         {
+          "connector": {
+            "end": {
+              "x": 2857.172,
+              "y": 1220.895
+            },
+            "start": {
+              "x": 2831.172,
+              "y": 1220.895
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 2905.59,
+              "y": 1269.313
+            },
+            "start": {
+              "x": 2857.172,
+              "y": 1220.895
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
           "circle": {
             "centre": {
               "x": 2831.172,
-              "y": 1175.422
+              "y": 1220.895
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 2857.172,
+              "y": 1220.895
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 2905.59,
+              "y": 1269.313
             },
             "outlineWidth": 3.5,
             "radius": 8.5

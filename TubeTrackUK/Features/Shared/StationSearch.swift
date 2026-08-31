@@ -127,7 +127,7 @@ struct StationSearchSheet: View {
                             HStack(alignment: .top, spacing: 8) {
                                 VStack(alignment: .leading, spacing: 5) {
                                     Text(station.name)
-                                        .font(.body.weight(.semibold))
+                                        .font(.appBody(.semibold))
                                         .foregroundStyle(.primary)
 
                                     StationLineLegend(lineIDs: lineIDs)
@@ -182,7 +182,7 @@ private struct StationLineLegend: View {
                         .accessibilityHidden(true)
 
                     Text(lineID.displayName)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                 }
                 .fixedSize()

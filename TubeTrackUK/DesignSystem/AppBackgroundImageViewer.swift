@@ -385,7 +385,7 @@ struct AppBackgroundImageViewer: View {
                 Spacer()
                 Button(action: dismissToMap) {
                     Image(systemName: "xmark")
-                        .font(.caption.weight(.bold))
+                        .font(.appCaption(.bold))
                         .foregroundStyle(.white)
                         .frame(width: 30, height: 30)
                         .background(.black.opacity(0.5), in: Circle())
@@ -407,7 +407,7 @@ struct AppBackgroundImageViewer: View {
                         Image(systemName: "arrow.up.right.square")
                             .accessibilityHidden(true)
                     }
-                    .font(.caption2.weight(.medium))
+                    .font(.appCaption2(.medium))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 7)

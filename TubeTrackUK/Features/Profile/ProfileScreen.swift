@@ -24,7 +24,7 @@ struct ProfileScreen: View {
                             Spacer()
                             if appState.isTfLAPIKeyConfigured {
                                 Text("Added")
-                                    .font(.subheadline)
+                                    .font(.appSubheadline())
                                     .foregroundStyle(.secondary)
                             }
                         }

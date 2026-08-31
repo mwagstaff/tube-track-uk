@@ -46,7 +46,7 @@ struct TubeTrackUKTests {
         let graph = try TubeGraph.bundled()
         #expect(graph.lines.count == 20)
         #expect(graph.stations.count == 509)
-        #expect(graph.segments.count == 617)
+        #expect(graph.segments.count == 618)
         #expect(graph.segments.allSatisfy { $0.geographicPoints.count >= 2 })
         #expect(graph.segments.filter { $0.geographicPoints.count > 2 }.count > 340)
         #expect(graph.source.attribution.contains("OpenStreetMap contributors"))
@@ -63,7 +63,7 @@ struct TubeTrackUKTests {
         #expect(graph.segments(for: .lioness).count == 18)
         #expect(graph.segments(for: .mildmay).count == 27)
         #expect(graph.segments(for: .suffragette).count == 12)
-        #expect(graph.segments(for: .weaver).count == 24)
+        #expect(graph.segments(for: .weaver).count == 25)
         #expect(graph.segments(for: .windrush).count == 28)
         let bankStops = graph.stations.filter { $0.hubID == "HUBBAN" }
         #expect(bankStops.contains { $0.lineIDs.contains(.dlr) })

@@ -120,7 +120,7 @@ struct NearMeScreen: View {
 
                     VStack(alignment: .leading, spacing: 5) {
                         Text("Closest stations")
-                            .font(.title3.weight(.bold))
+                            .font(.appTitle3(.bold))
                     }
                     .padding(.horizontal, 4)
                     .padding(.bottom, 3)
@@ -144,7 +144,7 @@ struct NearMeScreen: View {
                         .id(visibleStationCount)
                     } else {
                         Text("Distances are straight-line estimates from your current location.")
-                            .font(.caption2)
+                            .font(.appCaption2())
                             .foregroundStyle(.tertiary)
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.vertical, 6)
@@ -199,7 +199,7 @@ struct NearMeScreen: View {
     private var disruptionDateControl: some View {
         HStack(spacing: 12) {
             Label("Disruptions", systemImage: "exclamationmark.triangle.fill")
-                .font(.headline)
+                .font(.appHeadline())
                 .foregroundStyle(Color.primary)
 
             Spacer(minLength: 8)
@@ -303,7 +303,7 @@ private struct LoadMoreStationsTrigger: View {
                 .controlSize(.small)
             Text("Loading 3 more nearby stations…")
         }
-        .font(.caption.weight(.medium))
+        .font(.appCaption(.medium))
         .foregroundStyle(.secondary)
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
@@ -343,14 +343,19 @@ private struct NearbyStationCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Button {
-                showOnMap()
-            } label: {
-                stationHeader
+            HStack(spacing: 2) {
+                Button {
+                    showOnMap()
+                } label: {
+                    stationHeader
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("\(station.name), \(distanceText) away")
+                .accessibilityHint("Shows this station in the real-world map view")
+
+                StationDirectionsButton(station: station, iconOnly: true)
+                    .padding(.trailing, 8)
             }
-            .buttonStyle(.plain)
-            .accessibilityLabel("\(station.name), \(distanceText) away")
-            .accessibilityHint("Shows this station in the real-world map view")
 
             if appState.isViewingLiveStatus {
                 StationDeparturesSection(
@@ -383,18 +388,18 @@ private struct NearbyStationCard: View {
     private var stationHeader: some View {
         HStack(spacing: 12) {
             Text("\(rank)")
-                .font(.caption.weight(.bold))
+                .font(.appCaption(.bold))
                 .foregroundStyle(Color.white)
                 .frame(width: 27, height: 27)
                 .background(Color.tubeBlue, in: .circle)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(station.name)
-                    .font(.headline)
+                    .font(.appHeadline())
                     .foregroundStyle(Color.primary)
                     .multilineTextAlignment(.leading)
                 Text(distanceText)
-                    .font(.caption.weight(.medium))
+                    .font(.appCaption(.medium))
                     .foregroundStyle(Color.secondary)
             }
 
@@ -403,12 +408,11 @@ private struct NearbyStationCard: View {
             Label("View on map", systemImage: "map.fill")
                 .labelStyle(.iconOnly)
                 .foregroundStyle(Color.tubeBlue)
-            Image(systemName: "chevron.right")
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color.secondary.opacity(0.65))
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(.rect)
-        .padding(.horizontal, 15)
+        .padding(.leading, 15)
+        .padding(.trailing, 6)
         .padding(.top, 15)
         .padding(.bottom, 12)
     }
@@ -419,7 +423,7 @@ private struct NearbyStationCard: View {
             HStack(spacing: 9) {
                 ProgressView()
                 Text("Loading planned disruptions…")
-                    .font(.subheadline)
+                    .font(.appSubheadline())
                     .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -428,9 +432,9 @@ private struct NearbyStationCard: View {
             Label {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Planned disruptions unavailable")
-                        .font(.subheadline.weight(.semibold))
+                        .font(.appSubheadline(.semibold))
                     Text(error)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                 }
             } icon: {
@@ -440,7 +444,7 @@ private struct NearbyStationCard: View {
         } else {
             VStack(alignment: .leading, spacing: 14) {
                 Text("Planned disruptions")
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .foregroundStyle(.secondary)
 
                 ForEach(Array(plannedDisruptionGroups.enumerated()), id: \.element.id) { index, group in
@@ -504,7 +508,7 @@ private struct NearbyLineDisruptionView: View {
                         }
                     }
                 Text(group.lineID.displayName)
-                    .font(.subheadline.weight(.bold))
+                    .font(.appSubheadline(.bold))
             }
             .accessibilityElement(children: .combine)
 
@@ -516,7 +520,7 @@ private struct NearbyLineDisruptionView: View {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundStyle(.green)
                 }
-                .font(.subheadline)
+                .font(.appSubheadline())
             } else {
                 ForEach(Array(group.works.enumerated()), id: \.element.id) { index, work in
                     Button {
@@ -526,15 +530,15 @@ private struct NearbyLineDisruptionView: View {
                     } label: {
                         VStack(alignment: .leading, spacing: 9) {
                             Text(work.title)
-                                .font(.subheadline.weight(.bold))
+                                .font(.appSubheadline(.bold))
                                 .foregroundStyle(.orange)
                             Text(work.detail)
-                                .font(.subheadline)
+                                .font(.appSubheadline())
                                 .foregroundStyle(.primary)
                                 .fixedSize(horizontal: false, vertical: true)
 
                             Label(validityLabel(for: work), systemImage: "clock.fill")
-                                .font(.caption.weight(.semibold))
+                                .font(.appCaption(.semibold))
                                 .foregroundStyle(.primary)
 
                             Divider()
@@ -542,11 +546,11 @@ private struct NearbyLineDisruptionView: View {
                             HStack(spacing: 6) {
                                 Spacer(minLength: 0)
                                 Label("View on map", systemImage: "map.fill")
-                                    .font(.caption.weight(.bold))
+                                    .font(.appCaption(.bold))
                                     .foregroundStyle(Color.tubeBlue)
 
                                 Image(systemName: "chevron.right")
-                                    .font(.caption2.weight(.bold))
+                                    .font(.appCaption2(.bold))
                                     .foregroundStyle(Color.tubeBlue)
                             }
                         }

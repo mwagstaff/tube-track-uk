@@ -45,7 +45,7 @@ struct TfLAPIKeyScreen: View {
             Label("API key added", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
             Text("Your key is stored securely on this device and is included as the app_key query parameter on TfL requests.")
-                .font(.footnote)
+                .font(.appFootnote())
                 .foregroundStyle(.secondary)
         }
     }
@@ -59,7 +59,7 @@ struct TfLAPIKeyScreen: View {
                 instruction(2, "Add a free subscription to the “500 Requests per min” product.")
                 instruction(3, "Copy the API key from your profile and enter it below.")
             }
-            .font(.subheadline)
+            .font(.appSubheadline())
 
             Link(destination: portalURL) {
                 Label("Open TfL API Portal", systemImage: "arrow.up.right.square")
@@ -108,7 +108,7 @@ struct TfLAPIKeyScreen: View {
     private func instruction(_ number: Int, _ text: String) -> some View {
         HStack(alignment: .firstTextBaseline, spacing: 10) {
             Text("\(number)")
-                .font(.caption.weight(.bold))
+                .font(.appCaption(.bold))
                 .foregroundStyle(.white)
                 .frame(width: 22, height: 22)
                 .background(Color.tubeBlue, in: Circle())

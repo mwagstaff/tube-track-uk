@@ -147,7 +147,7 @@ struct WorksScreen: View {
                     }
                 } header: {
                     Text(LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM"))
-                        .font(.subheadline.weight(.bold))
+                        .font(.appSubheadline(.bold))
                         .textCase(.uppercase)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -191,7 +191,7 @@ struct WorksScreen: View {
         } label: {
             HStack(spacing: 6) {
                 Circle().fill(color).frame(width: 8, height: 8)
-                Text(title).font(.caption.weight(.semibold))
+                Text(title).font(.appCaption(.semibold))
             }
             .padding(.horizontal, 11)
             .padding(.vertical, 8)
@@ -212,11 +212,11 @@ struct WorksScreen: View {
         } label: {
             VStack(spacing: 1) {
                 Text(quickDate.title)
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
                 Text(LondonRailDate.formatted(date, dateFormat: "d MMM"))
-                    .font(.caption2)
+                    .font(.appCaption2())
                     .opacity(selected ? 0.85 : 0.65)
             }
             .frame(maxWidth: .infinity, minHeight: 44)
@@ -327,20 +327,20 @@ private struct WorkCard: View {
                     .scrollIndicators(.hidden)
                     Spacer(minLength: 4)
                     Text(work.confidence == .lineOnly ? "Line-wide" : "Section")
-                        .font(.caption2.weight(.bold))
+                        .font(.appCaption2(.bold))
                         .foregroundStyle(.orange)
                 }
-                Text(work.title).font(.headline)
+                Text(work.title).font(.appHeadline())
                 Text(work.detail)
-                    .font(.subheadline)
+                    .font(.appSubheadline())
                     .foregroundStyle(.secondary)
                     .lineLimit(4)
                 Label(dateRange, systemImage: "calendar")
-                    .font(.caption.weight(.medium))
+                    .font(.appCaption(.medium))
                     .foregroundStyle(.secondary)
             }
             Image(systemName: "chevron.right")
-                .font(.caption.weight(.bold))
+                .font(.appCaption(.bold))
                 .foregroundStyle(.tertiary)
         }
         .padding(15)

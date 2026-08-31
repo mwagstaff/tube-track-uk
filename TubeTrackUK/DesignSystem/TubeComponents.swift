@@ -45,7 +45,7 @@ struct LineBadge: View {
                     .lineLimit(1)
             }
         }
-        .font(.caption.weight(.semibold))
+        .font(.appCaption(.semibold))
         .padding(.horizontal, 9)
         .padding(.vertical, 6)
         .background(.thinMaterial, in: .capsule)
@@ -79,7 +79,7 @@ struct FreshnessLabel: View {
                         Text("Updated just now")
                     }
                 }
-                .font(.caption2)
+                .font(.appCaption2())
                 .foregroundStyle(freshness == .stale ? .orange : .secondary)
                 .accessibilityLabel(
                     freshness == .stale

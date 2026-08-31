@@ -95,6 +95,10 @@ struct RootTabView: View {
         .onChange(of: appState.mapPresentationMode) {
             revealBackgroundIfNeeded()
         }
+        .onChange(of: appState.stationSelectionGeneration) {
+            guard appState.selectedStationID != nil else { return }
+            closestStationPanelHidden = true
+        }
         .onDisappear {
             backgroundRevealTask?.cancel()
         }
@@ -149,7 +153,7 @@ private struct AppStartupBackgroundChrome: View {
         GeometryReader { proxy in
             ZStack {
                 Text("TubeTrack UK")
-                    .font(.headline.weight(.semibold))
+                    .font(.appHeadline(.semibold))
                     .tracking(0.2)
                     .foregroundStyle(.white.opacity(0.94))
                     .padding(.horizontal, 14)
@@ -167,7 +171,7 @@ private struct AppStartupBackgroundChrome: View {
                         .tint(.white)
                     Text("Loading...")
                 }
-                .font(.caption.weight(.medium))
+                .font(.appCaption(.medium))
                 .foregroundStyle(.white.opacity(0.94))
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)

@@ -388,7 +388,7 @@ struct UnifiedMapScreen: View {
     private var actionToast: some View {
         if let actionNotice {
             Label(actionNotice.message, systemImage: actionNotice.symbol)
-                .font(.subheadline.weight(.semibold))
+                .font(.appSubheadline(.semibold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 14)
                 .frame(minHeight: 40)
@@ -441,7 +441,7 @@ private struct OpenStreetMapAttribution: View {
     var body: some View {
         Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
             Text("© OpenStreetMap contributors")
-                .font(.caption2.weight(.medium))
+                .font(.appCaption2(.medium))
                 .padding(.horizontal, 9)
                 .padding(.vertical, 5)
                 .glassEffect(.regular, in: .capsule)

@@ -108,7 +108,7 @@ struct LiveStatusDock: View {
 
     private var statusIcon: some View {
         Image(systemName: summary.symbol)
-            .font(.headline)
+            .font(.appHeadline())
             .foregroundStyle(summary.color)
             .symbolEffect(.pulse, isActive: appState.isRefreshingStatus)
     }
@@ -116,12 +116,12 @@ struct LiveStatusDock: View {
     private func statusText(lineLimit: Int) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             Text(summary.title)
-                .font(.subheadline.weight(.semibold))
+                .font(.appSubheadline(.semibold))
                 .foregroundStyle(.primary)
                 .lineLimit(lineLimit)
             if let detail = summary.detail {
                 Text(detail)
-                    .font(.caption)
+                    .font(.appCaption())
                     .foregroundStyle(.secondary)
                     .lineLimit(lineLimit)
             }
@@ -130,7 +130,7 @@ struct LiveStatusDock: View {
 
     private var disclosureIcon: some View {
         Image(systemName: expanded ? "chevron.down" : "chevron.up")
-            .font(.caption.weight(.bold))
+            .font(.appCaption(.bold))
             .foregroundStyle(.secondary)
     }
 }
@@ -187,12 +187,12 @@ struct DisruptionTimeFilterBar: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: selected ? "checkmark" : window.symbol)
-                    .font(.caption.weight(.bold))
+                    .font(.appCaption(.bold))
                     .frame(width: 14)
                 Text(window.title)
-                    .font(.caption.weight(.semibold))
+                    .font(.appCaption(.semibold))
                 Text(count, format: .number)
-                    .font(.caption2.weight(.bold).monospacedDigit())
+                    .font(.appCaption2(.bold).monospacedDigit())
                     .padding(.horizontal, 6)
                     .frame(minWidth: 22, minHeight: 22)
                     .background(
@@ -274,11 +274,11 @@ struct DisruptionDateMenu: View {
                     .foregroundStyle(Color(uiColor: .label))
                 if !compact {
                     Text(selectionTitle)
-                        .font(.subheadline.weight(.semibold))
+                        .font(.appSubheadline(.semibold))
                         .lineLimit(1)
                         .foregroundStyle(Color(uiColor: .label))
                     Image(systemName: "chevron.up.chevron.down")
-                        .font(.caption2.weight(.bold))
+                        .font(.appCaption2(.bold))
                         .foregroundStyle(Color(uiColor: .secondaryLabel))
                 }
             }
@@ -377,14 +377,14 @@ struct LiveStatusPanel: View {
             VStack(spacing: 12) {
                 HStack {
                     Text(appState.isViewingLiveStatus ? "Live Status" : "Planned Work")
-                        .font(.headline)
+                        .font(.appHeadline())
                     Spacer()
                     Button("Close", systemImage: "xmark.circle.fill") {
                         withAnimation(.spring(duration: 0.35)) { expanded = false }
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
-                    .font(.title2)
+                    .font(.appTitle2())
                     .frame(width: 44, height: 44)
                     .contentShape(.rect)
                     .buttonStyle(.plain)
@@ -519,7 +519,7 @@ struct LiveStatusPanel: View {
                             LineBadge(lineID: lineID)
                             Spacer()
                             Text(status.statusSeverityDescription)
-                                .font(.caption)
+                                .font(.appCaption())
                                 .foregroundStyle(.secondary)
                         }
                     }
@@ -552,7 +552,7 @@ private struct StaleLiveStatusNotice: View {
                             .foregroundStyle(.orange)
 
                         Text("Live disruption data is stale. Retrying…")
-                            .font(.caption.weight(.semibold))
+                            .font(.appCaption(.semibold))
                             .foregroundStyle(.primary)
 
                         Spacer(minLength: 4)
@@ -586,7 +586,7 @@ private struct DisruptionCategoryFilterMenu: View {
             }
         } label: {
             Label("Filter", systemImage: "line.3.horizontal.decrease.circle")
-                .font(.subheadline.weight(.semibold))
+                .font(.appSubheadline(.semibold))
                 .padding(.horizontal, 12)
                 .frame(minHeight: 44)
         }
@@ -636,25 +636,25 @@ private struct PlannedWorkRow: View {
                 VStack(alignment: .leading, spacing: 5) {
                     HStack(alignment: .firstTextBaseline) {
                         Text(work.lineIDs.map(\.displayName).joined(separator: ", "))
-                            .font(.subheadline.weight(.bold))
+                            .font(.appSubheadline(.bold))
                             .lineLimit(1)
                         Spacer(minLength: 8)
                         Text(work.title)
-                            .font(.caption.weight(.semibold))
+                            .font(.appCaption(.semibold))
                             .foregroundStyle(.orange)
                             .lineLimit(1)
                     }
                     Text(work.detail)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                         .lineLimit(3)
                     Label(validityLabel, systemImage: "clock")
-                        .font(.caption2)
+                        .font(.appCaption2())
                         .foregroundStyle(.tertiary)
                 }
 
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
+                    .font(.appCaption(.bold))
                     .foregroundStyle(.tertiary)
             }
             .padding(11)
@@ -695,22 +695,22 @@ private struct DisruptionRow: View {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack {
                         Text(disruption.lineID.displayName)
-                            .font(.subheadline.weight(.bold))
+                            .font(.appSubheadline(.bold))
                         Spacer()
                         Text(disruption.title)
-                            .font(.caption.weight(.semibold))
+                            .font(.appCaption(.semibold))
                             .foregroundStyle(.red)
                     }
                     Text(disruption.reason)
-                        .font(.caption)
+                        .font(.appCaption())
                         .foregroundStyle(.secondary)
                         .lineLimit(3)
                     Text(disruption.confidence.userDescription)
-                        .font(.caption2)
+                        .font(.appCaption2())
                         .foregroundStyle(.tertiary)
                 }
                 Image(systemName: "chevron.right")
-                    .font(.caption.weight(.bold))
+                    .font(.appCaption(.bold))
                     .foregroundStyle(.tertiary)
             }
             .padding(11)

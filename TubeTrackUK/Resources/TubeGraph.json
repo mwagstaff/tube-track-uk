@@ -78292,6 +78292,40 @@
       ]
     },
     {
+      "id": "weaver:910GBTHNLGR:910GHAKNYNM",
+      "lineID": "weaver",
+      "fromStationID": "910GBTHNLGR",
+      "toStationID": "910GHAKNYNM",
+      "schematicPoints": [
+        {
+          "x": 1035.0,
+          "y": 345.0
+        },
+        {
+          "x": 1035.0,
+          "y": 273.0
+        }
+      ],
+      "geographicPoints": [
+        {
+          "latitude": 51.523917,
+          "longitude": -0.059568
+        },
+        {
+          "latitude": 51.531973,
+          "longitude": -0.057279
+        },
+        {
+          "latitude": 51.541153,
+          "longitude": -0.057753
+        },
+        {
+          "latitude": 51.548757,
+          "longitude": -0.060819
+        }
+      ]
+    },
+    {
       "id": "weaver:910GBTHNLGR:910GCAMHTH",
       "lineID": "weaver",
       "fromStationID": "910GBTHNLGR",
@@ -89278,6 +89312,7 @@
       "segmentIDs": [
         "weaver:910GBTHNLGR:910GLIVST",
         "weaver:910GBTHNLGR:910GCAMHTH",
+        "weaver:910GBTHNLGR:910GHAKNYNM",
         "weaver:910GCAMHTH:910GLONFLDS",
         "weaver:910GHAKNYNM:910GLONFLDS",
         "weaver:910GCLAPTON:910GHAKNYNM",
@@ -89305,8 +89340,6 @@
         [
           "910GLIVST",
           "910GBTHNLGR",
-          "910GCAMHTH",
-          "910GLONFLDS",
           "910GHAKNYNM",
           "910GCLAPTON",
           "910GSTJMSST",
