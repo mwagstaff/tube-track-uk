@@ -1,0 +1,6 @@
+node_modules/
+*.log
+.env
+.bw-secrets*.env.sh
+.static-config*.env.sh
+.start-with-bw-env*.sh
