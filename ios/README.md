@@ -85,10 +85,17 @@ python3 Tools/BeckMapBuilder/audit_map_fidelity.py \
   --output-html design_brief/beck_map/audits/april-2026-structural-fidelity-audit.html
 ```
 
-Use `--fail-on critical` in CI to reject source-hash, canvas-transform and
-topology failures. High- and medium-severity geometry candidates require
-visual confirmation in the generated HTML overlay before a versioned artwork
-change is approved.
+Use `--fail-on high` in CI to reject source-hash, canvas-transform, topology,
+detached-symbol and skewed-tick failures. Non-octilinear route and connector
+angles remain medium-severity review candidates because the official artwork
+contains deliberate exceptions; correct them only when the locked overlay
+shows a source mismatch.
+
+The final map compiler runs `normalize_station_markers.py` after every rail mode
+has been composed. That pass promotes connector-linked ordinary ticks to
+interchange roundels and derives visibly skewed ticks from their closest local
+route tangent. It is idempotent, so rerunning it must not change a current
+bundled asset.
 
 ## Background images
 

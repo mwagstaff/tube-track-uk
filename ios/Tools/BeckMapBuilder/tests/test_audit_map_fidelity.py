@@ -1,3 +1,5 @@
+import copy
+import json
 import struct
 import sys
 import tempfile
@@ -6,8 +8,10 @@ from pathlib import Path
 
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "audit_map_fidelity.py"
+IOS_ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(SCRIPT_PATH.parent))
 import audit_map_fidelity as audit_module
+import normalize_station_markers as normalize_module
 
 
 def marker(station_id, name, primitives, anchor=(10, 10), line_ids=("central",)):
@@ -135,7 +139,7 @@ class MapFidelityAuditTests(unittest.TestCase):
         audit.audit_connectors()
         self.assertNotIn("connector-angle-review", {finding.code for finding in audit.findings})
 
-    def test_noncanonical_connector_is_flagged_with_station_id(self):
+    def test_noncanonical_connector_is_a_review_candidate_with_station_id(self):
         markers = [
             marker("a", "A", [circle(10, 10), connector((10, 10), (20, 15)), circle(20, 15)]),
             marker("b", "B", [circle(20, 10)], anchor=(20, 10)),
@@ -143,7 +147,7 @@ class MapFidelityAuditTests(unittest.TestCase):
         audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
         audit.audit_connectors()
         finding = next(finding for finding in audit.findings if finding.code == "connector-angle-review")
-        self.assertEqual(finding.severity, "high")
+        self.assertEqual(finding.severity, "medium")
         self.assertEqual(finding.evidence["stationID"], "a")
 
     def test_perpendicular_tick_passes_and_skewed_tick_fails(self):
@@ -174,7 +178,28 @@ class MapFidelityAuditTests(unittest.TestCase):
         audit.audit_routes()
         finding = next(finding for finding in audit.findings if finding.code == "non-canonical-straight-runs")
         self.assertEqual(finding.location, "central")
+        self.assertEqual(finding.severity, "medium")
         self.assertEqual(finding.evidence["count"], 1)
+
+    def test_roundel_on_connector_endpoint_is_attached(self):
+        markers = [
+            marker("a", "A", [connector((10, 10), (16, 18)), circle(16, 18)]),
+            marker("b", "B", [circle(20, 10)], anchor=(20, 10)),
+        ]
+        audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
+        audit.audit_roundels()
+        self.assertNotIn("roundel-not-on-route-port", {finding.code for finding in audit.findings})
+
+    def test_tick_on_middle_of_station_path_uses_local_tangent(self):
+        markers = [
+            marker("a", "A", [tick((15, 3), (15, 17))], anchor=(15, 10)),
+            marker("b", "B", [tick((20, 3), (20, 17))], anchor=(20, 10)),
+        ]
+        audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
+        audit.audit_ticks()
+        codes = {finding.code for finding in audit.findings}
+        self.assertNotIn("tick-not-on-route-port", codes)
+        self.assertNotIn("tick-not-perpendicular", codes)
 
     def test_small_shared_corridor_roundel_offset_is_medium(self):
         markers = [
@@ -219,6 +244,52 @@ class MapFidelityAuditTests(unittest.TestCase):
             report = audit.run(root / "manifest.json")
             codes = {finding["code"] for finding in report["findings"]}
             self.assertIn("reference-hash-mismatch", codes)
+
+    def test_connector_endpoint_promotes_matching_tick_to_roundel(self):
+        markers = [
+            marker("a", "A", [tick((10, 3), (10, 17))]),
+            marker(
+                "b", "B",
+                [connector((10, 10), (20, 10)), circle(20, 10)],
+                anchor=(20, 10),
+            ),
+        ]
+        document = self.document(markers)
+        self.assertEqual(normalize_module._promote_connector_endpoint_ticks(document), 1)
+        kinds = [primitive["kind"] for primitive in document["stationMarkers"][0]["primitives"]]
+        self.assertEqual(kinds, ["circle"])
+
+    def test_skewed_tick_is_regenerated_from_local_path_tangent(self):
+        markers = [
+            marker("a", "A", [tick((3, 10), (17, 10))]),
+            marker("b", "B", [tick((20, 3), (20, 17))], anchor=(20, 10)),
+        ]
+        document = self.document(markers)
+        self.assertEqual(normalize_module._normalize_tick_angles(document), 1)
+        corrected = document["stationMarkers"][0]["primitives"][0]["tick"]
+        self.assertEqual(corrected["start"]["x"], 10)
+        self.assertEqual(corrected["end"]["x"], 10)
+        self.assertEqual(abs(corrected["end"]["y"] - corrected["start"]["y"]), 14)
+
+    def test_bundled_map_has_no_unresolved_high_fidelity_findings(self):
+        document = audit_module.load_json(
+            IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json"
+        )
+        graph = audit_module.load_json(IOS_ROOT / "TubeTrackUK/Resources/TubeGraph.json")
+        manifest_path = IOS_ROOT / "design_brief/beck_map/tfl-standard-map-april-2026.json"
+        manifest = audit_module.load_json(manifest_path)
+        report = audit_module.MapFidelityAudit(document, graph, manifest).run(manifest_path)
+        self.assertNotIn("critical", report["summary"]["bySeverity"])
+        self.assertNotIn("high", report["summary"]["bySeverity"])
+
+    def test_bundled_marker_normalization_is_idempotent(self):
+        document = json.loads((
+            IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json"
+        ).read_text())
+        graph = json.loads((IOS_ROOT / "TubeTrackUK/Resources/TubeGraph.json").read_text())
+        original = copy.deepcopy(document)
+        self.assertEqual(normalize_module.normalize(document, graph), 0)
+        self.assertEqual(document, original)
 
 
 if __name__ == "__main__":

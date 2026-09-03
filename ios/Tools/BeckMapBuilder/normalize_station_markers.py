@@ -15,23 +15,31 @@ import math
 from collections import Counter
 from pathlib import Path
 
+from map_geometry import (
+    Point,
+    acute_angle as _acute_angle,
+    command_point as _command_point,
+    distance as _distance,
+    midpoint as _midpoint,
+    nearest_on_cubic as _nearest_on_cubic,
+    nearest_on_line as _nearest_on_line,
+    point as _point,
+)
 
-Point = tuple[float, float]
 CONNECTION_KINDS = {"connector", "walkingConnector"}
 CONNECTION_TOLERANCE = 10.0
 TICK_HALF_LENGTH = 7.0
 TICK_WIDTH = 3.2
+PATH_ATTACHMENT_TOLERANCE = 1.0
+TICK_ANGLE_TOLERANCE_DEGREES = 0.5
 
 # TubeGraph does not currently group this documented out-of-station
 # interchange, and the traced artwork has no connector primitive to discover.
 ADDITIONAL_CONNECTED_STATION_IDS = {
     "910GHACKNYC",  # Hackney Central
     "910GHAKNYNM",  # Hackney Downs
+    "910GHAYESAH",  # Hayes & Harlington branch junction
 }
-
-
-def _point(value: dict) -> Point:
-    return (value["x"], value["y"])
 
 
 def _rounded(point: Point) -> dict:
@@ -67,10 +75,6 @@ def _is_connected(marker: dict, connector_endpoints: list[Point]) -> bool:
         for marker_point in _marker_points(marker)
         for endpoint in connector_endpoints
     )
-
-
-def _command_point(command: dict, key: str = "to") -> Point:
-    return _point(command[key])
 
 
 def _start_tangent(commands: list[dict]) -> Point:
@@ -142,6 +146,47 @@ def _station_tangent(
     return min(candidates, key=lambda candidate: (candidate[0], candidate[1]))[2]
 
 
+def _nearest_station_path(
+    document: dict, paths_by_id: dict[str, dict], station_id: str,
+    line_id: str, target: Point,
+) -> tuple[float, Point, Point, str] | None:
+    matches: list[tuple[float, Point, Point, str]] = []
+    for segment in document["segments"]:
+        if segment["lineID"] != line_id or station_id not in {
+            segment["fromStationID"], segment["toStationID"]
+        }:
+            continue
+        translation = segment.get("translation", {"x": 0, "y": 0})
+        previous: Point | None = None
+        for command in paths_by_id[segment["pathID"]]["commands"]:
+            operation = command["op"]
+            if operation == "move":
+                raw = _command_point(command)
+                previous = (raw[0] + translation["x"], raw[1] + translation["y"])
+                continue
+            if operation not in {"line", "cubic"} or previous is None:
+                continue
+            raw_end = _command_point(command)
+            end = (raw_end[0] + translation["x"], raw_end[1] + translation["y"])
+            if operation == "line":
+                measured = _nearest_on_line(target, previous, end)
+            else:
+                raw_control1 = _command_point(command, "control1")
+                raw_control2 = _command_point(command, "control2")
+                control1 = (
+                    raw_control1[0] + translation["x"],
+                    raw_control1[1] + translation["y"],
+                )
+                control2 = (
+                    raw_control2[0] + translation["x"],
+                    raw_control2[1] + translation["y"],
+                )
+                measured = _nearest_on_cubic(target, previous, control1, control2, end)
+            matches.append((*measured, segment["id"]))
+            previous = end
+    return min(matches, key=lambda match: (match[0], match[3]), default=None)
+
+
 def _tick(line_id: str, centre: Point, tangent: Point) -> dict:
     magnitude = math.hypot(*tangent)
     if magnitude <= 0.001:
@@ -161,8 +206,88 @@ def _tick(line_id: str, centre: Point, tangent: Point) -> dict:
     }
 
 
+def _circle(centre: Point) -> dict:
+    return {
+        "kind": "circle",
+        "circle": {
+            "centre": _rounded(centre),
+            "radius": 8.5,
+            "outlineWidth": 3.5,
+        },
+    }
+
+
+def _promote_connector_endpoint_ticks(document: dict) -> int:
+    markers = document["stationMarkers"]
+    circles = [
+        _point(primitive["circle"]["centre"])
+        for marker in markers
+        for primitive in marker["primitives"]
+        if primitive["kind"] == "circle"
+    ]
+    endpoints = _connector_endpoints(markers)
+    promoted = 0
+    for endpoint in endpoints:
+        if any(_distance(endpoint, centre) <= PATH_ATTACHMENT_TOLERANCE for centre in circles):
+            continue
+        candidates: list[tuple[float, str, dict, list[int]]] = []
+        for marker in markers:
+            matching_ticks = [
+                index
+                for index, primitive in enumerate(marker["primitives"])
+                if primitive["kind"] == "tick"
+                and _distance(
+                    endpoint,
+                    _midpoint(
+                        _point(primitive["tick"]["start"]),
+                        _point(primitive["tick"]["end"]),
+                    ),
+                ) <= PATH_ATTACHMENT_TOLERANCE
+            ]
+            anchor_distance = _distance(endpoint, _point(marker["anchor"]))
+            if matching_ticks or anchor_distance <= PATH_ATTACHMENT_TOLERANCE:
+                candidates.append((anchor_distance, marker["stationID"], marker, matching_ticks))
+        if not candidates:
+            continue
+        _, _, marker, matching_ticks = min(candidates, key=lambda value: (value[0], value[1]))
+        marker["primitives"] = [
+            primitive
+            for index, primitive in enumerate(marker["primitives"])
+            if index not in matching_ticks
+        ]
+        marker["primitives"].append(_circle(endpoint))
+        circles.append(endpoint)
+        promoted += 1
+    return promoted
+
+
+def _normalize_tick_angles(document: dict) -> int:
+    paths_by_id = {path["id"]: path for path in document["paths"]}
+    corrected = 0
+    for marker in document["stationMarkers"]:
+        for index, primitive in enumerate(marker["primitives"]):
+            if primitive["kind"] != "tick":
+                continue
+            tick = primitive["tick"]
+            start = _point(tick["start"])
+            end = _point(tick["end"])
+            centre = _midpoint(start, end)
+            match = _nearest_station_path(
+                document, paths_by_id, marker["stationID"], tick["lineID"], centre
+            )
+            if match is None or match[0] > PATH_ATTACHMENT_TOLERANCE:
+                continue
+            tick_vector = (end[0] - start[0], end[1] - start[1])
+            deviation = abs(90.0 - _acute_angle(tick_vector, match[2]))
+            if deviation <= TICK_ANGLE_TOLERANCE_DEGREES:
+                continue
+            marker["primitives"][index] = _tick(tick["lineID"], centre, match[2])
+            corrected += 1
+    return corrected
+
+
 def normalize(document: dict, graph: dict) -> int:
-    """Replace false roundels and return the number of normalized stations."""
+    """Normalize ordinary ticks and interchange endpoints after composition."""
     stations_by_id = {station["id"]: station for station in graph["stations"]}
     hub_sizes = Counter(
         station.get("hubID") or station["id"] for station in graph["stations"]
@@ -203,6 +328,8 @@ def normalize(document: dict, graph: dict) -> int:
         marker["primitives"] = retained
         normalized_count += 1
 
+    normalized_count += _promote_connector_endpoint_ticks(document)
+    normalized_count += _normalize_tick_angles(document)
     return normalized_count
 
 

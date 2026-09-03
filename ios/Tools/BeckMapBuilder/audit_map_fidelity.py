@@ -22,6 +22,17 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable
 
+from map_geometry import (
+    acute_angle,
+    command_point,
+    distance,
+    midpoint,
+    nearest_on_cubic,
+    nearest_on_line,
+    point,
+    translated,
+)
+
 
 SEVERITY_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4}
 CANONICAL_ANGLES = (0.0, 45.0, 90.0)
@@ -64,18 +75,6 @@ def png_dimensions(path: Path) -> tuple[int, int]:
     return struct.unpack(">II", signature[16:24])
 
 
-def point(value: dict[str, Any]) -> tuple[float, float]:
-    return float(value["x"]), float(value["y"])
-
-
-def distance(left: tuple[float, float], right: tuple[float, float]) -> float:
-    return math.hypot(left[0] - right[0], left[1] - right[1])
-
-
-def midpoint(left: tuple[float, float], right: tuple[float, float]) -> tuple[float, float]:
-    return (left[0] + right[0]) / 2, (left[1] + right[1]) / 2
-
-
 def vector_angle(vector: tuple[float, float]) -> float:
     angle = math.degrees(math.atan2(abs(vector[1]), abs(vector[0])))
     return min(90.0, max(0.0, angle))
@@ -84,60 +83,6 @@ def vector_angle(vector: tuple[float, float]) -> float:
 def canonical_angle(angle: float) -> tuple[float, float]:
     nearest = min(CANONICAL_ANGLES, key=lambda candidate: abs(candidate - angle))
     return nearest, abs(nearest - angle)
-
-
-def acute_angle(left: tuple[float, float], right: tuple[float, float]) -> float:
-    left_length = math.hypot(*left)
-    right_length = math.hypot(*right)
-    if left_length <= 1e-9 or right_length <= 1e-9:
-        return 0.0
-    cosine = abs((left[0] * right[0] + left[1] * right[1]) / (left_length * right_length))
-    return math.degrees(math.acos(min(1.0, max(-1.0, cosine))))
-
-
-def translated(value: tuple[float, float], translation: dict[str, Any]) -> tuple[float, float]:
-    return value[0] + float(translation["x"]), value[1] + float(translation["y"])
-
-
-def command_point(command: dict[str, Any], key: str = "to") -> tuple[float, float]:
-    return point(command[key])
-
-
-def path_start_tangent(commands: list[dict[str, Any]]) -> tuple[float, float] | None:
-    start = command_point(commands[0])
-    for command in commands[1:]:
-        if command["op"] == "cubic":
-            candidates = (command_point(command, "control1"), command_point(command))
-        elif command["op"] == "line":
-            candidates = (command_point(command),)
-        else:
-            continue
-        for candidate in candidates:
-            tangent = candidate[0] - start[0], candidate[1] - start[1]
-            if math.hypot(*tangent) > 1e-6:
-                return tangent
-    return None
-
-
-def path_end_tangent(commands: list[dict[str, Any]]) -> tuple[float, float] | None:
-    current = command_point(commands[0])
-    drawable: list[tuple[dict[str, Any], tuple[float, float]]] = []
-    for command in commands[1:]:
-        if command["op"] in {"line", "cubic"}:
-            drawable.append((command, current))
-            current = command_point(command)
-    for command, previous in reversed(drawable):
-        end = command_point(command)
-        candidates = (
-            (command_point(command, "control2"), previous)
-            if command["op"] == "cubic"
-            else (previous,)
-        )
-        for candidate in candidates:
-            tangent = end[0] - candidate[0], end[1] - candidate[1]
-            if math.hypot(*tangent) > 1e-6:
-                return tangent
-    return None
 
 
 def resolve_manifest_path(manifest_path: Path, relative_path: str) -> Path:
@@ -160,10 +105,43 @@ class MapFidelityAudit:
         self.findings: list[Finding] = []
         self.metrics: dict[str, Any] = {}
         self.paths_by_id = {path_record["id"]: path_record for path_record in document["paths"]}
-        self.markers_by_id = {
-            marker["stationID"]: marker for marker in document["stationMarkers"]
-        }
-        self.segment_endpoints = self._segment_endpoints()
+
+    def _nearest_station_path(
+        self, target: tuple[float, float], station_id: str, line_id: str | None = None,
+    ) -> tuple[float, tuple[float, float], tuple[float, float], dict[str, Any]] | None:
+        matches: list[
+            tuple[float, tuple[float, float], tuple[float, float], dict[str, Any]]
+        ] = []
+        for segment in self.document["segments"]:
+            if station_id not in {segment["fromStationID"], segment["toStationID"]}:
+                continue
+            if line_id is not None and segment["lineID"] != line_id:
+                continue
+            path_record = self.paths_by_id.get(segment["pathID"])
+            if path_record is None:
+                continue
+            translation = segment.get("translation", {"x": 0, "y": 0})
+            previous: tuple[float, float] | None = None
+            for command_index, command in enumerate(path_record["commands"]):
+                operation = command["op"]
+                if operation == "move":
+                    previous = translated(command_point(command), translation)
+                    continue
+                if operation not in {"line", "cubic"} or previous is None:
+                    continue
+                end = translated(command_point(command), translation)
+                if operation == "line":
+                    measured = nearest_on_line(target, previous, end)
+                else:
+                    control1 = translated(command_point(command, "control1"), translation)
+                    control2 = translated(command_point(command, "control2"), translation)
+                    measured = nearest_on_cubic(target, previous, control1, control2, end)
+                matches.append((*measured, {
+                    "segmentID": segment["id"], "lineID": segment["lineID"],
+                    "pathID": segment["pathID"], "commandIndex": command_index,
+                }))
+                previous = end
+        return min(matches, key=lambda match: match[0], default=None)
 
     def add(
         self,
@@ -186,25 +164,6 @@ class MapFidelityAudit:
             recommendation=recommendation,
             evidence=evidence,
         ))
-
-    def _segment_endpoints(self) -> list[tuple[tuple[float, float], dict[str, Any]]]:
-        endpoints: list[tuple[tuple[float, float], dict[str, Any]]] = []
-        for segment in self.document["segments"]:
-            for side in ("from", "to"):
-                station_id = segment[f"{side}StationID"]
-                port = segment.get(f"{side}Port")
-                if port is None:
-                    marker = self.markers_by_id.get(station_id)
-                    if marker is None:
-                        continue
-                    port = marker["anchor"]
-                endpoints.append((point(port), {
-                    "stationID": station_id,
-                    "lineID": segment["lineID"],
-                    "segmentID": segment["id"],
-                    "side": side,
-                }))
-        return endpoints
 
     def run(self, manifest_path: Path) -> dict[str, Any]:
         self.audit_reference(manifest_path)
@@ -338,7 +297,6 @@ class MapFidelityAudit:
         thresholds = self.manifest["thresholds"]
         minimum_length = float(thresholds["straightSegmentMinimumLength"])
         medium_angle = float(thresholds["axisAngleMediumDegrees"])
-        high_angle = float(thresholds["axisAngleHighDegrees"])
         deviations_by_line: dict[str, list[dict[str, Any]]] = defaultdict(list)
         command_counts: Counter[str] = Counter()
         for segment in self.document["segments"]:
@@ -374,12 +332,11 @@ class MapFidelityAudit:
                 previous = destination
         for line_id, deviations in sorted(deviations_by_line.items()):
             largest = max(item["deviationDegrees"] for item in deviations)
-            severity = "high" if largest > high_angle else "medium"
             self.add(
-                severity, "routes", "non-canonical-straight-runs", line_id,
+                "medium", "routes", "non-canonical-straight-runs", line_id,
                 f"{len(deviations)} straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-                "Unreviewed angles weaken the TfL map's geometric rhythm and may expose slice-seam drift.",
-                "Compare each command with the locked artwork; correct only mismatches and allowlist authored exceptions.",
+                "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
+                "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
                 lineID=line_id, count=len(deviations), maximumDeviationDegrees=largest,
                 candidates=deviations,
             )
@@ -398,6 +355,16 @@ class MapFidelityAudit:
             self.manifest["thresholds"]["roundelPortHighDistanceArtworkUnits"]
         )
         style_counts: Counter[tuple[float, float]] = Counter()
+        connector_endpoints = [
+            (point(primitive[primitive["kind"]][endpoint]), {
+                "stationID": marker["stationID"], "primitiveIndex": primitive_index,
+                "kind": primitive["kind"], "endpoint": endpoint,
+            })
+            for marker in self.document["stationMarkers"]
+            for primitive_index, primitive in enumerate(marker["primitives"])
+            if primitive["kind"] in {"connector", "walkingConnector"}
+            for endpoint in ("start", "end")
+        ]
         roundel_count = 0
         unmatched = 0
         for marker in self.document["stationMarkers"]:
@@ -421,19 +388,35 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], radius=style[0], outlineWidth=style[1],
                         baseline=baseline,
                     )
-                match = nearest(centre, self.segment_endpoints)
-                if match is None or match[0] > medium_port_tolerance:
+                path_match = self._nearest_station_path(centre, marker["stationID"])
+                connector_match = nearest(centre, connector_endpoints)
+                path_distance = None if path_match is None else path_match[0]
+                connector_distance = None if connector_match is None else connector_match[0]
+                attached_to_path = path_distance is not None and path_distance <= medium_port_tolerance
+                attached_to_connector = (
+                    connector_distance is not None
+                    and connector_distance <= medium_port_tolerance
+                )
+                if not attached_to_path and not attached_to_connector:
                     unmatched += 1
-                    severity = "high" if match is None or match[0] > high_port_tolerance else "medium"
+                    nearest_distance = min(
+                        value for value in (path_distance, connector_distance) if value is not None
+                    ) if path_distance is not None or connector_distance is not None else None
+                    severity = (
+                        "high"
+                        if nearest_distance is None or nearest_distance > high_port_tolerance
+                        else "medium"
+                    )
                     self.add(
                         severity, "roundels", "roundel-not-on-route-port",
                         f"{marker['stationID']} primitive {primitive_index}",
-                        "A roundel centre is not attached to any authored route endpoint.",
+                        "A roundel centre is not attached to its authored route or an interchange connector.",
                         "The symbol can appear visually detached or imply the wrong interchange relationship.",
-                        "Compare the centre with the official station artwork and move the corresponding route port and glyph together.",
+                        "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
                         stationID=marker["stationID"], centre=centre,
-                        nearestDistance=None if match is None else round(match[0], 3),
-                        nearestEndpoint=None if match is None else match[1],
+                        nearestDistance=None if nearest_distance is None else round(nearest_distance, 3),
+                        nearestPath=None if path_match is None else path_match[3],
+                        nearestConnector=None if connector_match is None else connector_match[1],
                     )
         self.metrics["roundels"] = {
             "count": roundel_count,
@@ -443,32 +426,6 @@ class MapFidelityAudit:
                 for style, count in sorted(style_counts.items())
             ],
         }
-
-    def _tangent_candidates(
-        self, station_id: str, line_id: str
-    ) -> list[tuple[tuple[float, float], tuple[float, float], str]]:
-        candidates: list[tuple[tuple[float, float], tuple[float, float], str]] = []
-        for segment in self.document["segments"]:
-            if segment["lineID"] != line_id or station_id not in {
-                segment["fromStationID"], segment["toStationID"]
-            }:
-                continue
-            path_record = self.paths_by_id.get(segment["pathID"])
-            if path_record is None:
-                continue
-            commands = path_record["commands"]
-            translation = segment.get("translation", {"x": 0, "y": 0})
-            station_is_start = (
-                segment["fromStationID"] == station_id
-                if segment["pathDirection"] == "forward"
-                else segment["toStationID"] == station_id
-            )
-            endpoint = command_point(commands[0] if station_is_start else commands[-1])
-            endpoint = translated(endpoint, translation)
-            tangent = path_start_tangent(commands) if station_is_start else path_end_tangent(commands)
-            if tangent is not None:
-                candidates.append((endpoint, tangent, segment["id"]))
-        return candidates
 
     def audit_ticks(self) -> None:
         baseline = self.manifest["baselineStyles"]["tick"]
@@ -499,29 +456,21 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], lineID=tick["lineID"],
                         length=round(length, 3), width=tick["width"], baseline=baseline,
                     )
-                tangents = self._tangent_candidates(marker["stationID"], tick["lineID"])
-                tangent_matches = [
-                    (distance(centre, endpoint), tangent, segment_id)
-                    for endpoint, tangent, segment_id in tangents
-                ]
-                nearby_tangents = [match for match in tangent_matches if match[0] <= port_tolerance]
-                if not nearby_tangents:
-                    tangent_match = min(tangent_matches, key=lambda item: item[0], default=None)
+                path_match = self._nearest_station_path(
+                    centre, marker["stationID"], tick["lineID"]
+                )
+                if path_match is None or path_match[0] > port_tolerance:
                     self.add(
                         "high", "ticks", "tick-not-on-route-port",
                         f"{marker['stationID']} primitive {primitive_index}",
-                        "A station tick is not centred on its line's authored endpoint.",
+                        "A station tick is not centred on its line's authored path.",
                         "The station mark can float beside the route or attach to the wrong line.",
-                        "Align the route port and tick centre from the same source coordinate.",
+                        "Align the route path and tick centre from the same reviewed source coordinate.",
                         stationID=marker["stationID"], lineID=tick["lineID"], centre=centre,
-                        nearestDistance=None if tangent_match is None else round(tangent_match[0], 3),
+                        nearestDistance=None if path_match is None else round(path_match[0], 3),
                     )
                     continue
-                tangent_match = min(
-                    nearby_tangents,
-                    key=lambda item: abs(90.0 - acute_angle(tick_vector, item[1])),
-                )
-                angle = acute_angle(tick_vector, tangent_match[1])
+                angle = acute_angle(tick_vector, path_match[2])
                 deviation = abs(90.0 - angle)
                 if deviation > angle_tolerance:
                     perpendicular_candidates += 1
@@ -532,7 +481,7 @@ class MapFidelityAudit:
                         "The station grammar looks skewed and less like the official TfL artwork.",
                         "Recreate the tick normal from the reviewed local route tangent.",
                         stationID=marker["stationID"], lineID=tick["lineID"],
-                        segmentID=tangent_match[2], angleDegrees=round(angle, 3),
+                        segmentID=path_match[3]["segmentID"], angleDegrees=round(angle, 3),
                         deviationDegrees=round(deviation, 3),
                     )
         self.metrics["ticks"] = {
@@ -545,7 +494,6 @@ class MapFidelityAudit:
     def audit_connectors(self) -> None:
         thresholds = self.manifest["thresholds"]
         medium_angle = float(thresholds["axisAngleMediumDegrees"])
-        high_angle = float(thresholds["axisAngleHighDegrees"])
         medium_endpoint_tolerance = float(
             thresholds["connectorEndpointMediumDistanceArtworkUnits"]
         )
@@ -586,12 +534,11 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], kind=kind, start=start, end=end,
                     )
                 if kind == "connector" and deviation > medium_angle:
-                    severity = "high" if deviation > high_angle else "medium"
                     self.add(
-                        severity, "connectors", "connector-angle-review", location,
+                        "medium", "connectors", "connector-angle-review", location,
                         f"An internal connector is {angle:.3f} degrees rather than horizontal, vertical, or 45 degrees.",
-                        "An unintended angle breaks the official interchange grammar and can make the map look loosely constructed.",
-                        "Compare with the locked TfL symbol; align to the reference axis or add a documented authored exception.",
+                        "An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.",
+                        "Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.",
                         stationID=marker["stationID"], stationName=marker["name"], kind=kind,
                         angleDegrees=round(angle, 3), nearestCanonicalAngle=nearest_angle,
                         deviationDegrees=round(deviation, 3), start=start, end=end, length=round(length, 3),
@@ -667,6 +614,31 @@ class MapFidelityAudit:
 
 def markdown_report(report: dict[str, Any]) -> str:
     counts = report["summary"]["bySeverity"]
+    unresolved_highs = counts.get("critical", 0) + counts.get("high", 0)
+    if unresolved_highs:
+        next_steps = [
+            "1. Review every critical or high structural finding against the official reference.",
+            "2. Resolve detached roundels, uncovered connector endpoints, or non-perpendicular ticks before cosmetic tuning.",
+            "3. Pin source-profile-correct line colours and add masked visual comparisons.",
+            "4. Convert confirmed corrections into station- and segment-specific regression fixtures.",
+        ]
+    else:
+        next_steps = [
+            "1. Keep the high-severity audit gate enabled to prevent structural regressions.",
+            "2. Visually adjudicate medium route and connector angle candidates against the official artwork.",
+            "3. Pin source-profile-correct line colours and add masked visual comparisons.",
+            "4. Convert confirmed medium corrections into station- and segment-specific regression fixtures.",
+        ]
+    priority_steps = [
+        "1. Immediate: resolve critical source/topology failures, if any.",
+        (
+            "2. Short-term: visually adjudicate high-severity structural findings."
+            if unresolved_highs else
+            "2. Short-term: visually adjudicate medium connector, roundel, tick, and route candidates."
+        ),
+        "3. Medium-term: implement confirmed geometry corrections in a new versioned artwork asset.",
+        "4. Long-term: add colour-managed pixel masks and local crossing-order regression tests.",
+    ]
     lines = [
         "# TfL Map Structural Fidelity Audit",
         "",
@@ -683,10 +655,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "### Most important next steps",
         "",
-        "1. Review every high-severity connector and route-angle candidate against the official reference.",
-        "2. Resolve detached roundels, connector endpoints, or non-perpendicular ticks before cosmetic tuning.",
-        "3. Pin source-profile-correct line colours and add masked visual comparisons.",
-        "4. Convert confirmed corrections into station- and segment-specific regression fixtures.",
+        *next_steps,
         "",
         "## Detailed findings by severity",
         "",
@@ -729,10 +698,7 @@ def markdown_report(report: dict[str, Any]) -> str:
         "",
         "## Recommendations by priority",
         "",
-        "1. Immediate: resolve critical source/topology failures, if any.",
-        "2. Short-term: visually adjudicate high-severity connector, roundel, tick, and route candidates.",
-        "3. Medium-term: implement confirmed geometry corrections in a new versioned artwork asset.",
-        "4. Long-term: add colour-managed pixel masks and local crossing-order regression tests.",
+        *priority_steps,
         "",
         "## Reproduction",
         "",

@@ -54,6 +54,30 @@ struct BeckMapRepositoryTests {
         })
     }
 
+    @Test func fullMapConnectorEndpointsRemainCoveredByRoundels() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let roundelCentres = document.stationMarkers.flatMap { marker in
+            marker.primitives.compactMap { primitive -> BeckMapPoint? in
+                guard case let .circle(circle) = primitive else { return nil }
+                return circle.centre
+            }
+        }
+        let connectorEndpoints = document.stationMarkers.flatMap { marker in
+            marker.primitives.flatMap { primitive -> [BeckMapPoint] in
+                guard case let .connector(connector) = primitive else { return [] }
+                return [connector.start, connector.end]
+            }
+        }
+
+        #expect(!connectorEndpoints.isEmpty)
+        #expect(connectorEndpoints.allSatisfy { endpoint in
+            roundelCentres.contains { centre in
+                hypot(endpoint.x - centre.x, endpoint.y - centre.y) <= 8.5
+            }
+        })
+    }
+
     @Test func isolatedSingleLineStationsUseTicksAcrossEveryNetwork() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)

@@ -41193,13 +41193,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2894.437,
-              "y": 1141.8
+              "x": 2894.261,
+              "y": 1141.983
             },
             "lineID": "weaver",
             "start": {
-              "x": 2884.185,
-              "y": 1132.266
+              "x": 2884.361,
+              "y": 1132.083
             },
             "width": 3.2
           }
@@ -48098,13 +48098,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2276.961,
-              "y": 1537.958
+              "x": 2277.72,
+              "y": 1538.615
             },
             "lineID": "circle",
             "start": {
-              "x": 2286.861,
-              "y": 1528.058
+              "x": 2286.102,
+              "y": 1527.401
             },
             "width": 3.2
           }
@@ -48113,13 +48113,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2282.898,
-              "y": 1532.099
+              "x": 2283.657,
+              "y": 1532.756
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 2292.798,
-              "y": 1522.199
+              "x": 2292.039,
+              "y": 1521.542
             },
             "width": 3.2
           }
@@ -48128,13 +48128,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2271.191,
-              "y": 1543.951
+              "x": 2271.949,
+              "y": 1544.607
             },
             "lineID": "metropolitan",
             "start": {
-              "x": 2281.091,
-              "y": 1534.051
+              "x": 2280.333,
+              "y": 1533.395
             },
             "width": 3.2
           }
@@ -49524,19 +49524,15 @@
       "name": "Canada Water",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 2705.054,
-              "y": 1924.55
+          "circle": {
+            "centre": {
+              "x": 2705.0,
+              "y": 1918.0
             },
-            "lineID": "jubilee",
-            "start": {
-              "x": 2705.049,
-              "y": 1910.55
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUCWR"
@@ -49857,13 +49853,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 603.098,
-              "y": 815.021
+              "x": 603.413,
+              "y": 815.317
             },
             "lineID": "metropolitan",
             "start": {
-              "x": 612.998,
-              "y": 805.121
+              "x": 612.683,
+              "y": 804.825
             },
             "width": 3.2
           }
@@ -49872,13 +49868,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 596.664,
-              "y": 821.456
+              "x": 596.979,
+              "y": 821.752
             },
             "lineID": "piccadilly",
             "start": {
-              "x": 606.564,
-              "y": 811.556
+              "x": 606.249,
+              "y": 811.26
             },
             "width": 3.2
           }
@@ -50777,12 +50773,12 @@
           "tick": {
             "end": {
               "x": 1960.0,
-              "y": 1521.0
+              "y": 1521.069
             },
             "lineID": "northern",
             "start": {
               "x": 1974.0,
-              "y": 1521.0
+              "y": 1520.931
             },
             "width": 3.2
           }
@@ -51056,13 +51052,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1443.238,
-              "y": 1864.734
+              "x": 1450.238,
+              "y": 1857.734
             },
             "lineID": "circle",
             "start": {
-              "x": 1457.238,
-              "y": 1864.734
+              "x": 1450.238,
+              "y": 1871.734
             },
             "width": 3.2
           }
@@ -51071,13 +51067,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1442.973,
-              "y": 1873.04
+              "x": 1449.973,
+              "y": 1880.04
             },
             "lineID": "district",
             "start": {
-              "x": 1456.973,
-              "y": 1873.04
+              "x": 1449.973,
+              "y": 1866.04
             },
             "width": 3.2
           }
@@ -52119,19 +52115,15 @@
       "name": "Kensington (Olympia)",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 1328.844,
+          "circle": {
+            "centre": {
+              "x": 1335.844,
               "y": 1763.973
             },
-            "lineID": "district",
-            "start": {
-              "x": 1342.844,
-              "y": 1763.973
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUKOY"
@@ -52963,12 +52955,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2222.219,
+              "x": 2232.119,
               "y": 1767.156
             },
             "lineID": "circle",
             "start": {
-              "x": 2232.119,
+              "x": 2222.219,
               "y": 1757.256
             },
             "width": 3.2
@@ -52978,12 +52970,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2225.093,
+              "x": 2234.992,
               "y": 1775.994
             },
             "lineID": "district",
             "start": {
-              "x": 2234.993,
+              "x": 2225.094,
               "y": 1766.094
             },
             "width": 3.2
@@ -53570,13 +53562,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1899.594,
-              "y": 2298.208
+              "x": 1899.687,
+              "y": 2298.114
             },
             "lineID": "northern",
             "start": {
-              "x": 1909.606,
-              "y": 2307.992
+              "x": 1909.513,
+              "y": 2308.086
             },
             "width": 3.2
           }
@@ -54461,19 +54453,15 @@
       "name": "Shepherd's Bush (Central)",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
+          "circle": {
+            "centre": {
               "x": 1323.77,
-              "y": 1689.391
+              "y": 1682.391
             },
-            "lineID": "central",
-            "start": {
-              "x": 1323.77,
-              "y": 1675.391
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUSBC"
@@ -56033,19 +56021,15 @@
       "name": "West Brompton",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 1328.781,
+          "circle": {
+            "centre": {
+              "x": 1335.781,
               "y": 1949.797
             },
-            "lineID": "district",
-            "start": {
-              "x": 1342.781,
-              "y": 1949.797
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUWBN"

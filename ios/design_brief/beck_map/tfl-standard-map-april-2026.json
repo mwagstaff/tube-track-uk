@@ -59,7 +59,7 @@
     "connectorEndpointMediumDistanceArtworkUnits": 0.01,
     "connectorEndpointHighDistanceArtworkUnits": 8.5,
     "roundelPortMediumDistanceArtworkUnits": 1,
-    "roundelPortHighDistanceArtworkUnits": 8.5,
+    "roundelPortHighDistanceArtworkUnits": 12.7,
     "tickPortDistanceArtworkUnits": 1,
     "tickPerpendicularDegrees": 0.5,
     "styleTolerance": 0.01
