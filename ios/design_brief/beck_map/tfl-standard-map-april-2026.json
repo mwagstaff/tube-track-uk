@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "reference": {
+    "title": "Transport for London Standard Tube Map",
+    "printedRevision": "April 2026",
+    "sourceURL": "https://content.tfl.gov.uk/standard-tube-map.pdf",
+    "licensingURL": "https://tfl.gov.uk/info-for/business-and-advertisers/map-licensing",
+    "usageNote": "The source states that online maps are for personal use and directs commercial users to TfL map licensing.",
+    "pdf": {
+      "path": "../map/standard-tube-map.pdf",
+      "sha256": "2909ed43dd8064925e49a519823f184e074b32125de582696962792cd612fbbe",
+      "pageCount": 2,
+      "pageOnePoints": [1190.55, 907.588]
+    },
+    "raster": {
+      "path": "../../TubeTrackUK/Resources/BeckMap/v1/full-underground-reference-debug.png",
+      "sha256": "fca56e79394da473d918af0cc2f2de075c9fa96f4562db90f8dd03f743ffeea8",
+      "pixelSize": [2382, 1816],
+      "dpi": 144
+    },
+    "coordinateSystem": {
+      "artworkSize": [4764, 3632],
+      "artworkUnitsPerReferencePixel": 2
+    }
+  },
+  "supplementalSegmentIDs": [
+    "piccadilly:940GZZLUHNX:940GZZLUHR4"
+  ],
+  "baselineStyles": {
+    "document": {
+      "routeStrokeWidth": 8.3,
+      "affectedOuterStrokeWidth": 19,
+      "affectedKnockoutStrokeWidth": 15,
+      "affectedRouteStrokeWidth": 10,
+      "primaryLabelFontSize": 18,
+      "secondaryLabelFontSize": 16,
+      "labelPadding": 2
+    },
+    "roundel": {
+      "radius": 8.5,
+      "outlineWidth": 3.5
+    },
+    "tick": {
+      "length": 14,
+      "width": 3.2
+    },
+    "connector": {
+      "width": 7.5
+    },
+    "walkingConnector": {
+      "width": 4.5,
+      "dash": [8, 5]
+    }
+  },
+  "thresholds": {
+    "axisAngleMediumDegrees": 0.25,
+    "axisAngleHighDegrees": 1,
+    "straightSegmentMinimumLength": 12,
+    "connectorEndpointMediumDistanceArtworkUnits": 0.01,
+    "connectorEndpointHighDistanceArtworkUnits": 8.5,
+    "roundelPortMediumDistanceArtworkUnits": 1,
+    "roundelPortHighDistanceArtworkUnits": 8.5,
+    "tickPortDistanceArtworkUnits": 1,
+    "tickPerpendicularDegrees": 0.5,
+    "styleTolerance": 0.01
+  },
+  "colourAuditStatus": "pending source-profile extraction",
+  "displayLineColours": {
+    "bakerloo": "#8c4512",
+    "central": "#e01f24",
+    "circle": "#ffc70d",
+    "district": "#007d38",
+    "hammersmith-city": "#f297b3",
+    "jubilee": "#7a878c",
+    "metropolitan": "#990059",
+    "northern": "#000000",
+    "piccadilly": "#001aa6",
+    "victoria": "#00a1e0",
+    "waterloo-city": "#75d1bf",
+    "dlr": "#00afad",
+    "elizabeth": "#60399e",
+    "tram": "#69c22f",
+    "liberty": "#4f5d62",
+    "lioness": "#f89c0e",
+    "mildmay": "#2486cb",
+    "suffragette": "#59c338",
+    "weaver": "#b0237f",
+    "windrush": "#ed1930"
+  }
+}

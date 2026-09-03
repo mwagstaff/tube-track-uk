@@ -3492,7 +3492,7 @@
       "alignment": "leading",
       "id": "label.940GZZLUFCN",
       "position": {
-        "x": 2231.91,
+        "x": 2208.281,
         "y": 1475.029
       },
       "priority": 10,
@@ -8960,7 +8960,7 @@
         {
           "op": "line",
           "to": {
-            "x": 2211.91,
+            "x": 2188.29,
             "y": 1463.029
           }
         }
@@ -8972,7 +8972,7 @@
         {
           "op": "move",
           "to": {
-            "x": 2211.91,
+            "x": 2188.29,
             "y": 1463.029
           }
         },
@@ -13073,7 +13073,7 @@
         {
           "op": "line",
           "to": {
-            "x": 2188.819,
+            "x": 2165.191,
             "y": 1486.141
           }
         }
@@ -13085,7 +13085,7 @@
         {
           "op": "move",
           "to": {
-            "x": 2188.819,
+            "x": 2165.191,
             "y": 1486.141
           }
         },
@@ -14631,7 +14631,7 @@
         {
           "op": "line",
           "to": {
-            "x": 2217.839,
+            "x": 2194.218,
             "y": 1457.169
           }
         }
@@ -14643,7 +14643,7 @@
         {
           "op": "move",
           "to": {
-            "x": 2217.839,
+            "x": 2194.218,
             "y": 1457.169
           }
         },
@@ -16783,7 +16783,7 @@
         {
           "op": "line",
           "to": {
-            "x": 2206.037,
+            "x": 2182.392,
             "y": 1468.897
           }
         }
@@ -16795,7 +16795,7 @@
         {
           "op": "move",
           "to": {
-            "x": 2206.037,
+            "x": 2182.392,
             "y": 1468.897
           }
         },
@@ -29643,7 +29643,7 @@
     },
     {
       "fromPort": {
-        "x": 2211.91,
+        "x": 2188.29,
         "y": 1463.029
       },
       "fromStationID": "940GZZLUFCN",
@@ -29972,7 +29972,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.circle.shared-central.full.v1.5",
       "toPort": {
-        "x": 2211.91,
+        "x": 2188.29,
         "y": 1463.029
       },
       "toStationID": "940GZZLUFCN",
@@ -32752,7 +32752,7 @@
       "pathDirection": "reverse",
       "pathID": "beck.v1.path.elizabeth.paddington-abbey-wood.official.v1.3",
       "toPort": {
-        "x": 2188.819,
+        "x": 2165.191,
         "y": 1486.141
       },
       "toStationID": "910GFRNDXR",
@@ -32763,7 +32763,7 @@
     },
     {
       "fromPort": {
-        "x": 2188.819,
+        "x": 2165.191,
         "y": 1486.141
       },
       "fromStationID": "910GFRNDXR",
@@ -33343,7 +33343,7 @@
     },
     {
       "fromPort": {
-        "x": 2217.839,
+        "x": 2194.218,
         "y": 1457.169
       },
       "fromStationID": "940GZZLUFCN",
@@ -33552,7 +33552,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.shared-central.full.v1.5",
       "toPort": {
-        "x": 2217.839,
+        "x": 2194.218,
         "y": 1457.169
       },
       "toStationID": "940GZZLUFCN",
@@ -34783,7 +34783,7 @@
     },
     {
       "fromPort": {
-        "x": 2206.037,
+        "x": 2182.392,
         "y": 1468.897
       },
       "fromStationID": "940GZZLUFCN",
@@ -35052,7 +35052,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.shared-central.full.v1.3",
       "toPort": {
-        "x": 2206.037,
+        "x": 2182.392,
         "y": 1468.897
       },
       "toStationID": "940GZZLUFCN",
@@ -41908,7 +41908,7 @@
     },
     {
       "anchor": {
-        "x": 2188.819,
+        "x": 2165.191,
         "y": 1486.141
       },
       "hitRadius": 14,
@@ -41920,7 +41920,7 @@
         {
           "circle": {
             "centre": {
-              "x": 2188.819,
+              "x": 2165.191,
               "y": 1486.141
             },
             "outlineWidth": 3.5,
@@ -50526,7 +50526,7 @@
     },
     {
       "anchor": {
-        "x": 2211.929,
+        "x": 2188.3,
         "y": 1463.032
       },
       "hitRadius": 24,
@@ -50540,11 +50540,11 @@
         {
           "connector": {
             "end": {
-              "x": 2188.819,
+              "x": 2165.191,
               "y": 1486.141
             },
             "start": {
-              "x": 2211.929,
+              "x": 2188.3,
               "y": 1463.032
             },
             "width": 7.5
@@ -50554,7 +50554,7 @@
         {
           "circle": {
             "centre": {
-              "x": 2211.929,
+              "x": 2188.3,
               "y": 1463.032
             },
             "outlineWidth": 3.5,
@@ -50565,7 +50565,7 @@
         {
           "circle": {
             "centre": {
-              "x": 2188.819,
+              "x": 2165.191,
               "y": 1486.141
             },
             "outlineWidth": 3.5,

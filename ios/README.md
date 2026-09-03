@@ -67,6 +67,29 @@ For detailed geographic geometry, pass a reproducible OSM PBF containing
 Reviewed OSM geometry for every supported TfL rail line is retained during
 API-only refreshes; TfL route geometry is used as the fallback.
 
+## Auditing authored map fidelity
+
+The structural fidelity audit checks every route command, roundel, ordinary
+station tick and interchange connector against the locked April 2026 TfL
+reference and TfL-style geometric invariants. It never edits map coordinates.
+
+From the `ios` directory, regenerate the tracked baseline reports with:
+
+```sh
+python3 Tools/BeckMapBuilder/audit_map_fidelity.py \
+  --document TubeTrackUK/Resources/BeckMap/v1/full-underground.json \
+  --graph TubeTrackUK/Resources/TubeGraph.json \
+  --manifest design_brief/beck_map/tfl-standard-map-april-2026.json \
+  --output-json design_brief/beck_map/audits/april-2026-structural-fidelity-audit.json \
+  --output-markdown design_brief/beck_map/audits/april-2026-structural-fidelity-audit.md \
+  --output-html design_brief/beck_map/audits/april-2026-structural-fidelity-audit.html
+```
+
+Use `--fail-on critical` in CI to reject source-hash, canvas-transform and
+topology failures. High- and medium-severity geometry candidates require
+visual confirmation in the generated HTML overlay before a versioned artwork
+change is approved.
+
 ## Background images
 
 Add background photographs anywhere under `TubeTrackUK/Images`. The app target's
