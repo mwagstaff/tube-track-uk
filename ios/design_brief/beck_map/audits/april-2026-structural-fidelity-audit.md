@@ -8,15 +8,15 @@ Pass for the audited map layer. The artwork is authored, data-driven, and restra
 
 - Reference: Transport for London Standard Tube Map (April 2026)
 - Artwork: `tube-track-uk.beck.full-underground.v1`
-- Findings: 82 total (medium: 82)
+- Findings: 78 total (high: 40, medium: 38)
 - Status: candidate deviations require visual confirmation against the locked reference before geometry changes
 
 ### Most important next steps
 
-1. Keep the high-severity audit gate enabled to prevent structural regressions.
-2. Visually adjudicate medium route and connector angle candidates against the official artwork.
+1. Review every critical or high structural finding against the official reference.
+2. Resolve detached roundels, uncovered connector endpoints, or non-perpendicular ticks before cosmetic tuning.
 3. Pin source-profile-correct line colours and add masked visual comparisons.
-4. Convert confirmed medium corrections into station- and segment-specific regression fixtures.
+4. Convert confirmed corrections into station- and segment-specific regression fixtures.
 
 ## Detailed findings by severity
 
@@ -24,11 +24,329 @@ Pass for the audited map layer. The artwork is authored, data-driven, and restra
 
 No findings.
 
-### High (0)
+### High (40)
 
-No findings.
+#### `connector-angle-review` - 910GBARKING primitive 0
 
-### Medium (82)
+- Category: connectors
+- Description: A connector is 28.178 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":28.178,"deviationDegrees":16.822,"end":[3587.523,1525.187],"kind":"connector","length":51.653,"nearestCanonicalAngle":45.0,"start":[3541.992,1549.578],"stationID":"910GBARKING","stationName":"Barking"}`
+
+#### `connector-angle-review` - 910GCLPHMJC primitive 0
+
+- Category: connectors
+- Description: A connector is 42.099 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":42.099,"deviationDegrees":2.901,"end":[1477.407,2266.062],"kind":"connector","length":43.653,"nearestCanonicalAngle":45.0,"start":[1509.797,2295.328],"stationID":"910GCLPHMJC","stationName":"Clapham Junction"}`
+
+#### `connector-angle-review` - 910GEUSTON primitive 0
+
+- Category: connectors
+- Description: A connector is 38.005 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":38.005,"deviationDegrees":6.995,"end":[1962.828,1345.609],"kind":"connector","length":41.591,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"910GEUSTON","stationName":"London Euston"}`
+
+#### `connector-angle-review` - 910GLIVST primitive 0
+
+- Category: connectors
+- Description: A connector is 47.380 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":47.38,"deviationDegrees":2.38,"end":[2444.88,1426.488],"kind":"connector","length":81.002,"nearestCanonicalAngle":45.0,"start":[2390.031,1486.094],"stationID":"910GLIVST","stationName":"London Liverpool Street"}`
+
+#### `connector-angle-review` - 910GSEVNSIS primitive 0
+
+- Category: connectors
+- Description: A connector is 43.386 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":43.386,"deviationDegrees":1.614,"end":[2708.25,935.207],"kind":"connector","length":35.776,"nearestCanonicalAngle":45.0,"start":[2734.25,959.782],"stationID":"910GSEVNSIS","stationName":"Seven Sisters"}`
+
+#### `connector-angle-review` - 910GSHADWEL primitive 0
+
+- Category: connectors
+- Description: A connector is 42.976 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":42.976,"deviationDegrees":2.024,"end":[2704.938,1718.422],"kind":"connector","length":58.356,"nearestCanonicalAngle":45.0,"start":[2747.634,1758.203],"stationID":"910GSHADWEL","stationName":"Shadwell"}`
+
+#### `connector-angle-review` - 910GUPMNSTR primitive 0
+
+- Category: connectors
+- Description: A connector is 85.626 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":85.626,"deviationDegrees":4.374,"end":[3940.062,1171.437],"kind":"connector","length":30.357,"nearestCanonicalAngle":90.0,"start":[3937.747,1201.706],"stationID":"910GUPMNSTR","stationName":"Upminster"}`
+
+#### `connector-angle-review` - 910GWLTWCEN primitive 0
+
+- Category: connectors
+- Description: A connector is 12.915 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":12.915,"deviationDegrees":12.915,"end":[2986.293,954.805],"kind":"connector","length":22.268,"nearestCanonicalAngle":0.0,"start":[3007.998,959.782],"stationID":"910GWLTWCEN","stationName":"Walthamstow Central"}`
+
+#### `connector-angle-review` - 940GZZCRWCR primitive 0
+
+- Category: connectors
+- Description: A connector is 52.756 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":52.756,"deviationDegrees":7.756,"end":[2670.517,2669.516],"kind":"connector","length":56.875,"nearestCanonicalAngle":45.0,"start":[2704.938,2624.24],"stationID":"940GZZCRWCR","stationName":"West Croydon"}`
+
+#### `connector-angle-review` - 940GZZCRWMB primitive 0
+
+- Category: connectors
+- Description: A connector is 49.587 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":49.587,"deviationDegrees":4.587,"end":[1387.281,2406.609],"kind":"connector","length":79.439,"nearestCanonicalAngle":45.0,"start":[1335.781,2346.125],"stationID":"940GZZCRWMB","stationName":"Wimbledon"}`
+
+#### `connector-angle-review` - 940GZZDLCGT primitive 0
+
+- Category: connectors
+- Description: A connector is 28.024 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":28.024,"deviationDegrees":16.976,"end":[3289.016,1726.297],"kind":"connector","length":67.908,"nearestCanonicalAngle":45.0,"start":[3229.07,1758.203],"stationID":"940GZZDLCGT","stationName":"Canning Town DLR Station"}`
+
+#### `connector-angle-review` - 940GZZDLSTD primitive 0
+
+- Category: connectors
+- Description: A connector is 2.887 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":2.887,"deviationDegrees":2.887,"end":[3252.75,1271.032],"kind":"connector","length":23.749,"nearestCanonicalAngle":0.0,"start":[3229.031,1269.836],"stationID":"940GZZDLSTD","stationName":"Stratford DLR Station"}`
+
+#### `connector-angle-review` - 940GZZLUBKF primitive 0
+
+- Category: connectors
+- Description: A connector is 72.938 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":72.938,"deviationDegrees":17.062,"end":[2178.679,1810.696],"kind":"connector","length":4.502,"nearestCanonicalAngle":90.0,"start":[2180.0,1815.0],"stationID":"940GZZLUBKF","stationName":"Blackfriars"}`
+
+#### `connector-angle-review` - 940GZZLUBKF primitive 1
+
+- Category: connectors
+- Description: A connector is 63.175 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":63.175,"deviationDegrees":18.175,"end":[2182.043,1819.04],"kind":"connector","length":4.527,"nearestCanonicalAngle":45.0,"start":[2180.0,1815.0],"stationID":"940GZZLUBKF","stationName":"Blackfriars"}`
+
+#### `connector-angle-review` - 940GZZLUBND primitive 0
+
+- Category: connectors
+- Description: A connector is 31.015 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":31.015,"deviationDegrees":13.985,"end":[1682.0,1620.0],"kind":"connector","length":53.674,"nearestCanonicalAngle":45.0,"start":[1728.0,1592.344],"stationID":"940GZZLUBND","stationName":"Bond Street"}`
+
+#### `connector-angle-review` - 940GZZLUBND primitive 1
+
+- Category: connectors
+- Description: A connector is 37.369 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":37.369,"deviationDegrees":7.631,"end":[1767.999,1561.797],"kind":"connector","length":50.329,"nearestCanonicalAngle":45.0,"start":[1728.0,1592.344],"stationID":"940GZZLUBND","stationName":"Bond Street"}`
+
+#### `connector-angle-review` - 940GZZLUBST primitive 0
+
+- Category: connectors
+- Description: A connector is 57.189 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":57.189,"deviationDegrees":12.189,"end":[1710.489,1385.796],"kind":"connector","length":52.614,"nearestCanonicalAngle":45.0,"start":[1681.979,1430.016],"stationID":"940GZZLUBST","stationName":"Baker Street"}`
+
+#### `connector-angle-review` - 940GZZLUCST primitive 0
+
+- Category: connectors
+- Description: A connector is 70.257 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":70.257,"deviationDegrees":19.743,"end":[2263.25,1726.124],"kind":"connector","length":5.181,"nearestCanonicalAngle":90.0,"start":[2265.0,1731.0],"stationID":"940GZZLUCST","stationName":"Cannon Street"}`
+
+#### `connector-angle-review` - 940GZZLUCST primitive 1
+
+- Category: connectors
+- Description: A connector is 74.163 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":74.163,"deviationDegrees":15.837,"end":[2266.125,1734.966],"kind":"connector","length":4.122,"nearestCanonicalAngle":90.0,"start":[2265.0,1731.0],"stationID":"940GZZLUCST","stationName":"Cannon Street"}`
+
+#### `connector-angle-review` - 940GZZLUCYF primitive 0
+
+- Category: connectors
+- Description: A connector is 29.370 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":29.37,"deviationDegrees":15.63,"end":[3027.29,1903.547],"kind":"connector","length":70.421,"nearestCanonicalAngle":45.0,"start":[2965.92,1938.085],"stationID":"940GZZLUCYF","stationName":"Canary Wharf"}`
+
+#### `connector-angle-review` - 940GZZLUEMB primitive 0
+
+- Category: connectors
+- Description: A connector is 46.128 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":46.128,"deviationDegrees":1.128,"end":[1990.353,1868.606],"kind":"connector","length":34.305,"nearestCanonicalAngle":45.0,"start":[1966.578,1843.876],"stationID":"940GZZLUEMB","stationName":"Embankment"}`
+
+#### `connector-angle-review` - 940GZZLUEUS primitive 0
+
+- Category: connectors
+- Description: A connector is 31.368 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":31.368,"deviationDegrees":13.632,"end":[2028.407,1300.0],"kind":"connector","length":38.423,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"940GZZLUEUS","stationName":"Euston"}`
+
+#### `connector-angle-review` - 940GZZLUEUS primitive 1
+
+- Category: connectors
+- Description: A connector is 53.625 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":53.625,"deviationDegrees":8.625,"end":[2027.754,1363.652],"kind":"connector","length":54.216,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"940GZZLUEUS","stationName":"Euston"}`
+
+#### `connector-angle-review` - 940GZZLUMGT primitive 0
+
+- Category: connectors
+- Description: A connector is 49.685 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":49.685,"deviationDegrees":4.685,"end":[2354.687,1521.438],"kind":"connector","length":36.721,"nearestCanonicalAngle":45.0,"start":[2330.929,1549.438],"stationID":"940GZZLUMGT","stationName":"Moorgate"}`
+
+#### `connector-angle-review` - 940GZZLUNHG primitive 0
+
+- Category: connectors
+- Description: A connector is 14.800 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":14.8,"deviationDegrees":14.8,"end":[1410.266,1683.976],"kind":"connector","length":6.205,"nearestCanonicalAngle":0.0,"start":[1416.265,1682.391],"stationID":"940GZZLUNHG","stationName":"Notting Hill Gate"}`
+
+#### `connector-angle-review` - 940GZZLUPAC primitive 0
+
+- Category: connectors
+- Description: A connector is 33.189 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":33.189,"deviationDegrees":11.811,"end":[1414.989,1381.627],"kind":"connector","length":53.78,"nearestCanonicalAngle":45.0,"start":[1369.982,1352.188],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
+
+#### `connector-angle-review` - 940GZZLUPAC primitive 1
+
+- Category: connectors
+- Description: A connector is 29.097 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":29.097,"deviationDegrees":15.903,"end":[1459.978,1406.664],"kind":"connector","length":51.487,"nearestCanonicalAngle":45.0,"start":[1414.989,1381.627],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
+
+#### `connector-angle-review` - 940GZZLUSTD primitive 0
+
+- Category: connectors
+- Description: A connector is 55.232 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":55.232,"deviationDegrees":10.232,"end":[3229.031,1269.836],"kind":"connector","length":30.83,"nearestCanonicalAngle":45.0,"start":[3211.45,1244.51],"stationID":"940GZZLUSTD","stationName":"Stratford"}`
+
+#### `connector-angle-review` - 940GZZLUTCR primitive 0
+
+- Category: connectors
+- Description: A connector is 51.943 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":51.943,"deviationDegrees":6.943,"end":[1966.983,1561.804],"kind":"connector","length":38.786,"nearestCanonicalAngle":45.0,"start":[1943.074,1592.344],"stationID":"940GZZLUTCR","stationName":"Tottenham Court Road"}`
+
+#### `connector-angle-review` - 940GZZLUTWH primitive 0
+
+- Category: connectors
+- Description: A connector is 77.253 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":77.253,"deviationDegrees":12.747,"end":[2528.968,1687.438],"kind":"connector","length":4.677,"nearestCanonicalAngle":90.0,"start":[2530.0,1692.0],"stationID":"940GZZLUTWH","stationName":"Tower Hill"}`
+
+#### `connector-angle-review` - 940GZZLUTWH primitive 1
+
+- Category: connectors
+- Description: A connector is 61.766 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":61.766,"deviationDegrees":16.766,"end":[2532.005,1695.734],"kind":"connector","length":4.238,"nearestCanonicalAngle":45.0,"start":[2530.0,1692.0],"stationID":"940GZZLUTWH","stationName":"Tower Hill"}`
+
+#### `connector-angle-review` - 940GZZLUVIC primitive 0
+
+- Category: connectors
+- Description: A connector is 52.056 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":52.056,"deviationDegrees":7.056,"end":[1729.02,1844.839],"kind":"connector","length":30.492,"nearestCanonicalAngle":45.0,"start":[1710.271,1868.885],"stationID":"940GZZLUVIC","stationName":"Victoria"}`
+
+#### `connector-angle-review` - 940GZZLUWCY primitive 0
+
+- Category: connectors
+- Description: A connector is 48.813 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":48.813,"deviationDegrees":3.813,"end":[1172.758,1644.957],"kind":"walkingConnector","length":49.742,"nearestCanonicalAngle":45.0,"start":[1140.002,1682.391],"stationID":"940GZZLUWCY","stationName":"White City"}`
+
+#### `connector-angle-review` - 940GZZLUWHM primitive 0
+
+- Category: connectors
+- Description: A connector is 28.137 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":28.137,"deviationDegrees":16.863,"end":[3280.781,1545.945],"kind":"connector","length":58.66,"nearestCanonicalAngle":45.0,"start":[3229.053,1518.282],"stationID":"940GZZLUWHM","stationName":"West Ham"}`
+
+#### `connector-angle-review` - 940GZZLUWPL primitive 0
+
+- Category: connectors
+- Description: A connector is 43.644 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":43.644,"deviationDegrees":1.356,"end":[2735.05,1516.281],"kind":"connector","length":41.611,"nearestCanonicalAngle":45.0,"start":[2704.938,1545.0],"stationID":"940GZZLUWPL","stationName":"Whitechapel"}`
+
+#### `connector-angle-review` - 940GZZLUWSM primitive 1
+
+- Category: connectors
+- Description: A connector is 86.949 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":86.949,"deviationDegrees":3.051,"end":[1873.785,1873.034],"kind":"connector","length":4.04,"nearestCanonicalAngle":90.0,"start":[1874.0,1869.0],"stationID":"940GZZLUWSM","stationName":"Westminster"}`
+
+#### `connector-angle-review` - 940GZZLUWSM primitive 2
+
+- Category: connectors
+- Description: A connector is 47.343 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
+- Evidence: `{"angleDegrees":47.343,"deviationDegrees":2.343,"end":[1885.992,1855.985],"kind":"connector","length":17.697,"nearestCanonicalAngle":45.0,"start":[1874.0,1869.0],"stationID":"940GZZLUWSM","stationName":"Westminster"}`
+
+#### `roundel-not-on-route-port` - 910GQPRK primitive 0
+
+- Category: roundels
+- Description: A roundel centre is not attached to its authored route or an interchange connector.
+- Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
+- Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
+- Evidence: `{"centre":[1172.907,1276.111],"nearestConnector":{"endpoint":"start","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUPAC"},"nearestDistance":13.078,"nearestPath":{"lineID":"lioness","pathID":"beck.v1.path.lioness.euston-watford.official.v1.3","segmentID":"lioness:910GKENSLG:910GQPRK","side":"from"},"stationID":"910GQPRK"}`
+
+#### `tick-not-on-route-port` - 940GZZLURYO primitive 0
+
+- Category: ticks
+- Description: A station tick is not centred on its exact station endpoint.
+- Impact: The station mark can float beside the route or attach to the wrong line.
+- Recommendation: Align the route endpoint and tick centre from the same reviewed source coordinate.
+- Evidence: `{"centre":[1382.062,1394.063],"lineID":"circle","nearestDistance":29.204,"stationID":"940GZZLURYO"}`
+
+#### `tick-not-on-route-port` - 940GZZLURYO primitive 1
+
+- Category: ticks
+- Description: A station tick is not centred on its exact station endpoint.
+- Impact: The station mark can float beside the route or attach to the wrong line.
+- Recommendation: Align the route endpoint and tick centre from the same reviewed source coordinate.
+- Evidence: `{"centre":[1376.281,1388.203],"lineID":"hammersmith-city","nearestDistance":27.885,"stationID":"940GZZLURYO"}`
+
+### Medium (38)
 
 #### `duplicate-connector` - (2390.031, 1486.094) to (2390.031, 1549.447)
 
@@ -38,14 +356,6 @@ No findings.
 - Recommendation: Retain one visual primitive and associate the relevant semantic station records with it.
 - Evidence: `{"count":2,"end":[2390.031,1549.447],"kind":"connector","start":[2390.031,1486.094]}`
 
-#### `connector-angle-review` - 910GBARKING primitive 0
-
-- Category: connectors
-- Description: An internal connector is 28.178 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":28.178,"deviationDegrees":16.822,"end":[3587.523,1525.187],"kind":"connector","length":51.653,"nearestCanonicalAngle":45.0,"start":[3541.992,1549.578],"stationID":"910GBARKING","stationName":"Barking"}`
-
 #### `connector-endpoint-without-roundel` - 910GBARKING primitive 0
 
 - Category: connectors
@@ -54,149 +364,21 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[3541.992,1549.578],"endpoint":"start","kind":"connector","nearestDistance":4.194,"nearestRoundel":{"primitiveIndex":0,"stationID":"940GZZLUBKG"},"stationID":"910GBARKING"}`
 
-#### `connector-angle-review` - 910GCLPHMJC primitive 0
-
-- Category: connectors
-- Description: An internal connector is 42.099 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":42.099,"deviationDegrees":2.901,"end":[1477.407,2266.062],"kind":"connector","length":43.653,"nearestCanonicalAngle":45.0,"start":[1509.797,2295.328],"stationID":"910GCLPHMJC","stationName":"Clapham Junction"}`
-
 #### `connector-angle-review` - 910GCNNB primitive 0
 
 - Category: connectors
-- Description: An internal connector is 89.602 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.602 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.602,"deviationDegrees":0.398,"end":[2534.278,1205.469],"kind":"connector","length":30.497,"nearestCanonicalAngle":90.0,"start":[2534.49,1174.973],"stationID":"910GCNNB","stationName":"Canonbury"}`
-
-#### `connector-angle-review` - 910GEUSTON primitive 0
-
-- Category: connectors
-- Description: An internal connector is 38.005 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":38.005,"deviationDegrees":6.995,"end":[1962.828,1345.609],"kind":"connector","length":41.591,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"910GEUSTON","stationName":"London Euston"}`
-
-#### `connector-angle-review` - 910GKENOLYM primitive 0
-
-- Category: connectors
-- Description: An internal connector is 4.948 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":4.948,"deviationDegrees":4.948,"end":[1306.969,1766.473],"kind":"connector","length":28.983,"nearestCanonicalAngle":0.0,"start":[1335.844,1763.973],"stationID":"910GKENOLYM","stationName":"Kensington (Olympia)"}`
-
-#### `connector-angle-review` - 910GLIVST primitive 0
-
-- Category: connectors
-- Description: An internal connector is 47.380 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":47.38,"deviationDegrees":2.38,"end":[2444.88,1426.488],"kind":"connector","length":81.002,"nearestCanonicalAngle":45.0,"start":[2390.031,1486.094],"stationID":"910GLIVST","stationName":"London Liverpool Street"}`
-
-#### `connector-angle-review` - 910GSEVNSIS primitive 0
-
-- Category: connectors
-- Description: An internal connector is 43.386 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":43.386,"deviationDegrees":1.614,"end":[2708.25,935.207],"kind":"connector","length":35.776,"nearestCanonicalAngle":45.0,"start":[2734.25,959.782],"stationID":"910GSEVNSIS","stationName":"Seven Sisters"}`
-
-#### `connector-angle-review` - 910GSHADWEL primitive 0
-
-- Category: connectors
-- Description: An internal connector is 42.976 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":42.976,"deviationDegrees":2.024,"end":[2704.938,1718.422],"kind":"connector","length":58.356,"nearestCanonicalAngle":45.0,"start":[2747.634,1758.203],"stationID":"910GSHADWEL","stationName":"Shadwell"}`
-
-#### `connector-angle-review` - 910GSHPDSB primitive 0
-
-- Category: connectors
-- Description: An internal connector is 21.961 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":21.961,"deviationDegrees":21.961,"end":[1275.747,1701.756],"kind":"connector","length":51.78,"nearestCanonicalAngle":0.0,"start":[1323.77,1682.391],"stationID":"910GSHPDSB","stationName":"Shepherds Bush"}`
 
 #### `connector-angle-review` - 910GSTFD primitive 0
 
 - Category: connectors
-- Description: An internal connector is 0.759 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 0.759 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":0.759,"deviationDegrees":0.759,"end":[3229.031,1269.836],"kind":"connector","length":39.456,"nearestCanonicalAngle":0.0,"start":[3189.578,1269.313],"stationID":"910GSTFD","stationName":"Stratford (London)"}`
-
-#### `connector-angle-review` - 910GUPMNSTR primitive 0
-
-- Category: connectors
-- Description: An internal connector is 85.626 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":85.626,"deviationDegrees":4.374,"end":[3940.062,1171.437],"kind":"connector","length":30.357,"nearestCanonicalAngle":90.0,"start":[3937.747,1201.706],"stationID":"910GUPMNSTR","stationName":"Upminster"}`
-
-#### `connector-angle-review` - 910GWBRMPTN primitive 0
-
-- Category: connectors
-- Description: An internal connector is 4.647 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":4.647,"deviationDegrees":4.647,"end":[1306.969,1947.455],"kind":"connector","length":28.907,"nearestCanonicalAngle":0.0,"start":[1335.781,1949.797],"stationID":"910GWBRMPTN","stationName":"West Brompton"}`
-
-#### `connector-angle-review` - 910GWHMDSTD primitive 0
-
-- Category: connectors
-- Description: An internal connector is 19.509 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":19.509,"deviationDegrees":19.509,"end":[1544.828,1174.922],"kind":"connector","length":47.401,"nearestCanonicalAngle":0.0,"start":[1500.148,1159.092],"stationID":"910GWHMDSTD","stationName":"West Hampstead"}`
-
-#### `connector-angle-review` - 910GWLTWCEN primitive 0
-
-- Category: connectors
-- Description: An internal connector is 12.915 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":12.915,"deviationDegrees":12.915,"end":[2986.293,954.805],"kind":"connector","length":22.268,"nearestCanonicalAngle":0.0,"start":[3007.998,959.782],"stationID":"910GWLTWCEN","stationName":"Walthamstow Central"}`
-
-#### `connector-angle-review` - 940GZZCRWCR primitive 0
-
-- Category: connectors
-- Description: An internal connector is 52.756 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":52.756,"deviationDegrees":7.756,"end":[2670.517,2669.516],"kind":"connector","length":56.875,"nearestCanonicalAngle":45.0,"start":[2704.938,2624.24],"stationID":"940GZZCRWCR","stationName":"West Croydon"}`
-
-#### `connector-angle-review` - 940GZZCRWMB primitive 0
-
-- Category: connectors
-- Description: An internal connector is 49.587 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":49.587,"deviationDegrees":4.587,"end":[1387.281,2406.609],"kind":"connector","length":79.439,"nearestCanonicalAngle":45.0,"start":[1335.781,2346.125],"stationID":"940GZZCRWMB","stationName":"Wimbledon"}`
-
-#### `connector-angle-review` - 940GZZDLCGT primitive 0
-
-- Category: connectors
-- Description: An internal connector is 28.024 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":28.024,"deviationDegrees":16.976,"end":[3289.016,1726.297],"kind":"connector","length":67.908,"nearestCanonicalAngle":45.0,"start":[3229.07,1758.203],"stationID":"940GZZDLCGT","stationName":"Canning Town DLR Station"}`
-
-#### `connector-angle-review` - 940GZZDLSTD primitive 0
-
-- Category: connectors
-- Description: An internal connector is 2.887 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":2.887,"deviationDegrees":2.887,"end":[3252.75,1271.032],"kind":"connector","length":23.749,"nearestCanonicalAngle":0.0,"start":[3229.031,1269.836],"stationID":"940GZZDLSTD","stationName":"Stratford DLR Station"}`
-
-#### `connector-angle-review` - 940GZZLUBKF primitive 0
-
-- Category: connectors
-- Description: An internal connector is 72.938 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":72.938,"deviationDegrees":17.062,"end":[2178.679,1810.696],"kind":"connector","length":4.502,"nearestCanonicalAngle":90.0,"start":[2180.0,1815.0],"stationID":"940GZZLUBKF","stationName":"Blackfriars"}`
 
 #### `connector-endpoint-without-roundel` - 940GZZLUBKF primitive 0
 
@@ -206,14 +388,6 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2178.679,1810.696],"endpoint":"end","kind":"connector","nearestDistance":4.502,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUBKF"},"stationID":"940GZZLUBKF"}`
 
-#### `connector-angle-review` - 940GZZLUBKF primitive 1
-
-- Category: connectors
-- Description: An internal connector is 63.175 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":63.175,"deviationDegrees":18.175,"end":[2182.043,1819.04],"kind":"connector","length":4.527,"nearestCanonicalAngle":45.0,"start":[2180.0,1815.0],"stationID":"940GZZLUBKF","stationName":"Blackfriars"}`
-
 #### `connector-endpoint-without-roundel` - 940GZZLUBKF primitive 1
 
 - Category: connectors
@@ -222,45 +396,13 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2182.043,1819.04],"endpoint":"end","kind":"connector","nearestDistance":4.527,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUBKF"},"stationID":"940GZZLUBKF"}`
 
-#### `connector-angle-review` - 940GZZLUBND primitive 0
-
-- Category: connectors
-- Description: An internal connector is 31.015 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":31.015,"deviationDegrees":13.985,"end":[1682.0,1620.0],"kind":"connector","length":53.674,"nearestCanonicalAngle":45.0,"start":[1728.0,1592.344],"stationID":"940GZZLUBND","stationName":"Bond Street"}`
-
-#### `connector-angle-review` - 940GZZLUBND primitive 1
-
-- Category: connectors
-- Description: An internal connector is 37.369 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":37.369,"deviationDegrees":7.631,"end":[1767.999,1561.797],"kind":"connector","length":50.329,"nearestCanonicalAngle":45.0,"start":[1728.0,1592.344],"stationID":"940GZZLUBND","stationName":"Bond Street"}`
-
 #### `connector-angle-review` - 940GZZLUBSC primitive 0
 
 - Category: connectors
-- Description: An internal connector is 89.008 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.008 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.008,"deviationDegrees":0.992,"end":[1240.516,1873.042],"kind":"connector","length":29.858,"nearestCanonicalAngle":90.0,"start":[1239.999,1843.188],"stationID":"940GZZLUBSC","stationName":"Barons Court"}`
-
-#### `connector-angle-review` - 940GZZLUBST primitive 0
-
-- Category: connectors
-- Description: An internal connector is 57.189 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":57.189,"deviationDegrees":12.189,"end":[1710.489,1385.796],"kind":"connector","length":52.614,"nearestCanonicalAngle":45.0,"start":[1681.979,1430.016],"stationID":"940GZZLUBST","stationName":"Baker Street"}`
-
-#### `connector-angle-review` - 940GZZLUCST primitive 0
-
-- Category: connectors
-- Description: An internal connector is 70.257 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":70.257,"deviationDegrees":19.743,"end":[2263.25,1726.124],"kind":"connector","length":5.181,"nearestCanonicalAngle":90.0,"start":[2265.0,1731.0],"stationID":"940GZZLUCST","stationName":"Cannon Street"}`
 
 #### `connector-endpoint-without-roundel` - 940GZZLUCST primitive 0
 
@@ -270,14 +412,6 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2263.25,1726.124],"endpoint":"end","kind":"connector","nearestDistance":5.181,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUCST"},"stationID":"940GZZLUCST"}`
 
-#### `connector-angle-review` - 940GZZLUCST primitive 1
-
-- Category: connectors
-- Description: An internal connector is 74.163 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":74.163,"deviationDegrees":15.837,"end":[2266.125,1734.966],"kind":"connector","length":4.122,"nearestCanonicalAngle":90.0,"start":[2265.0,1731.0],"stationID":"940GZZLUCST","stationName":"Cannon Street"}`
-
 #### `connector-endpoint-without-roundel` - 940GZZLUCST primitive 1
 
 - Category: connectors
@@ -286,68 +420,28 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2266.125,1734.966],"endpoint":"end","kind":"connector","nearestDistance":4.122,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUCST"},"stationID":"940GZZLUCST"}`
 
-#### `connector-angle-review` - 940GZZLUCYF primitive 0
-
-- Category: connectors
-- Description: An internal connector is 29.370 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":29.37,"deviationDegrees":15.63,"end":[3027.29,1903.547],"kind":"connector","length":70.421,"nearestCanonicalAngle":45.0,"start":[2965.92,1938.085],"stationID":"940GZZLUCYF","stationName":"Canary Wharf"}`
-
 #### `connector-angle-review` - 940GZZLUECT primitive 0
 
 - Category: connectors
-- Description: An internal connector is 89.351 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.351 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.351,"deviationDegrees":0.649,"end":[1376.479,1873.041],"kind":"connector","length":29.855,"nearestCanonicalAngle":90.0,"start":[1376.141,1843.188],"stationID":"940GZZLUECT","stationName":"Earl's Court"}`
-
-#### `connector-angle-review` - 940GZZLUEMB primitive 0
-
-- Category: connectors
-- Description: An internal connector is 46.128 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":46.128,"deviationDegrees":1.128,"end":[1990.353,1868.606],"kind":"connector","length":34.305,"nearestCanonicalAngle":45.0,"start":[1966.578,1843.876],"stationID":"940GZZLUEMB","stationName":"Embankment"}`
-
-#### `connector-angle-review` - 940GZZLUEUS primitive 0
-
-- Category: connectors
-- Description: An internal connector is 31.368 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":31.368,"deviationDegrees":13.632,"end":[2028.407,1300.0],"kind":"connector","length":38.423,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"940GZZLUEUS","stationName":"Euston"}`
-
-#### `connector-angle-review` - 940GZZLUEUS primitive 1
-
-- Category: connectors
-- Description: An internal connector is 53.625 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":53.625,"deviationDegrees":8.625,"end":[2027.754,1363.652],"kind":"connector","length":54.216,"nearestCanonicalAngle":45.0,"start":[1995.6,1320.0],"stationID":"940GZZLUEUS","stationName":"Euston"}`
 
 #### `connector-angle-review` - 940GZZLUFPK primitive 0
 
 - Category: connectors
-- Description: An internal connector is 44.508 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 44.508 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":44.508,"deviationDegrees":0.492,"end":[2406.13,1058.002],"kind":"connector","length":18.777,"nearestCanonicalAngle":45.0,"start":[2392.739,1044.839],"stationID":"940GZZLUFPK","stationName":"Finsbury Park"}`
-
-#### `connector-angle-review` - 940GZZLUHSC primitive 0
-
-- Category: connectors
-- Description: An internal connector is 51.100 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":51.1,"deviationDegrees":6.1,"end":[1168.656,1789.903],"kind":"connector","length":13.063,"nearestCanonicalAngle":45.0,"start":[1176.859,1800.069],"stationID":"940GZZLUHSC","stationName":"Hammersmith (H&C Line)"}`
 
 #### `connector-angle-review` - 940GZZLUMED primitive 1
 
 - Category: connectors
-- Description: An internal connector is 89.566 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.566 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.566,"deviationDegrees":0.434,"end":[2909.95,1549.594],"kind":"connector","length":6.594,"nearestCanonicalAngle":90.0,"start":[2910.0,1543.0],"stationID":"940GZZLUMED","stationName":"Mile End"}`
 
 #### `connector-endpoint-without-roundel` - 940GZZLUMED primitive 1
@@ -358,22 +452,6 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2909.95,1549.594],"endpoint":"end","kind":"connector","nearestDistance":6.594,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUMED"},"stationID":"940GZZLUMED"}`
 
-#### `connector-angle-review` - 940GZZLUMGT primitive 0
-
-- Category: connectors
-- Description: An internal connector is 49.685 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":49.685,"deviationDegrees":4.685,"end":[2354.687,1521.438],"kind":"connector","length":36.721,"nearestCanonicalAngle":45.0,"start":[2330.929,1549.438],"stationID":"940GZZLUMGT","stationName":"Moorgate"}`
-
-#### `connector-angle-review` - 940GZZLUNHG primitive 0
-
-- Category: connectors
-- Description: An internal connector is 14.800 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":14.8,"deviationDegrees":14.8,"end":[1410.266,1683.976],"kind":"connector","length":6.205,"nearestCanonicalAngle":0.0,"start":[1416.265,1682.391],"stationID":"940GZZLUNHG","stationName":"Notting Hill Gate"}`
-
 #### `connector-endpoint-without-roundel` - 940GZZLUNHG primitive 0
 
 - Category: connectors
@@ -382,61 +460,21 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[1410.266,1683.976],"endpoint":"end","kind":"connector","nearestDistance":6.205,"nearestRoundel":{"primitiveIndex":1,"stationID":"940GZZLUNHG"},"stationID":"940GZZLUNHG"}`
 
-#### `connector-angle-review` - 940GZZLUPAC primitive 0
-
-- Category: connectors
-- Description: An internal connector is 33.189 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":33.189,"deviationDegrees":11.811,"end":[1414.989,1381.627],"kind":"connector","length":53.78,"nearestCanonicalAngle":45.0,"start":[1369.982,1352.188],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
-
-#### `connector-angle-review` - 940GZZLUPAC primitive 1
-
-- Category: connectors
-- Description: An internal connector is 29.097 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":29.097,"deviationDegrees":15.903,"end":[1459.978,1406.664],"kind":"connector","length":51.487,"nearestCanonicalAngle":45.0,"start":[1414.989,1381.627],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
-
 #### `connector-angle-review` - 940GZZLUSKS primitive 0
 
 - Category: connectors
-- Description: An internal connector is 89.240 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.240 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.24,"deviationDegrees":0.76,"end":[1523.672,1868.887],"kind":"connector","length":25.725,"nearestCanonicalAngle":90.0,"start":[1524.013,1843.164],"stationID":"940GZZLUSKS","stationName":"South Kensington"}`
-
-#### `connector-angle-review` - 940GZZLUSTD primitive 0
-
-- Category: connectors
-- Description: An internal connector is 55.232 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":55.232,"deviationDegrees":10.232,"end":[3229.031,1269.836],"kind":"connector","length":30.83,"nearestCanonicalAngle":45.0,"start":[3211.45,1244.51],"stationID":"940GZZLUSTD","stationName":"Stratford"}`
-
-#### `connector-angle-review` - 940GZZLUTCR primitive 0
-
-- Category: connectors
-- Description: An internal connector is 51.943 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":51.943,"deviationDegrees":6.943,"end":[1966.983,1561.804],"kind":"connector","length":38.786,"nearestCanonicalAngle":45.0,"start":[1943.074,1592.344],"stationID":"940GZZLUTCR","stationName":"Tottenham Court Road"}`
 
 #### `connector-angle-review` - 940GZZLUTNG primitive 0
 
 - Category: connectors
-- Description: An internal connector is 89.526 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
+- Description: A connector is 89.526 degrees rather than horizontal, vertical, or 45 degrees.
+- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
+- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":89.526,"deviationDegrees":0.474,"end":[919.595,1873.046],"kind":"connector","length":29.859,"nearestCanonicalAngle":90.0,"start":[919.842,1843.188],"stationID":"940GZZLUTNG","stationName":"Turnham Green"}`
-
-#### `connector-angle-review` - 940GZZLUTWH primitive 0
-
-- Category: connectors
-- Description: An internal connector is 77.253 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":77.253,"deviationDegrees":12.747,"end":[2528.968,1687.438],"kind":"connector","length":4.677,"nearestCanonicalAngle":90.0,"start":[2530.0,1692.0],"stationID":"940GZZLUTWH","stationName":"Tower Hill"}`
 
 #### `connector-endpoint-without-roundel` - 940GZZLUTWH primitive 0
 
@@ -446,14 +484,6 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2528.968,1687.438],"endpoint":"end","kind":"connector","nearestDistance":4.677,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUTWH"},"stationID":"940GZZLUTWH"}`
 
-#### `connector-angle-review` - 940GZZLUTWH primitive 1
-
-- Category: connectors
-- Description: An internal connector is 61.766 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":61.766,"deviationDegrees":16.766,"end":[2532.005,1695.734],"kind":"connector","length":4.238,"nearestCanonicalAngle":45.0,"start":[2530.0,1692.0],"stationID":"940GZZLUTWH","stationName":"Tower Hill"}`
-
 #### `connector-endpoint-without-roundel` - 940GZZLUTWH primitive 1
 
 - Category: connectors
@@ -461,30 +491,6 @@ No findings.
 - Impact: The bar may visibly miss its interchange node or terminate without a station symbol.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[2532.005,1695.734],"endpoint":"end","kind":"connector","nearestDistance":4.238,"nearestRoundel":{"primitiveIndex":2,"stationID":"940GZZLUTWH"},"stationID":"940GZZLUTWH"}`
-
-#### `connector-angle-review` - 940GZZLUVIC primitive 0
-
-- Category: connectors
-- Description: An internal connector is 52.056 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":52.056,"deviationDegrees":7.056,"end":[1729.02,1844.839],"kind":"connector","length":30.492,"nearestCanonicalAngle":45.0,"start":[1710.271,1868.885],"stationID":"940GZZLUVIC","stationName":"Victoria"}`
-
-#### `connector-angle-review` - 940GZZLUWHM primitive 0
-
-- Category: connectors
-- Description: An internal connector is 28.137 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":28.137,"deviationDegrees":16.863,"end":[3280.781,1545.945],"kind":"connector","length":58.66,"nearestCanonicalAngle":45.0,"start":[3229.053,1518.282],"stationID":"940GZZLUWHM","stationName":"West Ham"}`
-
-#### `connector-angle-review` - 940GZZLUWPL primitive 0
-
-- Category: connectors
-- Description: An internal connector is 43.644 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":43.644,"deviationDegrees":1.356,"end":[2735.05,1516.281],"kind":"connector","length":41.611,"nearestCanonicalAngle":45.0,"start":[2704.938,1545.0],"stationID":"940GZZLUWPL","stationName":"Whitechapel"}`
 
 #### `connector-endpoint-without-roundel` - 940GZZLUWSM primitive 0
 
@@ -494,14 +500,6 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[1874.002,1864.734],"endpoint":"end","kind":"connector","nearestDistance":4.266,"nearestRoundel":{"primitiveIndex":3,"stationID":"940GZZLUWSM"},"stationID":"940GZZLUWSM"}`
 
-#### `connector-angle-review` - 940GZZLUWSM primitive 1
-
-- Category: connectors
-- Description: An internal connector is 86.949 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":86.949,"deviationDegrees":3.051,"end":[1873.785,1873.034],"kind":"connector","length":4.04,"nearestCanonicalAngle":90.0,"start":[1874.0,1869.0],"stationID":"940GZZLUWSM","stationName":"Westminster"}`
-
 #### `connector-endpoint-without-roundel` - 940GZZLUWSM primitive 1
 
 - Category: connectors
@@ -510,37 +508,13 @@ No findings.
 - Recommendation: Move the endpoint and corresponding roundel together using the official source coordinate.
 - Evidence: `{"coordinate":[1873.785,1873.034],"endpoint":"end","kind":"connector","nearestDistance":4.04,"nearestRoundel":{"primitiveIndex":3,"stationID":"940GZZLUWSM"},"stationID":"940GZZLUWSM"}`
 
-#### `connector-angle-review` - 940GZZLUWSM primitive 2
-
-- Category: connectors
-- Description: An internal connector is 47.343 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":47.343,"deviationDegrees":2.343,"end":[1885.992,1855.985],"kind":"connector","length":17.697,"nearestCanonicalAngle":45.0,"start":[1874.0,1869.0],"stationID":"940GZZLUWSM","stationName":"Westminster"}`
-
-#### `connector-angle-review` - 940GZZLUWYP primitive 0
-
-- Category: connectors
-- Description: An internal connector is 7.389 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.
-- Recommendation: Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.
-- Evidence: `{"angleDegrees":7.389,"deviationDegrees":7.389,"end":[1238.166,944.182],"kind":"connector","length":44.269,"nearestCanonicalAngle":0.0,"start":[1282.067,949.875],"stationID":"940GZZLUWYP","stationName":"Wembley Park"}`
-
-#### `roundel-not-on-route-port` - 910GQPRK primitive 0
-
-- Category: roundels
-- Description: A roundel centre is not attached to its authored route or an interchange connector.
-- Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
-- Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
-- Evidence: `{"centre":[1172.907,1276.111],"nearestConnector":{"endpoint":"start","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUPAC"},"nearestDistance":9.248,"nearestPath":{"commandIndex":1,"lineID":"lioness","pathID":"beck.v1.path.lioness.euston-watford.official.v1.3","segmentID":"lioness:910GKENSLG:910GQPRK"},"stationID":"910GQPRK"}`
-
 #### `roundel-not-on-route-port` - 940GZZLUBKG primitive 0
 
 - Category: roundels
 - Description: A roundel centre is not attached to its authored route or an interchange connector.
 - Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
 - Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
-- Evidence: `{"centre":[3541.488,1545.414],"nearestConnector":{"endpoint":"start","kind":"connector","primitiveIndex":0,"stationID":"910GBARKING"},"nearestDistance":4.164,"nearestPath":{"commandIndex":1,"lineID":"district","pathID":"beck.v1.path.district.eastern-fan.v1.6","segmentID":"district:940GZZLUBKG:940GZZLUEHM"},"stationID":"940GZZLUBKG"}`
+- Evidence: `{"centre":[3541.488,1545.414],"nearestConnector":{"endpoint":"start","kind":"connector","primitiveIndex":0,"stationID":"910GBARKING"},"nearestDistance":4.194,"nearestPath":{"lineID":"hammersmith-city","pathID":"beck.v1.path.hammersmith-city.eastern-fan.v1.6","segmentID":"hammersmith-city:940GZZLUBKG:940GZZLUEHM","side":"to"},"stationID":"940GZZLUBKG"}`
 
 #### `roundel-not-on-route-port` - 940GZZLUOXC primitive 0
 
@@ -548,7 +522,7 @@ No findings.
 - Description: A roundel centre is not attached to its authored route or an interchange connector.
 - Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
 - Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
-- Evidence: `{"centre":[1800.0,1594.0],"nearestConnector":{"endpoint":"end","kind":"connector","primitiveIndex":1,"stationID":"940GZZLUBND"},"nearestDistance":1.375,"nearestPath":{"commandIndex":3,"lineID":"bakerloo","pathID":"beck.v1.path.bakerloo.central-completion.v1.1","segmentID":"bakerloo:940GZZLUOXC:940GZZLURGP"},"stationID":"940GZZLUOXC"}`
+- Evidence: `{"centre":[1800.0,1594.0],"nearestConnector":{"endpoint":"end","kind":"connector","primitiveIndex":1,"stationID":"940GZZLUBND"},"nearestDistance":1.375,"nearestPath":{"lineID":"bakerloo","pathID":"beck.v1.path.bakerloo.central-completion.v1.1","segmentID":"bakerloo:940GZZLUOXC:940GZZLURGP","side":"to"},"stationID":"940GZZLUOXC"}`
 
 #### `roundel-not-on-route-port` - 940GZZLURYL primitive 0
 
@@ -556,7 +530,7 @@ No findings.
 - Description: A roundel centre is not attached to its authored route or an interchange connector.
 - Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
 - Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
-- Evidence: `{"centre":[660.125,862.149],"nearestConnector":{"endpoint":"end","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUWYP"},"nearestDistance":4.542,"nearestPath":{"commandIndex":1,"lineID":"metropolitan","pathID":"beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.5","segmentID":"metropolitan:940GZZLUEAE:940GZZLURYL"},"stationID":"940GZZLURYL"}`
+- Evidence: `{"centre":[660.125,862.149],"nearestConnector":{"endpoint":"end","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUWYP"},"nearestDistance":4.55,"nearestPath":{"lineID":"piccadilly","pathID":"beck.v1.path.piccadilly.uxbridge.western-fan.v1.5","segmentID":"piccadilly:940GZZLUEAE:940GZZLURYL","side":"to"},"stationID":"940GZZLURYL"}`
 
 #### `non-canonical-straight-runs` - central
 
@@ -605,14 +579,6 @@ No findings.
 - Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
 - Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
 - Evidence: `{"candidates":[{"angleDegrees":36.775,"commandIndex":1,"deviationDegrees":8.225,"length":116.892,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.hammersmith-city.shared-central.full.v1.6","segmentID":"hammersmith-city:940GZZLUBBN:940GZZLUFCN"},{"angleDegrees":36.775,"commandIndex":1,"deviationDegrees":8.225,"length":112.717,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.hammersmith-city.shared-central.full.v1.5","segmentID":"hammersmith-city:940GZZLUFCN:940GZZLUKSX"}],"count":2,"lineID":"hammersmith-city","maximumDeviationDegrees":8.225}`
-
-#### `non-canonical-straight-runs` - jubilee
-
-- Category: routes
-- Description: 2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
-- Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
-- Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
-- Evidence: `{"candidates":[{"angleDegrees":50.792,"commandIndex":1,"deviationDegrees":5.792,"length":63.24,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.jubilee.northwest-connector.v1.9","segmentID":"jubilee:940GZZLUFYR:940GZZLUWHP"},{"angleDegrees":38.715,"commandIndex":1,"deviationDegrees":6.285,"length":57.948,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.jubilee.northwest-connector.v1.8","segmentID":"jubilee:940GZZLUKBN:940GZZLUWHP"}],"count":2,"lineID":"jubilee","maximumDeviationDegrees":6.285}`
 
 #### `non-canonical-straight-runs` - metropolitan
 
@@ -711,7 +677,7 @@ No findings.
 ## Recommendations by priority
 
 1. Immediate: resolve critical source/topology failures, if any.
-2. Short-term: visually adjudicate medium connector, roundel, tick, and route candidates.
+2. Short-term: visually adjudicate high-severity structural findings.
 3. Medium-term: implement confirmed geometry corrections in a new versioned artwork asset.
 4. Long-term: add colour-managed pixel masks and local crossing-order regression tests.
 

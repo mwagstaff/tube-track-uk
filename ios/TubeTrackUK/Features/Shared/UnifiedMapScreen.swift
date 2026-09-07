@@ -6,6 +6,7 @@ struct UnifiedMapScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var statusExpanded = false
     @Binding var closestStationPanelHidden: Bool
+    @Binding var mapNavigationActive: Bool
     @State private var layoutProgress: CGFloat = 0
     @State private var morphGeometry: MapMorphGeometry?
     @State private var geometryGraphID: String?
@@ -31,7 +32,8 @@ struct UnifiedMapScreen: View {
                 onUserZoomIn: {
                     guard !closestStationPanelHidden else { return }
                     setClosestStationPanel(hidden: true)
-                }
+                },
+                onInteractionChange: setMapNavigation(active:)
             )
                 .opacity(beckRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .beck)
@@ -40,7 +42,9 @@ struct UnifiedMapScreen: View {
                 resetToken: resetToken,
                 locationFocusRequest: locationFocusRequest,
                 onResetAvailabilityChange: { realWorldResetAvailable = $0 },
-                onOverviewOpacityChange: { realWorldOverviewOpacity = $0 }
+                onOverviewOpacityChange: { realWorldOverviewOpacity = $0 },
+                screenFurnitureOpacity: screenFurnitureOpacity,
+                onInteractionChange: setMapNavigation(active:)
             )
                 .opacity(realWorldRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .realWorld)
@@ -67,24 +71,34 @@ struct UnifiedMapScreen: View {
                         setClosestStationPanel(hidden: true)
                     }
                 )
-                .opacity(activeMapChromeOpacity)
-                .allowsHitTesting(activeMapChromeOpacity > 0.1)
+                .opacity(activeMapChromeOpacity * screenFurnitureOpacity)
+                .allowsHitTesting(activeMapChromeOpacity > 0.1 && !mapNavigationActive)
+                .accessibilityHidden(mapNavigationActive)
                 .zIndex(4)
             }
         }
         .overlay(alignment: .bottom) {
             bottomOverlay
+                .opacity(screenFurnitureOpacity)
+                .allowsHitTesting(!mapNavigationActive)
+                .accessibilityHidden(mapNavigationActive)
         }
         .overlay(alignment: .bottom) {
             compactOpenStreetMapAttribution
+                .opacity(screenFurnitureOpacity)
+                .allowsHitTesting(!mapNavigationActive)
+                .accessibilityHidden(mapNavigationActive)
         }
         .overlay(alignment: .top) {
             actionToast
+                .opacity(screenFurnitureOpacity)
+                .accessibilityHidden(mapNavigationActive)
         }
         .onAppear {
             layoutProgress = appState.mapPresentationMode == .realWorld ? 1 : 0
         }
         .onChange(of: appState.mapPresentationMode) { _, mode in
+            setMapNavigation(active: false)
             transitionTask?.cancel()
             let target: CGFloat = mode == .realWorld ? 1 : 0
             if reduceMotion {
@@ -105,6 +119,7 @@ struct UnifiedMapScreen: View {
             }
         }
         .onDisappear {
+            setMapNavigation(active: false)
             transitionTask?.cancel()
             toastDismissTask?.cancel()
         }
@@ -215,6 +230,10 @@ struct UnifiedMapScreen: View {
         appState.mapPresentationMode == .beck ? beckRendererOpacity : realWorldChromeOpacity
     }
 
+    private var screenFurnitureOpacity: Double {
+        mapNavigationActive ? 0 : 1
+    }
+
     private var showsMapReset: Bool {
         switch appState.mapPresentationMode {
         case .beck:
@@ -250,6 +269,29 @@ struct UnifiedMapScreen: View {
         }
     }
 
+    private func setMapNavigation(active: Bool) {
+        guard mapNavigationActive != active else { return }
+        if reduceMotion {
+            var transaction = Transaction()
+            transaction.disablesAnimations = true
+            withTransaction(transaction) {
+                mapNavigationActive = active
+            }
+        } else {
+            withAnimation(
+                .timingCurve(
+                    active ? 0.7 : 0.16,
+                    active ? 0 : 1,
+                    active ? 0.84 : 0.3,
+                    1,
+                    duration: active ? 0.12 : 0.2
+                )
+            ) {
+                mapNavigationActive = active
+            }
+        }
+    }
+
     private func resetMapView() {
         realWorldResetAvailable = false
         zoomedDisruptionsExpanded = false
@@ -257,6 +299,7 @@ struct UnifiedMapScreen: View {
         appState.clearMapSelection()
         appState.selectedMapNetworkStat = nil
         appState.disruptionDisplayMode = .normal
+        appState.setMobileCoverageMode(.off)
         resetToken += 1
     }
 
@@ -335,7 +378,13 @@ struct UnifiedMapScreen: View {
                     }
 
                     if !hasMapSelection, !statusExpanded, overviewOpacity > 0.01 {
-                        MapNetworkStatsCard(onAction: showActionNotice(_:))
+                        Group {
+                            if appState.mobileCoverageMode.isActive {
+                                MobileCoverageLegend()
+                            } else {
+                                MapNetworkStatsCard(onAction: showActionNotice(_:))
+                            }
+                        }
                             .padding(
                                 .top,
                                 appState.mapPresentationMode == .realWorld

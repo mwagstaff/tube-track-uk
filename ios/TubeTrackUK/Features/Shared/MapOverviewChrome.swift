@@ -214,25 +214,57 @@ struct MapDisruptionOverviewCard: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 10)
             } else {
-                HStack(spacing: collapsedPillSpacing) {
-                    ForEach(lineEntries) { disruption in
-                        Capsule()
-                            .fill(Color.tubeLine(disruption.lineID))
-                            .overlay {
-                                Capsule()
-                                    .stroke(.primary.opacity(0.16), lineWidth: 0.5)
-                            }
-                            .frame(width: collapsedPillWidth, height: 6)
-                            .accessibilityHidden(true)
+                HStack(alignment: .bottom, spacing: collapsedCategorySpacing) {
+                    if !lineGroups.majorIssues.isEmpty {
+                        collapsedPillGroup(
+                            title: "Major",
+                            disruptions: lineGroups.majorIssues
+                        )
+                    }
+                    if !lineGroups.minorDelays.isEmpty {
+                        collapsedPillGroup(
+                            title: "Minor",
+                            disruptions: lineGroups.minorDelays
+                        )
                     }
                 }
                 .frame(maxWidth: .infinity)
+                .frame(height: 28)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 11)
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(affectedLinesAccessibilityLabel)
             }
         }
+    }
+
+    private func collapsedPillGroup(
+        title: String,
+        disruptions: [ResolvedDisruption]
+    ) -> some View {
+        VStack(spacing: 2) {
+            Text(title)
+                .font(.appCaption2(.medium))
+                .foregroundStyle(.tertiary)
+                .lineLimit(1)
+                .accessibilityHidden(true)
+
+            HStack(spacing: collapsedPillSpacing) {
+                ForEach(disruptions) { disruption in
+                    Capsule()
+                        .fill(Color.tubeLine(disruption.lineID))
+                        .overlay {
+                            Capsule()
+                                .stroke(.primary.opacity(0.16), lineWidth: 0.5)
+                        }
+                        .frame(width: collapsedPillWidth, height: 6)
+                        .accessibilityHidden(true)
+                }
+            }
+        }
+    }
+
+    private var collapsedCategorySpacing: CGFloat {
+        lineGroups.majorIssues.isEmpty || lineGroups.minorDelays.isEmpty ? 0 : 12
     }
 
     private var collapsedPillSpacing: CGFloat {
@@ -242,12 +274,28 @@ struct MapDisruptionOverviewCard: View {
     private var collapsedPillWidth: CGFloat {
         guard !lineEntries.isEmpty else { return 0 }
         let availableWidth: CGFloat = 292
-        let gaps = CGFloat(max(0, lineEntries.count - 1)) * collapsedPillSpacing
+        let gaps = CGFloat(
+            max(0, lineGroups.majorIssues.count - 1)
+                + max(0, lineGroups.minorDelays.count - 1)
+        ) * collapsedPillSpacing + collapsedCategorySpacing
         return min(24, max(10, (availableWidth - gaps) / CGFloat(lineEntries.count)))
     }
 
     private var affectedLinesAccessibilityLabel: String {
-        "Affected lines: " + lineEntries.map(\.lineID.displayName).joined(separator: ", ")
+        var groups: [String] = []
+        if !lineGroups.majorIssues.isEmpty {
+            groups.append(
+                "Major: "
+                    + lineGroups.majorIssues.map(\.lineID.displayName).joined(separator: ", ")
+            )
+        }
+        if !lineGroups.minorDelays.isEmpty {
+            groups.append(
+                "Minor: "
+                    + lineGroups.minorDelays.map(\.lineID.displayName).joined(separator: ", ")
+            )
+        }
+        return "Affected lines. " + groups.joined(separator: ". ")
     }
 
     private var expandedContent: some View {
@@ -428,7 +476,7 @@ struct MapDisruptionOverviewCard: View {
             if isLoadingTfLDisruptions {
                 return "Loading disruption data from TfL..."
             }
-            return "All supported London rail lines are reporting normally."
+            return "All lines are reporting normally... For now."
         }
         return "No planned work matches the selected date and times."
     }
@@ -543,6 +591,8 @@ struct MapExploreHint: View {
 
 struct MapNetworkStatsCard: View {
     private static let statHeight: CGFloat = 82
+    // More negative moves the selection boundary up; positive moves it down.
+    private static let selectionBoundaryYOffset: CGFloat = -12
 
     @Environment(TubeAppState.self) private var appState
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -594,15 +644,14 @@ struct MapNetworkStatsCard: View {
 
         return Button {
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.26)) {
-                if let disruptionScope = MapDisruptionHighlightScope(filter: filter) {
+                if let disruptionScope = MapDisruptionHighlightScope(filter: filter),
+                   !selected {
                     onAction(MapActionNotice(
                         message: disruptionScope.noticeMessage,
                         symbol: AppTab.works.symbol
                     ))
-                    appState.setDisruptionHighlightScope(disruptionScope)
-                } else {
-                    appState.toggleMapNetworkStat(filter)
                 }
+                appState.toggleMapNetworkStat(filter)
             }
         } label: {
             VStack(spacing: 4) {
@@ -634,7 +683,9 @@ struct MapNetworkStatsCard: View {
                         RoundedRectangle(cornerRadius: 13)
                             .stroke(filter.color.opacity(selected ? 0.42 : 0), lineWidth: 1)
                     }
-                    .padding(4)
+                    .padding(.horizontal, 4)
+                    .padding(.top, 8)
+                    .offset(y: Self.selectionBoundaryYOffset)
             }
             .contentShape(.rect)
         }
@@ -650,10 +701,13 @@ struct MapNetworkStatsCard: View {
         for filter: MapNetworkStatFilter,
         selected: Bool
     ) -> String {
+        if selected {
+            return "Clears this filter and shows all lines"
+        }
         if MapDisruptionHighlightScope(filter: filter) != nil {
             return "Highlights matching affected sections on the map"
         }
-        return selected ? "Shows all lines" : "Highlights matching lines on the map"
+        return "Highlights matching lines on the map"
     }
 
     private var divider: some View {

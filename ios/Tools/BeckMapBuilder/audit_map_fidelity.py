@@ -29,6 +29,10 @@ from map_geometry import (
     midpoint,
     nearest_on_cubic,
     nearest_on_line,
+    path_end,
+    path_end_tangent,
+    path_start,
+    path_start_tangent,
     point,
     translated,
 )
@@ -143,6 +147,41 @@ class MapFidelityAudit:
                 previous = end
         return min(matches, key=lambda match: match[0], default=None)
 
+    def _nearest_station_endpoint(
+        self, target: tuple[float, float], station_id: str, line_id: str | None = None,
+    ) -> tuple[float, tuple[float, float], tuple[float, float], dict[str, Any]] | None:
+        matches: list[
+            tuple[float, tuple[float, float], tuple[float, float], dict[str, Any]]
+        ] = []
+        for segment in self.document["segments"]:
+            if station_id not in {segment["fromStationID"], segment["toStationID"]}:
+                continue
+            if line_id is not None and segment["lineID"] != line_id:
+                continue
+            path_record = self.paths_by_id.get(segment["pathID"])
+            if path_record is None:
+                continue
+            commands = path_record["commands"]
+            station_is_path_start = (
+                segment["fromStationID"] == station_id
+            ) == (segment["pathDirection"] == "forward")
+            endpoint = path_start(commands) if station_is_path_start else path_end(commands)
+            tangent = (
+                path_start_tangent(commands)
+                if station_is_path_start
+                else path_end_tangent(commands)
+            )
+            if tangent is None:
+                continue
+            translation = segment.get("translation", {"x": 0, "y": 0})
+            endpoint = translated(endpoint, translation)
+            matches.append((distance(target, endpoint), endpoint, tangent, {
+                "segmentID": segment["id"], "lineID": segment["lineID"],
+                "pathID": segment["pathID"],
+                "side": "from" if segment["fromStationID"] == station_id else "to",
+            }))
+        return min(matches, key=lambda match: (match[0], match[3]["segmentID"]), default=None)
+
     def add(
         self,
         severity: str,
@@ -172,6 +211,7 @@ class MapFidelityAudit:
         self.audit_roundels()
         self.audit_ticks()
         self.audit_connectors()
+        self.audit_source_verified_geometry()
         self.audit_styles()
         self.findings.sort(key=lambda finding: (
             SEVERITY_ORDER[finding.severity], finding.category, finding.location, finding.code
@@ -365,6 +405,13 @@ class MapFidelityAudit:
             if primitive["kind"] in {"connector", "walkingConnector"}
             for endpoint in ("start", "end")
         ]
+        shared_roundel_expectations = {
+            expectation["stationID"]: expectation
+            for expectation in self.manifest.get(
+                "sourceVerifiedGeometry", {}
+            ).get("sharedStationRows", [])
+            if expectation.get("symbolMode") == "sharedRoundel"
+        }
         roundel_count = 0
         unmatched = 0
         for marker in self.document["stationMarkers"]:
@@ -388,11 +435,32 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], radius=style[0], outlineWidth=style[1],
                         baseline=baseline,
                     )
-                path_match = self._nearest_station_path(centre, marker["stationID"])
+                path_match = self._nearest_station_endpoint(centre, marker["stationID"])
                 connector_match = nearest(centre, connector_endpoints)
                 path_distance = None if path_match is None else path_match[0]
                 connector_distance = None if connector_match is None else connector_match[0]
                 attached_to_path = path_distance is not None and path_distance <= medium_port_tolerance
+                shared_expectation = shared_roundel_expectations.get(marker["stationID"])
+                if shared_expectation is not None:
+                    shared_ports = [
+                        point(segment[port_key])
+                        for segment in self.document["segments"]
+                        if segment["lineID"] in shared_expectation["lineIDs"]
+                        for port_key, station_key in (
+                            ("fromPort", "fromStationID"),
+                            ("toPort", "toStationID"),
+                        )
+                        if segment[station_key] == marker["stationID"]
+                    ]
+                    if shared_ports:
+                        shared_centre = (
+                            sum(port[0] for port in shared_ports) / len(shared_ports),
+                            sum(port[1] for port in shared_ports) / len(shared_ports),
+                        )
+                        attached_to_path = attached_to_path or (
+                            distance(centre, shared_centre)
+                            <= float(shared_expectation["toleranceArtworkUnits"])
+                        )
                 attached_to_connector = (
                     connector_distance is not None
                     and connector_distance <= medium_port_tolerance
@@ -456,16 +524,16 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], lineID=tick["lineID"],
                         length=round(length, 3), width=tick["width"], baseline=baseline,
                     )
-                path_match = self._nearest_station_path(
+                path_match = self._nearest_station_endpoint(
                     centre, marker["stationID"], tick["lineID"]
                 )
                 if path_match is None or path_match[0] > port_tolerance:
                     self.add(
                         "high", "ticks", "tick-not-on-route-port",
                         f"{marker['stationID']} primitive {primitive_index}",
-                        "A station tick is not centred on its line's authored path.",
+                        "A station tick is not centred on its exact station endpoint.",
                         "The station mark can float beside the route or attach to the wrong line.",
-                        "Align the route path and tick centre from the same reviewed source coordinate.",
+                        "Align the route endpoint and tick centre from the same reviewed source coordinate.",
                         stationID=marker["stationID"], lineID=tick["lineID"], centre=centre,
                         nearestDistance=None if path_match is None else round(path_match[0], 3),
                     )
@@ -494,6 +562,7 @@ class MapFidelityAudit:
     def audit_connectors(self) -> None:
         thresholds = self.manifest["thresholds"]
         medium_angle = float(thresholds["axisAngleMediumDegrees"])
+        high_angle = float(thresholds["axisAngleHighDegrees"])
         medium_endpoint_tolerance = float(
             thresholds["connectorEndpointMediumDistanceArtworkUnits"]
         )
@@ -533,12 +602,13 @@ class MapFidelityAudit:
                         "Restore both reviewed roundel centres and rebuild the connector.",
                         stationID=marker["stationID"], kind=kind, start=start, end=end,
                     )
-                if kind == "connector" and deviation > medium_angle:
+                if deviation > medium_angle:
+                    severity = "high" if deviation > high_angle else "medium"
                     self.add(
-                        "medium", "connectors", "connector-angle-review", location,
-                        f"An internal connector is {angle:.3f} degrees rather than horizontal, vertical, or 45 degrees.",
-                        "An unintended angle weakens the interchange grammar, but the official map also uses deliberate non-octilinear links.",
-                        "Compare with the locked TfL symbol; align only confirmed mismatches and retain source-traced exceptions.",
+                        severity, "connectors", "connector-angle-review", location,
+                        f"A connector is {angle:.3f} degrees rather than horizontal, vertical, or 45 degrees.",
+                        "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
+                        "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
                         stationID=marker["stationID"], stationName=marker["name"], kind=kind,
                         angleDegrees=round(angle, 3), nearestCanonicalAngle=nearest_angle,
                         deviationDegrees=round(deviation, 3), start=start, end=end, length=round(length, 3),
@@ -587,6 +657,165 @@ class MapFidelityAudit:
             "byKind": dict(sorted(Counter(record["kind"] for record in connector_records).items())),
             "nearestAxis": dict(sorted(angle_buckets.items())),
             "records": connector_records,
+        }
+
+    def audit_source_verified_geometry(self) -> None:
+        expectations = self.manifest.get("sourceVerifiedGeometry", {})
+        markers_by_id = {
+            marker["stationID"]: marker for marker in self.document["stationMarkers"]
+        }
+        checked_connectors = 0
+        checked_rows = 0
+
+        for expectation in expectations.get("connectorExpectations", []):
+            station_id = expectation["stationID"]
+            expected_kind = expectation["kind"]
+            marker = markers_by_id.get(station_id)
+            connector_primitives = [] if marker is None else [
+                primitive for primitive in marker["primitives"]
+                if primitive["kind"] in {"connector", "walkingConnector"}
+            ]
+            matching = [
+                primitive for primitive in connector_primitives
+                if primitive["kind"] == expected_kind
+            ]
+            if not matching:
+                self.add(
+                    "high", "connectors", "source-connector-kind-mismatch", station_id,
+                    f"The source-verified connector must be {expected_kind}.",
+                    "Using the wrong connector grammar changes the passenger-facing interchange meaning.",
+                    "Restore the source-traced connector kind and its reviewed endpoints.",
+                    stationID=station_id, expectedKind=expected_kind,
+                    actualKinds=[primitive["kind"] for primitive in connector_primitives],
+                )
+                continue
+            primitive = matching[0]
+            payload = primitive[expected_kind]
+            start, end = point(payload["start"]), point(payload["end"])
+            angle = vector_angle((end[0] - start[0], end[1] - start[1]))
+            expected_angle = float(expectation["angleDegrees"])
+            tolerance = float(expectation["toleranceDegrees"])
+            if abs(angle - expected_angle) > tolerance:
+                self.add(
+                    "high", "connectors", "source-connector-angle-mismatch", station_id,
+                    f"The source-verified connector is {angle:.3f} degrees instead of {expected_angle:.3f} degrees.",
+                    "The interchange no longer matches the locked TfL glyph relationship.",
+                    "Move both route ports, roundels, and the connector as one source-traced unit.",
+                    stationID=station_id, kind=expected_kind,
+                    expectedAngleDegrees=expected_angle, actualAngleDegrees=round(angle, 3),
+                    toleranceDegrees=tolerance,
+                )
+            checked_connectors += 1
+
+        for expectation in expectations.get("sharedStationRows", []):
+            station_id = expectation["stationID"]
+            line_ids = expectation["lineIDs"]
+            tolerance = float(expectation["toleranceArtworkUnits"])
+            ports_by_line: dict[str, list[tuple[float, float]]] = {}
+            for line_id in line_ids:
+                ports: list[tuple[float, float]] = []
+                for segment in self.document["segments"]:
+                    if segment["lineID"] != line_id:
+                        continue
+                    if segment["fromStationID"] == station_id:
+                        ports.append(point(segment["fromPort"]))
+                    if segment["toStationID"] == station_id:
+                        ports.append(point(segment["toPort"]))
+                ports_by_line[line_id] = ports
+            all_ports = [port for ports in ports_by_line.values() for port in ports]
+            if not all_ports or any(not ports for ports in ports_by_line.values()):
+                self.add(
+                    "high", "routes", "source-shared-row-port-missing", station_id,
+                    "A source-verified shared station row is missing a line port.",
+                    "The shared corridor cannot preserve a common station axis.",
+                    "Restore every expected semantic line endpoint at this station.",
+                    stationID=station_id, lineIDs=line_ids,
+                    portCounts={line_id: len(ports) for line_id, ports in ports_by_line.items()},
+                )
+                continue
+            row_spread = max(port[1] for port in all_ports) - min(port[1] for port in all_ports)
+            if row_spread > tolerance:
+                self.add(
+                    "high", "routes", "source-shared-row-misaligned", station_id,
+                    f"The shared station ports span {row_spread:.3f} artwork units vertically.",
+                    "Parallel Circle and Hammersmith & City stations appear staggered.",
+                    "Set every source-verified line endpoint to the same station row.",
+                    stationID=station_id, lineIDs=line_ids,
+                    rowSpreadArtworkUnits=round(row_spread, 3), toleranceArtworkUnits=tolerance,
+                )
+
+            marker = markers_by_id.get(station_id)
+            if marker is None:
+                continue
+            circles = [
+                point(primitive["circle"]["centre"])
+                for primitive in marker["primitives"] if primitive["kind"] == "circle"
+            ]
+            if expectation.get("symbolMode") == "sharedRoundel":
+                shared_centre = (
+                    sum(port[0] for port in all_ports) / len(all_ports),
+                    sum(port[1] for port in all_ports) / len(all_ports),
+                )
+                primitive_kinds = [
+                    primitive["kind"] for primitive in marker["primitives"]
+                ]
+                centre_distance = min(
+                    (distance(circle_centre, shared_centre) for circle_centre in circles),
+                    default=None,
+                )
+                if (
+                    primitive_kinds != ["circle"]
+                    or centre_distance is None
+                    or centre_distance > tolerance
+                ):
+                    self.add(
+                        "high", "roundels", "source-shared-roundel-mismatch",
+                        station_id,
+                        "The shared terminus must use one roundel centred across both line ports.",
+                        "Multiple glyphs imply an interchange between separate passenger nodes.",
+                        "Replace the connector and line-specific roundels with one centred roundel.",
+                        stationID=station_id, lineIDs=line_ids,
+                        primitiveKinds=primitive_kinds,
+                        nearestDistance=(
+                            None if centre_distance is None else round(centre_distance, 3)
+                        ),
+                        toleranceArtworkUnits=tolerance,
+                    )
+                checked_rows += 1
+                continue
+            for line_id, ports in ports_by_line.items():
+                ticks = [
+                    midpoint(
+                        point(primitive["tick"]["start"]),
+                        point(primitive["tick"]["end"]),
+                    )
+                    for primitive in marker["primitives"]
+                    if primitive["kind"] == "tick"
+                    and primitive["tick"]["lineID"] == line_id
+                ]
+                symbols = ticks or circles
+                nearest_distance = min(
+                    (distance(symbol, port) for symbol in symbols for port in ports),
+                    default=None,
+                )
+                if nearest_distance is None or nearest_distance > tolerance:
+                    self.add(
+                        "high", "roundels" if circles else "ticks",
+                        "source-station-symbol-row-mismatch", f"{station_id} {line_id}",
+                        "The station symbol is not centred on its source-verified line endpoint.",
+                        "The routes can be aligned while their visible station marks remain staggered.",
+                        "Regenerate the symbol from the final aligned line port.",
+                        stationID=station_id, lineID=line_id,
+                        nearestDistance=(
+                            None if nearest_distance is None else round(nearest_distance, 3)
+                        ),
+                        toleranceArtworkUnits=tolerance,
+                    )
+            checked_rows += 1
+
+        self.metrics["sourceVerifiedGeometry"] = {
+            "connectorExpectationsChecked": checked_connectors,
+            "sharedStationRowsChecked": checked_rows,
         }
 
     def audit_styles(self) -> None:

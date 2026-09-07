@@ -62,15 +62,18 @@ struct StationDetailCard: View {
                 }
                 StationDeparturesSection(
                     lineIDs: lineIDs,
+                    preferredLineID: appState.selectedStationDepartureLineID,
+                    controlledLineID: appState.selectedStationDepartureLineID,
                     arrivals: appState.stationArrivals,
                     statuses: appState.statuses,
                     isLoading: appState.isRefreshingStationArrivals,
                     errorMessage: appState.stationArrivalsError,
                     warning: stationWarning,
                     maxDeparturesHeight: 280,
-                    onShowWarning: showStationIssue
+                    onShowWarning: showStationIssue,
+                    onSelectLine: appState.selectDepartureLine
                 )
-                .id(station.id)
+                .id("\(station.id):\(appState.stationSelectionGeneration)")
             }
         }
         .accessibilityElement(children: .contain)
@@ -258,6 +261,7 @@ struct DisruptionDetailSheet: View {
 
 struct TrainMapCalloutOverlay: View {
     let train: LiveTubeTrain
+    let servicePresentation: LiveTrainServicePresentation
     let nextStopName: String
     let date: Date
     let markerPoint: CGPoint
@@ -274,6 +278,7 @@ struct TrainMapCalloutOverlay: View {
 
         TrainMapCallout(
             train: train,
+            servicePresentation: servicePresentation,
             nextStopName: nextStopName,
             date: date,
             arrowOffset: layout.arrowOffset,
@@ -294,6 +299,7 @@ struct TrainMapCalloutOverlay: View {
 
 private struct TrainMapCallout: View {
     let train: LiveTubeTrain
+    let servicePresentation: LiveTrainServicePresentation
     let nextStopName: String
     let date: Date
     let arrowOffset: CGFloat
@@ -340,6 +346,10 @@ private struct TrainMapCallout: View {
         return "\(minutes) min"
     }
 
+    private var informationalNote: String? {
+        servicePresentation.informationalNote(for: train.lineID)
+    }
+
     var body: some View {
         Group {
             if placement == .above {
@@ -356,7 +366,7 @@ private struct TrainMapCallout: View {
         }
         .shadow(color: .black.opacity(0.16), radius: 10, y: 4)
         .accessibilityLabel(accessibilitySummary)
-        .accessibilityValue("Next stop \(nextStopName), \(relativeETA)")
+        .accessibilityValue(accessibilityValue)
     }
 
     private var accessibilitySummary: String {
@@ -364,6 +374,12 @@ private struct TrainMapCallout: View {
             return "\(lineName), destination \(destinationName)"
         }
         return "\(lineName), destination \(destinationName), direction \(directionName)"
+    }
+
+    private var accessibilityValue: String {
+        let nextStop = "Next stop \(nextStopName), \(relativeETA)"
+        guard let informationalNote else { return nextStop }
+        return "\(nextStop). \(informationalNote)"
     }
 
     private var bubble: some View {
@@ -388,7 +404,9 @@ private struct TrainMapCallout: View {
 
             VStack(alignment: .leading, spacing: 11) {
                 HStack(alignment: .top, spacing: 8) {
-                    Image(systemName: "tram.fill")
+                    Image(
+                        systemName: servicePresentation.markerSystemName ?? "tram.fill"
+                    )
                         .foregroundStyle(Color.tubeLine(train.lineID))
                         .padding(.top, 4)
 
@@ -446,6 +464,19 @@ private struct TrainMapCallout: View {
                             .font(.appTitle3(.bold).monospacedDigit())
                             .foregroundStyle(Color.tubeLine(train.lineID))
                     }
+                }
+
+                if let informationalNote {
+                    Divider()
+
+                    Label {
+                        Text(informationalNote)
+                    } icon: {
+                        Image(systemName: "info.circle.fill")
+                    }
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
                 }
 
             }

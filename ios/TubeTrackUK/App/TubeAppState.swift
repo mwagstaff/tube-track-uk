@@ -104,6 +104,7 @@ final class TubeAppState {
     var mapPresentationMode: MapPresentationMode = .beck
     var sharedMapViewport: SharedMapViewport?
     var beckMapCameraSnapshot: BeckMapCameraSnapshot?
+    var mobileCoverageMode: MobileCoverageMode = .off
     var disruptionDisplayMode: DisruptionDisplayMode = .normal
     var selectedMapNetworkStat: MapNetworkStatFilter?
     var disruptionDateSelection: DisruptionDateSelection = .today
@@ -117,6 +118,7 @@ final class TubeAppState {
     private(set) var trainSelectionGeneration = 0
     var selectedLineID: TubeLineID?
     var selectedStationID: String?
+    private(set) var selectedStationDepartureLineID: TubeLineID?
     private(set) var stationSelectionGeneration = 0
     private(set) var nearMeFocusedStationID: String?
     private(set) var nearMeFocusGeneration = 0
@@ -147,6 +149,7 @@ final class TubeAppState {
     }
 
     var graph: TubeGraph?
+    private(set) var mobileCoverage: MobileCoverageSnapshot?
     private(set) var initialBeckMapDocument: BeckMapDocument?
     var statuses: [TfLLineStatus] = []
     var disruptions: [ResolvedDisruption] = []
@@ -211,6 +214,11 @@ final class TubeAppState {
            let mode = MapPresentationMode(rawValue: arguments[flag + 1]) {
             mapPresentationMode = mode
         }
+        if let flag = arguments.firstIndex(of: "-DebugMobileCoverage"),
+           arguments.indices.contains(flag + 1),
+           let mode = MobileCoverageMode(rawValue: arguments[flag + 1]) {
+            mobileCoverageMode = mode
+        }
         if arguments.contains("-DebugLiveTrains") {
             showLiveTrains = true
             trainLineFilter = [.piccadilly]
@@ -238,6 +246,10 @@ final class TubeAppState {
     var selectedTrain: LiveTubeTrain? {
         guard let selectedTrainID else { return nil }
         return liveTrains.first { $0.id == selectedTrainID }
+    }
+
+    var currentlyClosedLineIDs: Set<TubeLineID> {
+        LineServiceClosurePolicy.closedLineIDs(in: statuses)
     }
 
     var isViewingLiveStatus: Bool {
@@ -377,12 +389,16 @@ final class TubeAppState {
                     region: .fullUnderground,
                     graph: graph
                 )
-                return (graph, document)
+                // Coverage is an optional enhancement. A stale or malformed
+                // snapshot must not prevent the bundled maps from loading.
+                let mobileCoverage = try? MobileCoverageRepository().load(graph: graph)
+                return (graph, document, mobileCoverage)
             }.value
             guard !Task.isCancelled else { return }
 
             let loadedGraph = startupContent.0
             initialBeckMapDocument = startupContent.1
+            mobileCoverage = startupContent.2
             graph = loadedGraph
             let repository = TubeNetworkRepository(graph: loadedGraph)
             let client = TubeTrackAPIClient()
@@ -560,8 +576,25 @@ final class TubeAppState {
 
     func setDisruptionHighlightScope(_ scope: MapDisruptionHighlightScope?) {
         clearMapSelection()
+        if scope != nil {
+            mobileCoverageMode = .off
+        }
         selectedMapNetworkStat = scope?.filter
         disruptionDisplayMode = scope == nil ? .normal : .issues
+    }
+
+    func cycleMobileCoverageMode() {
+        setMobileCoverageMode(mobileCoverageMode.next)
+    }
+
+    func setMobileCoverageMode(_ mode: MobileCoverageMode) {
+        guard mobileCoverageMode != mode else { return }
+        clearMapSelection()
+        if mode.isActive {
+            selectedMapNetworkStat = nil
+            disruptionDisplayMode = .normal
+        }
+        mobileCoverageMode = mode
     }
 
     func highlightAllDisruptionsOnMap() {
@@ -575,10 +608,23 @@ final class TubeAppState {
         selectedTab = .map
     }
 
-    func select(station: TubeStation) {
+    func select(
+        station: TubeStation,
+        preferredDepartureLineID: TubeLineID? = nil
+    ) {
         cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedTrainID = nil
+        let stationLineIDs = Set(graph?.lineIDs(at: station) ?? station.lineIDs)
+        if let preferredDepartureLineID {
+            selectedStationDepartureLineID = stationLineIDs.contains(preferredDepartureLineID)
+                ? preferredDepartureLineID
+                : nil
+        } else if station.lineIDs.count == 1 {
+            selectedStationDepartureLineID = station.lineIDs.first
+        } else {
+            selectedStationDepartureLineID = nil
+        }
         selectedStationID = station.id
         stationSelectionGeneration &+= 1
         selectedLineID = nil
@@ -599,6 +645,13 @@ final class TubeAppState {
         selectedTab = .nearMe
     }
 
+    func selectDepartureLine(_ lineID: TubeLineID) {
+        guard let station = selectedStation else { return }
+        let stationLineIDs = Set(graph?.lineIDs(at: station) ?? station.lineIDs)
+        guard stationLineIDs.contains(lineID) else { return }
+        selectedStationDepartureLineID = lineID
+    }
+
     func consumeNearMeFocus(generation: Int) {
         guard generation == nearMeFocusGeneration else { return }
         nearMeFocusedStationID = nil
@@ -608,6 +661,7 @@ final class TubeAppState {
         cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedStationID = nil
+        selectedStationDepartureLineID = nil
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
         stationArrivalsError = nil
@@ -701,6 +755,7 @@ final class TubeAppState {
 
     func select(disruption: ResolvedDisruption) {
         let mapFocus = MapDisruptionFocus(disruption: disruption, graph: graph)
+        mobileCoverageMode = .off
         selectedMapNetworkStat = nil
         clearStationSelection()
         selectedTrainID = nil
@@ -725,7 +780,11 @@ final class TubeAppState {
         }
         clearMapSelection()
         disruptionDisplayMode = .normal
-        selectedMapNetworkStat = selectedMapNetworkStat == filter ? nil : filter
+        let nextFilter = selectedMapNetworkStat == filter ? nil : filter
+        if nextFilter != nil {
+            mobileCoverageMode = .off
+        }
+        selectedMapNetworkStat = nextFilter
     }
 
     func focus(on work: EngineeringWork, in tab: AppTab) {
@@ -735,6 +794,7 @@ final class TubeAppState {
                 overlapping: selectedDisruptionDate
             ).isEmpty
         clearMapSelection()
+        mobileCoverageMode = .off
         if !workIsInSelectedPlannedDay {
             disruptionDateSelection = .custom(work.startDate)
         }
@@ -919,11 +979,8 @@ final class TubeAppState {
         }
         cancelScheduledTrainRetry()
         let previousTrains = liveTrains
-        let previousByID = Dictionary(
-            uniqueKeysWithValues: previousTrains.map { ($0.id, $0) }
-        )
         if let selectedTrainID,
-           let previous = previousByID[selectedTrainID],
+           let previous = previousTrains.first(where: { $0.id == selectedTrainID }),
            let incoming = trains.first(where: { $0.id == selectedTrainID }),
            !LiveTrainSnapshotReconciler.isContinuousJourney(
                from: previous,

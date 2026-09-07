@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// An original, compact "chomper" mark for the Station Chase easter egg.
+/// An original, compact "chomper" mark for the Track Attack easter egg.
 /// It deliberately avoids branded character details while remaining legible
 /// beside the map's other toolbar symbols.
-struct StationChaseGlyph: View {
+struct TrackAttackGlyph: View {
     var mouthAngle: Double = 34
 
     var body: some View {

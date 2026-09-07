@@ -78,6 +78,25 @@ struct BeckMapRepositoryTests {
         })
     }
 
+    @Test func splitInterchangeRoundelsRetainTheirPassengerFacingLines() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+
+        let barkingSuffragette = try #require(document.stationMarkers.first {
+            $0.stationID == "910GBARKING"
+        })
+        let westHam = try #require(document.stationMarkers.first {
+            $0.stationID == "940GZZLUWHM"
+        })
+        let westBromptonMildmay = try #require(document.stationMarkers.first {
+            $0.stationID == "910GWBRMPTN"
+        })
+
+        #expect(barkingSuffragette.lineIDs == [.suffragette])
+        #expect(westHam.lineIDs.contains(.jubilee))
+        #expect(westBromptonMildmay.lineIDs == [.mildmay])
+    }
+
     @Test func isolatedSingleLineStationsUseTicksAcrossEveryNetwork() throws {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
@@ -235,8 +254,12 @@ struct BeckMapRepositoryTests {
 
         func connectors(_ marker: BeckMapStationMarkerRecord) -> [BeckMapLinePrimitive] {
             marker.primitives.compactMap {
-                if case let .connector(connector) = $0 { return connector }
-                return nil
+                switch $0 {
+                case let .connector(connector), let .walkingConnector(connector):
+                    return connector
+                case .circle, .tick:
+                    return nil
+                }
             }
         }
 
@@ -284,13 +307,20 @@ struct BeckMapRepositoryTests {
             ("910GWLTWCEN", 25),
             ("910GHGHI", 32),
             ("910GCLDNNRB", 55),
-            ("910GWHMDSTD", 50),
+            ("910GWHMDSTD", 55),
+            ("910GFNCHLYR", 90),
             ("910GBARKING", 60),
         ]
         for (stationID, maximumLength) in compactInterchanges {
             let links = connectors(try marker(stationID))
             #expect(!links.isEmpty)
             #expect(links.allSatisfy { length($0) <= maximumLength })
+        }
+        for stationID in ["910GWHMDSTD", "910GFNCHLYR"] {
+            #expect(try marker(stationID).primitives.contains {
+                if case .walkingConnector = $0 { return true }
+                return false
+            })
         }
         let caledonianLink = try #require(
             connectors(try marker("910GCLDNNRB")).first
@@ -1103,6 +1133,12 @@ struct BeckMapRepositoryTests {
             #expect(abs(circlePort.y - hammersmithCityPort.y) < 0.001)
         }
 
+        let hammersmithHammersmithCity = try marker("940GZZLUHSC")
+        #expect(hammersmithHammersmithCity.lineIDs.contains(.circle))
+        #expect(hammersmithHammersmithCity.lineIDs.contains(.hammersmithCity))
+        #expect(circleCount(hammersmithHammersmithCity) == 1)
+        #expect(connectorCount(hammersmithHammersmithCity) == 0)
+
         let victoria = try marker("940GZZLUVIC")
         #expect(circleCount(victoria) == 2)
         #expect(connectorCount(victoria) == 1)
@@ -1284,6 +1320,28 @@ struct BeckMapRepositoryTests {
         })
         #expect(bondLabel.position.x < bond.anchor.x)
         #expect(bondLabel.position.y < bond.anchor.y)
+
+        let ealing = try marker("940GZZLUEBY")
+        let ealingElizabeth = try marker("910GEALINGB")
+        let ealingCentral = try stationPort("940GZZLUEBY", on: .central)
+        let ealingDistrict = try stationPort("940GZZLUEBY", on: .district)
+        let ealingElizabethPort = try stationPort("910GEALINGB", on: .elizabeth)
+        #expect(ealingCentral.x == ealingDistrict.x)
+        #expect(ealingCentral.x == ealingElizabethPort.x)
+        #expect(circles(ealing).contains(ealingElizabethPort))
+        #expect(circles(ealing).contains(ealingCentral))
+        #expect(circles(ealing).contains(ealingDistrict))
+        #expect(ealingElizabeth.anchor == ealingElizabethPort)
+        #expect(hasConnector(
+            ealing,
+            between: ealingElizabethPort,
+            and: ealingCentral
+        ))
+        #expect(hasConnector(
+            ealing,
+            between: ealingCentral,
+            and: ealingDistrict
+        ))
 
         let liverpool = try marker("940GZZLULVT")
         let liverpoolElizabethMarker = try marker("910GLIVSTLL")
@@ -1609,6 +1667,38 @@ struct BeckMapRepositoryTests {
         ] {
             #expect(labelsByStationID[stationID]?.effectiveVisibilityTier == .local)
         }
+    }
+
+    @Test func northwestWalkingInterchangeLabelsUseOfficialZonesAndPriority() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try repository.load(region: .fullUnderground, graph: graph)
+        let labels = Dictionary(
+            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+        )
+        let markers = Dictionary(
+            uniqueKeysWithValues: document.stationMarkers.map { ($0.stationID, $0) }
+        )
+
+        let westHampstead = try #require(labels["940GZZLUWHP"])
+        #expect(westHampstead.text == "West\nHampstead")
+        #expect(westHampstead.alignment == .centre)
+        #expect(westHampstead.effectiveVisibilityTier == .network)
+        #expect(westHampstead.priority >= 10)
+        #expect(westHampstead.associatedStationIDs?.contains("910GWHMDSTD") == true)
+        let westHampsteadMildmay = try #require(markers["910GWHMDSTD"])
+        #expect(westHampstead.position.y < westHampsteadMildmay.anchor.y)
+
+        let finchleyFrognal = try #require(labels["910GFNCHLYR"])
+        #expect(finchleyFrognal.alignment == .leading)
+        let finchleyFrognalMarker = try #require(markers["910GFNCHLYR"])
+        #expect(finchleyFrognal.position.y > finchleyFrognalMarker.anchor.y)
+
+        let finchleyRoad = try #require(labels["940GZZLUFYR"])
+        #expect(finchleyRoad.text == "Finchley\nRoad")
+        #expect(finchleyRoad.alignment == .trailing)
+        let finchleyRoadMarker = try #require(markers["940GZZLUFYR"])
+        #expect(finchleyRoad.position.x < finchleyRoadMarker.anchor.x)
+        #expect(finchleyRoad.position.y > finchleyRoadMarker.anchor.y)
     }
 
     @Test func labelCollisionResolverRejectsMarkersAndEarlierLabels() {

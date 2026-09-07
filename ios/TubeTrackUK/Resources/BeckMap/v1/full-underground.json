@@ -473,11 +473,11 @@
       "visibilityTier": "minor"
     },
     {
-      "alignment": "trailing",
+      "alignment": "leading",
       "id": "label.910GFNCHLYR",
       "position": {
-        "x": 1689.62,
-        "y": 1146.71
+        "x": 1643.0,
+        "y": 1194.0
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -3541,16 +3541,16 @@
       "visibilityTier": "local"
     },
     {
-      "alignment": "leading",
+      "alignment": "trailing",
       "id": "label.940GZZLUFYR",
       "position": {
-        "x": 1565.0,
-        "y": 1215.0
+        "x": 1533.0,
+        "y": 1278.0
       },
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUFYR",
-      "text": "Finchley Road",
+      "text": "Finchley\nRoad",
       "visibilityTier": "network"
     },
     {
@@ -3622,8 +3622,8 @@
       "alignment": "leading",
       "id": "label.940GZZLUGHK",
       "position": {
-        "x": 1188.758,
-        "y": 1738.004
+        "x": 1188.757,
+        "y": 1744.045
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -3911,7 +3911,7 @@
       "alignment": "trailing",
       "id": "label.940GZZLUHSC",
       "position": {
-        "x": 1158.859,
+        "x": 1154.757,
         "y": 1800.069
       },
       "priority": 10,
@@ -4107,7 +4107,7 @@
       "id": "label.940GZZLUKOY",
       "position": {
         "x": 1317.844,
-        "y": 1763.973
+        "y": 1765.223
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5051,8 +5051,8 @@
       "alignment": "leading",
       "id": "label.940GZZLUSBM",
       "position": {
-        "x": 1188.758,
-        "y": 1697.956
+        "x": 1188.757,
+        "y": 1703.971
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5168,8 +5168,8 @@
       "alignment": "leading",
       "id": "label.940GZZLUSJW",
       "position": {
-        "x": 1648.0,
-        "y": 1298.0
+        "x": 1695.038,
+        "y": 1345.034
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5341,8 +5341,8 @@
       "alignment": "leading",
       "id": "label.940GZZLUSWC",
       "position": {
-        "x": 1598.0,
-        "y": 1248.0
+        "x": 1641.0,
+        "y": 1292.0
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5641,7 +5641,7 @@
       "id": "label.940GZZLUWBN",
       "position": {
         "x": 1317.781,
-        "y": 1949.797
+        "y": 1948.626
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5692,17 +5692,20 @@
       "visibilityTier": "network"
     },
     {
-      "alignment": "leading",
+      "alignment": "centre",
+      "associatedStationIDs": [
+        "910GWHMDSTD"
+      ],
       "id": "label.940GZZLUWHP",
       "position": {
-        "x": 1518.148,
-        "y": 1145.092
+        "x": 1554.0,
+        "y": 1141.0
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWHP",
-      "text": "West Hampstead",
-      "visibilityTier": "local"
+      "text": "West\nHampstead",
+      "visibilityTier": "network"
     },
     {
       "alignment": "trailing",
@@ -9492,12 +9495,12 @@
     },
     {
       "commands": [
-        {
-          "op": "move",
-          "to": {
-            "x": 600.003,
-            "y": 1707.781
-          }
+      {
+        "op": "move",
+        "to": {
+          "x": 600.109,
+          "y": 1707.781
+        }
         },
         {
           "op": "line",
@@ -10729,7 +10732,7 @@
           "op": "move",
           "to": {
             "x": 1335.844,
-            "y": 1763.973
+            "y": 1765.223
           }
         },
         {
@@ -10901,7 +10904,7 @@
           "op": "line",
           "to": {
             "x": 1335.781,
-            "y": 1949.797
+            "y": 1948.626
           }
         }
       ],
@@ -10913,7 +10916,7 @@
           "op": "move",
           "to": {
             "x": 1335.781,
-            "y": 1949.797
+            "y": 1948.626
           }
         },
         {
@@ -12707,24 +12710,24 @@
             "y": 1657.203
           }
         },
-        {
-          "op": "line",
-          "to": {
-            "x": 597.033,
-            "y": 1657.203
-          }
+      {
+        "op": "line",
+        "to": {
+          "x": 600.109,
+          "y": 1657.203
+        }
         }
       ],
       "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.5"
     },
     {
       "commands": [
-        {
-          "op": "move",
-          "to": {
-            "x": 597.033,
-            "y": 1657.203
-          }
+      {
+        "op": "move",
+        "to": {
+          "x": 600.109,
+          "y": 1657.203
+        }
         },
         {
           "op": "line",
@@ -15561,15 +15564,15 @@
         {
           "op": "move",
           "to": {
-            "x": 1546.009,
-            "y": 1213.963
+            "x": 1570.0,
+            "y": 1238.0
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 1579.975,
-            "y": 1247.949
+            "x": 1622.0,
+            "y": 1290.0
           }
         }
       ],
@@ -15580,15 +15583,15 @@
         {
           "op": "move",
           "to": {
-            "x": 1579.975,
-            "y": 1247.949
+            "x": 1622.0,
+            "y": 1290.0
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 1629.962,
-            "y": 1297.966
+            "x": 1677.0,
+            "y": 1345.0
           }
         }
       ],
@@ -15599,8 +15602,8 @@
         {
           "op": "move",
           "to": {
-            "x": 1629.962,
-            "y": 1297.966
+            "x": 1677.0,
+            "y": 1345.0
           }
         },
         {
@@ -15804,8 +15807,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1500.148,
-            "y": 1159.092
+            "x": 1543.9,
+            "y": 1211.9
           }
         }
       ],
@@ -15816,8 +15819,8 @@
         {
           "op": "move",
           "to": {
-            "x": 1500.148,
-            "y": 1159.092
+            "x": 1543.9,
+            "y": 1211.9
           }
         },
         {
@@ -15837,8 +15840,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1546.009,
-            "y": 1213.963
+            "x": 1570.0,
+            "y": 1238.0
           }
         }
       ],
@@ -16941,8 +16944,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1238.166,
-            "y": 944.182
+            "x": 1263.067,
+            "y": 968.875
           }
         }
       ],
@@ -16953,15 +16956,15 @@
         {
           "op": "move",
           "to": {
-            "x": 1238.166,
-            "y": 944.182
+            "x": 1263.067,
+            "y": 968.875
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 1545.867,
-            "y": 1251.883
+            "x": 1551.0,
+            "y": 1257.0
           }
         }
       ],
@@ -16972,8 +16975,8 @@
         {
           "op": "move",
           "to": {
-            "x": 1545.867,
-            "y": 1251.883
+            "x": 1551.0,
+            "y": 1257.0
           }
         },
         {
@@ -17261,15 +17264,15 @@
         {
           "op": "move",
           "to": {
-            "x": 1238.166,
-            "y": 944.182
+            "x": 1263.067,
+            "y": 968.875
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 1368.908,
-            "y": 1074.924
+            "x": 1387.96,
+            "y": 1093.846
           }
         }
       ],
@@ -17280,15 +17283,15 @@
         {
           "op": "move",
           "to": {
-            "x": 1368.908,
-            "y": 1074.924
+            "x": 1387.96,
+            "y": 1093.846
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 1545.867,
-            "y": 1251.883
+            "x": 1551.0,
+            "y": 1257.0
           }
         }
       ],
@@ -17416,18 +17419,6 @@
             "x": 1705.62,
             "y": 1164.71
           }
-        }
-      ],
-      "id": "beck.v1.path.mildmay.stratford-clapham.official.v1.11"
-    },
-    {
-      "commands": [
-        {
-          "op": "move",
-          "to": {
-            "x": 1705.62,
-            "y": 1164.71
-          }
         },
         {
           "op": "line",
@@ -17454,8 +17445,27 @@
         {
           "op": "line",
           "to": {
-            "x": 1544.828,
-            "y": 1174.922
+            "x": 1633.1,
+            "y": 1174.9
+          }
+        }
+      ],
+      "id": "beck.v1.path.mildmay.stratford-clapham.official.v1.11"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1633.1,
+            "y": 1174.9
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1580.9,
+            "y": 1174.9
           }
         }
       ],
@@ -17466,8 +17476,8 @@
         {
           "op": "move",
           "to": {
-            "x": 1544.828,
-            "y": 1174.922
+            "x": 1580.9,
+            "y": 1174.9
           }
         },
         {
@@ -17650,8 +17660,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1275.747,
-            "y": 1701.756
+            "x": 1290.079,
+            "y": 1716.082
           }
         }
       ],
@@ -17662,8 +17672,8 @@
         {
           "op": "move",
           "to": {
-            "x": 1275.747,
-            "y": 1701.756
+            "x": 1290.079,
+            "y": 1716.082
           }
         },
         {
@@ -17692,7 +17702,7 @@
           "op": "line",
           "to": {
             "x": 1306.969,
-            "y": 1766.473
+            "y": 1765.223
           }
         }
       ],
@@ -17704,14 +17714,14 @@
           "op": "move",
           "to": {
             "x": 1306.969,
-            "y": 1766.473
+            "y": 1765.223
           }
         },
         {
           "op": "line",
           "to": {
             "x": 1306.969,
-            "y": 1947.455
+            "y": 1948.626
           }
         }
       ],
@@ -17742,7 +17752,7 @@
           "op": "move",
           "to": {
             "x": 1306.969,
-            "y": 1947.455
+            "y": 1948.626
           }
         },
         {
@@ -30763,7 +30773,7 @@
     },
     {
       "fromPort": {
-        "x": 600.003,
+        "x": 600.109,
         "y": 1707.781
       },
       "fromStationID": "940GZZLUEBY",
@@ -30824,7 +30834,7 @@
     {
       "fromPort": {
         "x": 1335.844,
-        "y": 1763.973
+        "y": 1765.223
       },
       "fromStationID": "940GZZLUKOY",
       "id": "district:940GZZLUECT:940GZZLUKOY",
@@ -30853,7 +30863,7 @@
       "pathID": "beck.v1.path.district.wimbledon-branch.western-fan.v1.0",
       "toPort": {
         "x": 1335.781,
-        "y": 1949.797
+        "y": 1948.626
       },
       "toStationID": "940GZZLUWBN",
       "translation": {
@@ -31044,7 +31054,7 @@
     {
       "fromPort": {
         "x": 1335.781,
-        "y": 1949.797
+        "y": 1948.626
       },
       "fromStationID": "940GZZLUWBN",
       "id": "district:940GZZLUFBY:940GZZLUWBN",
@@ -32452,7 +32462,7 @@
       "pathDirection": "reverse",
       "pathID": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.6",
       "toPort": {
-        "x": 597.033,
+        "x": 600.109,
         "y": 1657.203
       },
       "toStationID": "910GEALINGB",
@@ -32723,7 +32733,7 @@
     },
     {
       "fromPort": {
-        "x": 597.033,
+        "x": 600.109,
         "y": 1657.203
       },
       "fromStationID": "910GEALINGB",
@@ -33903,8 +33913,8 @@
     },
     {
       "fromPort": {
-        "x": 1629.962,
-        "y": 1297.966
+        "x": 1677.0,
+        "y": 1345.0
       },
       "fromStationID": "940GZZLUSJW",
       "id": "jubilee:940GZZLUBST:940GZZLUSJW",
@@ -34083,8 +34093,8 @@
     },
     {
       "fromPort": {
-        "x": 1546.009,
-        "y": 1213.963
+        "x": 1570.0,
+        "y": 1238.0
       },
       "fromStationID": "940GZZLUFYR",
       "id": "jubilee:940GZZLUFYR:940GZZLUSWC",
@@ -34092,8 +34102,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.jubilee.northwest-connector.v1.10",
       "toPort": {
-        "x": 1579.975,
-        "y": 1247.949
+        "x": 1622.0,
+        "y": 1290.0
       },
       "toStationID": "940GZZLUSWC",
       "translation": {
@@ -34103,8 +34113,8 @@
     },
     {
       "fromPort": {
-        "x": 1500.148,
-        "y": 1159.092
+        "x": 1543.9,
+        "y": 1211.9
       },
       "fromStationID": "940GZZLUWHP",
       "id": "jubilee:940GZZLUFYR:940GZZLUWHP",
@@ -34112,8 +34122,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.jubilee.northwest-connector.v1.9",
       "toPort": {
-        "x": 1546.009,
-        "y": 1213.963
+        "x": 1570.0,
+        "y": 1238.0
       },
       "toStationID": "940GZZLUFYR",
       "translation": {
@@ -34152,8 +34162,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.jubilee.northwest-connector.v1.8",
       "toPort": {
-        "x": 1500.148,
-        "y": 1159.092
+        "x": 1543.9,
+        "y": 1211.9
       },
       "toStationID": "940GZZLUWHP",
       "translation": {
@@ -34263,8 +34273,8 @@
     },
     {
       "fromPort": {
-        "x": 1579.975,
-        "y": 1247.949
+        "x": 1622.0,
+        "y": 1290.0
       },
       "fromStationID": "940GZZLUSWC",
       "id": "jubilee:940GZZLUSJW:940GZZLUSWC",
@@ -34272,8 +34282,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.jubilee.northwest-connector.v1.11",
       "toPort": {
-        "x": 1629.962,
-        "y": 1297.966
+        "x": 1677.0,
+        "y": 1345.0
       },
       "toStationID": "940GZZLUSJW",
       "translation": {
@@ -34823,8 +34833,8 @@
     },
     {
       "fromPort": {
-        "x": 1545.867,
-        "y": 1251.883
+        "x": 1551.0,
+        "y": 1257.0
       },
       "fromStationID": "940GZZLUFYR",
       "id": "metropolitan:940GZZLUBST:940GZZLUFYR",
@@ -35063,8 +35073,8 @@
     },
     {
       "fromPort": {
-        "x": 1368.908,
-        "y": 1074.924
+        "x": 1387.96,
+        "y": 1093.846
       },
       "fromStationID": "940GZZLUWIG",
       "id": "metropolitan:940GZZLUFYR:940GZZLUWIG",
@@ -35072,8 +35082,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.willesden-service.northwest-connector.v1.1",
       "toPort": {
-        "x": 1545.867,
-        "y": 1251.883
+        "x": 1551.0,
+        "y": 1257.0
       },
       "toStationID": "940GZZLUFYR",
       "translation": {
@@ -35083,8 +35093,8 @@
     },
     {
       "fromPort": {
-        "x": 1238.166,
-        "y": 944.182
+        "x": 1263.067,
+        "y": 968.875
       },
       "fromStationID": "940GZZLUWYP",
       "id": "metropolitan:940GZZLUFYR:940GZZLUWYP",
@@ -35092,8 +35102,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.11",
       "toPort": {
-        "x": 1545.867,
-        "y": 1251.883
+        "x": 1551.0,
+        "y": 1257.0
       },
       "toStationID": "940GZZLUFYR",
       "translation": {
@@ -35372,8 +35382,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.10",
       "toPort": {
-        "x": 1238.166,
-        "y": 944.182
+        "x": 1263.067,
+        "y": 968.875
       },
       "toStationID": "940GZZLUWYP",
       "translation": {
@@ -35423,8 +35433,8 @@
     },
     {
       "fromPort": {
-        "x": 1238.166,
-        "y": 944.182
+        "x": 1263.067,
+        "y": 968.875
       },
       "fromStationID": "940GZZLUWYP",
       "id": "metropolitan:940GZZLUWIG:940GZZLUWYP",
@@ -35432,8 +35442,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.willesden-service.northwest-connector.v1.0",
       "toPort": {
-        "x": 1368.908,
-        "y": 1074.924
+        "x": 1387.96,
+        "y": 1093.846
       },
       "toStationID": "940GZZLUWIG",
       "translation": {
@@ -35503,8 +35513,8 @@
     },
     {
       "fromPort": {
-        "x": 1544.828,
-        "y": 1174.922
+        "x": 1580.9,
+        "y": 1174.9
       },
       "fromStationID": "910GWHMDSTD",
       "id": "mildmay:910GBRBY:910GWHMDSTD",
@@ -35664,7 +35674,7 @@
     {
       "fromPort": {
         "x": 1306.969,
-        "y": 1947.455
+        "y": 1948.626
       },
       "fromStationID": "910GWBRMPTN",
       "id": "mildmay:910GCSEAH:910GWBRMPTN",
@@ -35712,8 +35722,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.11",
       "toPort": {
-        "x": 1705.62,
-        "y": 1164.71
+        "x": 1633.1,
+        "y": 1174.9
       },
       "toStationID": "910GFNCHLYR",
       "translation": {
@@ -35723,8 +35733,8 @@
     },
     {
       "fromPort": {
-        "x": 1705.62,
-        "y": 1164.71
+        "x": 1633.1,
+        "y": 1174.9
       },
       "fromStationID": "910GFNCHLYR",
       "id": "mildmay:910GFNCHLYR:910GWHMDSTD",
@@ -35732,8 +35742,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.12",
       "toPort": {
-        "x": 1544.828,
-        "y": 1174.922
+        "x": 1580.9,
+        "y": 1174.9
       },
       "toStationID": "910GWHMDSTD",
       "translation": {
@@ -35883,8 +35893,8 @@
     },
     {
       "fromPort": {
-        "x": 1275.747,
-        "y": 1701.756
+        "x": 1290.079,
+        "y": 1716.082
       },
       "fromStationID": "910GSHPDSB",
       "id": "mildmay:910GKENOLYM:910GSHPDSB",
@@ -35893,7 +35903,7 @@
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.18",
       "toPort": {
         "x": 1306.969,
-        "y": 1766.473
+        "y": 1765.223
       },
       "toStationID": "910GKENOLYM",
       "translation": {
@@ -35904,7 +35914,7 @@
     {
       "fromPort": {
         "x": 1306.969,
-        "y": 1766.473
+        "y": 1765.223
       },
       "fromStationID": "910GKENOLYM",
       "id": "mildmay:910GKENOLYM:910GWBRMPTN",
@@ -35913,7 +35923,7 @@
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.19",
       "toPort": {
         "x": 1306.969,
-        "y": 1947.455
+        "y": 1948.626
       },
       "toStationID": "910GWBRMPTN",
       "translation": {
@@ -35972,8 +35982,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.mildmay.stratford-clapham.official.v1.17",
       "toPort": {
-        "x": 1275.747,
-        "y": 1701.756
+        "x": 1290.079,
+        "y": 1716.082
       },
       "toStationID": "910GSHPDSB",
       "translation": {
@@ -41193,13 +41203,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2894.261,
-              "y": 1141.983
+              "x": 2894.437,
+              "y": 1141.8
             },
             "lineID": "weaver",
             "start": {
-              "x": 2884.361,
-              "y": 1132.083
+              "x": 2884.185,
+              "y": 1132.266
             },
             "width": 3.2
           }
@@ -41699,7 +41709,7 @@
     },
     {
       "anchor": {
-        "x": 597.033,
+        "x": 600.109,
         "y": 1657.203
       },
       "hitRadius": 14,
@@ -41711,7 +41721,7 @@
         {
           "circle": {
             "centre": {
-              "x": 597.033,
+              "x": 600.109,
               "y": 1657.203
             },
             "outlineWidth": 3.5,
@@ -41850,8 +41860,8 @@
     },
     {
       "anchor": {
-        "x": 1705.62,
-        "y": 1164.71
+        "x": 1633.1,
+        "y": 1174.9
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -41860,19 +41870,29 @@
       "name": "Finchley Road & Frognal",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
+          "kind": "walkingConnector",
+          "walkingConnector": {
             "end": {
-              "x": 1700.671,
-              "y": 1159.759
+              "x": 1633.1,
+              "y": 1174.9
             },
-            "lineID": "mildmay",
             "start": {
-              "x": 1710.569,
-              "y": 1169.661
+              "x": 1570.0,
+              "y": 1238.0
             },
-            "width": 3.2
+            "width": 4.5
           }
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1633.1,
+              "y": 1174.9
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "910GFNCHLYR"
@@ -42840,7 +42860,7 @@
     {
       "anchor": {
         "x": 1306.969,
-        "y": 1766.473
+        "y": 1765.223
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -42852,11 +42872,11 @@
           "connector": {
             "end": {
               "x": 1306.969,
-              "y": 1766.473
+              "y": 1765.223
             },
             "start": {
               "x": 1335.844,
-              "y": 1763.973
+              "y": 1765.223
             },
             "width": 7.5
           },
@@ -42866,7 +42886,7 @@
           "circle": {
             "centre": {
               "x": 1306.969,
-              "y": 1766.473
+              "y": 1765.223
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -43957,8 +43977,8 @@
     },
     {
       "anchor": {
-        "x": 1275.747,
-        "y": 1701.756
+        "x": 1290.079,
+        "y": 1716.082
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -43967,24 +43987,24 @@
       "name": "Shepherds Bush",
       "primitives": [
         {
-          "connector": {
+          "kind": "walkingConnector",
+          "walkingConnector": {
             "end": {
-              "x": 1275.747,
-              "y": 1701.756
+              "x": 1290.079,
+              "y": 1716.082
             },
             "start": {
               "x": 1323.77,
               "y": 1682.391
             },
-            "width": 7.5
-          },
-          "kind": "connector"
+            "width": 4.5
+          }
         },
         {
           "circle": {
             "centre": {
-              "x": 1275.747,
-              "y": 1701.756
+              "x": 1290.079,
+              "y": 1716.082
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -44710,7 +44730,7 @@
     {
       "anchor": {
         "x": 1306.969,
-        "y": 1947.455
+        "y": 1948.626
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -44722,11 +44742,11 @@
           "connector": {
             "end": {
               "x": 1306.969,
-              "y": 1947.455
+              "y": 1948.626
             },
             "start": {
               "x": 1335.781,
-              "y": 1949.797
+              "y": 1948.626
             },
             "width": 7.5
           },
@@ -44736,7 +44756,7 @@
           "circle": {
             "centre": {
               "x": 1306.969,
-              "y": 1947.455
+              "y": 1948.626
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -44968,8 +44988,8 @@
     },
     {
       "anchor": {
-        "x": 1544.828,
-        "y": 1174.922
+        "x": 1580.9,
+        "y": 1174.9
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -44978,24 +44998,24 @@
       "name": "West Hampstead",
       "primitives": [
         {
-          "connector": {
+          "kind": "walkingConnector",
+          "walkingConnector": {
             "end": {
-              "x": 1544.828,
-              "y": 1174.922
+              "x": 1580.9,
+              "y": 1174.9
             },
             "start": {
-              "x": 1500.148,
-              "y": 1159.092
+              "x": 1543.9,
+              "y": 1211.9
             },
-            "width": 7.5
-          },
-          "kind": "connector"
+            "width": 4.5
+          }
         },
         {
           "circle": {
             "centre": {
-              "x": 1544.828,
-              "y": 1174.922
+              "x": 1580.9,
+              "y": 1174.9
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -49926,7 +49946,21 @@
         {
           "connector": {
             "end": {
-              "x": 600.003,
+              "x": 600.109,
+              "y": 1682.391
+            },
+            "start": {
+              "x": 600.109,
+              "y": 1657.203
+            },
+            "width": 7.5
+          },
+          "kind": "connector"
+        },
+        {
+          "connector": {
+            "end": {
+              "x": 600.109,
               "y": 1707.781
             },
             "start": {
@@ -49936,6 +49970,17 @@
             "width": 7.5
           },
           "kind": "connector"
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 600.109,
+              "y": 1657.203
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         },
         {
           "circle": {
@@ -49951,7 +49996,7 @@
         {
           "circle": {
             "centre": {
-              "x": 600.003,
+              "x": 600.109,
               "y": 1707.781
             },
             "outlineWidth": 3.5,
@@ -50683,8 +50728,8 @@
     },
     {
       "anchor": {
-        "x": 1546.009,
-        "y": 1213.963
+        "x": 1570.0,
+        "y": 1238.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -50696,12 +50741,12 @@
         {
           "connector": {
             "end": {
-              "x": 1545.867,
-              "y": 1251.883
+              "x": 1551.0,
+              "y": 1257.0
             },
             "start": {
-              "x": 1546.009,
-              "y": 1213.963
+              "x": 1570.0,
+              "y": 1238.0
             },
             "width": 7.5
           },
@@ -50710,8 +50755,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1546.009,
-              "y": 1213.963
+              "x": 1570.0,
+              "y": 1238.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -50721,8 +50766,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1545.867,
-              "y": 1251.883
+              "x": 1551.0,
+              "y": 1257.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -50875,8 +50920,8 @@
     },
     {
       "anchor": {
-        "x": 1172.758,
-        "y": 1738.004
+        "x": 1172.757,
+        "y": 1744.045
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -50889,12 +50934,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1183.859,
+              "x": 1169.859,
               "y": 1744.045
             },
             "lineID": "circle",
             "start": {
-              "x": 1169.859,
+              "x": 1183.859,
               "y": 1744.045
             },
             "width": 3.2
@@ -50904,13 +50949,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1175.656,
-              "y": 1731.963
+              "x": 1161.656,
+              "y": 1744.045
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1161.656,
-              "y": 1731.963
+              "x": 1175.656,
+              "y": 1744.045
             },
             "width": 3.2
           }
@@ -51573,7 +51618,7 @@
     },
     {
       "anchor": {
-        "x": 1176.859,
+        "x": 1172.757,
         "y": 1800.069
       },
       "hitRadius": 24,
@@ -51584,35 +51629,10 @@
       "name": "Hammersmith (H&C Line)",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 1168.656,
-              "y": 1789.903
-            },
-            "start": {
-              "x": 1176.859,
-              "y": 1800.069
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
-              "x": 1176.859,
+              "x": 1172.757,
               "y": 1800.069
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1168.656,
-              "y": 1789.903
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -51952,13 +51972,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1449.981,
-              "y": 1127.796
+              "x": 1449.98,
+              "y": 1127.795
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1459.884,
-              "y": 1117.9
+              "x": 1459.885,
+              "y": 1117.901
             },
             "width": 3.2
           }
@@ -52106,7 +52126,7 @@
     {
       "anchor": {
         "x": 1335.844,
-        "y": 1763.973
+        "y": 1765.223
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -52118,7 +52138,7 @@
           "circle": {
             "centre": {
               "x": 1335.844,
-              "y": 1763.973
+              "y": 1765.223
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -53562,13 +53582,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1899.687,
-              "y": 2298.114
+              "x": 1899.6,
+              "y": 2298.201
             },
             "lineID": "northern",
             "start": {
-              "x": 1909.513,
-              "y": 2308.086
+              "x": 1909.6,
+              "y": 2307.999
             },
             "width": 3.2
           }
@@ -54468,8 +54488,8 @@
     },
     {
       "anchor": {
-        "x": 1172.758,
-        "y": 1697.956
+        "x": 1172.757,
+        "y": 1703.971
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -54482,12 +54502,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1183.859,
+              "x": 1169.859,
               "y": 1703.971
             },
             "lineID": "circle",
             "start": {
-              "x": 1169.859,
+              "x": 1183.859,
               "y": 1703.971
             },
             "width": 3.2
@@ -54497,13 +54517,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1175.656,
-              "y": 1691.942
+              "x": 1161.656,
+              "y": 1703.971
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1161.656,
-              "y": 1691.942
+              "x": 1175.656,
+              "y": 1703.971
             },
             "width": 3.2
           }
@@ -54777,8 +54797,8 @@
     },
     {
       "anchor": {
-        "x": 1629.962,
-        "y": 1297.966
+        "x": 1677.0,
+        "y": 1345.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -54790,13 +54810,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1625.011,
-              "y": 1302.915
+              "x": 1672.05,
+              "y": 1349.95
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1634.913,
-              "y": 1293.018
+              "x": 1681.95,
+              "y": 1340.05
             },
             "width": 3.2
           }
@@ -55208,8 +55228,8 @@
     },
     {
       "anchor": {
-        "x": 1579.975,
-        "y": 1247.949
+        "x": 1622.0,
+        "y": 1290.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -55221,13 +55241,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1575.024,
-              "y": 1252.897
+              "x": 1617.05,
+              "y": 1294.95
             },
             "lineID": "jubilee",
             "start": {
-              "x": 1584.926,
-              "y": 1243.001
+              "x": 1626.95,
+              "y": 1285.05
             },
             "width": 3.2
           }
@@ -56012,7 +56032,7 @@
     {
       "anchor": {
         "x": 1335.781,
-        "y": 1949.797
+        "y": 1948.626
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -56024,7 +56044,7 @@
           "circle": {
             "centre": {
               "x": 1335.781,
-              "y": 1949.797
+              "y": 1948.626
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -56156,8 +56176,8 @@
     },
     {
       "anchor": {
-        "x": 1500.148,
-        "y": 1159.092
+        "x": 1543.9,
+        "y": 1211.9
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -56168,8 +56188,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1500.148,
-              "y": 1159.092
+              "x": 1543.9,
+              "y": 1211.9
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -56223,8 +56243,8 @@
         {
           "connector": {
             "end": {
-              "x": 1368.908,
-              "y": 1074.924
+              "x": 1387.96,
+              "y": 1093.846
             },
             "start": {
               "x": 1406.96,
@@ -56248,8 +56268,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1368.908,
-              "y": 1074.924
+              "x": 1387.96,
+              "y": 1093.846
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -56949,8 +56969,8 @@
         {
           "connector": {
             "end": {
-              "x": 1238.166,
-              "y": 944.182
+              "x": 1263.067,
+              "y": 968.875
             },
             "start": {
               "x": 1282.067,
@@ -56974,8 +56994,8 @@
         {
           "circle": {
             "centre": {
-              "x": 1238.166,
-              "y": 944.182
+              "x": 1263.067,
+              "y": 968.875
             },
             "outlineWidth": 3.5,
             "radius": 8.5

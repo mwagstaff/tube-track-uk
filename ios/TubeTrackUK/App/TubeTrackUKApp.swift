@@ -5,6 +5,7 @@ struct TubeTrackUKApp: App {
     @State private var appState = TubeAppState()
     @State private var backgroundImageStore = AppBackgroundImageStore()
     @State private var gameHighScoreStore = TubeGameHighScoreStore()
+    @State private var gameCenter = GameCenterService()
 
     init() {
         AppTypography.prepare()
@@ -16,6 +17,7 @@ struct TubeTrackUKApp: App {
                 .environment(appState)
                 .environment(backgroundImageStore)
                 .environment(gameHighScoreStore)
+                .environment(gameCenter)
                 .font(.appBody())
                 .preferredColorScheme(appState.preferredColorScheme)
         }

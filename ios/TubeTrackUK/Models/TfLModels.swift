@@ -35,6 +35,14 @@ struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
     }
 }
 
+enum LineServiceClosurePolicy {
+    static func closedLineIDs(in statuses: [TfLLineStatus]) -> Set<TubeLineID> {
+        Set(statuses.compactMap { line in
+            line.lineStatuses.contains(where: \.isServiceClosed) ? line.id : nil
+        })
+    }
+}
+
 struct TfLValidityPeriod: Codable, Equatable, Sendable {
     let fromDate: Date?
     let toDate: Date?

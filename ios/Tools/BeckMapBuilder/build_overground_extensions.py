@@ -348,6 +348,43 @@ def append_overground_artwork(
     finally:
         rail.JOIN_TOLERANCE = original_join_tolerance
 
+    # TubeGraph includes the passenger through-link from Bethnal Green to
+    # Hackney Downs, while the printed Weaver artwork reaches the latter via
+    # the Cambridge Heath/London Fields branch drawing. Preserve that semantic
+    # adjacency with the reviewed bypass already used by the bundled map.
+    bypass_segment_id = "weaver:910GBTHNLGR:910GHAKNYNM"
+    if bypass_segment_id not in selected_segments:
+        bypass_path_id = (
+            "beck.v1.path.weaver.liverpool-chingford-bypass.official.v1.0"
+        )
+        bypass_start = (2724.905, 1379.344)
+        bypass_end = (2857.172, 1220.895)
+        selected_paths[bypass_path_id] = {
+            "id": bypass_path_id,
+            "commands": [
+                {"op": "move", "to": vector.rounded(bypass_start)},
+                {"op": "line", "to": vector.rounded((2744.905, 1379.344))},
+                {
+                    "op": "cubic",
+                    "control1": vector.rounded((2806.905, 1379.344)),
+                    "control2": vector.rounded((2857.172, 1329.077)),
+                    "to": vector.rounded((2857.172, 1267.077)),
+                },
+                {"op": "line", "to": vector.rounded(bypass_end)},
+            ],
+        }
+        selected_segments[bypass_segment_id] = {
+            "id": bypass_segment_id,
+            "lineID": "weaver",
+            "fromStationID": "910GBTHNLGR",
+            "toStationID": "910GHAKNYNM",
+            "fromPort": vector.rounded(bypass_start),
+            "toPort": vector.rounded(bypass_end),
+            "pathID": bypass_path_id,
+            "pathDirection": "forward",
+            "translation": {"x": 0, "y": 0},
+        }
+
     actual = expected.intersection(selected_segments)
     if actual != expected:
         raise ValueError(

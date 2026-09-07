@@ -129,6 +129,39 @@ struct StationDeparturesTests {
         #expect(replaced == .victoria)
     }
 
+    @Test func selectionPrefersTheLineAssociatedWithTheTappedStationMarker() {
+        let selected = StationDepartureSelection.resolved(
+            current: nil,
+            preferred: .mildmay,
+            lineIDs: [.district, .mildmay],
+            arrivals: [arrival(id: "district", line: .district, seconds: 30)]
+        )
+
+        #expect(selected == .mildmay)
+    }
+
+    @Test func controlledMapSelectionCannotBeOverriddenByStaleLocalState() {
+        let victoria = StationDepartureSelection.resolved(
+            controlled: .victoria,
+            requested: .circle,
+            usesControlledSelection: true,
+            preferred: .victoria,
+            lineIDs: [.circle, .district, .victoria],
+            arrivals: [arrival(id: "circle", line: .circle, seconds: 30)]
+        )
+        let piccadilly = StationDepartureSelection.resolved(
+            controlled: .piccadilly,
+            requested: .circle,
+            usesControlledSelection: true,
+            preferred: .piccadilly,
+            lineIDs: [.circle, .district, .piccadilly],
+            arrivals: [arrival(id: "circle", line: .circle, seconds: 30)]
+        )
+
+        #expect(victoria == .victoria)
+        #expect(piccadilly == .piccadilly)
+    }
+
     @Test func arrivalsAfterTheFirstTwelveRemainAvailableToLaterLines() {
         let northern = (1...12).map { index in
             arrival(

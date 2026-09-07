@@ -258,15 +258,21 @@ final class AppBackgroundImageStore {
     }
 }
 
+enum AppBackgroundImagePlaceholder {
+    case systemBackground
+    case launch
+}
+
 struct AppBackgroundImage: View {
     @Environment(AppBackgroundImageStore.self) private var store
 
     var scrimOpacity: Double = 0
+    var placeholder: AppBackgroundImagePlaceholder = .systemBackground
 
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Color(.systemBackground)
+                placeholderView
 
                 if let image = store.selectedImage {
                     Image(uiImage: image)
@@ -281,6 +287,20 @@ struct AppBackgroundImage: View {
         }
         .ignoresSafeArea()
         .accessibilityHidden(true)
+    }
+
+    @ViewBuilder
+    private var placeholderView: some View {
+        switch placeholder {
+        case .systemBackground:
+            Color(.systemBackground)
+        case .launch:
+            ZStack {
+                Color("LaunchBackground")
+
+                Image("LaunchMark")
+            }
+        }
     }
 }
 

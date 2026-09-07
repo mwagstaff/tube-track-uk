@@ -9,9 +9,9 @@ enum TubeGameEngineError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidConfiguration:
-            "Station Chase has an invalid gameplay configuration."
+            "Track Attack has an invalid gameplay configuration."
         case let .unavailableStartStation(stationID):
-            "Station Chase cannot start at station \(stationID)."
+            "Track Attack cannot start at station \(stationID)."
         }
     }
 }
@@ -26,6 +26,7 @@ final class TubeGameEngine {
     let network: TubeGameNetwork
     let configuration: TubeGameConfiguration
     private(set) var snapshot: TubeGameSnapshot
+    private(set) var collisionLineID: TubeLineID?
 
     @ObservationIgnored private var runSeed: UInt64
     @ObservationIgnored private var phase: TubeGamePhase
@@ -33,6 +34,7 @@ final class TubeGameEngine {
     @ObservationIgnored private var queuedDirection: TubeGameDirection?
     @ObservationIgnored private var committedRoutePreview: TubeGameRoutePreview?
     @ObservationIgnored private var cachedRoutePreview: TubeGameRoutePreview?
+    @ObservationIgnored private var cachedAvailableSwipes: [TubeGameSwipeOption]
     @ObservationIgnored private var routePreviewNeedsResolution: Bool
     @ObservationIgnored private var recentStationConsumptions: [TubeGameStationConsumption]
     @ObservationIgnored private var scoreTracker: TubeGameScoreTracker
@@ -50,6 +52,7 @@ final class TubeGameEngine {
         let start = try Self.resolveStart(in: network, policy: configuration.startPolicy)
         var scoreTracker = TubeGameScoreTracker()
         scoreTracker.markStartingHubConsumed(start.hub.id)
+        scoreTracker.refreshCompletedLines(lineHubIDs: network.lineHubIDs)
         let player = PlayerState(
             currentStationID: start.node.stationID,
             position: start.node.point,
@@ -68,6 +71,11 @@ final class TubeGameEngine {
             committedRoutePreview: nil,
             player: player
         )
+        let initialAvailableSwipes = Self.resolveAvailableSwipes(
+            network: network,
+            configuration: configuration,
+            player: player
+        )
 
         self.network = network
         self.configuration = configuration
@@ -77,6 +85,7 @@ final class TubeGameEngine {
         queuedDirection = configuration.initialDirection
         committedRoutePreview = nil
         cachedRoutePreview = initialRoutePreview
+        cachedAvailableSwipes = initialAvailableSwipes
         routePreviewNeedsResolution = false
         recentStationConsumptions = []
         self.scoreTracker = scoreTracker
@@ -90,6 +99,7 @@ final class TubeGameEngine {
             elapsedTime: 0,
             queuedDirection: configuration.initialDirection,
             routePreview: initialRoutePreview,
+            availableSwipes: initialAvailableSwipes,
             scoreTracker: scoreTracker,
             recentStationConsumptions: [],
             player: player,
@@ -117,13 +127,16 @@ final class TubeGameEngine {
         }
         var tracker = TubeGameScoreTracker()
         tracker.markStartingHubConsumed(start.hub.id)
+        tracker.refreshCompletedLines(lineHubIDs: network.lineHubIDs)
 
+        collisionLineID = nil
         runSeed = nextSeed
         phase = .ready
         elapsedTime = 0
         queuedDirection = configuration.initialDirection
         committedRoutePreview = nil
         cachedRoutePreview = nil
+        cachedAvailableSwipes = []
         routePreviewNeedsResolution = true
         recentStationConsumptions = []
         scoreTracker = tracker
@@ -211,6 +224,8 @@ final class TubeGameEngine {
         return TubeGameScoreRecord(
             score: snapshot.score,
             stationsEaten: snapshot.stationsEaten,
+            linesCleared: snapshot.linesCleared,
+            terminusStationsReached: snapshot.terminusStationsReached,
             maxCombo: snapshot.maximumSameLineStreak,
             configuredDuration: snapshot.configuredDuration,
             elapsedTime: snapshot.elapsedTime,
@@ -266,8 +281,8 @@ final class TubeGameEngine {
             // A zero radius is an explicit collision-off setting used by
             // deterministic previews/tests; normal gameplay always supplies
             // a positive hit radius.
-            let collided = configuration.collisionDistance > 0
-                && trainSimulation.snapshots.contains { train in
+            let collidedTrain = trainSimulation.snapshots.first { train in
+                guard configuration.collisionDistance > 0 else { return false }
                 let previousTrainPosition = previousTrainPositions[train.id] ?? train.position
                 return Self.sweptCollision(
                     firstStart: previousPlayerPosition,
@@ -277,7 +292,8 @@ final class TubeGameEngine {
                     collisionDistance: configuration.collisionDistance
                 )
             }
-            if collided {
+            if let collidedTrain {
+                collisionLineID = collidedTrain.lineID
                 phase = .ended(.collision)
             } else if scoreTracker.consumedHubIDs.count == network.collectibleHubCount {
                 phase = .ended(.networkCleared)
@@ -459,13 +475,16 @@ final class TubeGameEngine {
         player.previousRailEdgeID = traversal.edgeID
         player.previousRailOriginStationID = traversal.fromStationID
         player.incomingHeading = traversal.incomingTangent
+        routePreviewNeedsResolution = true
         guard let node = network.node(stationID: traversal.toStationID),
               let hub = network.hub(id: node.hubID) else { return }
         guard let scoreEvent = scoreTracker.consume(
             hub: hub,
             enteredOn: lineID,
+            isTerminus: network.terminusHubIDs.contains(hub.id),
             configuration: configuration
         ) else { return }
+        scoreTracker.refreshCompletedLines(lineHubIDs: network.lineHubIDs)
         recentStationConsumptions.append(TubeGameStationConsumption(
             hubID: hub.id,
             stationName: hub.name,
@@ -504,6 +523,11 @@ final class TubeGameEngine {
                 committedRoutePreview: committedRoutePreview,
                 player: player
             )
+            cachedAvailableSwipes = Self.resolveAvailableSwipes(
+                network: network,
+                configuration: configuration,
+                player: player
+            )
             routePreviewNeedsResolution = false
         }
         snapshot = Self.makeSnapshot(
@@ -514,6 +538,7 @@ final class TubeGameEngine {
             elapsedTime: elapsedTime,
             queuedDirection: queuedDirection,
             routePreview: cachedRoutePreview,
+            availableSwipes: cachedAvailableSwipes,
             scoreTracker: scoreTracker,
             recentStationConsumptions: recentStationConsumptions,
             player: player,
@@ -529,6 +554,7 @@ final class TubeGameEngine {
         elapsedTime: TimeInterval,
         queuedDirection: TubeGameDirection?,
         routePreview: TubeGameRoutePreview?,
+        availableSwipes: [TubeGameSwipeOption],
         scoreTracker: TubeGameScoreTracker,
         recentStationConsumptions: [TubeGameStationConsumption],
         player: PlayerState,
@@ -559,12 +585,15 @@ final class TubeGameEngine {
             remainingTime: max(0, configuration.duration - elapsedTime),
             score: scoreTracker.score,
             stationsEaten: scoreTracker.stationsEaten,
+            terminusStationsReached: scoreTracker.terminusStationsReached,
+            completedLineIDs: scoreTracker.completedLineIDs,
             totalCollectibleStations: network.collectibleHubCount,
             sameLineStreak: scoreTracker.sameLineStreak,
             maximumSameLineStreak: scoreTracker.maximumSameLineStreak,
             comboLineID: scoreTracker.comboLineID,
             queuedDirection: queuedDirection,
             routePreview: routePreview,
+            availableSwipes: availableSwipes,
             consumedHubIDs: scoreTracker.consumedHubIDs,
             lastScoreEvent: scoreTracker.lastEvent,
             recentStationConsumptions: recentStationConsumptions,
@@ -581,6 +610,46 @@ final class TubeGameEngine {
         player: PlayerState
     ) -> TubeGameRoutePreview? {
         guard let queuedDirection else { return committedRoutePreview }
+
+        return resolveRouteSelection(
+            network: network,
+            configuration: configuration,
+            direction: queuedDirection,
+            player: player
+        )?.preview
+    }
+
+    private static func resolveAvailableSwipes(
+        network: TubeGameNetwork,
+        configuration: TubeGameConfiguration,
+        player: PlayerState
+    ) -> [TubeGameSwipeOption] {
+        TubeGameDirection.allCases.compactMap { direction in
+            guard let selection = resolveRouteSelection(
+                network: network,
+                configuration: configuration,
+                direction: direction,
+                player: player
+            ), selection.usedQueuedDirection else {
+                return nil
+            }
+            let preview = selection.preview
+            return TubeGameSwipeOption(
+                direction: direction,
+                lineID: preview.lineID,
+                edgeID: preview.edgeID,
+                fromStationID: preview.fromStationID,
+                toStationID: preview.toStationID
+            )
+        }
+    }
+
+    private static func resolveRouteSelection(
+        network: TubeGameNetwork,
+        configuration: TubeGameConfiguration,
+        direction: TubeGameDirection,
+        player: PlayerState
+    ) -> RouteSelection? {
 
         // A queued input always describes the next routing decision. While a
         // rail (or the transfer leading to a selected rail) is in progress,
@@ -628,7 +697,7 @@ final class TubeGameEngine {
             }
             guard let decision = TubeGameJunctionRouter.choose(
                 candidates: candidates,
-                queuedDirection: queuedDirection,
+                queuedDirection: direction,
                 incomingHeading: incomingHeading,
                 hasCurrentLine: currentLineID != nil,
                 acceptanceDegrees: configuration.directionAcceptanceDegrees
@@ -637,13 +706,16 @@ final class TubeGameEngine {
             }
             let connection = decision.connection
             if decision.shouldClearQueuedDirection {
-                return TubeGameRoutePreview(
-                    direction: queuedDirection,
-                    edgeID: connection.edgeID,
-                    fromStationID: connection.fromStationID,
-                    toStationID: connection.toStationID,
-                    lineID: lineID,
-                    isCommitted: false
+                return RouteSelection(
+                    preview: TubeGameRoutePreview(
+                        direction: direction,
+                        edgeID: connection.edgeID,
+                        fromStationID: connection.fromStationID,
+                        toStationID: connection.toStationID,
+                        lineID: lineID,
+                        isCommitted: false
+                    ),
+                    usedQueuedDirection: decision.usedQueuedDirection
                 )
             }
 
@@ -654,6 +726,11 @@ final class TubeGameEngine {
             currentLineID = lineID
         }
         return nil
+    }
+
+    private struct RouteSelection {
+        let preview: TubeGameRoutePreview
+        let usedQueuedDirection: Bool
     }
 
     private static func resolveStart(

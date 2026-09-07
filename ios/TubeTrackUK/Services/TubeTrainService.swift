@@ -434,6 +434,7 @@ enum DLRPredictionResolver {
 
         var output: [LiveTubeTrain] = []
         var emittedOrigins: Set<DLROriginKey> = []
+        var emittedTrainIDs: Set<String> = []
         for destinationStationID in Set(observations.map(\.destinationStationID)).sorted() {
             let group = observations
                 .filter { $0.destinationStationID == destinationStationID }
@@ -516,6 +517,12 @@ enum DLRPredictionResolver {
                     observation.stationID,
                     String(absoluteArrivalSlot),
                 ].joined(separator: ":")
+                // Mirrored platform faces and small countdown differences can
+                // describe the same arrival more than once. The 30-second slot
+                // intentionally gives those observations one identity, so only
+                // emit the nearest (the group is ordered by countdown) rather
+                // than passing duplicate Identifiable values to the UI.
+                guard emittedTrainIDs.insert(syntheticID).inserted else { continue }
                 output.append(LiveTubeTrain(
                     id: syntheticID,
                     vehicleID: "DLR-\(absoluteArrivalSlot)",

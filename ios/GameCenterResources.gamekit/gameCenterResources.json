@@ -1,0 +1,103 @@
+{
+  "meta" : {
+    "version" : "2024-11-15"
+  },
+  "resources" : {
+    "leaderboardLocalizations" : {
+      "stationchase.lines.v1" : [
+        {
+          "formatterSuffix" : "lines",
+          "formatterSuffixSingular" : "line",
+          "locale" : "en-GB",
+          "localID" : "stationchase.lines.v1-en-GB",
+          "name" : "Lines Cleared"
+        }
+      ],
+      "stationchase.score.v1" : [
+        {
+          "formatterSuffix" : "points",
+          "formatterSuffixSingular" : "point",
+          "locale" : "en-GB",
+          "localID" : "stationchase.score.v1-en-GB",
+          "name" : "High Score"
+        }
+      ],
+      "stationchase.stations.v1" : [
+        {
+          "formatterSuffix" : "stations",
+          "formatterSuffixSingular" : "station",
+          "locale" : "en-GB",
+          "localID" : "stationchase.stations.v1-en-GB",
+          "name" : "Stations Eaten"
+        }
+      ],
+      "stationchase.termini.v1" : [
+        {
+          "formatterSuffix" : "termini",
+          "formatterSuffixSingular" : "terminus",
+          "locale" : "en-GB",
+          "localID" : "stationchase.termini.v1-en-GB",
+          "name" : "Terminus Stations Reached"
+        }
+      ]
+    },
+    "leaderboards" : [
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track Attack High Score",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.score.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      },
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track Attack Stations Eaten",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.stations.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      },
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track Attack Lines Cleared",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.lines.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      },
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track Attack Terminus Stations Reached",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.termini.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      }
+    ]
+  }
+}

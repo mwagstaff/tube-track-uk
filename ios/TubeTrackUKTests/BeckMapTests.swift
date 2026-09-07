@@ -4,6 +4,29 @@ import Testing
 @testable import TubeTrackUK
 
 struct BeckMapTests {
+    @Test func liveTrainOnClosedLineUsesGhostMarkerAndExplainsFeedData() {
+        let closedLine = LiveTrainServicePresentation.resolve(
+            lineID: .jubilee,
+            closedLineIDs: [.jubilee]
+        )
+
+        #expect(closedLine == .lineClosed)
+        #expect(closedLine.markerSystemName == "ghost.fill")
+        #expect(
+            closedLine.informationalNote(for: .jubilee)
+                == "This train is unlikely to be in service because the Jubilee line is closed. It is shown only because TfL data says it is here."
+        )
+
+        let openLine = LiveTrainServicePresentation.resolve(
+            lineID: .jubilee,
+            closedLineIDs: [.central]
+        )
+
+        #expect(openLine == .lineOpen)
+        #expect(openLine.markerSystemName == nil)
+        #expect(openLine.informationalNote(for: .jubilee) == nil)
+    }
+
     @Test func networkSummaryDeduplicatesAffectedLinesAndSeparatesClosures() {
         let statuses = [
             status(.central, severity: 6, description: "Severe Delays"),
@@ -34,9 +57,91 @@ struct BeckMapTests {
         #expect(summary.count(for: .lines) == 20)
         #expect(summary.goodServiceLineIDs == [.circle])
         #expect(summary.minorDelayLineIDs == [.victoria])
-        #expect(summary.majorIssueLineIDs == [.central, .district, .dlr])
-        #expect(summary.count(for: .majorIssues) == 3)
+        #expect(summary.majorIssueLineIDs == [.central])
+        #expect(summary.count(for: .majorIssues) == 1)
         #expect(summary.closedLineIDs == [.district, .dlr, .lioness])
+    }
+
+    @Test func networkSummaryAssignsMixedSeverityLinesToOneHighestPriorityBucket() {
+        let disruptedLineIDs: Set<TubeLineID> = [.elizabeth, .metropolitan, .victoria]
+        let goodStatuses = TubeLineID.allCases
+            .filter { !disruptedLineIDs.contains($0) }
+            .map { status($0, severity: 10, description: "Good Service") }
+        let statuses = goodStatuses + [
+            status(
+                .elizabeth,
+                entries: [
+                    (severity: 6, description: "Severe Delays"),
+                    (severity: 9, description: "Minor Delays"),
+                ]
+            ),
+            status(.metropolitan, severity: 9, description: "Minor Delays"),
+            status(.victoria, severity: 6, description: "Severe Delays"),
+        ]
+        let disruptions = [
+            disruption("elizabeth-severe", lineID: .elizabeth, segmentID: "elizabeth-1"),
+            disruption(
+                "elizabeth-minor",
+                lineID: .elizabeth,
+                segmentID: "elizabeth-2",
+                severity: 9
+            ),
+            disruption(
+                "metropolitan-minor",
+                lineID: .metropolitan,
+                segmentID: "metropolitan-1",
+                severity: 9
+            ),
+            disruption("victoria-severe", lineID: .victoria, segmentID: "victoria-1"),
+        ]
+
+        let summary = MapNetworkStatusSummary(
+            statuses: statuses,
+            disruptions: disruptions
+        )
+
+        #expect(summary.count(for: .lines) == 20)
+        #expect(summary.count(for: .goodService) == 17)
+        #expect(summary.minorDelayLineIDs == [.metropolitan])
+        #expect(summary.majorIssueLineIDs == [.elizabeth, .victoria])
+        #expect(summary.closedLineIDs.isEmpty)
+        #expect(
+            summary.count(for: .goodService)
+                + summary.count(for: .minorDelays)
+                + summary.count(for: .majorIssues)
+                + summary.count(for: .closed)
+                == summary.count(for: .lines)
+        )
+    }
+
+    @Test func networkSummaryAssignsClosedLinesOnlyToClosedBucket() {
+        let statuses = [
+            status(
+                .district,
+                entries: [
+                    (severity: 6, description: "Severe Delays"),
+                    (severity: 20, description: "Service Closed"),
+                ]
+            ),
+        ]
+        let disruptions = [
+            disruption("district-severe", lineID: .district, segmentID: "district-1"),
+            disruption(
+                "district-closed",
+                lineID: .district,
+                segmentID: "district-2",
+                severity: 20
+            ),
+        ]
+
+        let summary = MapNetworkStatusSummary(
+            statuses: statuses,
+            disruptions: disruptions
+        )
+
+        #expect(summary.majorIssueLineIDs.isEmpty)
+        #expect(summary.minorDelayLineIDs.isEmpty)
+        #expect(summary.closedLineIDs == [.district])
     }
 
     @Test func plannedNetworkSummaryCountsEveryUnaffectedLineAsGoodService() {
@@ -76,7 +181,11 @@ struct BeckMapTests {
             networkFeaturedLineIDs: [.central, .victoria],
             networkFeaturedSegmentIDs: ["central-affected"],
             networkSectionLineIDs: [.central],
-            closedLineIDs: [.district, .dlr]
+            closedLineIDs: [.district, .dlr],
+            mobileCoverageMode: .off,
+            mobileCoverageBySegmentID: [:],
+            mobileCoverageByStationID: [:],
+            stationOnlyCoverageStationIDs: []
         )
 
         #expect(!filtered.emphasizesIssues)
@@ -103,7 +212,11 @@ struct BeckMapTests {
             networkFeaturedLineIDs: [],
             networkFeaturedSegmentIDs: [],
             networkSectionLineIDs: [],
-            closedLineIDs: [.district, .dlr]
+            closedLineIDs: [.district, .dlr],
+            mobileCoverageMode: .off,
+            mobileCoverageBySegmentID: [:],
+            mobileCoverageByStationID: [:],
+            stationOnlyCoverageStationIDs: []
         )
         #expect(defaultView.mutesSegment(
             id: "district", lineID: .district, isAffected: false
@@ -264,19 +377,29 @@ struct BeckMapTests {
         severity: Int,
         description: String
     ) -> TfLLineStatus {
+        status(
+            lineID,
+            entries: [(severity: severity, description: description)]
+        )
+    }
+
+    private func status(
+        _ lineID: TubeLineID,
+        entries: [(severity: Int, description: String)]
+    ) -> TfLLineStatus {
         TfLLineStatus(
             id: lineID,
             name: lineID.displayName,
-            lineStatuses: [
+            lineStatuses: entries.map { entry in
                 TfLStatusEntry(
-                    id: severity,
-                    statusSeverity: severity,
-                    statusSeverityDescription: description,
+                    id: entry.severity,
+                    statusSeverity: entry.severity,
+                    statusSeverityDescription: entry.description,
                     reason: nil,
                     validityPeriods: nil,
                     disruption: nil
                 )
-            ]
+            }
         )
     }
 

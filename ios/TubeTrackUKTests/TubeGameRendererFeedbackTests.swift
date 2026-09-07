@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import TubeTrackUK
 
-@Suite("Station Chase renderer feedback")
+@Suite("Track Attack renderer feedback")
 struct TubeGameRendererFeedbackTests {
     @Test func gamePreservesKenningtonsAuthoredBranchRoundelsAndConnector() throws {
         let graph = try TubeGraph.bundled()
@@ -162,6 +162,18 @@ struct TubeGameRendererFeedbackTests {
         ).first)
         #expect(forwardMarker.tangent == CGVector(dx: 1, dy: 0))
         #expect(reverseMarker.tangent == CGVector(dx: -1, dy: 0))
+    }
+
+    @Test func swipeHintsUseUniqueLineCodesAndPlainLanguageDirections() {
+        let codes = TubeLineID.allCases.map(TubeGameSwipeHintPresentation.lineCode)
+
+        #expect(Set(codes).count == TubeLineID.allCases.count)
+        #expect(codes.allSatisfy { (2 ... 3).contains($0.count) })
+        #expect(TubeGameSwipeHintPresentation.spokenName(for: .north) == "swipe up")
+        #expect(
+            TubeGameSwipeHintPresentation.spokenName(for: .southWest)
+                == "swipe down and left"
+        )
     }
 
     private func consumption(

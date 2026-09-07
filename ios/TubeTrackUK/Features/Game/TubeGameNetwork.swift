@@ -145,13 +145,13 @@ enum TubeGameNetworkError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case let .missingStationMarker(stationID):
-            "Station Chase cannot find artwork for station \(stationID)."
+            "Track Attack cannot find artwork for station \(stationID)."
         case let .missingPath(segmentID, pathID):
-            "Station Chase segment \(segmentID) cannot find path \(pathID)."
+            "Track Attack segment \(segmentID) cannot find path \(pathID)."
         case let .invalidSegmentGeometry(segmentID):
-            "Station Chase segment \(segmentID) has no playable geometry."
+            "Track Attack segment \(segmentID) has no playable geometry."
         case let .missingRouteSegment(lineID, fromStationID, toStationID):
-            "Station Chase route on \(lineID.displayName) cannot join \(fromStationID) to \(toStationID)."
+            "Track Attack route on \(lineID.displayName) cannot join \(fromStationID) to \(toStationID)."
         }
     }
 }
@@ -164,6 +164,8 @@ struct TubeGameNetwork: Sendable {
     let edges: [TubeGameEdge]
     let trainRoutes: [TubeGameTrainRoute]
     let lineSegmentCounts: [TubeLineID: Int]
+    let lineHubIDs: [TubeLineID: Set<String>]
+    let terminusHubIDs: Set<String>
 
     private let hubsByID: [String: TubeGameHub]
     private let nodesByID: [String: TubeGameNode]
@@ -348,6 +350,19 @@ struct TubeGameNetwork: Sendable {
             builtHubAdjacency[toHubID, default: []].insert(fromHubID)
         }
 
+        var builtTerminusHubIDs: Set<String> = []
+        for route in builtRoutes {
+            guard let firstStationID = route.stationIDs.first,
+                  let lastStationID = route.stationIDs.last,
+                  firstStationID != lastStationID else { continue }
+            if let firstHubID = builtNodesByID[firstStationID]?.hubID {
+                builtTerminusHubIDs.insert(firstHubID)
+            }
+            if let lastHubID = builtNodesByID[lastStationID]?.hubID {
+                builtTerminusHubIDs.insert(lastHubID)
+            }
+        }
+
         graphGeneratedAt = graph.generatedAt
         artworkSize = CGSize(width: document.artworkSize.width, height: document.artworkSize.height)
         hubs = builtHubs
@@ -355,6 +370,13 @@ struct TubeGameNetwork: Sendable {
         edges = builtEdges
         trainRoutes = builtRoutes
         lineSegmentCounts = Dictionary(uniqueKeysWithValues: graph.lines.map { ($0.id, $0.segmentIDs.count) })
+        lineHubIDs = Dictionary(uniqueKeysWithValues: graph.lines.map { line in
+            (
+                line.id,
+                Set(builtHubs.lazy.filter { $0.lineIDs.contains(line.id) }.map(\.id))
+            )
+        })
+        terminusHubIDs = builtTerminusHubIDs
         hubsByID = Dictionary(uniqueKeysWithValues: builtHubs.map { ($0.id, $0) })
         nodesByID = builtNodesByID
         edgesByID = builtEdgesByID

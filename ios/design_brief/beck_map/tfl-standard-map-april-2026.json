@@ -59,10 +59,80 @@
     "connectorEndpointMediumDistanceArtworkUnits": 0.01,
     "connectorEndpointHighDistanceArtworkUnits": 8.5,
     "roundelPortMediumDistanceArtworkUnits": 1,
-    "roundelPortHighDistanceArtworkUnits": 12.7,
+    "roundelPortHighDistanceArtworkUnits": 8.5,
     "tickPortDistanceArtworkUnits": 1,
     "tickPerpendicularDegrees": 0.5,
     "styleTolerance": 0.01
+  },
+  "sourceVerifiedGeometry": {
+    "connectorExpectations": [
+      {
+        "stationID": "910GKENOLYM",
+        "kind": "connector",
+        "angleDegrees": 0,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "910GSHPDSB",
+        "kind": "walkingConnector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "910GWBRMPTN",
+        "kind": "connector",
+        "angleDegrees": 0,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "940GZZLUWYP",
+        "kind": "connector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "940GZZLUWIG",
+        "kind": "connector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "910GWHMDSTD",
+        "kind": "walkingConnector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "940GZZLUFYR",
+        "kind": "connector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      },
+      {
+        "stationID": "910GFNCHLYR",
+        "kind": "walkingConnector",
+        "angleDegrees": 45,
+        "toleranceDegrees": 0.01
+      }
+    ],
+    "sharedStationRows": [
+      {
+        "stationID": "940GZZLUSBM",
+        "lineIDs": ["circle", "hammersmith-city"],
+        "toleranceArtworkUnits": 0.01
+      },
+      {
+        "stationID": "940GZZLUGHK",
+        "lineIDs": ["circle", "hammersmith-city"],
+        "toleranceArtworkUnits": 0.01
+      },
+      {
+        "stationID": "940GZZLUHSC",
+        "lineIDs": ["circle", "hammersmith-city"],
+        "symbolMode": "sharedRoundel",
+        "toleranceArtworkUnits": 0.01
+      }
+    ]
   },
   "colourAuditStatus": "pending source-profile extraction",
   "displayLineColours": {

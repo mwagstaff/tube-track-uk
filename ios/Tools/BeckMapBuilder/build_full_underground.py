@@ -21,6 +21,7 @@ import build_central_core_join as vector
 import build_rail_extensions as rail
 import build_overground_extensions as overground
 import build_tram_extensions as tram
+import normalize_official_geometry
 import normalize_station_markers
 
 
@@ -85,6 +86,7 @@ LABEL_ASSOCIATED_STATION_IDS = {
     "940GZZLULVT": ("910GLIVST", "910GLIVSTLL"),
     "940GZZLUPAC": ("910GPADTON", "910GPADTLL", "940GZZLUPAH"),
     "940GZZLUSTD": ("910GSTFD", "940GZZDLSTD"),
+    "940GZZLUWHP": ("910GWHMDSTD",),
 }
 
 
@@ -304,6 +306,7 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
     # Royal Oak is deliberately displayed on the outward diagonal approach,
     # matching the official map's separation from Paddington.
     "Royal Oak": (-18, -16, "trailing"),
+    "Hammersmith (H&C Line)": (-18, 0, "trailing"),
     # Keep Ruislip's name attached to its corrected shared-corridor stop,
     # rather than retaining the earlier label position at the Central crossing.
     "Ruislip": (0, 22, "centre"),
@@ -1155,7 +1158,23 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
 
         # TfL groups these shared-service corridors into one or two physical
         # nodes instead of drawing a ring for every line-specific port.
-        if station["name"] == "Aldgate":
+        if station["name"] == "Hammersmith (H&C Line)":
+            # Circle and Hammersmith & City terminate at one physical station.
+            # The official map uses one centred roundel spanning both compact
+            # parallel lanes, rather than a two-node interchange connector.
+            shared_port = average_point([
+                line_port(selected_segments, station_id, "circle"),
+                line_port(selected_segments, station_id, "hammersmith-city"),
+            ])
+            marker = {
+                "stationID": station_id,
+                "name": station["name"],
+                "lineIDs": line_ids,
+                "anchor": vector.rounded(shared_port),
+                "hitRadius": 24,
+                "primitives": [circle(shared_port)],
+            }
+        elif station["name"] == "Aldgate":
             circle_port = line_port(selected_segments, station_id, "circle")
             metropolitan_port = line_port(
                 selected_segments, station_id, "metropolitan"
@@ -2555,6 +2574,34 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         circle(tottenham_elizabeth),
     ]
 
+    # Ealing Broadway is one physical interchange represented by separate
+    # Underground and Elizabeth records. Align all three route ports on the
+    # Central roundel's vertical axis, then extend the existing Central–District
+    # symbol up to the Elizabeth roundel.
+    ealing_central = line_port(selected_segments, "940GZZLUEBY", "central")
+    ealing_district = line_port(selected_segments, "940GZZLUEBY", "district")
+    ealing_elizabeth = line_port(selected_segments, "910GEALINGB", "elizabeth")
+    ealing_district = (ealing_central[0], ealing_district[1])
+    ealing_elizabeth = (ealing_central[0], ealing_elizabeth[1])
+    move_line_port("940GZZLUEBY", "district", ealing_district)
+    move_line_port("910GEALINGB", "elizabeth", ealing_elizabeth)
+    replace_marker(
+        "910GEALINGB",
+        ealing_elizabeth,
+        [circle(ealing_elizabeth)],
+    )
+    replace_marker(
+        "940GZZLUEBY",
+        ealing_central,
+        [
+            connector(ealing_elizabeth, ealing_central),
+            connector(ealing_central, ealing_district),
+            circle(ealing_elizabeth),
+            circle(ealing_central),
+            circle(ealing_district),
+        ],
+    )
+
     # Bond Street's Elizabeth node is a third physical roundel. Join it to the
     # Central node and redraw that destination circle after the connector so
     # the ring stays visually intact across marker ownership boundaries.
@@ -2749,6 +2796,7 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
             "mildmay", "suffragette", "weaver", "windrush", "tram",
         ],
     }
+    normalize_official_geometry.apply(document)
     coalesce_physical_hub_labels(document)
     apply_label_presentation_metadata(document)
     normalize_station_markers.normalize(document, graph)

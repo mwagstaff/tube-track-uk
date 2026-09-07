@@ -307,6 +307,64 @@ struct TubeTrackUKTests {
         #expect(appState.selectedLineID == nil)
     }
 
+    @Test @MainActor func stationSelectionPreservesTheTappedLineAtSplitInterchanges() throws {
+        let graph = try TubeGraph.bundled()
+        let barkingSuffragette = try #require(
+            graph.stationsByID["910GBARKING"]
+        )
+        let westHam = try #require(
+            graph.stationsByID["940GZZLUWHM"]
+        )
+        let westBromptonDistrict = try #require(
+            graph.stationsByID["940GZZLUWBN"]
+        )
+        let westBromptonMildmay = try #require(
+            graph.stationsByID["910GWBRMPTN"]
+        )
+        let victoria = try #require(graph.stationsByID["940GZZLUVIC"])
+        let southKensington = try #require(graph.stationsByID["940GZZLUSKS"])
+        let appState = TubeAppState()
+        appState.graph = graph
+
+        appState.select(station: barkingSuffragette)
+        #expect(appState.selectedStationDepartureLineID == .suffragette)
+
+        appState.select(
+            station: westHam,
+            preferredDepartureLineID: .jubilee
+        )
+        #expect(appState.selectedStationDepartureLineID == .jubilee)
+
+        appState.select(
+            station: westBromptonMildmay,
+            preferredDepartureLineID: .mildmay
+        )
+        #expect(appState.selectedStationDepartureLineID == .mildmay)
+
+        appState.select(
+            station: victoria,
+            preferredDepartureLineID: .victoria
+        )
+        #expect(appState.selectedStationDepartureLineID == .victoria)
+
+        appState.select(
+            station: southKensington,
+            preferredDepartureLineID: .piccadilly
+        )
+        #expect(appState.selectedStationDepartureLineID == .piccadilly)
+        appState.selectDepartureLine(.circle)
+        #expect(appState.selectedStationDepartureLineID == .circle)
+
+        appState.select(
+            station: westBromptonDistrict,
+            preferredDepartureLineID: .central
+        )
+        #expect(appState.selectedStationDepartureLineID == nil)
+
+        appState.clearStationSelection()
+        #expect(appState.selectedStationDepartureLineID == nil)
+    }
+
     @Test func disruptionDisplayModesReverseSectionEmphasis() {
         #expect(DisruptionDisplayMode.normal.mutesSegment(isAffected: true))
         #expect(!DisruptionDisplayMode.normal.mutesSegment(isAffected: false))
@@ -480,6 +538,19 @@ struct TubeTrackUKTests {
 
         appState.setDisruptionHighlightScope(.all)
         #expect(appState.activeAffectedSegmentIDs == ["major-segment", "minor-segment"])
+    }
+
+    @Test @MainActor func mapNetworkStatsToggleOffWhenSelectedAgain() {
+        let appState = TubeAppState()
+
+        for filter in MapNetworkStatFilter.allCases {
+            appState.toggleMapNetworkStat(filter)
+            #expect(appState.selectedMapNetworkStat == filter)
+
+            appState.toggleMapNetworkStat(filter)
+            #expect(appState.selectedMapNetworkStat == nil)
+            #expect(appState.disruptionDisplayMode == .normal)
+        }
     }
 
     @Test func dataFreshnessUsesStableCopyInsteadOfACountdown() {
@@ -1103,6 +1174,27 @@ struct TubeTrackUKTests {
         #expect(expired.isEmpty)
     }
 
+    @Test func trainReconciliationRepairsDuplicateSnapshotIDs() throws {
+        let older = markerTrain(seconds: 100)
+        let newer = older.rebased(
+            progress: 0.4,
+            secondsToNextStation: 80,
+            updatedAt: Date(timeIntervalSince1970: 1_010)
+        )
+
+        let trains = LiveTrainSnapshotReconciler.reconcile(
+            previous: [older, older],
+            incoming: [older, newer],
+            at: newer.updatedAt,
+            segmentsByID: [:]
+        )
+
+        let train = try #require(trains.first)
+        #expect(trains.count == 1)
+        #expect(train.id == older.id)
+        #expect(train.updatedAt == newer.updatedAt)
+    }
+
     @Test func liveTrainLocationTextPlacesOpposingKensalTrainsOnDifferentSides() throws {
         let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
         let kensalGreenID = "940GZZLUKSL"
@@ -1459,6 +1551,24 @@ struct TubeTrackUKTests {
         ))
     }
 
+    @Test func hiddenRealWorldMapCannotOverwriteABeckMapStationSelection() {
+        #expect(RealWorldMapSelectionPolicy.stationIDToSelect(
+            mapSelection: "940GZZLUSKS",
+            selectedStationID: "940GZZLUSKS",
+            presentationMode: .beck
+        ) == nil)
+        #expect(RealWorldMapSelectionPolicy.stationIDToSelect(
+            mapSelection: "940GZZLUSKS",
+            selectedStationID: "940GZZLUSKS",
+            presentationMode: .realWorld
+        ) == nil)
+        #expect(RealWorldMapSelectionPolicy.stationIDToSelect(
+            mapSelection: "940GZZLUVIC",
+            selectedStationID: "940GZZLUSKS",
+            presentationMode: .realWorld
+        ) == "940GZZLUVIC")
+    }
+
     @Test func beckMapLineHitTestingChoosesNearestDisruptedSegmentWithinTolerance() {
         let horizontal = BeckMapLineHitTarget(
             segmentID: "horizontal",
@@ -1490,6 +1600,128 @@ struct TubeTrackUKTests {
             among: [horizontal, vertical],
             maximumDistance: 4
         ) == nil)
+    }
+
+    @Test func beckMapStationLineResolutionUsesRenderedPathsAtRoundels() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
+        let renderCache = BeckMapCanvas.RenderCache(document: document)
+
+        func resolvedLine(stationID: String, point: CGPoint) throws -> TubeLineID? {
+            let marker = try #require(document.stationMarkers.first {
+                $0.stationID == stationID
+            })
+            let station = try #require(graph.stationsByID[stationID])
+            return BeckMapStationLineResolver.preferredLineID(
+                for: marker,
+                tappedAt: point,
+                colocatedStationIDs: Set(graph.stations(inSamePlaceAs: station).map(\.id)),
+                segments: renderCache.renderedSegments
+            )
+        }
+
+        let expectedLines: [(String, CGPoint, TubeLineID)] = [
+            ("940GZZLUECT", CGPoint(x: 1_376.141, y: 1_843.188), .piccadilly),
+            ("940GZZLUHSD", CGPoint(x: 1_171.929, y: 1_843.188), .piccadilly),
+            ("940GZZLUTNG", CGPoint(x: 919.842, y: 1_843.188), .piccadilly),
+            ("940GZZLUACT", CGPoint(x: 707.996, y: 1_843.219), .piccadilly),
+            ("940GZZLUECM", CGPoint(x: 667.578, y: 1_773.965), .piccadilly),
+            ("940GZZLUEBY", CGPoint(x: 600.003, y: 1_707.781), .district),
+            ("940GZZLUSKS", CGPoint(x: 1_524.013, y: 1_843.164), .piccadilly),
+            ("940GZZLUBND", CGPoint(x: 1_682, y: 1_620), .jubilee),
+            ("940GZZLUWSM", CGPoint(x: 1_885.992, y: 1_855.985), .jubilee),
+            ("940GZZLUVIC", CGPoint(x: 1_729.02, y: 1_844.839), .victoria),
+        ]
+
+        for (stationID, point, expectedLineID) in expectedLines {
+            #expect(try resolvedLine(stationID: stationID, point: point) == expectedLineID)
+        }
+    }
+
+    @Test func beckMapStationMarkerHitTestingCoversEveryAuthoredRoundel() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
+
+        #expect(BeckMapStationMarkerHitTester.nearestMarker(
+            to: CGPoint(x: 1_524.013, y: 1_843.164),
+            among: document.stationMarkers,
+            minimumHitRadius: 12
+        )?.stationID == "940GZZLUSKS")
+        #expect(BeckMapStationMarkerHitTester.nearestMarker(
+            to: CGPoint(x: 1_682, y: 1_620),
+            among: document.stationMarkers,
+            minimumHitRadius: 12
+        )?.stationID == "940GZZLUBND")
+        #expect(BeckMapStationMarkerHitTester.nearestMarker(
+            to: CGPoint(x: 1_767.999, y: 1_561.797),
+            among: document.stationMarkers,
+            minimumHitRadius: 12
+        )?.stationID == "910GBONDST")
+    }
+
+    @Test @MainActor func beckMapScreenTapSelectsTheMatchingDepartureLine() throws {
+        let graph = try TubeGraph.bundled()
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
+        let renderCache = BeckMapCanvas.RenderCache(document: document)
+        let appState = TubeAppState()
+        appState.graph = graph
+
+        let cameraScale: CGFloat = 1.73
+        let cameraOffset = CGSize(width: -821.5, height: 367.25)
+        let screenTapOffset = CGVector(dx: 9, dy: -7)
+        let expectedSelections: [(String, CGPoint, TubeLineID)] = [
+            ("910GBARKING", CGPoint(x: 3_587.523, y: 1_525.187), .suffragette),
+            ("940GZZLUWHM", CGPoint(x: 3_229.053, y: 1_518.282), .jubilee),
+            ("910GWBRMPTN", CGPoint(x: 1_306.969, y: 1_948.626), .mildmay),
+            ("940GZZLUECT", CGPoint(x: 1_376.141, y: 1_843.188), .piccadilly),
+            ("940GZZLUHSD", CGPoint(x: 1_171.929, y: 1_843.188), .piccadilly),
+            ("940GZZLUTNG", CGPoint(x: 919.842, y: 1_843.188), .piccadilly),
+            ("940GZZLUACT", CGPoint(x: 707.996, y: 1_843.219), .piccadilly),
+            ("940GZZLUECM", CGPoint(x: 667.578, y: 1_773.965), .piccadilly),
+            ("940GZZLUEBY", CGPoint(x: 600.003, y: 1_707.781), .district),
+            ("940GZZLUSKS", CGPoint(x: 1_524.013, y: 1_843.164), .piccadilly),
+            ("940GZZLUBND", CGPoint(x: 1_682, y: 1_620), .jubilee),
+            ("940GZZLUWSM", CGPoint(x: 1_885.992, y: 1_855.985), .jubilee),
+            ("940GZZLUVIC", CGPoint(x: 1_729.02, y: 1_844.839), .victoria),
+        ]
+
+        for (stationID, artworkPoint, expectedLineID) in expectedSelections {
+            let screenPoint = CGPoint(
+                x: artworkPoint.x * cameraScale + cameraOffset.width + screenTapOffset.dx,
+                y: artworkPoint.y * cameraScale + cameraOffset.height + screenTapOffset.dy
+            )
+            let selection = try #require(BeckMapStationTapResolver.resolve(
+                screenPoint: screenPoint,
+                cameraScale: cameraScale,
+                cameraOffset: cameraOffset,
+                document: document,
+                renderedSegments: renderCache.renderedSegments,
+                graph: graph
+            ))
+            #expect(selection.stationID == stationID)
+            #expect(selection.preferredLineID == expectedLineID)
+
+            let station = try #require(graph.stationsByID[selection.stationID])
+            appState.select(
+                station: station,
+                preferredDepartureLineID: selection.preferredLineID
+            )
+            #expect(RealWorldMapSelectionPolicy.stationIDToSelect(
+                mapSelection: appState.selectedStationID,
+                selectedStationID: appState.selectedStationID,
+                presentationMode: appState.mapPresentationMode
+            ) == nil)
+            #expect(appState.selectedStationID == stationID)
+            #expect(appState.selectedStationDepartureLineID == expectedLineID)
+            #expect(StationDepartureSelection.resolved(
+                controlled: appState.selectedStationDepartureLineID,
+                requested: .circle,
+                usesControlledSelection: true,
+                preferred: appState.selectedStationDepartureLineID,
+                lineIDs: graph.lineIDs(at: station),
+                arrivals: []
+            ) == expectedLineID)
+        }
     }
 
     @Test func engineeringWorksPreferStructuredSourceAndSortChronologically() {

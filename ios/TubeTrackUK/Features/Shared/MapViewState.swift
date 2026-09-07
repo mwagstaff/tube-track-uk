@@ -165,10 +165,8 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
         let allLineIDs = Set(TubeLineID.allCases)
         let disrupted = Set(disruptions.map(\.lineID))
         let networkStatuses = statuses.filter { TubeLineID.allCases.contains($0.id) }
-        let liveClosed: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
-            line.lineStatuses.contains { $0.isServiceClosed } ? line.id : nil
-        })
-        let liveMinorDelays: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
+        let liveClosed = LineServiceClosurePolicy.closedLineIDs(in: networkStatuses)
+        let reportedMinorDelays: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
             line.lineStatuses.contains { $0.statusSeverity == 9 } ? line.id : nil
         })
         let liveGoodService: Set<TubeLineID> = Set(networkStatuses.compactMap { line in
@@ -176,7 +174,16 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
                   line.lineStatuses.allSatisfy(\.isGoodService) else { return nil }
             return line.id
         })
-        let liveMajorIssues = Set(disruptions.lazy.filter(\.isMajorIssue).map(\.lineID))
+        let reportedMajorIssues = Set(
+            disruptions.lazy.filter(\.isMajorIssue).map(\.lineID)
+        )
+        // TfL can report different severities for separate sections of one line.
+        // Keep the summary cards mutually exclusive by assigning each line to its
+        // highest-priority bucket: closed, then major, then minor.
+        let liveMajorIssues = reportedMajorIssues.subtracting(liveClosed)
+        let liveMinorDelays = reportedMinorDelays
+            .subtracting(liveClosed)
+            .subtracting(reportedMajorIssues)
 
         lineIDs = allLineIDs
         goodServiceLineIDs = isViewingLiveStatus

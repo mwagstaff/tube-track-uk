@@ -121,6 +121,8 @@ enum LiveTrainSnapshotReconciler {
         segmentsByID: [String: TubeSegment],
         requestedLineIDs: Set<TubeLineID> = []
     ) -> [LiveTubeTrain] {
+        let previous = deduplicated(previous)
+        let incoming = deduplicated(incoming)
         let previousByID = Dictionary(uniqueKeysWithValues: previous.map { ($0.id, $0) })
         let incomingIDs = Set(incoming.map(\.id))
         var output = incoming.map { train in
@@ -145,6 +147,23 @@ enum LiveTrainSnapshotReconciler {
         }
 
         return output.sorted { $0.id < $1.id }
+    }
+
+    private static func deduplicated(_ trains: [LiveTubeTrain]) -> [LiveTubeTrain] {
+        var trainsByID: [String: LiveTubeTrain] = [:]
+        for train in trains {
+            guard let current = trainsByID[train.id] else {
+                trainsByID[train.id] = train
+                continue
+            }
+
+            if train.updatedAt > current.updatedAt
+                || (train.updatedAt == current.updatedAt
+                    && train.secondsToNextStation < current.secondsToNextStation) {
+                trainsByID[train.id] = train
+            }
+        }
+        return Array(trainsByID.values)
     }
 
     static func isContinuousJourney(
@@ -289,6 +308,32 @@ struct LiveTrainStationBoardSnapshot: Sendable {
     let stationID: String
     let arrivals: [TfLArrivalPrediction]
     let updatedAt: Date
+}
+
+enum LiveTrainServicePresentation: Equatable, Sendable {
+    case lineOpen
+    case lineClosed
+
+    static let closedLineMarkerSystemName = "ghost.fill"
+
+    static func resolve(
+        lineID: TubeLineID,
+        closedLineIDs: Set<TubeLineID>
+    ) -> Self {
+        closedLineIDs.contains(lineID) ? .lineClosed : .lineOpen
+    }
+
+    var markerSystemName: String? {
+        self == .lineClosed ? Self.closedLineMarkerSystemName : nil
+    }
+
+    func informationalNote(for lineID: TubeLineID) -> String? {
+        guard self == .lineClosed else { return nil }
+        let lineName = lineID.isUnderground
+            ? "\(lineID.displayName) line"
+            : lineID.displayName
+        return "This train is unlikely to be in service because the \(lineName) is closed. It is shown only because TfL data says it is here."
+    }
 }
 
 enum LiveTrainMarkerPolicy {

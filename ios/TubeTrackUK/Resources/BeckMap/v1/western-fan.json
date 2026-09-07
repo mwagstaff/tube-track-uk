@@ -843,8 +843,8 @@
       "alignment": "trailing",
       "id": "label.940GZZLUHSC",
       "position": {
-        "x": 1058.859,
-        "y": 1200.069
+        "x": 1054.757,
+        "y": 1194.986
       },
       "priority": 10,
       "rotationDegrees": 0,
@@ -8662,8 +8662,8 @@
     },
     {
       "anchor": {
-        "x": 1076.859,
-        "y": 1200.069
+        "x": 1072.757,
+        "y": 1194.986
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -8673,35 +8673,10 @@
       "name": "Hammersmith (H&C Line)",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 1068.656,
-              "y": 1189.903
-            },
-            "start": {
-              "x": 1076.859,
-              "y": 1200.069
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
-              "x": 1076.859,
-              "y": 1200.069
-            },
-            "outlineWidth": 3.5,
-            "radius": 8.5
-          },
-          "kind": "circle"
-        },
-        {
-          "circle": {
-            "centre": {
-              "x": 1068.656,
-              "y": 1189.903
+              "x": 1072.757,
+              "y": 1194.986
             },
             "outlineWidth": 3.5,
             "radius": 8.5

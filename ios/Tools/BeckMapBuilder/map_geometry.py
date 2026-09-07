@@ -17,6 +17,59 @@ def command_point(command: dict[str, Any], key: str = "to") -> Point:
     return point(command[key])
 
 
+def path_start(commands: list[dict[str, Any]]) -> Point:
+    if not commands or commands[0]["op"] != "move":
+        raise ValueError("Path must begin with a move command")
+    return command_point(commands[0])
+
+
+def path_end(commands: list[dict[str, Any]]) -> Point:
+    current = path_start(commands)
+    for command in commands[1:]:
+        if command["op"] in {"move", "line", "cubic"}:
+            current = command_point(command)
+    return current
+
+
+def path_start_tangent(commands: list[dict[str, Any]]) -> Point | None:
+    start = path_start(commands)
+    for command in commands[1:]:
+        if command["op"] == "cubic":
+            candidates = (command_point(command, "control1"), command_point(command))
+        elif command["op"] == "line":
+            candidates = (command_point(command),)
+        else:
+            continue
+        for candidate in candidates:
+            tangent = candidate[0] - start[0], candidate[1] - start[1]
+            if math.hypot(*tangent) > 1e-9:
+                return tangent
+    return None
+
+
+def path_end_tangent(commands: list[dict[str, Any]]) -> Point | None:
+    current = path_start(commands)
+    drawable: list[tuple[dict[str, Any], Point]] = []
+    for command in commands[1:]:
+        if command["op"] in {"line", "cubic"}:
+            drawable.append((command, current))
+            current = command_point(command)
+        elif command["op"] == "move":
+            current = command_point(command)
+    for command, previous in reversed(drawable):
+        end = command_point(command)
+        candidates = (
+            (command_point(command, "control2"), previous)
+            if command["op"] == "cubic"
+            else (previous,)
+        )
+        for candidate in candidates:
+            tangent = end[0] - candidate[0], end[1] - candidate[1]
+            if math.hypot(*tangent) > 1e-9:
+                return tangent
+    return None
+
+
 def translated(value: Point, translation: dict[str, Any]) -> Point:
     return value[0] + float(translation["x"]), value[1] + float(translation["y"])
 

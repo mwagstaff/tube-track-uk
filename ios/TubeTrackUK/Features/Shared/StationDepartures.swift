@@ -119,12 +119,32 @@ struct StationDepartureGroup: Identifiable, Sendable {
 
 enum StationDepartureSelection {
     static func resolved(
+        controlled: TubeLineID?,
+        requested: TubeLineID?,
+        usesControlledSelection: Bool,
+        preferred: TubeLineID? = nil,
+        lineIDs: [TubeLineID],
+        arrivals: [TfLArrivalPrediction]
+    ) -> TubeLineID? {
+        resolved(
+            current: usesControlledSelection ? controlled : requested,
+            preferred: preferred,
+            lineIDs: lineIDs,
+            arrivals: arrivals
+        )
+    }
+
+    static func resolved(
         current: TubeLineID?,
+        preferred: TubeLineID? = nil,
         lineIDs: [TubeLineID],
         arrivals: [TfLArrivalPrediction]
     ) -> TubeLineID? {
         if let current, lineIDs.contains(current) {
             return current
+        }
+        if let preferred, lineIDs.contains(preferred) {
+            return preferred
         }
 
         let linesWithPredictions = Set(arrivals.compactMap {
@@ -253,6 +273,8 @@ struct StationDeparturesSection: View {
     @State private var presentedStatusLineID: TubeLineID?
 
     let lineIDs: [TubeLineID]
+    let preferredLineID: TubeLineID?
+    let controlledLineID: TubeLineID?
     let arrivals: [TfLArrivalPrediction]
     let statuses: [TfLLineStatus]
     let isLoading: Bool
@@ -260,18 +282,24 @@ struct StationDeparturesSection: View {
     let warning: StationDepartureWarning?
     let maxDeparturesHeight: CGFloat?
     let onShowWarning: (() -> Void)?
+    let onSelectLine: ((TubeLineID) -> Void)?
 
     init(
         lineIDs: [TubeLineID],
+        preferredLineID: TubeLineID? = nil,
+        controlledLineID: TubeLineID? = nil,
         arrivals: [TfLArrivalPrediction],
         statuses: [TfLLineStatus],
         isLoading: Bool = false,
         errorMessage: String? = nil,
         warning: StationDepartureWarning? = nil,
         maxDeparturesHeight: CGFloat? = nil,
-        onShowWarning: (() -> Void)? = nil
+        onShowWarning: (() -> Void)? = nil,
+        onSelectLine: ((TubeLineID) -> Void)? = nil
     ) {
         self.lineIDs = lineIDs
+        self.preferredLineID = preferredLineID
+        self.controlledLineID = controlledLineID
         self.arrivals = arrivals
         self.statuses = statuses
         self.isLoading = isLoading
@@ -279,11 +307,18 @@ struct StationDeparturesSection: View {
         self.warning = warning
         self.maxDeparturesHeight = maxDeparturesHeight
         self.onShowWarning = onShowWarning
+        self.onSelectLine = onSelectLine
+        _requestedLineID = State(initialValue: preferredLineID.flatMap {
+            lineIDs.contains($0) ? $0 : nil
+        })
     }
 
     private var selectedLineID: TubeLineID? {
         StationDepartureSelection.resolved(
-            current: requestedLineID,
+            controlled: controlledLineID,
+            requested: requestedLineID,
+            usesControlledSelection: onSelectLine != nil,
+            preferred: preferredLineID,
             lineIDs: lineIDs,
             arrivals: arrivals
         )
@@ -339,6 +374,13 @@ struct StationDeparturesSection: View {
             reconcileSelection()
         }
         .onChange(of: selectionInputID) {
+            reconcileSelection()
+        }
+        .onChange(of: preferredLineID) { _, preferredLineID in
+            guard onSelectLine == nil else { return }
+            requestedLineID = preferredLineID.flatMap {
+                lineIDs.contains($0) ? $0 : nil
+            }
             reconcileSelection()
         }
     }
@@ -413,6 +455,16 @@ struct StationDeparturesSection: View {
 
     private func select(_ lineID: TubeLineID) {
         guard lineID != selectedLineID else { return }
+        if let onSelectLine {
+            if reduceMotion {
+                onSelectLine(lineID)
+            } else {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    onSelectLine(lineID)
+                }
+            }
+            return
+        }
         if reduceMotion {
             requestedLineID = lineID
         } else {
@@ -423,6 +475,7 @@ struct StationDeparturesSection: View {
     }
 
     private func reconcileSelection() {
+        guard onSelectLine == nil else { return }
         if let requestedLineID, lineIDs.contains(requestedLineID) {
             return
         }
@@ -432,6 +485,7 @@ struct StationDeparturesSection: View {
         }
         requestedLineID = StationDepartureSelection.resolved(
             current: nil,
+            preferred: preferredLineID,
             lineIDs: lineIDs,
             arrivals: arrivals
         )
@@ -539,6 +593,7 @@ struct StationLinePill: View {
             .contentShape(.rect)
         }
         .buttonStyle(StationDepartureButtonStyle())
+        .accessibilityIdentifier("departures-line-\(lineID.rawValue)")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(lineID.displayName)
         .accessibilityValue(selected ? "Selected" : "Not selected")

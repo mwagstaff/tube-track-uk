@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import TubeTrackUK
 
-@Suite("Station Chase engine")
+@Suite("Track Attack engine")
 struct TubeGameEngineTests {
 #if DEBUG
     @Test func debugPlaybackCanRunAtTenPercentSpeedOrFreezeCompletely() {
@@ -25,6 +25,20 @@ struct TubeGameEngineTests {
     }
 #endif
 
+    @Test @MainActor func collisionRetainsTrainLineAndRestartClearsIt() throws {
+        var configuration = TubeGameConfiguration.standard
+        configuration.countdownDuration = 0
+        configuration.collisionDistance = 100_000
+        let engine = try TubeGameEngine(network: makeNetwork(), configuration: configuration, seed: 7)
+        let expectedLine = try #require(engine.snapshot.trains.first?.lineID)
+        engine.start()
+        engine.tick(deltaTime: 0.02)
+        #expect(engine.snapshot.phase == .ended(.collision))
+        #expect(engine.collisionLineID == expectedLine)
+        engine.restart(seed: 8)
+        #expect(engine.collisionLineID == nil)
+    }
+
     @Test func fullNetworkUsesPhysicalHubIdentityAcrossAllTwentyLines() throws {
         let network = try makeNetwork()
 
@@ -32,11 +46,48 @@ struct TubeGameEngineTests {
         #expect(network.hubs.count == 457)
         #expect(network.collectibleHubCount == 457)
         #expect(Set(network.edges.compactMap(\.kind.lineID)) == Set(TubeLineID.allCases))
+        #expect(Set(network.lineHubIDs.keys) == Set(TubeLineID.allCases))
+        #expect(network.lineHubIDs.values.allSatisfy { !$0.isEmpty })
+        let ealingBroadwayHubID = try #require(network.node(stationID: "940GZZLUEBY")?.hubID)
+        let oxfordCircusHubID = try #require(network.node(stationID: "940GZZLUOXC")?.hubID)
+        #expect(network.terminusHubIDs.contains(ealingBroadwayHubID))
+        #expect(!network.terminusHubIDs.contains(oxfordCircusHubID))
         #expect(network.edges.contains { $0.kind.isTransfer })
 
         let groupedNodeCount = network.hubs.reduce(0) { $0 + $1.stationIDs.count }
         #expect(groupedNodeCount == network.nodes.count)
         #expect(network.hubs.contains { $0.stationIDs.count > 1 && $0.lineIDs.count > 1 })
+    }
+
+    @Test func completedLinesUseConsumedPhysicalHubsAndCountEachLineOnce() {
+        let configuration = TubeGameConfiguration.standard
+        var tracker = TubeGameScoreTracker()
+        let lineHubIDs: [TubeLineID: Set<String>] = [
+            .central: ["start", "a"],
+            .victoria: ["a", "b"],
+            .bakerloo: [],
+        ]
+
+        tracker.markStartingHubConsumed("start")
+        tracker.refreshCompletedLines(lineHubIDs: lineHubIDs)
+        #expect(tracker.completedLineIDs.isEmpty)
+
+        _ = tracker.consume(
+            hub: hub(id: "a", lines: [.central, .victoria]),
+            enteredOn: .central,
+            configuration: configuration
+        )
+        tracker.refreshCompletedLines(lineHubIDs: lineHubIDs)
+        #expect(tracker.completedLineIDs == [.central])
+
+        _ = tracker.consume(
+            hub: hub(id: "b", lines: [.victoria]),
+            enteredOn: .victoria,
+            configuration: configuration
+        )
+        tracker.refreshCompletedLines(lineHubIDs: lineHubIDs)
+        tracker.refreshCompletedLines(lineHubIDs: lineHubIDs)
+        #expect(tracker.completedLineIDs == [.central, .victoria])
     }
 
     @Test func scoringRewardsInterchangeSizeAndSmallCappedSameLineStreaks() {
@@ -97,6 +148,34 @@ struct TubeGameEngineTests {
             )
         }
         #expect(tracker.lastEvent?.streakBonus == 10)
+    }
+
+    @Test func terminusStationsAreCountedOnceWhenConsumed() {
+        let configuration = TubeGameConfiguration.standard
+        var tracker = TubeGameScoreTracker()
+        let terminus = hub(id: "terminus", lines: [.central])
+        let ordinary = hub(id: "ordinary", lines: [.central])
+
+        #expect(tracker.consume(
+            hub: terminus,
+            enteredOn: .central,
+            isTerminus: true,
+            configuration: configuration
+        ) != nil)
+        #expect(tracker.terminusStationsReached == 1)
+
+        #expect(tracker.consume(
+            hub: terminus,
+            enteredOn: .central,
+            isTerminus: true,
+            configuration: configuration
+        ) == nil)
+        _ = tracker.consume(
+            hub: ordinary,
+            enteredOn: .central,
+            configuration: configuration
+        )
+        #expect(tracker.terminusStationsReached == 1)
     }
 
     @Test func everyRoundelInAPhysicalStationIsConsumedByOneScoreEvent() {
@@ -522,6 +601,53 @@ struct TubeGameEngineTests {
         }
         #expect(!invalid.decision.usedQueuedDirection)
         #expect(invalid.decision.shouldClearQueuedDirection)
+    }
+
+    @MainActor
+    @Test func availableSwipeHintsMatchOnlyDirectionsConsumedByTheNextChoice() throws {
+        let network = try makeNetwork()
+        let invalid = try #require(findStartChoice(
+            in: network,
+            directions: TubeGameDirection.allCases,
+            usedQueuedDirection: false
+        ))
+        var configuration = quietConfiguration()
+        configuration.startPolicy = .fixed(
+            stationID: invalid.hub.representativeStationID
+        )
+        configuration.initialDirection = invalid.direction
+        let engine = try TubeGameEngine(
+            network: network,
+            configuration: configuration,
+            seed: 20
+        )
+        let options = Dictionary(
+            uniqueKeysWithValues: engine.snapshot.availableSwipes.map {
+                ($0.direction, $0)
+            }
+        )
+
+        #expect(!options.isEmpty)
+        #expect(options[invalid.direction] == nil)
+        for direction in TubeGameDirection.allCases {
+            let decision = startDecision(
+                in: network,
+                hub: invalid.hub,
+                direction: direction
+            )
+            if let decision,
+               decision.shouldClearQueuedDirection,
+               decision.usedQueuedDirection,
+               let lineID = decision.connection.lineID {
+                let option = try #require(options[direction])
+                #expect(option.edgeID == decision.connection.edgeID)
+                #expect(option.fromStationID == decision.connection.fromStationID)
+                #expect(option.toStationID == decision.connection.toStationID)
+                #expect(option.lineID == lineID)
+            } else {
+                #expect(options[direction] == nil)
+            }
+        }
     }
 
     @MainActor

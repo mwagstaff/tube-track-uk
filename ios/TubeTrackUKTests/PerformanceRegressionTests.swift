@@ -3,8 +3,14 @@ import Testing
 @testable import TubeTrackUK
 
 struct PerformanceRegressionTests {
+    @Test func startupInterstitialCoversTheInitialMapFrame() {
+        #expect(AppStartupPresentation.isInitiallyPresented)
+        #expect(AppStartupPresentation.initialOpacity == 1)
+        #expect(AppStartupPresentation.initiallyShowsChrome)
+    }
+
     @Test func startupInterstitialIsFullyDismissedWithinTwoAndAHalfSeconds() {
-        #expect(AppStartupTiming.maximumInterstitialDuration == 2.5)
+        #expect(AppStartupTiming.maximumInterstitialDuration <= 2.5)
         #expect(AppStartupTiming.interstitialFadeDuration >= 0)
         #expect(AppStartupTiming.revealDeadline >= 0)
         #expect(
@@ -308,6 +314,31 @@ struct PerformanceRegressionTests {
         #expect(train.secondsToNextStation == 100)
     }
 
+    @Test func dlrResolverCoalescesPredictionsSharingASyntheticID() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let trains = DLRPredictionResolver.resolve(
+            predictions: [
+                dlrPrediction(
+                    stationID: "940GZZDLCAN",
+                    seconds: 5,
+                    destinationStationID: "940GZZDLLEW"
+                ),
+                dlrPrediction(
+                    stationID: "940GZZDLCAN",
+                    seconds: 10,
+                    destinationStationID: "940GZZDLLEW"
+                ),
+            ],
+            repository: repository,
+            now: Date(timeIntervalSince1970: 4_000)
+        )
+
+        let train = try #require(trains.first)
+        #expect(trains.count == 1)
+        #expect(train.secondsToNextStation == 5)
+        #expect(Set(trains.map(\.id)).count == trains.count)
+    }
+
     @Test func indexedSegmentLookupMatchesEveryBundledConnectionInBothDirections() throws {
         let graph = try TubeGraph.bundled()
         let repository = TubeNetworkRepository(graph: graph)
@@ -477,8 +508,8 @@ struct PerformanceRegressionTests {
         #expect(zoomInRefreshCount == 0)
     }
 
-    @Test func schematicStationLabelsReturnAsSoonAsMomentumBegins() {
-        #expect(!BeckMapInteractionOverlayPolicy.showsStationLabels(
+    @Test func schematicStationLabelsStayVisibleDuringNavigation() {
+        #expect(BeckMapInteractionOverlayPolicy.showsStationLabels(
             isFingerDown: true,
             isPinching: false
         ))
@@ -486,7 +517,7 @@ struct PerformanceRegressionTests {
             isFingerDown: false,
             isPinching: false
         ))
-        #expect(!BeckMapInteractionOverlayPolicy.showsStationLabels(
+        #expect(BeckMapInteractionOverlayPolicy.showsStationLabels(
             isFingerDown: false,
             isPinching: true
         ))

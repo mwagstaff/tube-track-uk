@@ -308,6 +308,20 @@ def build(svg: Path, graph_path: Path) -> dict:
             anchor = main_match.point
             primitives = [tick_primitive(line_id, main_match)]
             interchange = False
+        elif name == "Hammersmith (H&C Line)":
+            # Circle and Hammersmith & City terminate at one physical station.
+            # Centre one roundel across the two compact parallel lanes.
+            representatives: dict[str, vector.Match] = {}
+            for line_id, match in line_matches:
+                representatives.setdefault(line_id, match)
+            anchor = tuple(
+                sum(match.point[i] for match in representatives.values())
+                / len(representatives)
+                for i in (0, 1)
+            )
+            primitives = [{"kind": "circle", "circle": {
+                "centre": vector.rounded(anchor), "radius": 8.5, "outlineWidth": 3.5,
+            }}]
         elif name in ordinary_shared_stations:
             # Circle and Hammersmith & City share these stations; the parallel
             # artwork does not imply an interchange between separate platforms.

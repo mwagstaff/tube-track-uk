@@ -8,6 +8,8 @@ struct RealWorldMapScreen: View {
     let locationFocusRequest: MapLocationFocusRequest?
     let onResetAvailabilityChange: (Bool) -> Void
     let onOverviewOpacityChange: (Double) -> Void
+    let screenFurnitureOpacity: Double
+    let onInteractionChange: (Bool) -> Void
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
@@ -18,6 +20,8 @@ struct RealWorldMapScreen: View {
     @State private var overviewOpacity = 1.0
     @State private var fittedNetworkZoom: Double?
     @State private var recapturesOverviewZoom = false
+    @GestureState private var isTrackingPan = false
+    @GestureState private var isTrackingPinch = false
 
     private static let centralLondon = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 51.5078, longitude: -0.1278),
@@ -39,10 +43,16 @@ struct RealWorldMapScreen: View {
                             .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
                             .mapControls {
                                 MapCompass()
+                                    .opacity(screenFurnitureOpacity)
                                 MapScaleView()
+                                    .opacity(screenFurnitureOpacity)
                             }
                             .onChange(of: mapSelection) { _, stationID in
-                                guard let stationID,
+                                guard let stationID = RealWorldMapSelectionPolicy.stationIDToSelect(
+                                    mapSelection: stationID,
+                                    selectedStationID: appState.selectedStationID,
+                                    presentationMode: appState.mapPresentationMode
+                                ),
                                       let station = graph.stations.first(where: { $0.id == stationID }) else { return }
                                 withAnimation(.smooth(duration: 0.35)) {
                                     appState.select(station: station)
@@ -76,6 +86,18 @@ struct RealWorldMapScreen: View {
                                         )
                                     }
                             )
+                            .simultaneousGesture(
+                                DragGesture(minimumDistance: 2)
+                                    .updating($isTrackingPan) { _, isTracking, _ in
+                                        isTracking = true
+                                    }
+                            )
+                            .simultaneousGesture(
+                                MagnifyGesture(minimumScaleDelta: 0.005)
+                                    .updating($isTrackingPinch) { _, isTracking, _ in
+                                        isTracking = true
+                                    }
+                            )
 
                             if appState.showLiveTrains, appState.selectedTab == .map {
                                 RealWorldTrainCanvas(
@@ -89,6 +111,7 @@ struct RealWorldMapScreen: View {
                     .onChange(of: appState.mapPresentationMode) { _, mode in
                         acceptsCameraUpdates = false
                         guard mode == .realWorld else { return }
+                        mapSelection = appState.selectedStationID
                         calibrateOverviewZoomFromBeckMap()
                         applySharedViewport(in: viewportProxy.size)
                         if appState.selectedDisruption != nil {
@@ -116,6 +139,9 @@ struct RealWorldMapScreen: View {
             guard !stations.isEmpty else { return }
             focus(on: stations)
         }
+        .onChange(of: isTrackingPan || isTrackingPinch) { _, isInteracting in
+            onInteractionChange(isInteracting)
+        }
         .onChange(of: locationFocusRequest?.id) { _, _ in
             guard appState.mapPresentationMode == .realWorld,
                   let locationFocusRequest else { return }
@@ -129,10 +155,12 @@ struct RealWorldMapScreen: View {
             focus(on: appState.activeAffectedStationIDs)
         }
         .onChange(of: appState.selectedStationID) { _, stationID in
+            guard appState.mapPresentationMode == .realWorld else { return }
             mapSelection = stationID
         }
         .onChange(of: appState.stationSelectionGeneration) { _, _ in
-            guard let stationID = appState.selectedStationID else { return }
+            guard appState.mapPresentationMode == .realWorld,
+                  let stationID = appState.selectedStationID else { return }
             focus(on: [stationID])
         }
         .onChange(of: appState.trainSelectionGeneration) { _, _ in
@@ -168,6 +196,9 @@ struct RealWorldMapScreen: View {
             }
             renderData = RealWorldMapRenderData(graph: graph)
         }
+        .onDisappear {
+            onInteractionChange(false)
+        }
     }
 
     @MapContentBuilder
@@ -194,9 +225,35 @@ struct RealWorldMapScreen: View {
             .subtracting(affectedSegmentIDs)
         let unaffectedPolylines = renderData.polylines(covering: unaffectedSegmentIDs)
         let affectedPolylines = renderData.polylines(covering: affectedSegmentIDs)
+        let mobileCoverageMode = appState.mobileCoverageMode
+        let mobileCoverage = appState.mobileCoverage
+        let availableCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
+            guard mobileCoverageMode.isActive,
+                  let graphSegment = appState.graph?.segmentsByID[segment.id],
+                  mobileCoverage?.availability(
+                      for: graphSegment,
+                      mode: mobileCoverageMode
+                  ) == .available else { return nil }
+            return segment.id
+        })
+        let unknownCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
+            guard mobileCoverageMode.isActive,
+                  let graphSegment = appState.graph?.segmentsByID[segment.id],
+                  mobileCoverage?.availability(
+                      for: graphSegment,
+                      mode: mobileCoverageMode
+                  ) == .unknown else { return nil }
+            return segment.id
+        })
+        let availableCoveragePolylines = renderData.polylines(
+            covering: availableCoverageSegmentIDs
+        )
+        let unknownCoveragePolylines = renderData.polylines(
+            covering: unknownCoverageSegmentIDs
+        )
 
         ForEach(unaffectedPolylines) { polyline in
-            let muted = MapNetworkRouteStyling.mutesSegment(
+            let muted = mobileCoverageMode.isActive || MapNetworkRouteStyling.mutesSegment(
                 lineID: polyline.lineID,
                 isAffected: false,
                 isFeaturedSection: !featuredSegmentIDs.isDisjoint(with: polyline.segmentIDs),
@@ -260,6 +317,34 @@ struct RealWorldMapScreen: View {
                     .mapOverlayLevel(level: .aboveLabels)
             }
         }
+
+        if mobileCoverageMode.isActive {
+            ForEach(availableCoveragePolylines) { polyline in
+                MapPolyline(polyline.overlay)
+                    .stroke(
+                        Color.tubeLine(polyline.lineID),
+                        style: StrokeStyle(
+                            lineWidth: 4,
+                            lineCap: .round,
+                            lineJoin: .round
+                        )
+                    )
+                    .mapOverlayLevel(level: .aboveLabels)
+            }
+            ForEach(unknownCoveragePolylines) { polyline in
+                MapPolyline(polyline.overlay)
+                    .stroke(
+                        Color.orange.opacity(0.72),
+                        style: StrokeStyle(
+                            lineWidth: 4,
+                            lineCap: .round,
+                            lineJoin: .round,
+                            dash: [8, 6]
+                        )
+                    )
+                    .mapOverlayLevel(level: .aboveLabels)
+            }
+        }
     }
 
     @MapContentBuilder
@@ -271,6 +356,12 @@ struct RealWorldMapScreen: View {
             )
         }) { station in
             let selected = appState.selectedStationID == station.id
+            let coverageAvailability = appState.mobileCoverage?.availability(
+                for: station.id,
+                mode: appState.mobileCoverageMode
+            ) ?? .outOfScope
+            let stationOnlyCoverage = appState.mobileCoverageMode.isActive
+                && appState.mobileCoverage?.stationOnlyCoverageStationIDs.contains(station.id) == true
             let showsName = RealWorldStationVisibilityPolicy.showsName(
                 at: networkZoom,
                 isSelected: selected
@@ -300,12 +391,62 @@ struct RealWorldMapScreen: View {
                             width: selected ? 18 : markerDiameter,
                             height: selected ? 18 : markerDiameter
                         )
+
+                    if stationOnlyCoverage {
+                        Image(systemName: "cellularbars")
+                            .font(.system(size: 6, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 13, height: 13)
+                            .background(Color.green, in: .circle)
+                            .overlay {
+                                Circle().stroke(.white, lineWidth: 1)
+                            }
+                            .offset(x: 9, y: -9)
+                    }
                 }
+                    .opacity(stationMarkerOpacity(coverageAvailability, selected: selected))
                     .animation(.smooth(duration: 0.3), value: selected)
-                    .accessibilityLabel(station.name)
+                    .accessibilityLabel(
+                        stationCoverageAccessibilityLabel(
+                            station: station,
+                            availability: coverageAvailability,
+                            stationOnly: stationOnlyCoverage
+                        )
+                    )
             }
             .tag(station.id)
         }
+    }
+
+    private func stationMarkerOpacity(
+        _ availability: MobileCoverageAvailability,
+        selected: Bool
+    ) -> Double {
+        guard appState.mobileCoverageMode.isActive, !selected else { return 1 }
+        switch availability {
+        case .available: return 1
+        case .unavailable: return 0.42
+        case .unknown: return 0.72
+        case .outOfScope: return 0.22
+        }
+    }
+
+    private func stationCoverageAccessibilityLabel(
+        station: TubeStation,
+        availability: MobileCoverageAvailability,
+        stationOnly: Bool
+    ) -> String {
+        guard appState.mobileCoverageMode.isActive else { return station.name }
+        if stationOnly {
+            return "\(station.name), mobile coverage in station only"
+        }
+        let coverageDescription = switch availability {
+        case .available: "mobile coverage available"
+        case .unavailable: "no verified mobile coverage"
+        case .unknown: "mobile coverage unknown"
+        case .outOfScope: "outside the underground coverage view"
+        }
+        return "\(station.name), \(coverageDescription)"
     }
 
     private func displayStations(graph: TubeGraph) -> [TubeStation] {
@@ -566,6 +707,22 @@ enum RealWorldMapOverviewVisibilityPolicy {
     }
 }
 
+enum RealWorldMapSelectionPolicy {
+    static func stationIDToSelect(
+        mapSelection: String?,
+        selectedStationID: String?,
+        presentationMode: MapPresentationMode
+    ) -> String? {
+        // Both map renderers stay mounted during mode transitions. Only a new,
+        // user-driven selection on the active geographic map may select again.
+        guard presentationMode == .realWorld,
+              mapSelection != selectedStationID else {
+            return nil
+        }
+        return mapSelection
+    }
+}
+
 enum RealWorldLineHitTesting {
     static let lineHitRadius: CGFloat = 16
     static let stationExclusionRadius: CGFloat = 28
@@ -652,10 +809,16 @@ private struct RealWorldTrainCanvas: View {
                                     with: .color(Color.tubeLine(train.lineID).opacity(0.18))
                                 )
                             }
-                            let markerImage = context.resolve(
-                                Image(train.lineID.liveTrainMarkerAssetName)
+                            let servicePresentation = LiveTrainServicePresentation.resolve(
+                                lineID: train.lineID,
+                                closedLineIDs: appState.currentlyClosedLineIDs
                             )
-                            context.draw(markerImage, in: markerRect)
+                            LiveTrainMarkerRenderer.draw(
+                                presentation: servicePresentation,
+                                lineID: train.lineID,
+                                context: &context,
+                                in: markerRect
+                            )
                         }
                     }
                     .allowsHitTesting(false)
@@ -691,6 +854,10 @@ private struct RealWorldTrainCanvas: View {
                        let nextStopName = appState.graph?.stationsByID[train.nextStationID]?.name {
                         TrainMapCalloutOverlay(
                             train: train,
+                            servicePresentation: .resolve(
+                                lineID: train.lineID,
+                                closedLineIDs: appState.currentlyClosedLineIDs
+                            ),
                             nextStopName: nextStopName,
                             date: timeline.date,
                             markerPoint: markerPoint,
@@ -732,10 +899,20 @@ private struct RealWorldTrainCanvas: View {
         let destination = train.destination ?? "unknown destination"
         let nextStop = appState.graph?.stationsByID[train.nextStationID]?.name
             ?? "unknown next stop"
+        let summary: String
         if let direction = LiveTrainDirection.displayName(for: train.direction) {
-            return "\(direction) train to \(destination), next stop \(nextStop)"
+            summary = "\(direction) train to \(destination), next stop \(nextStop)"
+        } else {
+            summary = "Train to \(destination), next stop \(nextStop)"
         }
-        return "Train to \(destination), next stop \(nextStop)"
+        let presentation = LiveTrainServicePresentation.resolve(
+            lineID: train.lineID,
+            closedLineIDs: appState.currentlyClosedLineIDs
+        )
+        guard let note = presentation.informationalNote(for: train.lineID) else {
+            return summary
+        }
+        return "\(summary). \(note)"
     }
 }
 

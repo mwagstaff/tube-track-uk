@@ -22,7 +22,7 @@ struct TubeGameHighScoreStoreTests {
         let restored = TubeGameHighScoreStore(defaults: suite.defaults)
         #expect(restored.scores == [record])
         #expect(restored.shareText(for: record) == record.shareText)
-        #expect(record.shareText.contains("Station Chase"))
+        #expect(record.shareText.contains("Track Attack"))
         #expect(record.shareText.contains("TubeTrack UK"))
         #expect(!record.shareText.localizedCaseInsensitiveContains("Pac-Man"))
     }
@@ -84,6 +84,37 @@ struct TubeGameHighScoreStoreTests {
         #expect(TubeGameHighScoreStore(defaults: suite.defaults).scores.isEmpty)
     }
 
+    @Test @MainActor func versionOneScoresMigrateWithNoClearedLines() throws {
+        let suite = try TestDefaults()
+        defer { suite.remove() }
+        let id = try #require(UUID(uuidString: "00000000-0000-0000-0000-000000000042"))
+        let legacy = LegacyScoreArchive(
+            version: 1,
+            scores: [LegacyScoreRecord(
+                id: id,
+                score: 240,
+                stationsEaten: 12,
+                maxCombo: 4,
+                configuredDuration: 60,
+                elapsedTime: 42,
+                endReason: .completed,
+                playedAt: Date(timeIntervalSince1970: 100),
+                runSeed: 123,
+                graphGeneratedAt: "2026-08-23T20:26:26.921154+00:00",
+                rulesVersion: 1
+            )]
+        )
+        suite.defaults.set(
+            try JSONEncoder().encode(legacy),
+            forKey: TestDefaults.storageKey
+        )
+
+        let restored = TubeGameHighScoreStore(defaults: suite.defaults)
+        #expect(restored.scores.count == 1)
+        #expect(restored.scores.first?.id == id)
+        #expect(restored.scores.first?.linesCleared == 0)
+    }
+
     @Test @MainActor func manualQuitIsExcludedFromLeaderboardAndPersistence() throws {
         let suite = try TestDefaults()
         defer { suite.remove() }
@@ -135,6 +166,25 @@ struct TubeGameHighScoreStoreTests {
 private struct TestArchive: Codable {
     let version: Int
     let scores: [TubeGameScoreRecord]
+}
+
+private struct LegacyScoreArchive: Encodable {
+    let version: Int
+    let scores: [LegacyScoreRecord]
+}
+
+private struct LegacyScoreRecord: Encodable {
+    let id: UUID
+    let score: Int
+    let stationsEaten: Int
+    let maxCombo: Int
+    let configuredDuration: TimeInterval
+    let elapsedTime: TimeInterval
+    let endReason: TubeGameScoreEndReason
+    let playedAt: Date
+    let runSeed: UInt64
+    let graphGeneratedAt: String
+    let rulesVersion: Int
 }
 
 private struct TestDefaults {

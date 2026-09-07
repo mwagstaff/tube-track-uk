@@ -578,8 +578,89 @@ struct TubeGamePlayfield: View {
     ) {
         drawRoutePreview(context: &context, camera: camera, palette: palette)
         drawCollectibles(context: &context, camera: camera, palette: palette)
+        drawAvailableSwipeHints(context: &context, camera: camera, palette: palette)
         drawActors(context: &context, camera: camera, palette: palette)
         drawRecentStationLabels(context: &context, camera: camera, palette: palette)
+    }
+
+    private func drawAvailableSwipeHints(
+        context: inout GraphicsContext,
+        camera: TubeGameCameraState,
+        palette: BeckMapPalette
+    ) {
+        guard directionInputIsEnabled else { return }
+
+        let playerPoint = camera.screenPoint(snapshot.player.position)
+        for option in snapshot.availableSwipes {
+            let vector = option.direction.vector
+            let centre = CGPoint(
+                x: playerPoint.x + vector.dx * 62,
+                y: playerPoint.y + vector.dy * 62
+            )
+            let isQueued = snapshot.queuedDirection == option.direction
+            // Unselected routes are compact chevrons; only the buffered choice
+            // needs a line abbreviation. Spoken route names remain available.
+            let rect = CGRect(x: centre.x - 12, y: centre.y - 12, width: 24, height: 24)
+            context.fill(
+                Path(ellipseIn: rect),
+                with: .color(palette.labelSurface.opacity(isQueued ? 0.92 : 0.65))
+            )
+            drawSwipeHintArrow(
+                option.direction,
+                centre: centre,
+                context: &context,
+                colour: Color.tubeLine(option.lineID).opacity(isQueued ? 1 : 0.8)
+            )
+            if isQueued {
+                var code = context.resolve(
+                    Text(TubeGameSwipeHintPresentation.lineCode(for: option.lineID))
+                        .font(AppTypography.fixedBody(size: 10, weight: .semibold))
+                )
+                code.shading = .color(palette.ink)
+                let labelRect = CGRect(x: centre.x - 13, y: centre.y + 14, width: 26, height: 14)
+                context.fill(
+                    Path(roundedRect: labelRect, cornerRadius: 5),
+                    with: .color(palette.labelSurface.opacity(0.9))
+                )
+                context.draw(code, at: CGPoint(x: labelRect.midX, y: labelRect.midY))
+            }
+        }
+    }
+
+    private func drawSwipeHintArrow(
+        _ direction: TubeGameDirection,
+        centre: CGPoint,
+        context: inout GraphicsContext,
+        colour: Color
+    ) {
+        let vector = direction.vector
+        let perpendicular = CGVector(dx: -vector.dy, dy: vector.dx)
+        let start = CGPoint(
+            x: centre.x - vector.dx * 4,
+            y: centre.y - vector.dy * 4
+        )
+        let tip = CGPoint(
+            x: centre.x + vector.dx * 4.5,
+            y: centre.y + vector.dy * 4.5
+        )
+        var arrow = Path()
+        arrow.move(to: start)
+        arrow.addLine(to: tip)
+        arrow.move(to: tip)
+        arrow.addLine(to: CGPoint(
+            x: tip.x - vector.dx * 3.5 + perpendicular.dx * 2.7,
+            y: tip.y - vector.dy * 3.5 + perpendicular.dy * 2.7
+        ))
+        arrow.move(to: tip)
+        arrow.addLine(to: CGPoint(
+            x: tip.x - vector.dx * 3.5 - perpendicular.dx * 2.7,
+            y: tip.y - vector.dy * 3.5 - perpendicular.dy * 2.7
+        ))
+        context.stroke(
+            arrow,
+            with: .color(colour),
+            style: StrokeStyle(lineWidth: 1.6, lineCap: .round, lineJoin: .round)
+        )
     }
 
     private func drawRoutePreview(
@@ -884,7 +965,12 @@ struct TubeGamePlayfield: View {
             snapshot.recentStationConsumptions,
             at: snapshot.elapsedTime
         ).last.map { " Latest station eaten, \($0.stationName)." } ?? ""
-        return "Station Chase at \(snapshot.player.stationName)\(destination)\(line). Score \(snapshot.score). \(seconds) seconds remaining. \(snapshot.remainingStationCount) stations remaining.\(danger)\(latestEaten)"
+        let swipeChoices = snapshot.availableSwipes.isEmpty
+            ? ""
+            : " Next junction: " + snapshot.availableSwipes.map {
+                "\(TubeGameSwipeHintPresentation.spokenName(for: $0.direction)) for \($0.lineID.displayName)"
+            }.joined(separator: ", ") + "."
+        return "Track Attack at \(snapshot.player.stationName)\(destination)\(line). Score \(snapshot.score). \(seconds) seconds remaining. \(snapshot.remainingStationCount) stations remaining.\(swipeChoices)\(danger)\(latestEaten)"
     }
 }
 
@@ -1092,6 +1178,46 @@ enum TubeGameRouteFeedback {
             point: point,
             tangent: CGVector(dx: delta.dx / length, dy: delta.dy / length)
         )
+    }
+}
+
+enum TubeGameSwipeHintPresentation {
+    static func lineCode(for lineID: TubeLineID) -> String {
+        switch lineID {
+        case .bakerloo: "BAK"
+        case .central: "CEN"
+        case .circle: "CIR"
+        case .district: "DIS"
+        case .hammersmithCity: "H&C"
+        case .jubilee: "JUB"
+        case .metropolitan: "MET"
+        case .northern: "NOR"
+        case .piccadilly: "PIC"
+        case .victoria: "VIC"
+        case .waterlooCity: "W&C"
+        case .dlr: "DLR"
+        case .elizabeth: "ELZ"
+        case .tram: "TRM"
+        case .liberty: "LIB"
+        case .lioness: "LIO"
+        case .mildmay: "MIL"
+        case .suffragette: "SUF"
+        case .weaver: "WEA"
+        case .windrush: "WIN"
+        }
+    }
+
+    static func spokenName(for direction: TubeGameDirection) -> String {
+        switch direction {
+        case .north: "swipe up"
+        case .northEast: "swipe up and right"
+        case .east: "swipe right"
+        case .southEast: "swipe down and right"
+        case .south: "swipe down"
+        case .southWest: "swipe down and left"
+        case .west: "swipe left"
+        case .northWest: "swipe up and left"
+        }
     }
 }
 

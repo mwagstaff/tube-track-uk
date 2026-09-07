@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		E71A7624304B0DA800EA021F /* GameCenterResources.gamekit in Resources */ = {isa = PBXBuildFile; fileRef = E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		A10000000000000000000031 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -20,6 +24,7 @@
 		A10000000000000000000002 /* TubeTrackUK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeTrackUK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000003 /* TubeTrackUKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TubeTrackUKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000040 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = GameCenterResources.gamekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -56,6 +61,7 @@
 		A10000000000000000000006 = {
 			isa = PBXGroup;
 			children = (
+				E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */,
 				A10000000000000000000004 /* TubeTrackUK */,
 				A10000000000000000000005 /* TubeTrackUKTests */,
 				A10000000000000000000041 /* Configuration */,
@@ -141,6 +147,11 @@
 				TargetAttributes = {
 					A10000000000000000000010 = {
 						CreatedOnToolsVersion = 26.0;
+						SystemCapabilities = {
+							com.apple.GameCenter = {
+								enabled = 1;
+							};
+						};
 					};
 					A10000000000000000000020 = {
 						CreatedOnToolsVersion = 26.0;
@@ -173,6 +184,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E71A7624304B0DA800EA021F /* GameCenterResources.gamekit in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,16 +283,17 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TubeTrackUK/TubeTrackUK.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SJ8X4DLAN9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configuration/TubeTrackUK-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -299,6 +312,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = TubeTrackUK/TubeTrackUK.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SJ8X4DLAN9;
@@ -318,10 +332,10 @@
 					"west-connector-reference-debug.png",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Configuration/TubeTrackUK-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK;
 				PRODUCT_NAME = "$(TARGET_NAME)";

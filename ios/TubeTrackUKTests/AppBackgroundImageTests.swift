@@ -1,8 +1,27 @@
 import Foundation
 import Testing
+import UIKit
 @testable import TubeTrackUK
 
 struct AppBackgroundImageTests {
+    @Test func launchScreenUsesTheBrandedBridgeInsteadOfABlankBackground() throws {
+        let configuration = try #require(
+            Bundle.main.object(forInfoDictionaryKey: "UILaunchScreen")
+                as? [String: Any]
+        )
+
+        #expect(configuration["UIColorName"] as? String == "LaunchBackground")
+        #expect(configuration["UIImageName"] as? String == "LaunchMark")
+        #expect(configuration["UIImageRespectsSafeAreaInsets"] as? Bool == true)
+        let launchMark = try #require(UIImage(named: "LaunchMark")?.cgImage)
+        #expect([
+            CGImageAlphaInfo.first,
+            .last,
+            .premultipliedFirst,
+            .premultipliedLast,
+        ].contains(launchMark.alphaInfo))
+    }
+
     @Test func manifestOnlyReturnsExistingSupportedImagesInsideDirectory() throws {
         let fileManager = FileManager.default
         let root = fileManager.temporaryDirectory

@@ -322,8 +322,16 @@ struct MapMorphTransitionLayer: View, @preconcurrency Animatable {
                 size: size
             )
             let rect = CGRect(x: point.x - 11, y: point.y - 11, width: 22, height: 22)
-            let markerImage = context.resolve(Image(train.lineID.liveTrainMarkerAssetName))
-            context.draw(markerImage, in: rect)
+            let servicePresentation = LiveTrainServicePresentation.resolve(
+                lineID: train.lineID,
+                closedLineIDs: appState.currentlyClosedLineIDs
+            )
+            LiveTrainMarkerRenderer.draw(
+                presentation: servicePresentation,
+                lineID: train.lineID,
+                context: &context,
+                in: rect
+            )
         }
     }
 

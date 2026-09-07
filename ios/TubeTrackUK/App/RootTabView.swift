@@ -3,10 +3,19 @@ import UIKit
 
 enum AppStartupTiming {
     /// Total first-launch presentation budget, including the fade from interstitial image to the Map.
-    static let maximumInterstitialDuration: TimeInterval = 0
-    static let interstitialFadeDuration: TimeInterval = 0
+    static let maximumInterstitialDuration: TimeInterval = 1.8
+    static let interstitialFadeDuration: TimeInterval = 0.5
     static let revealDeadline: TimeInterval =
         maximumInterstitialDuration - interstitialFadeDuration
+}
+
+enum AppStartupPresentation {
+    // SwiftUI runs onAppear after the view has already been presented. Keep an
+    // opaque interstitial in the initial value graph so the Map can never be
+    // the first rendered frame while the photograph is decoded off-main.
+    static let isInitiallyPresented = true
+    static let initialOpacity: Double = 1
+    static let initiallyShowsChrome = true
 }
 
 struct RootTabView: View {
@@ -15,13 +24,17 @@ struct RootTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var backgroundRevealPresented = false
-    @State private var backgroundRevealOpacity: Double = 0
+    @State private var backgroundRevealPresented =
+        AppStartupPresentation.isInitiallyPresented
+    @State private var backgroundRevealOpacity =
+        AppStartupPresentation.initialOpacity
     @State private var backgroundRevealTask: Task<Void, Never>?
     @State private var startupDeadlineTask: Task<Void, Never>?
     @State private var appStartupCompleted = false
-    @State private var backgroundRevealShowsStartupChrome = false
+    @State private var backgroundRevealShowsStartupChrome =
+        AppStartupPresentation.initiallyShowsChrome
     @State private var closestStationPanelHidden = false
+    @State private var mapNavigationActive = false
 
     var body: some View {
         @Bindable var state = appState
@@ -31,7 +44,8 @@ struct RootTabView: View {
                 Group {
                     if appState.selectedTab == .map {
                         UnifiedMapScreen(
-                            closestStationPanelHidden: $closestStationPanelHidden
+                            closestStationPanelHidden: $closestStationPanelHidden,
+                            mapNavigationActive: $mapNavigationActive
                         )
                     } else {
                         Color.clear
@@ -57,14 +71,19 @@ struct RootTabView: View {
             .toolbarBackground(.visible, for: .tabBar)
             .background {
                 TabBarBackgroundConfigurator(
-                    backgroundColor: tabBarBackgroundColor
+                    backgroundColor: tabBarBackgroundColor,
+                    screenFurnitureVisible: !mapNavigationActive,
+                    reduceMotion: reduceMotion
                 )
                 .frame(width: 0, height: 0)
             }
 
             if backgroundRevealPresented {
                 ZStack {
-                    AppBackgroundImage(scrimOpacity: 0.12)
+                    AppBackgroundImage(
+                        scrimOpacity: 0.12,
+                        placeholder: .launch
+                    )
 
                     if backgroundRevealShowsStartupChrome {
                         AppStartupBackgroundChrome()
@@ -108,6 +127,9 @@ struct RootTabView: View {
             }
         }
         .onChange(of: appState.selectedTab) {
+            if appState.selectedTab != .map {
+                mapNavigationActive = false
+            }
             revealBackgroundIfNeeded()
         }
         .onChange(of: appState.mapPresentationMode) {
@@ -252,6 +274,8 @@ private struct AppStartupBackgroundChrome: View {
 
 private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
     let backgroundColor: UIColor
+    let screenFurnitureVisible: Bool
+    let reduceMotion: Bool
 
     func makeUIViewController(context: Context) -> TabBarAppearanceController {
         TabBarAppearanceController()
@@ -262,6 +286,8 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
         context: Context
     ) {
         viewController.backgroundColor = backgroundColor
+        viewController.screenFurnitureVisible = screenFurnitureVisible
+        viewController.reduceMotion = reduceMotion
         viewController.applyAppearanceWhenAttached()
     }
 }
@@ -269,6 +295,9 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
 @MainActor
 private final class TabBarAppearanceController: UIViewController {
     var backgroundColor = UIColor.systemBackground
+    var screenFurnitureVisible = true
+    var reduceMotion = false
+    private weak var configuredTabBar: UITabBar?
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -295,6 +324,26 @@ private final class TabBarAppearanceController: UIViewController {
         tabBar.isTranslucent = false
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
+
+        let targetAlpha = screenFurnitureVisible ? 1.0 : 0.0
+        tabBar.isUserInteractionEnabled = screenFurnitureVisible
+
+        guard configuredTabBar === tabBar,
+              abs(tabBar.alpha - targetAlpha) > 0.001,
+              !reduceMotion else {
+            tabBar.alpha = targetAlpha
+            configuredTabBar = tabBar
+            return
+        }
+
+        UIView.animate(
+            withDuration: screenFurnitureVisible ? 0.2 : 0.12,
+            delay: 0,
+            options: [.beginFromCurrentState, .allowUserInteraction, .curveEaseOut]
+        ) {
+            tabBar.alpha = targetAlpha
+        }
+        configuredTabBar = tabBar
     }
 }
 

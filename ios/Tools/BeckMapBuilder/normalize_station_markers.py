@@ -21,9 +21,12 @@ from map_geometry import (
     command_point as _command_point,
     distance as _distance,
     midpoint as _midpoint,
-    nearest_on_cubic as _nearest_on_cubic,
-    nearest_on_line as _nearest_on_line,
+    path_end,
+    path_end_tangent,
+    path_start,
+    path_start_tangent,
     point as _point,
+    translated,
 )
 
 CONNECTION_KINDS = {"connector", "walkingConnector"}
@@ -146,7 +149,7 @@ def _station_tangent(
     return min(candidates, key=lambda candidate: (candidate[0], candidate[1]))[2]
 
 
-def _nearest_station_path(
+def _nearest_station_endpoint(
     document: dict, paths_by_id: dict[str, dict], station_id: str,
     line_id: str, target: Point,
 ) -> tuple[float, Point, Point, str] | None:
@@ -156,34 +159,21 @@ def _nearest_station_path(
             segment["fromStationID"], segment["toStationID"]
         }:
             continue
+        commands = paths_by_id[segment["pathID"]]["commands"]
+        station_is_path_start = (
+            segment["fromStationID"] == station_id
+        ) == (segment["pathDirection"] == "forward")
+        endpoint = path_start(commands) if station_is_path_start else path_end(commands)
+        tangent = (
+            path_start_tangent(commands)
+            if station_is_path_start
+            else path_end_tangent(commands)
+        )
+        if tangent is None:
+            continue
         translation = segment.get("translation", {"x": 0, "y": 0})
-        previous: Point | None = None
-        for command in paths_by_id[segment["pathID"]]["commands"]:
-            operation = command["op"]
-            if operation == "move":
-                raw = _command_point(command)
-                previous = (raw[0] + translation["x"], raw[1] + translation["y"])
-                continue
-            if operation not in {"line", "cubic"} or previous is None:
-                continue
-            raw_end = _command_point(command)
-            end = (raw_end[0] + translation["x"], raw_end[1] + translation["y"])
-            if operation == "line":
-                measured = _nearest_on_line(target, previous, end)
-            else:
-                raw_control1 = _command_point(command, "control1")
-                raw_control2 = _command_point(command, "control2")
-                control1 = (
-                    raw_control1[0] + translation["x"],
-                    raw_control1[1] + translation["y"],
-                )
-                control2 = (
-                    raw_control2[0] + translation["x"],
-                    raw_control2[1] + translation["y"],
-                )
-                measured = _nearest_on_cubic(target, previous, control1, control2, end)
-            matches.append((*measured, segment["id"]))
-            previous = end
+        endpoint = translated(endpoint, translation)
+        matches.append((_distance(target, endpoint), endpoint, tangent, segment["id"]))
     return min(matches, key=lambda match: (match[0], match[3]), default=None)
 
 
@@ -272,7 +262,7 @@ def _normalize_tick_angles(document: dict) -> int:
             start = _point(tick["start"])
             end = _point(tick["end"])
             centre = _midpoint(start, end)
-            match = _nearest_station_path(
+            match = _nearest_station_endpoint(
                 document, paths_by_id, marker["stationID"], tick["lineID"], centre
             )
             if match is None or match[0] > PATH_ATTACHMENT_TOLERANCE:

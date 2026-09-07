@@ -128,6 +128,16 @@ struct TubeGameRoutePreview: Equatable, Sendable {
     let isCommitted: Bool
 }
 
+/// A swipe the junction router can consume at the player's next routing
+/// choice, paired with the exact line that swipe selects.
+struct TubeGameSwipeOption: Equatable, Sendable {
+    let direction: TubeGameDirection
+    let lineID: TubeLineID
+    let edgeID: String
+    let fromStationID: String
+    let toStationID: String
+}
+
 /// A short-lived, gameplay-time-stamped record used for deterministic station
 /// collection feedback. Physical hubs are collected at most once per run, so
 /// the hub ID is also a stable identity for rendering.
@@ -173,12 +183,15 @@ struct TubeGameSnapshot: Equatable, Sendable {
     let remainingTime: TimeInterval
     let score: Int
     let stationsEaten: Int
+    let terminusStationsReached: Int
+    let completedLineIDs: Set<TubeLineID>
     let totalCollectibleStations: Int
     let sameLineStreak: Int
     let maximumSameLineStreak: Int
     let comboLineID: TubeLineID?
     let queuedDirection: TubeGameDirection?
     let routePreview: TubeGameRoutePreview?
+    let availableSwipes: [TubeGameSwipeOption]
     let consumedHubIDs: Set<String>
     let lastScoreEvent: TubeGameScoreEvent?
     let recentStationConsumptions: [TubeGameStationConsumption]
@@ -188,12 +201,18 @@ struct TubeGameSnapshot: Equatable, Sendable {
     var remainingStationCount: Int {
         max(0, totalCollectibleStations - consumedHubIDs.count)
     }
+
+    var linesCleared: Int {
+        completedLineIDs.count
+    }
 }
 
 struct TubeGameScoreTracker: Sendable {
     private(set) var score = 0
     private(set) var stationsEaten = 0
+    private(set) var terminusStationsReached = 0
     private(set) var consumedHubIDs: Set<String> = []
+    private(set) var completedLineIDs: Set<TubeLineID> = []
     private(set) var comboLineID: TubeLineID?
     private(set) var sameLineStreak = 0
     private(set) var maximumSameLineStreak = 0
@@ -203,10 +222,20 @@ struct TubeGameScoreTracker: Sendable {
         consumedHubIDs.insert(hubID)
     }
 
+    mutating func refreshCompletedLines(
+        lineHubIDs: [TubeLineID: Set<String>]
+    ) {
+        for (lineID, requiredHubIDs) in lineHubIDs
+        where !requiredHubIDs.isEmpty && requiredHubIDs.isSubset(of: consumedHubIDs) {
+            completedLineIDs.insert(lineID)
+        }
+    }
+
     @discardableResult
     mutating func consume(
         hub: TubeGameHub,
         enteredOn lineID: TubeLineID,
+        isTerminus: Bool = false,
         configuration: TubeGameConfiguration
     ) -> TubeGameScoreEvent? {
         guard consumedHubIDs.insert(hub.id).inserted else {
@@ -235,6 +264,9 @@ struct TubeGameScoreTracker: Sendable {
         )
         score += event.total
         stationsEaten += 1
+        if isTerminus {
+            terminusStationsReached += 1
+        }
         lastEvent = event
         return event
     }
