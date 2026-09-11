@@ -348,21 +348,23 @@ struct BeckMapCanvas: View {
     private var artworkBounds: CGRect { renderCache.artworkBounds }
     private var debugReferenceImage: UIImage? { renderCache.debugReferenceImage }
 
-    @State private var cameraScale: CGFloat = 0.35
-    @State private var cameraOffset = CGSize.zero
+    @State private var camera = BeckMapLayerCamera()
+    @State private var renderScale: CGFloat = 0.35
+    @State private var renderOffset = CGSize.zero
     @State private var minimumCameraScale: CGFloat = 0.2
     @State private var maximumCameraScale: CGFloat = 3.8
     @State private var fittedCameraScale: CGFloat = 0.35
     @State private var panStartOffset: CGSize?
-    @State private var panRenderOffset: CGSize?
     @State private var pinchStartScale: CGFloat?
     @State private var pinchMapPoint: CGPoint?
-    @State private var pinchRenderScale: CGFloat?
-    @State private var pinchRenderOffset: CGSize?
     @State private var isPanning = false
     @State private var isDecelerating = false
     @State private var isPinching = false
-    @State private var cameraTransitionTask: Task<Void, Never>?
+    @State private var cameraAnimator = BeckMapCameraAnimator()
+    @State private var isAnimatingCamera = false
+
+    private var cameraScale: CGFloat { camera.scale }
+    private var cameraOffset: CGSize { camera.offset }
 
     init(
         document: BeckMapDocument,
@@ -401,23 +403,11 @@ struct BeckMapCanvas: View {
     var body: some View {
         GeometryReader { proxy in
             let overscan = BeckMapArtworkCachePolicy.overscan
-            let renderScale = isPinching
-                ? (pinchRenderScale ?? cameraScale)
-                : cameraScale
-            let isTranslating = isPanning || isDecelerating
-            let showsStationLabels = BeckMapInteractionOverlayPolicy.showsStationLabels(
-                isFingerDown: isPanning,
-                isPinching: isPinching
-            )
-            let renderOffset = isPinching
-                ? (pinchRenderOffset ?? cameraOffset)
-                : (isTranslating ? (panRenderOffset ?? cameraOffset) : cameraOffset)
-            let transientScale = cameraScale / max(0.000_001, renderScale)
-            let artworkLayerOffset = CGSize(
-                width: cameraOffset.width - renderOffset.width * transientScale
-                    - overscan * transientScale,
-                height: cameraOffset.height - renderOffset.height * transientScale
-                    - overscan * transientScale
+            let renderScale = self.renderScale
+            let renderOffset = self.renderOffset
+            let canvasOffset = CGSize(
+                width: renderOffset.width + overscan,
+                height: renderOffset.height + overscan
             )
             let artworkCanvasSize = CGSize(
                 width: proxy.size.width + overscan * 2,
@@ -437,31 +427,26 @@ struct BeckMapCanvas: View {
             ZStack(alignment: .topLeading) {
                 palette.background
 
-                BeckMapCachedArtworkLayer(
+                BeckMapRetainedCanvas(
                     key: artworkCacheKey,
+                    camera: camera,
+                    renderScale: renderScale,
+                    renderOffset: renderOffset,
+                    overscan: overscan,
+                    canvasSize: artworkCanvasSize,
+                    colorScheme: colorScheme,
                     renderer: { context, size in
                         drawArtwork(
                             context: &context,
                             size: size,
                             cameraScale: renderScale,
-                            cameraOffset: CGSize(
-                                width: renderOffset.width + overscan,
-                                height: renderOffset.height + overscan
-                            )
+                            cameraOffset: canvasOffset
                         )
                     }
                 )
-                .equatable()
-                .frame(width: artworkCanvasSize.width, height: artworkCanvasSize.height)
-                .scaleEffect(transientScale, anchor: .topLeading)
-                .offset(
-                    x: artworkLayerOffset.width,
-                    y: artworkLayerOffset.height
-                )
                 .allowsHitTesting(false)
 
-                if !isReferenceOverlayActive,
-                   showsStationLabels {
+                if !isReferenceOverlayActive {
                     let labelCacheKey = BeckMapLabelCacheKey(
                         documentID: document.identifier,
                         graphGeneratedAt: document.source.graphGeneratedAt,
@@ -469,17 +454,23 @@ struct BeckMapCanvas: View {
                         colorScheme: colorScheme,
                         cameraScale: renderScale,
                         cameraOffset: renderOffset,
-                        canvasSize: proxy.size,
+                        canvasSize: artworkCanvasSize,
                         labelTypeScale: labelTypeScale
                     )
-                    BeckMapCachedLabelLayer(
+                    BeckMapRetainedCanvas(
                         key: labelCacheKey,
+                        camera: camera,
+                        renderScale: renderScale,
+                        renderOffset: renderOffset,
+                        overscan: overscan,
+                        canvasSize: artworkCanvasSize,
+                        colorScheme: colorScheme,
                         renderer: { context, size in
                             drawLabels(
                                 context: &context,
                                 viewport: size,
                                 cameraScale: renderScale,
-                                cameraOffset: renderOffset
+                                cameraOffset: canvasOffset
                             )
                             var markerContext = context
                             markerContext.concatenate(
@@ -488,8 +479,8 @@ struct BeckMapCanvas: View {
                                     b: 0,
                                     c: 0,
                                     d: renderScale,
-                                    tx: renderOffset.width,
-                                    ty: renderOffset.height
+                                    tx: canvasOffset.width,
+                                    ty: canvasOffset.height
                                 )
                             )
                             drawEmphasizedStationMarkers(
@@ -497,12 +488,6 @@ struct BeckMapCanvas: View {
                                 cameraScale: renderScale
                             )
                         }
-                    )
-                    .equatable()
-                    .scaleEffect(transientScale, anchor: .topLeading)
-                    .offset(
-                        x: cameraOffset.width - renderOffset.width * transientScale,
-                        y: cameraOffset.height - renderOffset.height * transientScale
                     )
                     .allowsHitTesting(false)
                 }
@@ -517,29 +502,30 @@ struct BeckMapCanvas: View {
                                 renderSecond: Int(timeline.date.timeIntervalSinceReferenceDate),
                                 cameraScale: renderScale,
                                 cameraOffset: renderOffset,
-                                canvasSize: viewport.size
+                                canvasSize: artworkCanvasSize,
+                                colorScheme: colorScheme
                             )
                             ZStack {
-                                BeckMapCachedTrainLayer(
+                                BeckMapRetainedCanvas(
                                     key: trainCacheKey,
+                                    camera: camera,
+                                    renderScale: renderScale,
+                                    renderOffset: renderOffset,
+                                    overscan: overscan,
+                                    canvasSize: artworkCanvasSize,
+                                    colorScheme: colorScheme,
                                     renderer: { context, size in
                                         drawTrains(
                                             context: &context,
                                             size: size,
                                             date: timeline.date,
                                             cameraScale: renderScale,
-                                            cameraOffset: renderOffset
+                                            cameraOffset: canvasOffset
                                         )
                                     }
                                 )
-                                .equatable()
-                                .scaleEffect(transientScale, anchor: .topLeading)
-                                .offset(
-                                    x: cameraOffset.width - renderOffset.width * transientScale,
-                                    y: cameraOffset.height - renderOffset.height * transientScale
-                                )
 
-                                if !isPanning, !isDecelerating, !isPinching,
+                                if !isPanning, !isDecelerating, !isPinching, !isAnimatingCamera,
                                    let train = appState.selectedTrain,
                                    let markerPoint = trainScreenPoint(
                                        for: train,
@@ -569,6 +555,11 @@ struct BeckMapCanvas: View {
 
                 BeckMapGestureSurface(
                     allowsMomentum: !reduceMotion,
+                    onTouchDown: {
+                        let wasAnimating = isAnimatingCamera
+                        cancelCameraAnimation()
+                        return wasAnimating
+                    },
                     onInteractionChange: onInteractionChange,
                     onPan: { translation, phase in
                         handlePan(translation: translation, phase: phase, in: proxy.size)
@@ -613,10 +604,7 @@ struct BeckMapCanvas: View {
             }
             .onChange(of: resetToken) { _, _ in
                 guard appState.mapPresentationMode == .beck else { return }
-                withAnimation(.smooth(duration: 0.5)) {
-                    resetCamera(in: proxy.size)
-                }
-                publishViewport(in: proxy.size)
+                resetCamera(in: proxy.size, animated: true)
             }
             .onChange(of: locationFocusRequest?.id) { _, _ in
                 guard appState.mapPresentationMode == .beck,
@@ -625,11 +613,12 @@ struct BeckMapCanvas: View {
             }
             .onChange(of: contentVerticalBias) { oldBias, newBias in
                 let delta = newBias - oldBias
-                withAnimation(.smooth(duration: 0.32)) {
-                    cameraOffset.height -= delta
-                }
-                updateCameraSnapshot(in: proxy.size)
-                publishViewport(in: proxy.size)
+                animateCamera(
+                    toScale: cameraScale,
+                    offset: CGSize(width: cameraOffset.width, height: cameraOffset.height - delta),
+                    viewportSize: proxy.size,
+                    duration: 0.32
+                )
             }
             .onChange(of: appState.mapPresentationMode) { _, mode in
                 guard mode == .beck else { return }
@@ -662,7 +651,7 @@ struct BeckMapCanvas: View {
             }
         }
         .onDisappear {
-            cameraTransitionTask?.cancel()
+            cancelCameraAnimation()
         }
     }
 
@@ -1395,7 +1384,7 @@ struct BeckMapCanvas: View {
         if document.geometryStatus != .authored, cameraScale < max(0.48, minimumCameraScale) {
             return
         }
-        let viewportRect = StationLabelLayoutEngine.availableViewport(in: viewport)
+        let viewportRect = BeckMapArtworkCachePolicy.labelViewport(in: viewport)
         let selectedStationID = presentation.selectedStationID
         let visibleLabels = renderedLabels.filter { renderedLabel in
             let label = renderedLabel.label
@@ -1691,8 +1680,8 @@ struct BeckMapCanvas: View {
         return blockers
     }
 
-    private func resetCamera(in size: CGSize) {
-        cameraTransitionTask?.cancel()
+    private func resetCamera(in size: CGSize, animated: Bool = false) {
+        cancelCameraAnimation()
         let fittingBounds = isReferenceOverlayActive
             ? CGRect(
                 x: 0,
@@ -1708,12 +1697,17 @@ struct BeckMapCanvas: View {
         fittedCameraScale = fittedScale
         minimumCameraScale = max(0.01, fittedScale * 0.82)
         maximumCameraScale = max(3.8, fittedScale * 4)
-        cameraScale = fittedScale
-        cameraOffset = CGSize(
-            width: size.width / 2 - fittingBounds.midX * cameraScale,
-            height: size.height / 2 - fittingBounds.midY * cameraScale - contentVerticalBias
+        let offset = CGSize(
+            width: size.width / 2 - fittingBounds.midX * fittedScale,
+            height: size.height / 2 - fittingBounds.midY * fittedScale - contentVerticalBias
         )
-        updateCameraSnapshot(in: size)
+        if animated {
+            animateCamera(toScale: fittedScale, offset: offset, viewportSize: size, duration: 0.5)
+        } else {
+            camera.update(scale: fittedScale, offset: offset)
+            refreshRenderedCamera()
+            updateCameraSnapshot(in: size)
+        }
     }
 
     private func focus(on stationIDs: Set<String>, in size: CGSize) {
@@ -1785,44 +1779,58 @@ struct BeckMapCanvas: View {
         duration: TimeInterval = 2,
         easing: BeckMapCameraEasing = .smoothStep
     ) {
-        cameraTransitionTask?.cancel()
+        cancelCameraAnimation()
 
         if reduceMotion {
-            cameraScale = targetScale
-            cameraOffset = targetOffset
-            updateCameraSnapshot(in: viewportSize)
+            camera.update(scale: targetScale, offset: targetOffset)
+            refreshRenderedCamera()
             publishViewport(in: viewportSize)
             return
         }
 
         let startScale = cameraScale
         let startOffset = cameraOffset
-        let startTime = ProcessInfo.processInfo.systemUptime
-        cameraTransitionTask = Task { @MainActor in
-            while !Task.isCancelled {
-                let elapsed = ProcessInfo.processInfo.systemUptime - startTime
-                let progress = min(1, max(0, elapsed / duration))
-                let easedProgress = easing.value(at: progress)
-
-                cameraScale = startScale + (targetScale - startScale) * CGFloat(easedProgress)
-                cameraOffset = CGSize(
-                    width: startOffset.width
-                        + (targetOffset.width - startOffset.width) * CGFloat(easedProgress),
-                    height: startOffset.height
-                        + (targetOffset.height - startOffset.height) * CGFloat(easedProgress)
+        isAnimatingCamera = true
+        cameraAnimator.animate(
+            duration: duration,
+            easing: { easing.value(at: $0) },
+            update: { progress in
+                camera.update(
+                    scale: startScale + (targetScale - startScale) * CGFloat(progress),
+                    offset: CGSize(
+                        width: startOffset.width
+                            + (targetOffset.width - startOffset.width) * CGFloat(progress),
+                        height: startOffset.height
+                            + (targetOffset.height - startOffset.height) * CGFloat(progress)
+                    )
                 )
-                updateCameraSnapshot(in: viewportSize)
-
-                guard progress < 1 else {
-                    publishViewport(in: viewportSize)
-                    return
-                }
-                do {
-                    try await Task.sleep(for: .milliseconds(16))
-                } catch {
-                    return
-                }
+                rebaseArtworkIfNeeded(in: viewportSize)
+            },
+            completion: {
+                isAnimatingCamera = false
+                refreshRenderedCamera()
+                publishViewport(in: viewportSize)
             }
+        )
+    }
+
+    private func cancelCameraAnimation() {
+        cameraAnimator.cancel()
+        if isAnimatingCamera { isAnimatingCamera = false }
+    }
+
+    private func refreshRenderedCamera() {
+        renderScale = cameraScale
+        renderOffset = cameraOffset
+    }
+
+    private func rebaseArtworkIfNeeded(in size: CGSize) {
+        if BeckMapArtworkCachePolicy.shouldRebase(
+            cameraScale: cameraScale, cameraOffset: cameraOffset,
+            renderScale: renderScale, renderOffset: renderOffset,
+            viewportSize: size
+        ) {
+            refreshRenderedCamera()
         }
     }
 
@@ -1833,23 +1841,18 @@ struct BeckMapCanvas: View {
     ) {
         switch phase {
         case .began:
-            cameraTransitionTask?.cancel()
+            cancelCameraAnimation()
             isPanning = true
             isDecelerating = false
             panStartOffset = cameraOffset
-            panRenderOffset = cameraOffset
         case .changed:
-            isPanning = true
+            guard !isPinching else { return }
             let start = panStartOffset ?? cameraOffset
-            panStartOffset = start
-            cameraOffset = CGSize(width: start.width + translation.width, height: start.height + translation.height)
-            let renderOffset = panRenderOffset ?? start
-            if BeckMapArtworkCachePolicy.shouldRebase(
-                cameraOffset: cameraOffset,
-                renderOffset: renderOffset
-            ) {
-                panRenderOffset = cameraOffset
-            }
+            camera.update(scale: cameraScale, offset: CGSize(
+                width: start.width + translation.width,
+                height: start.height + translation.height
+            ))
+            rebaseArtworkIfNeeded(in: size)
             // Panning changes only the offset. The outer map chrome depends on
             // zoom, so publishing this through shared app state every frame
             // needlessly invalidates the whole map screen.
@@ -1858,22 +1861,23 @@ struct BeckMapCanvas: View {
                 isPanning = false
                 isDecelerating = true
             }
-            cameraOffset = CGSize(
+            camera.update(scale: cameraScale, offset: CGSize(
                 width: cameraOffset.width + translation.width,
                 height: cameraOffset.height + translation.height
-            )
-            let renderOffset = panRenderOffset ?? cameraOffset
-            if BeckMapArtworkCachePolicy.shouldRebase(
-                cameraOffset: cameraOffset,
-                renderOffset: renderOffset
-            ) {
-                panRenderOffset = cameraOffset
-            }
+            ))
+            rebaseArtworkIfNeeded(in: size)
+        case .interrupted:
+            isPanning = false
+            isDecelerating = false
+            panStartOffset = nil
         case .ended:
             isPanning = false
             isDecelerating = false
             panStartOffset = nil
-            panRenderOffset = nil
+            // Offset-only motion keeps the existing labels and pixels. Reusing
+            // the buffer also avoids a final label shuffle when momentum stops.
+            // A touch may also have caught a zoom animation between rebases.
+            if renderScale != cameraScale { refreshRenderedCamera() }
             publishViewport(in: size)
         }
     }
@@ -1886,49 +1890,47 @@ struct BeckMapCanvas: View {
     ) {
         switch phase {
         case .began:
-            cameraTransitionTask?.cancel()
+            cancelCameraAnimation()
+            isPanning = false
+            isDecelerating = false
+            panStartOffset = nil
             isPinching = true
             pinchStartScale = cameraScale
-            pinchRenderScale = cameraScale
-            pinchRenderOffset = cameraOffset
             pinchMapPoint = CGPoint(
                 x: (location.x - cameraOffset.width) / cameraScale,
                 y: (location.y - cameraOffset.height) / cameraScale
             )
         case .changed:
-            isPinching = true
             guard let startScale = pinchStartScale, let mapPoint = pinchMapPoint else { return }
             let nextScale = min(maximumCameraScale, max(minimumCameraScale, startScale * magnification))
             if nextScale > cameraScale,
+               !BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+                   at: cameraScale,
+                   fittedScale: fittedCameraScale
+               ),
                BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
                    at: nextScale,
                    fittedScale: fittedCameraScale
                ) {
                 onUserZoomIn()
             }
-            cameraScale = nextScale
-            cameraOffset = CGSize(
+            camera.update(scale: nextScale, offset: CGSize(
                 width: location.x - mapPoint.x * nextScale,
                 height: location.y - mapPoint.y * nextScale
-            )
-            if let renderScale = pinchRenderScale,
-               BeckMapArtworkCachePolicy.shouldRebaseZoom(
-                   cameraScale: nextScale,
-                   renderScale: renderScale,
-                   viewportSize: size
-               ) {
-                pinchRenderScale = nextScale
-                pinchRenderOffset = cameraOffset
-            }
+            ))
+            rebaseArtworkIfNeeded(in: size)
+        case .interrupted:
+            isPinching = false
+            pinchStartScale = nil
+            pinchMapPoint = nil
         case .decelerating:
             break
         case .ended:
             isPinching = false
             pinchStartScale = nil
             pinchMapPoint = nil
-            pinchRenderScale = nil
-            pinchRenderOffset = nil
             panStartOffset = nil
+            refreshRenderedCamera()
             publishViewport(in: size)
         }
     }
@@ -1950,19 +1952,20 @@ struct BeckMapCanvas: View {
             updateCameraSnapshot(in: size)
             return
         }
-        cameraTransitionTask?.cancel()
+        cancelCameraAnimation()
         let scaleToFit = min(
             size.width / max(1, artworkRect.width),
             size.height / max(1, artworkRect.height)
         )
-        cameraScale = min(
+        let nextScale = min(
             maximumCameraScale,
             max(minimumCameraScale, scaleToFit)
         )
-        cameraOffset = CGSize(
-            width: size.width / 2 - centre.x * cameraScale,
-            height: size.height / 2 - centre.y * cameraScale
-        )
+        camera.update(scale: nextScale, offset: CGSize(
+            width: size.width / 2 - centre.x * nextScale,
+            height: size.height / 2 - centre.y * nextScale
+        ))
+        refreshRenderedCamera()
         updateCameraSnapshot(in: size)
     }
 
@@ -2011,7 +2014,6 @@ struct BeckMapCanvas: View {
             return
         }
 
-        let labelPlacements = stationLabelPlacements(in: viewport)
         if let selection = BeckMapStationTapResolver.resolve(
             screenPoint: location,
             cameraScale: cameraScale,
@@ -2024,11 +2026,8 @@ struct BeckMapCanvas: View {
                 selection.stationID,
                 selection.preferredLineID
             )
-        } else if let labelID = StationLabelHitTester.labelID(
-            at: location,
-            placements: labelPlacements,
-            minimumHitSize: 44
-        ), let stationID = renderedLabels.first(where: {
+        } else if let labelID = stationLabelID(at: location, in: viewport),
+                  let stationID = renderedLabels.first(where: {
             $0.label.id == labelID
         })?.label.stationID {
             onStationTap(stationID, nil)
@@ -2039,7 +2038,31 @@ struct BeckMapCanvas: View {
         }
     }
 
-    private func stationLabelPlacements(in viewport: CGSize) -> [StationLabelPlacement] {
+    private func stationLabelID(at location: CGPoint, in viewport: CGSize) -> String? {
+        let overscan = BeckMapArtworkCachePolicy.overscan
+        let transform = BeckMapLayerTransform.transform(
+            cameraScale: cameraScale, cameraOffset: cameraOffset,
+            renderScale: renderScale, renderOffset: renderOffset,
+            overscan: overscan
+        )
+        // Hit-test the same buffered label layout that is actually on screen,
+        // including when a tap interrupts momentum between cache rebases.
+        return StationLabelHitTester.labelID(
+            at: location.applying(transform.inverted()),
+            placements: stationLabelPlacements(
+                in: CGSize(width: viewport.width + overscan * 2, height: viewport.height + overscan * 2),
+                cameraScale: renderScale,
+                cameraOffset: CGSize(width: renderOffset.width + overscan, height: renderOffset.height + overscan)
+            ),
+            minimumHitSize: 44 / max(0.000_001, cameraScale / renderScale)
+        )
+    }
+
+    private func stationLabelPlacements(
+        in viewport: CGSize,
+        cameraScale: CGFloat,
+        cameraOffset: CGSize
+    ) -> [StationLabelPlacement] {
         if document.geometryStatus != .authored,
            cameraScale < max(0.48, minimumCameraScale) {
             return []
@@ -2056,8 +2079,8 @@ struct BeckMapCanvas: View {
         }
         guard !visibleLabels.isEmpty else { return [] }
 
-        let viewportRect = StationLabelLayoutEngine.availableViewport(in: viewport)
-        let markerFrames = markerExclusionFrames()
+        let viewportRect = BeckMapArtworkCachePolicy.labelViewport(in: viewport)
+        let markerFrames = markerExclusionFrames(cameraScale: cameraScale, cameraOffset: cameraOffset)
         let markerFramesByStationID = Dictionary(grouping: markerFrames, by: \.stationID)
             .mapValues { blockers in
                 blockers.reduce(into: CGRect.null) { bounds, blocker in
@@ -2100,7 +2123,11 @@ struct BeckMapCanvas: View {
             }.reduce(into: CGRect.null) { frame, markerFrame in
                 frame = frame.union(markerFrame)
             }
-            let screenAnchor = screenPoint(renderedLabel.artworkAnchor)
+            let screenAnchor = screenPoint(
+                renderedLabel.artworkAnchor,
+                cameraScale: cameraScale,
+                cameraOffset: cameraOffset
+            )
             return StationLabelLayoutInput(
                 id: label.id,
                 priority: label.priority,
@@ -2124,7 +2151,9 @@ struct BeckMapCanvas: View {
             inputs: layoutInputs,
             viewport: viewportRect,
             markerBlockers: markerFrames,
-            lineBlockers: lineExclusionBlockers(in: viewportRect)
+            lineBlockers: lineExclusionBlockers(
+                in: viewportRect, cameraScale: cameraScale, cameraOffset: cameraOffset
+            )
         )
     }
 
@@ -3393,9 +3422,13 @@ enum StationLabelLayoutEngine {
                 authoredAlignment: input.preferredAlignment,
                 screenOffset: input.screenOffset
             )
-            var bestPlacement: (score: Int, placement: StationLabelPlacement)?
+            var bestPlacement: StationLabelPlacement?
 
-            for (optionIndex, option) in options.enumerated() {
+            // Options and their candidates are already ordered by preference:
+            // each option used to add 18 to the score and has 15 candidates.
+            // The first valid candidate is therefore the same winning placement
+            // as an exhaustive search, without checking every remaining option.
+            placementSearch: for option in options {
                 guard let backgroundBounds = input.boundsByAlignment[option.alignment] else {
                     continue
                 }
@@ -3406,7 +3439,7 @@ enum StationLabelLayoutEngine {
                     screenOffset: option.screenOffset,
                     authoredAlignment: option.alignment
                 )
-                for (candidateIndex, candidate) in candidates.enumerated() {
+                for candidate in candidates {
                     let labelFrame = backgroundBounds
                         .applying(input.rotation)
                         .standardized
@@ -3423,8 +3456,7 @@ enum StationLabelLayoutEngine {
                         occupiedIndex: occupiedIndex
                     ) else { continue }
 
-                    let score = optionIndex * 18 + candidateIndex
-                    let placement = StationLabelPlacement(
+                    bestPlacement = StationLabelPlacement(
                         labelID: input.id,
                         position: candidate.position,
                         alignment: candidate.alignment,
@@ -3432,13 +3464,11 @@ enum StationLabelLayoutEngine {
                         backgroundBounds: backgroundBounds,
                         collisionFrame: collisionFrame
                     )
-                    if bestPlacement.map({ score < $0.score }) ?? true {
-                        bestPlacement = (score, placement)
-                    }
+                    break placementSearch
                 }
             }
 
-            guard let placement = bestPlacement?.placement else { continue }
+            guard let placement = bestPlacement else { continue }
             placements.append(placement)
             occupiedIndex.insert(
                 placement.collisionFrame,
@@ -3644,51 +3674,37 @@ private extension CGPoint {
     }
 }
 
-private enum BeckMapGesturePhase {
-    case began
-    case changed
-    case decelerating
-    case ended
-}
-
 enum BeckMapArtworkCachePolicy {
     /// Extra rendered content around the viewport prevents exposed edges while
     /// Core Animation translates or scales the cached Canvas during interaction.
-    static let overscan: CGFloat = 160
-    static let rebaseDistance: CGFloat = 120
+    static let overscan: CGFloat = 240
+
+    static func labelViewport(in canvasSize: CGSize) -> CGRect {
+        CGRect(origin: .zero, size: canvasSize).insetBy(dx: 8, dy: 8)
+    }
 
     static func shouldRebase(
-        cameraOffset: CGSize,
-        renderOffset: CGSize
-    ) -> Bool {
-        abs(cameraOffset.width - renderOffset.width) >= rebaseDistance
-            || abs(cameraOffset.height - renderOffset.height) >= rebaseDistance
-    }
-
-    static func shouldRebaseZoom(
         cameraScale: CGFloat,
+        cameraOffset: CGSize,
         renderScale: CGFloat,
+        renderOffset: CGSize,
         viewportSize: CGSize
     ) -> Bool {
-        let scaleRatio = cameraScale / max(0.000_001, renderScale)
-        guard scaleRatio < 1 else { return false }
-
-        let canvasSize = CGSize(
+        let transform = BeckMapLayerTransform.transform(
+            cameraScale: cameraScale, cameraOffset: cameraOffset,
+            renderScale: renderScale, renderOffset: renderOffset, overscan: overscan
+        )
+        let coverage = CGRect(
+            x: 0, y: 0,
             width: viewportSize.width + overscan * 2,
             height: viewportSize.height + overscan * 2
-        )
-        let minimumCoverageRatio = max(
-            viewportSize.width / max(1, canvasSize.width),
-            viewportSize.height / max(1, canvasSize.height)
-        )
-        return scaleRatio <= min(0.96, minimumCoverageRatio + 0.025)
+        ).applying(transform)
+        // Account for both zoom and focal-point translation, including a pinch
+        // near an edge. Leave time for the next buffer to render before exposure.
+        let requiredCoverage = CGRect(origin: .zero, size: viewportSize).insetBy(dx: -48, dy: -48)
+        return !coverage.contains(requiredCoverage) || cameraScale / max(0.000_001, renderScale) >= 1.75
     }
-}
 
-enum BeckMapInteractionOverlayPolicy {
-    static func showsStationLabels(isFingerDown: Bool, isPinching: Bool) -> Bool {
-        true
-    }
 }
 
 enum BeckMapMomentumPolicy {
@@ -3756,23 +3772,6 @@ private struct BeckMapArtworkCacheKey: Equatable {
     let canvasSize: CGSize
 }
 
-private struct BeckMapCachedArtworkLayer: View, Equatable {
-    let key: BeckMapArtworkCacheKey
-    let renderer: (inout GraphicsContext, CGSize) -> Void
-
-    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.key == rhs.key
-    }
-
-    var body: some View {
-        Canvas(
-            opaque: false,
-            rendersAsynchronously: true,
-            renderer: renderer
-        )
-    }
-}
-
 private struct BeckMapLabelCacheKey: Equatable {
     let documentID: String
     let graphGeneratedAt: String
@@ -3784,23 +3783,6 @@ private struct BeckMapLabelCacheKey: Equatable {
     let labelTypeScale: CGFloat
 }
 
-private struct BeckMapCachedLabelLayer: View, Equatable {
-    let key: BeckMapLabelCacheKey
-    let renderer: (inout GraphicsContext, CGSize) -> Void
-
-    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.key == rhs.key
-    }
-
-    var body: some View {
-        Canvas(
-            opaque: false,
-            rendersAsynchronously: true,
-            renderer: renderer
-        )
-    }
-}
-
 private struct BeckMapTrainCacheKey: Equatable {
     let trains: [LiveTubeTrain]
     let selectedTrainID: String?
@@ -3809,277 +3791,5 @@ private struct BeckMapTrainCacheKey: Equatable {
     let cameraScale: CGFloat
     let cameraOffset: CGSize
     let canvasSize: CGSize
-}
-
-private struct BeckMapCachedTrainLayer: View, Equatable {
-    let key: BeckMapTrainCacheKey
-    let renderer: (inout GraphicsContext, CGSize) -> Void
-
-    nonisolated static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.key == rhs.key
-    }
-
-    var body: some View {
-        Canvas(renderer: renderer)
-    }
-}
-
-private struct BeckMapGestureSurface: UIViewRepresentable {
-    let allowsMomentum: Bool
-    let onInteractionChange: (Bool) -> Void
-    let onPan: (CGSize, BeckMapGesturePhase) -> Void
-    let onPinch: (CGFloat, CGPoint, BeckMapGesturePhase) -> Void
-    let onTap: (CGPoint) -> Void
-
-    func makeCoordinator() -> Coordinator { Coordinator(parent: self) }
-
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.isMultipleTouchEnabled = true
-        view.isAccessibilityElement = false
-
-        let pan = UIPanGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.pan(_:)))
-        pan.minimumNumberOfTouches = 1
-        pan.maximumNumberOfTouches = 1
-        pan.delegate = context.coordinator
-
-        let pinch = UIPinchGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.pinch(_:)))
-        pinch.delegate = context.coordinator
-
-        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.tap(_:)))
-        tap.require(toFail: pan)
-        tap.require(toFail: pinch)
-
-        view.addGestureRecognizer(pan)
-        view.addGestureRecognizer(pinch)
-        view.addGestureRecognizer(tap)
-        return view
-    }
-
-    func updateUIView(_ uiView: UIView, context: Context) {
-        context.coordinator.parent = self
-    }
-
-    static func dismantleUIView(_ uiView: UIView, coordinator: Coordinator) {
-        coordinator.stopAllMotion()
-    }
-
-    final class Coordinator: NSObject, UIGestureRecognizerDelegate {
-        private enum PanMotion: Equatable {
-            case idle
-            case tracking
-            case decelerating
-        }
-
-        var parent: BeckMapGestureSurface
-        private var panMotion: PanMotion = .idle
-        private var displayLink: CADisplayLink?
-        private var latestTranslation = CGSize.zero
-        private var deliveredTranslation = CGSize.zero
-        private var releaseVelocity = CGPoint.zero
-        private var decelerationElapsed: TimeInterval = 0
-        private var isTrackingPinch = false
-        private var latestPinchScale: CGFloat = 1
-        private var latestPinchLocation = CGPoint.zero
-        private var deliveredPinchScale: CGFloat = 1
-        private var deliveredPinchLocation = CGPoint.zero
-        private var lastReportedInteractionState = false
-
-        init(parent: BeckMapGestureSurface) {
-            self.parent = parent
-        }
-
-        @objc func pan(_ recognizer: UIPanGestureRecognizer) {
-            guard let view = recognizer.view else { return }
-            let translation = recognizer.translation(in: view)
-            let translatedSize = CGSize(width: translation.x, height: translation.y)
-
-            switch recognizer.state {
-            case .began:
-                stopPanMotion(notifyParent: panMotion == .decelerating)
-                latestTranslation = .zero
-                deliveredTranslation = .zero
-                panMotion = .tracking
-                parent.onPan(.zero, .began)
-                notifyInteractionIfNeeded()
-                startDisplayLink(on: view.window?.screen)
-            case .changed:
-                latestTranslation = translatedSize
-            case .ended:
-                latestTranslation = translatedSize
-                deliverLatestTrackingTranslation()
-                let velocity = recognizer.velocity(in: view)
-                if parent.allowsMomentum, beginDeceleration(with: velocity) {
-                    panMotion = .decelerating
-                    // Separate touch tracking from momentum immediately so
-                    // lightweight overlays can return on finger-up.
-                    parent.onPan(.zero, .decelerating)
-                    notifyInteractionIfNeeded()
-                } else {
-                    stopPanMotion(notifyParent: true)
-                }
-            case .cancelled, .failed:
-                latestTranslation = translatedSize
-                deliverLatestTrackingTranslation()
-                stopPanMotion(notifyParent: true)
-            default:
-                break
-            }
-        }
-
-        @objc func pinch(_ recognizer: UIPinchGestureRecognizer) {
-            guard let view = recognizer.view else { return }
-            let location = recognizer.location(in: view)
-
-            switch recognizer.state {
-            case .began:
-                if panMotion == .decelerating {
-                    stopPanMotion(notifyParent: true)
-                }
-                latestPinchScale = recognizer.scale
-                latestPinchLocation = location
-                deliveredPinchScale = recognizer.scale
-                deliveredPinchLocation = location
-                isTrackingPinch = true
-                parent.onPinch(recognizer.scale, location, .began)
-                notifyInteractionIfNeeded()
-                startDisplayLink(on: view.window?.screen)
-            case .changed:
-                latestPinchScale = recognizer.scale
-                latestPinchLocation = location
-            case .ended, .cancelled, .failed:
-                latestPinchScale = recognizer.scale
-                latestPinchLocation = location
-                deliverLatestPinch()
-                isTrackingPinch = false
-                parent.onPinch(recognizer.scale, location, .ended)
-                notifyInteractionIfNeeded()
-                stopDisplayLinkIfIdle()
-            default:
-                break
-            }
-        }
-
-        @objc func tap(_ recognizer: UITapGestureRecognizer) {
-            guard recognizer.state == .ended, let view = recognizer.view else { return }
-            parent.onTap(recognizer.location(in: view))
-        }
-
-        func gestureRecognizer(
-            _ gestureRecognizer: UIGestureRecognizer,
-            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
-        ) -> Bool {
-            gestureRecognizer is UIPinchGestureRecognizer || otherGestureRecognizer is UIPinchGestureRecognizer
-        }
-
-        private func startDisplayLink(on screen: UIScreen?) {
-            guard displayLink == nil else { return }
-            let link = CADisplayLink(target: self, selector: #selector(displayLinkDidFire(_:)))
-            let maximumFramesPerSecond = Float(screen?.maximumFramesPerSecond ?? 60)
-            link.preferredFrameRateRange = CAFrameRateRange(
-                minimum: min(60, maximumFramesPerSecond),
-                maximum: maximumFramesPerSecond,
-                preferred: maximumFramesPerSecond
-            )
-            link.add(to: .main, forMode: .common)
-            displayLink = link
-        }
-
-        @objc private func displayLinkDidFire(_ link: CADisplayLink) {
-            switch panMotion {
-            case .idle:
-                break
-            case .tracking:
-                deliverLatestTrackingTranslation()
-            case .decelerating:
-                let frameDuration = min(
-                    1.0 / 20.0,
-                    max(1.0 / 240.0, link.targetTimestamp - link.timestamp)
-                )
-                let nextVelocity = BeckMapMomentumPolicy.attenuatedVelocity(
-                    releaseVelocity,
-                    over: frameDuration
-                )
-                parent.onPan(
-                    BeckMapMomentumPolicy.translation(
-                        from: releaseVelocity,
-                        to: nextVelocity,
-                        over: frameDuration
-                    ),
-                    .decelerating
-                )
-                releaseVelocity = nextVelocity
-                decelerationElapsed += frameDuration
-
-                if BeckMapMomentumPolicy.shouldStop(
-                    velocity: nextVelocity,
-                    elapsed: decelerationElapsed
-                ) {
-                    stopPanMotion(notifyParent: true)
-                }
-            }
-
-            if isTrackingPinch {
-                deliverLatestPinch()
-            }
-            stopDisplayLinkIfIdle()
-        }
-
-        private func deliverLatestTrackingTranslation() {
-            guard latestTranslation != deliveredTranslation else { return }
-            deliveredTranslation = latestTranslation
-            parent.onPan(latestTranslation, .changed)
-        }
-
-        private func deliverLatestPinch() {
-            guard latestPinchScale != deliveredPinchScale
-                    || latestPinchLocation != deliveredPinchLocation else { return }
-            deliveredPinchScale = latestPinchScale
-            deliveredPinchLocation = latestPinchLocation
-            parent.onPinch(latestPinchScale, latestPinchLocation, .changed)
-        }
-
-        private func beginDeceleration(with velocity: CGPoint) -> Bool {
-            guard let initialVelocity = BeckMapMomentumPolicy.initialVelocity(
-                from: velocity
-            ) else { return false }
-
-            releaseVelocity = initialVelocity
-            decelerationElapsed = 0
-            return true
-        }
-
-        fileprivate func stopPanMotion(notifyParent: Bool) {
-            panMotion = .idle
-            releaseVelocity = .zero
-            decelerationElapsed = 0
-            if notifyParent {
-                parent.onPan(.zero, .ended)
-            }
-            notifyInteractionIfNeeded()
-            stopDisplayLinkIfIdle()
-        }
-
-        private func notifyInteractionIfNeeded() {
-            let isInteracting = panMotion == .tracking || isTrackingPinch
-            guard isInteracting != lastReportedInteractionState else { return }
-            lastReportedInteractionState = isInteracting
-            parent.onInteractionChange(isInteracting)
-        }
-
-        private func stopDisplayLinkIfIdle() {
-            guard panMotion == .idle, !isTrackingPinch else { return }
-            displayLink?.invalidate()
-            displayLink = nil
-        }
-
-        fileprivate func stopAllMotion() {
-            isTrackingPinch = false
-            panMotion = .idle
-            displayLink?.invalidate()
-            displayLink = nil
-            notifyInteractionIfNeeded()
-        }
-    }
+    let colorScheme: ColorScheme
 }

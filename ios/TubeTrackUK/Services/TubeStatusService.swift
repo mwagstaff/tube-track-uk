@@ -8,7 +8,7 @@ struct TubeStatusSnapshot: Codable, Sendable {
 }
 
 actor TubeStatusService {
-    private static let freshLifetime: TimeInterval = 60
+    private static let freshLifetime: TimeInterval = 30
 
     private let client: TubeTrackAPIClient
     private let cache: SnapshotCache
@@ -21,7 +21,23 @@ actor TubeStatusService {
         self.repository = repository
     }
 
+    /// Reads the last known disruptions without waiting for a network request.
+    /// The original timestamp is retained even when the data is very old.
+    func cachedSnapshot() async -> TubeStatusSnapshot? {
+        if let latestSnapshot {
+            return latestSnapshot.asCached
+        }
+        guard let saved = try? await cache.load(TubeStatusSnapshot.self, named: "status.json") else {
+            return nil
+        }
+        // The actor may have received a newer response while reading the disk.
+        let snapshot = (latestSnapshot ?? saved).asCached
+        latestSnapshot = snapshot
+        return snapshot
+    }
+
     func fetch(forceRefresh: Bool = false) async throws -> TubeStatusSnapshot {
+        try Task.checkCancellation()
         let now = Date.now
         if !forceRefresh,
            let latestSnapshot,
@@ -29,23 +45,18 @@ actor TubeStatusService {
             return latestSnapshot
         }
         if !forceRefresh,
-           let cached = try? await cache.load(TubeStatusSnapshot.self, named: "status.json"),
+           let cached = await cachedSnapshot(),
            now.timeIntervalSince(cached.fetchedAt) < Self.freshLifetime {
-            let snapshot = TubeStatusSnapshot(
-                statuses: cached.statuses,
-                disruptions: cached.disruptions,
-                fetchedAt: cached.fetchedAt,
-                cached: true
-            )
-            latestSnapshot = snapshot
-            return snapshot
+            return cached
         }
 
         do {
-            let statuses: [TfLLineStatus] = try await client.get(
+            let response: TubeTrackAPIResponse<[TfLLineStatus]> = try await client.getSnapshot(
                 "/api/v1/status",
                 forceRefresh: forceRefresh
             )
+            try Task.checkCancellation()
+            let statuses = response.data
             let resolver = DisruptionResolver(repository: repository)
             let disruptions = statuses.flatMap(resolver.resolve).sorted { left, right in
                 if left.severity != right.severity { return left.severity < right.severity }
@@ -54,25 +65,32 @@ actor TubeStatusService {
             let snapshot = TubeStatusSnapshot(
                 statuses: statuses.map(\.compactedForDisplay),
                 disruptions: disruptions,
-                fetchedAt: .now,
-                cached: false
+                fetchedAt: response.updatedAt,
+                cached: response.cached || response.stale
             )
-            try? await cache.save(snapshot, named: "status.json")
             latestSnapshot = snapshot
+            try? await cache.save(snapshot, named: "status.json")
             return snapshot
         } catch {
-            if let cached = try? await cache.load(TubeStatusSnapshot.self, named: "status.json") {
-                let snapshot = TubeStatusSnapshot(
-                    statuses: cached.statuses,
-                    disruptions: cached.disruptions,
-                    fetchedAt: cached.fetchedAt,
-                    cached: true
-                )
-                latestSnapshot = snapshot
-                return snapshot
+            try Task.checkCancellation()
+            if error is CancellationError { throw error }
+            if let cached = await cachedSnapshot() {
+                latestSnapshot = cached
+                return cached
             }
             throw error
         }
+    }
+}
+
+private extension TubeStatusSnapshot {
+    var asCached: TubeStatusSnapshot {
+        TubeStatusSnapshot(
+            statuses: statuses,
+            disruptions: disruptions,
+            fetchedAt: fetchedAt,
+            cached: true
+        )
     }
 }
 

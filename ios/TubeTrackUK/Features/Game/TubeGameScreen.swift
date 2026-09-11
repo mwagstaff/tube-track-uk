@@ -68,6 +68,7 @@ private struct TubeGameSessionView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(TubeGameHighScoreStore.self) private var highScores
     @Environment(GameCenterService.self) private var gameCenter
+    @Environment(TubeAppState.self) private var appState
 
     @Bindable var engine: TubeGameEngine
     let renderModel: TubeGameRenderModel
@@ -151,7 +152,15 @@ private struct TubeGameSessionView: View {
         .ignoresSafeArea()
         .task {
             // Sign in only after the game has loaded and its session is onscreen.
+            gameCenter.setOffline(appState.isOffline)
             gameCenter.authenticate()
+        }
+        .onChange(of: appState.isOffline) { _, isOffline in
+            gameCenter.setOffline(isOffline)
+            if isOffline {
+                isChoosingLeaderboard = false
+                rankingsLeaderboard = nil
+            }
         }
         .onChange(of: engine.snapshot.phase) { _, newPhase in
             handlePhaseChange(newPhase)
@@ -176,6 +185,7 @@ private struct TubeGameSessionView: View {
                 Button(leaderboard.title) {
                     rankingsLeaderboard = leaderboard
                 }
+                .disabled(appState.isOffline)
             }
         } message: {
             Text("Compare with everyone over the past 24 hours, 7 days or all time.")
@@ -316,6 +326,14 @@ private struct TubeGameSessionView: View {
                 }
             }
 
+            if appState.isOffline {
+                Label("Offline · scores saved on this device", systemImage: "wifi.slash")
+                    .font(.appCaption(.semibold))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .glassEffect(.regular, in: .capsule)
+            }
+
             if dynamicTypeSize.isAccessibilitySize, !landscape {
                 VStack(alignment: .trailing, spacing: 10) {
                     TubeGameIntentBadge(snapshot: snapshot)
@@ -358,7 +376,8 @@ private struct TubeGameSessionView: View {
         case .ready:
             TubeGameReadyView(
                 bestScore: highScores.bestScore,
-                gameCenterAvailable: gameCenter.rankingsAvailable,
+                gameCenterAvailable: gameCenter.rankingsAvailable && !appState.isOffline,
+                isOffline: appState.isOffline,
                 onStart: engine.start,
                 onShowRankings: showRankings,
                 onDismiss: onDismiss
@@ -387,7 +406,8 @@ private struct TubeGameSessionView: View {
                 record: submittedRecord,
                 achievements: achievements,
                 collisionLineID: engine.collisionLineID,
-                gameCenterAvailable: gameCenter.rankingsAvailable,
+                gameCenterAvailable: gameCenter.rankingsAvailable && !appState.isOffline,
+                isOffline: appState.isOffline,
                 gameCenterSubmissionState: gameCenter.submissionState,
                 onPlayAgain: playAgain,
                 onShowRankings: showRankings,
@@ -429,7 +449,7 @@ private struct TubeGameSessionView: View {
     }
 
     private func showRankings() {
-        guard gameCenter.rankingsAvailable else { return }
+        guard !appState.isOffline, gameCenter.rankingsAvailable else { return }
         isChoosingLeaderboard = true
     }
 
@@ -662,6 +682,7 @@ private struct TubeGameIntentBadge: View {
 private struct TubeGameReadyView: View {
     let bestScore: Int
     let gameCenterAvailable: Bool
+    let isOffline: Bool
     let onStart: () -> Void
     let onShowRankings: () -> Void
     let onDismiss: () -> Void
@@ -674,11 +695,11 @@ private struct TubeGameReadyView: View {
             ScrollView {
                 VStack(spacing: 22) {
                     HStack(spacing: 12) {
-                        TrackAttackGlyph(mouthAngle: 30)
+                        TrackManGlyph(mouthAngle: 30)
                             .scaleEffect(2.35)
                             .frame(width: 48, height: 48)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("TRACK ATTACK")
+                            Text("TRACK-MAN")
                                 .font(.appTitle(.bold))
                             Text("A 60-second network run")
                                 .font(.appSubheadline(.medium))
@@ -734,9 +755,16 @@ private struct TubeGameReadyView: View {
                     .background(.yellow, in: .rect(cornerRadius: 16))
                     .accessibilityHint("Begins at Oxford Circus after a three-second countdown")
 
+                    if isOffline {
+                        Label("Play offline. Your scores are saved on this device.", systemImage: "wifi.slash")
+                            .font(.appCaption(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+
                     Button(action: onShowRankings) {
                         Label(
-                            gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable",
+                            isOffline ? "Game Center requires a connection" :
+                                (gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable"),
                             systemImage: "person.3.fill"
                         )
                         .font(.appHeadline(.semibold))
@@ -745,6 +773,7 @@ private struct TubeGameReadyView: View {
                     .buttonStyle(.plain)
                     .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 15))
                     .disabled(!gameCenterAvailable)
+                    .opacity(gameCenterAvailable ? 1 : 0.45)
                 }
                 .padding(24)
                 .frame(maxWidth: 560)
@@ -761,7 +790,7 @@ private struct TubeGameReadyView: View {
                     }
                     .buttonStyle(.plain)
                     .glassEffect(.regular.interactive(), in: .circle)
-                    .accessibilityLabel("Close Track Attack")
+                    .accessibilityLabel("Close Track-Man")
                     Spacer()
                 }
                 Spacer()
@@ -854,6 +883,7 @@ private struct TubeGameResultsView: View {
     let achievements: [TubeGameAchievement]
     let collisionLineID: TubeLineID?
     let gameCenterAvailable: Bool
+    let isOffline: Bool
     let gameCenterSubmissionState: GameCenterSubmissionState
     let onPlayAgain: () -> Void
     let onShowRankings: () -> Void
@@ -861,7 +891,6 @@ private struct TubeGameResultsView: View {
 
     @State private var shareFailed = false
     @State private var celebrationID = UUID()
-    @State private var areAchievementsExpanded = false
 
     var body: some View {
         ZStack {
@@ -895,41 +924,28 @@ private struct TubeGameResultsView: View {
                             .multilineTextAlignment(.center)
                     }
 
-                    if let achievement = achievements.first {
+                    if !achievements.isEmpty {
                         VStack(spacing: 10) {
-                            Image(systemName: "trophy.fill")
-                                .font(.appTitle2(.bold))
-                                .accessibilityHidden(true)
-                            Text(achievement.message)
-                                .font(.appTitle3(.bold))
-                                .fixedSize(horizontal: false, vertical: true)
-                            if achievements.count > 1 {
-                                DisclosureGroup(isExpanded: $areAchievementsExpanded) {
-                                    VStack(alignment: .leading, spacing: 10) {
-                                        ForEach(achievements.dropFirst()) { achievement in
-                                            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                                                Text(achievement.message)
-                                                    .fixedSize(horizontal: false, vertical: true)
-                                                Spacer(minLength: 8)
-                                                Text(achievement.value.formatted())
-                                                    .monospacedDigit()
-                                            }
-                                            .font(.appSubheadline(.semibold))
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .accessibilityElement(children: .combine)
-                                        }
+                            ForEach(achievements) { achievement in
+                                Label {
+                                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                                        Text(achievement.message)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                        Spacer(minLength: 8)
+                                        Text(achievement.formattedValue)
+                                            .monospacedDigit()
                                     }
-                                    .padding(.top, 8)
-                                } label: {
-                                    Text(achievementDisclosureLabel)
-                                        .font(.appBody(.semibold))
-                                        .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                                } icon: {
+                                    Image(systemName: "trophy.fill")
+                                        .font(.appCaption(.bold))
+                                        .accessibilityHidden(true)
                                 }
-                                .tint(accentTextColour)
+                                .font(.appSubheadline(.semibold))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .accessibilityElement(children: .combine)
                             }
                         }
                         .foregroundStyle(accentTextColour)
-                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .padding(16)
                         .background(Color(red: 0.03, green: 0.06, blue: 0.13), in: .rect(cornerRadius: 18))
@@ -951,8 +967,17 @@ private struct TubeGameResultsView: View {
                     }
 
                     ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 26) {
-                            resultMetrics
+                        Grid(horizontalSpacing: 26, verticalSpacing: 12) {
+                            GridRow {
+                                resultMetric(title: "STATIONS", value: "\(snapshot.stationsEaten)")
+                                resultMetric(title: "LINES", value: "\(snapshot.linesCleared)")
+                                resultMetric(title: "TERMINI", value: "\(snapshot.terminusStationsReached)")
+                            }
+                            GridRow {
+                                resultMetric(title: "BEST COMBO", value: "\(snapshot.maximumSameLineStreak)")
+                                resultMetric(title: "TIME SURVIVED", value: "\(timeSurvivedSeconds)s")
+                                resultMetric(title: "LOCAL BEST", value: "\(highScores.bestScore)")
+                            }
                         }
                         VStack(spacing: 12) {
                             resultMetrics
@@ -974,7 +999,8 @@ private struct TubeGameResultsView: View {
 
                     Button(action: onShowRankings) {
                         Label(
-                            gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable",
+                            isOffline ? "Game Center requires a connection" :
+                                (gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable"),
                             systemImage: "person.3.fill"
                         )
                         .font(.appHeadline(.semibold))
@@ -983,6 +1009,7 @@ private struct TubeGameResultsView: View {
                     .buttonStyle(.plain)
                     .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 15))
                     .disabled(!gameCenterAvailable)
+                    .opacity(gameCenterAvailable ? 1 : 0.45)
 
                     if reason != .manualQuit, record != nil {
                         TubeGameShareButton(
@@ -1041,14 +1068,6 @@ private struct TubeGameResultsView: View {
         }
     }
 
-    private var achievementDisclosureLabel: String {
-        let remainingCount = achievements.count - 1
-        let noun = remainingCount == 1 ? "record" : "records"
-        return areAchievementsExpanded
-            ? "Hide \(remainingCount) more \(noun)"
-            : "Plus \(remainingCount) more \(noun)!"
-    }
-
     @MainActor
     private func prepareShareImage() -> TubeGameShareItem? {
         guard let record, reason != .manualQuit else { return nil }
@@ -1056,7 +1075,10 @@ private struct TubeGameResultsView: View {
         renderer.scale = 3
         renderer.isOpaque = true
         guard let image = renderer.uiImage else { return nil }
-        return TubeGameShareItem(image: image, title: "TubeTrack UK · \(record.score) points")
+        return TubeGameShareItem(
+            image: image,
+            title: "TubeTrack UK · \(record.score) points · \(record.timeSurvivedSeconds)s survived"
+        )
     }
 
     private func resultMetric(title: String, value: String) -> some View {
@@ -1074,6 +1096,10 @@ private struct TubeGameResultsView: View {
     @ViewBuilder
     private func gameCenterSubmissionStatus(for recordID: UUID) -> some View {
         switch gameCenterSubmissionState {
+        case let .queued(id) where id == recordID:
+            Label("Saved on this device · Game Center will sync when connected", systemImage: "icloud.slash")
+                .font(.appCaption(.semibold))
+                .foregroundStyle(.secondary)
         case let .submitting(id) where id == recordID:
             Label("Saving to Game Center…", systemImage: "arrow.triangle.2.circlepath")
                 .font(.appCaption(.semibold))
@@ -1086,7 +1112,7 @@ private struct TubeGameResultsView: View {
             Label("Saved locally; Game Center could not update", systemImage: "icloud.slash")
                 .font(.appCaption(.semibold))
                 .foregroundStyle(.secondary)
-        case .idle, .submitting, .submitted, .failed:
+        case .idle, .queued, .submitting, .submitted, .failed:
             EmptyView()
         }
     }
@@ -1096,7 +1122,13 @@ private struct TubeGameResultsView: View {
         resultMetric(title: "STATIONS", value: "\(snapshot.stationsEaten)")
         resultMetric(title: "LINES", value: "\(snapshot.linesCleared)")
         resultMetric(title: "TERMINI", value: "\(snapshot.terminusStationsReached)")
+        resultMetric(title: "BEST COMBO", value: "\(snapshot.maximumSameLineStreak)")
+        resultMetric(title: "TIME SURVIVED", value: "\(timeSurvivedSeconds)s")
         resultMetric(title: "LOCAL BEST", value: "\(highScores.bestScore)")
+    }
+
+    private var timeSurvivedSeconds: Int {
+        record?.timeSurvivedSeconds ?? Int(max(0, snapshot.elapsedTime).rounded(.down))
     }
 
     private var accentTextColour: Color {
@@ -1160,7 +1192,7 @@ private struct TubeGameLoadingView: View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
             VStack(spacing: 14) {
-                TrackAttackGlyph()
+                TrackManGlyph()
                     .scaleEffect(2.5)
                     .frame(width: 50, height: 50)
                 ProgressView()
@@ -1174,7 +1206,7 @@ private struct TubeGameLoadingView: View {
                             .frame(width: 44, height: 44)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Close Track Attack")
+                    .accessibilityLabel("Close Track-Man")
                     Spacer()
                 }
                 Spacer()
@@ -1191,7 +1223,7 @@ private struct TubeGameLoadFailureView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label("Track Attack unavailable", systemImage: "tram.fill")
+            Label("Track-Man unavailable", systemImage: "tram.fill")
         } description: {
             Text(message)
         } actions: {
@@ -1243,7 +1275,7 @@ private extension TubeGameScoreEndReason {
     var detail: String {
         switch self {
         case .completed: "Your 60-second run is complete."
-        case .collision: "One touch is all it takes. The train ended your run."
+        case .collision: "In Track-Man, the train catches you."
         case .networkCleared: "You ate every available station. Remarkable work."
         case .manualQuit: "This run was not added to your local top ten."
         }

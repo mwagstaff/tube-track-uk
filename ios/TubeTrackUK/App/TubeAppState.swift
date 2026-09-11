@@ -111,6 +111,7 @@ final class TubeAppState {
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
     private(set) var isGameActive = false
+    private(set) var isOffline = false
     var showLiveTrains = false
     var isLoadingLiveTrains = false
     var trainLineFilter: Set<TubeLineID> = []
@@ -166,6 +167,7 @@ final class TubeAppState {
     var nearbyArrivalsErrorsByStationID: [String: String] = [:]
     var statusUpdatedAt: Date?
     var worksUpdatedAt: Date?
+    private(set) var worksCachedThrough: Date?
     var isUsingCachedStatus = false
     var isUsingCachedWorks = false
     var isLoadingGraph = true
@@ -193,13 +195,23 @@ final class TubeAppState {
     @ObservationIgnored private var started = false
     @ObservationIgnored private var initialRefreshTask: Task<Void, Never>?
     @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let snapshotCache: SnapshotCache
+    @ObservationIgnored private let connectivityMonitor: NetworkConnectivityMonitor?
 
     init(
         defaults: UserDefaults = .standard,
-        trainService: (any LiveTrainFetching)? = nil
+        trainService: (any LiveTrainFetching)? = nil,
+        apiClient: TubeTrackAPIClient? = nil,
+        snapshotCache: SnapshotCache = SnapshotCache(),
+        monitorsConnectivity: Bool = true
     ) {
         self.defaults = defaults
         self.trainService = trainService
+        self.apiClient = apiClient
+        self.snapshotCache = snapshotCache
+        self.connectivityMonitor = monitorsConnectivity
+            && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
+            ? NetworkConnectivityMonitor() : nil
         appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
             .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
 
@@ -225,6 +237,11 @@ final class TubeAppState {
         }
         if arguments.contains("-DebugIssues") {
             disruptionDisplayMode = .issues
+        }
+        if arguments.contains("-DebugOffline") {
+            isOffline = true
+            mapPresentationMode = .beck
+            showLiveTrains = false
         }
         #endif
     }
@@ -315,7 +332,8 @@ final class TubeAppState {
         MapNetworkStatusSummary(
             statuses: statuses,
             disruptions: visibleDisruptions,
-            isViewingLiveStatus: isViewingLiveStatus
+            isViewingLiveStatus: isViewingLiveStatus,
+            hasPlannedStatus: !isOffline || hasSavedWorks(for: selectedDisruptionDate)
         )
     }
 
@@ -352,7 +370,7 @@ final class TubeAppState {
     }
 
     var isUsingCachedDisruptionData: Bool {
-        isViewingLiveStatus ? isUsingCachedStatus : isUsingCachedWorks
+        isOffline || (isViewingLiveStatus ? isUsingCachedStatus : isUsingCachedWorks)
     }
 
     var isRefreshingDisruptionData: Bool {
@@ -360,7 +378,7 @@ final class TubeAppState {
     }
 
     var isLoadingInitialStatus: Bool {
-        statuses.isEmpty
+        !isOffline && statuses.isEmpty
             && statusUpdatedAt == nil
             && (isRefreshingStatus || statusError == nil)
     }
@@ -375,9 +393,20 @@ final class TubeAppState {
         }.count
     }
 
+    func hasSavedWorks(for date: Date) -> Bool {
+        guard let worksUpdatedAt, let worksCachedThrough else { return false }
+        let calendar = LondonRailDate.calendar
+        let day = calendar.startOfDay(for: date)
+        return day >= calendar.startOfDay(for: worksUpdatedAt)
+            && day <= calendar.startOfDay(for: worksCachedThrough)
+    }
+
     func start() async {
         guard !started else { return }
         started = true
+        connectivityMonitor?.start { [weak self] connected in
+            self?.setNetworkAvailable(connected)
+        }
         isLoadingGraph = true
         do {
             // JSON decoding and artwork validation are local CPU and disk work.
@@ -401,9 +430,9 @@ final class TubeAppState {
             mobileCoverage = startupContent.2
             graph = loadedGraph
             let repository = TubeNetworkRepository(graph: loadedGraph)
-            let client = TubeTrackAPIClient()
+            let client = apiClient ?? TubeTrackAPIClient()
             apiClient = client
-            let cache = SnapshotCache()
+            let cache = snapshotCache
             statusService = TubeStatusService(client: client, cache: cache, repository: repository)
             worksService = EngineeringWorksService(client: client, cache: cache, repository: repository)
             if trainService == nil {
@@ -411,6 +440,9 @@ final class TubeAppState {
             }
             stationArrivalsService = StationArrivalsService(client: client)
             isLoadingGraph = false
+
+            await restoreCachedDisruptions()
+            guard !Task.isCancelled else { return }
 
             // Live status and planned works enhance the already usable map.
             // Fetch them concurrently without keeping the launch interstitial
@@ -434,12 +466,34 @@ final class TubeAppState {
         updateLiveTrainPollingVisibility()
     }
 
-    func refreshStatus() async {
-        guard let statusService, !isRefreshingStatus else { return }
+    private func restoreCachedDisruptions() async {
+        async let status = statusService?.cachedSnapshot()
+        async let works = worksService?.cachedSnapshot()
+        let snapshots = await (status, works)
+        guard !Task.isCancelled else { return }
+        if let saved = snapshots.0,
+           statusUpdatedAt == nil || saved.fetchedAt > statusUpdatedAt! {
+            statuses = saved.statuses
+            disruptions = saved.disruptions
+            statusUpdatedAt = saved.fetchedAt
+            isUsingCachedStatus = true
+        }
+        if let saved = snapshots.1,
+           worksUpdatedAt == nil || saved.fetchedAt > worksUpdatedAt! {
+            engineeringWorks = saved.works
+            worksUpdatedAt = saved.fetchedAt
+            worksCachedThrough = saved.requestedThrough
+            isUsingCachedWorks = true
+        }
+    }
+
+    func refreshStatus(forceRefresh: Bool = false) async {
+        guard !isOffline, let statusService, !isRefreshingStatus else { return }
         isRefreshingStatus = true
         defer { isRefreshingStatus = false }
         do {
-            let snapshot = try await statusService.fetch()
+            let snapshot = try await statusService.fetch(forceRefresh: forceRefresh)
+            guard !Task.isCancelled else { return }
             if statuses != snapshot.statuses {
                 statuses = snapshot.statuses
             }
@@ -455,13 +509,15 @@ final class TubeAppState {
             }
             #endif
             statusUpdatedAt = snapshot.fetchedAt
-            isUsingCachedStatus = snapshot.cached
+            isUsingCachedStatus = snapshot.cached || isOffline
             statusError = nil
             if selectedDisruptionID != nil && selectedDisruption == nil {
                 selectedDisruptionID = nil
             }
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError) else { return }
             statusError = error.localizedDescription
+            isUsingCachedStatus = statusUpdatedAt != nil
         }
     }
 
@@ -469,7 +525,7 @@ final class TubeAppState {
         through requestedDate: Date? = nil,
         forceRefresh: Bool = false
     ) async {
-        guard let worksService, !isRefreshingWorks else { return }
+        guard !isOffline, let worksService, !isRefreshingWorks else { return }
         isRefreshingWorks = true
         defer { isRefreshingWorks = false }
         do {
@@ -477,19 +533,24 @@ final class TubeAppState {
                 through: requestedDate,
                 forceRefresh: forceRefresh
             )
+            guard !Task.isCancelled else { return }
             engineeringWorks = snapshot.works
             worksUpdatedAt = snapshot.fetchedAt
-            isUsingCachedWorks = snapshot.cached
+            worksCachedThrough = snapshot.requestedThrough
+            isUsingCachedWorks = snapshot.cached || isOffline
             worksError = nil
             if selectedEngineeringWorkID != nil && selectedEngineeringWork == nil {
                 clearMapSelection()
             }
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError) else { return }
             worksError = error.localizedDescription
+            isUsingCachedWorks = worksUpdatedAt != nil
         }
     }
 
     func setLiveTrains(_ enabled: Bool) {
+        guard !enabled || !isOffline else { return }
         showLiveTrains = enabled
         if enabled {
             isLoadingLiveTrains = liveTrains.isEmpty
@@ -690,7 +751,7 @@ final class TubeAppState {
         for stations: [TubeStation],
         forceRefresh: Bool = false
     ) async {
-        guard let graph, let stationArrivalsService else { return }
+        guard !isOffline, let graph, let stationArrivalsService else { return }
 
         let stationIDs = Set(stations.map(\.id))
         nearbyArrivalsLoadingStationIDs.formUnion(stationIDs)
@@ -735,6 +796,7 @@ final class TubeAppState {
 
             for await result in group {
                 guard nearbyArrivalsGenerationByStationID[result.stationID] == result.generation,
+                      !isOffline,
                       !Task.isCancelled else { continue }
                 nearbyArrivalsLoadingStationIDs.remove(result.stationID)
                 if let errorDescription = result.errorDescription {
@@ -838,6 +900,7 @@ final class TubeAppState {
             updateLiveTrainPollingVisibility()
             updateSelectedStationArrivalsVisibility()
         } else {
+            initialRefreshTask?.cancel()
             statusPollingTask?.cancel()
             statusPollingTask = nil
             trainPollingTask?.cancel()
@@ -845,6 +908,36 @@ final class TubeAppState {
             cancelTrainRefresh()
             cancelStationArrivalsPolling()
             cancelStationArrivalsRefresh()
+        }
+    }
+
+    /// Network changes affect only live enhancements; bundled content stays usable.
+    func setNetworkAvailable(_ available: Bool) {
+        guard isOffline != !available else { return }
+        isOffline = !available
+        if isOffline {
+            mapPresentationMode = .beck
+            initialRefreshTask?.cancel()
+            statusPollingTask?.cancel()
+            statusPollingTask = nil
+            isUsingCachedStatus = statusUpdatedAt != nil
+            isUsingCachedWorks = worksUpdatedAt != nil
+            setLiveTrains(false)
+            cancelStationArrivalsPolling()
+            cancelStationArrivalsRefresh()
+            stationArrivals = []
+            stationArrivalsUpdatedAt = nil
+            nearbyArrivalsByStationID = [:]
+            nearbyArrivalsUpdatedAtByStationID = [:]
+            nearbyArrivalsLoadingStationIDs = []
+            // Reject an arrivals response already in flight before disconnecting.
+            for stationID in Array(nearbyArrivalsGenerationByStationID.keys) {
+                nearbyArrivalsGenerationByStationID[stationID, default: 0] &+= 1
+            }
+        } else if appIsActive {
+            startStatusPolling(refreshImmediately: true)
+            updateLiveTrainPollingVisibility()
+            updateSelectedStationArrivalsVisibility()
         }
     }
 
@@ -902,21 +995,29 @@ final class TubeAppState {
     }
 
     private func startStatusPolling(refreshImmediately: Bool = false) {
-        guard appIsActive, statusPollingTask == nil, statusService != nil else { return }
+        guard appIsActive, !isOffline, statusPollingTask == nil, statusService != nil else { return }
         statusPollingTask = Task { [weak self] in
             if refreshImmediately {
-                await self?.refreshStatus()
+                await self?.refreshDisruptionSnapshots(forceRefresh: true)
             }
             while !Task.isCancelled {
-                try? await Task.sleep(for: .seconds(60))
+                do {
+                    try await Task.sleep(for: .seconds(30))
+                } catch { return }
                 guard !Task.isCancelled else { return }
-                await self?.refreshStatus()
+                await self?.refreshDisruptionSnapshots()
             }
         }
     }
 
+    private func refreshDisruptionSnapshots(forceRefresh: Bool = false) async {
+        async let status: Void = refreshStatus(forceRefresh: forceRefresh)
+        async let works: Void = refreshWorks(forceRefresh: forceRefresh)
+        _ = await (status, works)
+    }
+
     private func startTrainPolling() {
-        guard appIsActive,
+        guard appIsActive, !isOffline, !isGameActive,
               selectedTab == .map,
               trainPollingTask == nil,
               trainService != nil else { return }
@@ -931,7 +1032,7 @@ final class TubeAppState {
     }
 
     private func requestTrainRefresh() {
-        guard showLiveTrains,
+        guard showLiveTrains, !isOffline, !isGameActive,
               selectedTab == .map,
               trainRetryTask == nil,
               let trainService else { return }
@@ -1093,7 +1194,7 @@ final class TubeAppState {
     }
 
     private func requestStationArrivals(for stationID: String) {
-        guard appIsActive,
+        guard appIsActive, !isOffline, !isGameActive,
               selectedTab == .map,
               stationArrivalsService != nil,
               selectedStationID == stationID else {
@@ -1110,7 +1211,7 @@ final class TubeAppState {
     }
 
     private func startStationArrivalsPolling() {
-        guard appIsActive,
+        guard appIsActive, !isOffline, !isGameActive,
               selectedTab == .map,
               selectedStationID != nil,
               stationArrivalsService != nil,
@@ -1183,7 +1284,7 @@ final class TubeAppState {
     }
 
     private func updateLiveTrainPollingVisibility() {
-        guard appIsActive, !isGameActive, selectedTab == .map, showLiveTrains else {
+        guard appIsActive, !isOffline, !isGameActive, selectedTab == .map, showLiveTrains else {
             trainPollingTask?.cancel()
             trainPollingTask = nil
             cancelTrainRefresh()
@@ -1194,7 +1295,7 @@ final class TubeAppState {
     }
 
     private func updateSelectedStationArrivalsVisibility() {
-        guard appIsActive,
+        guard appIsActive, !isOffline,
               !isGameActive,
               selectedTab == .map,
               let selectedStationID else {

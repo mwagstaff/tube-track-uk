@@ -29,8 +29,34 @@ enum TubeTrackAPIClientError: LocalizedError, Sendable {
     }
 }
 
+struct TubeTrackAPIResponse<Value: Sendable>: Sendable {
+    let data: Value
+    /// When the server last fetched the underlying data, not when this phone
+    /// received a potentially cached HTTP response.
+    let updatedAt: Date
+    let cached: Bool
+    let stale: Bool
+}
+
+private struct TubeTrackAPIMetadata: Decodable, Sendable {
+    let updatedAt: Date?
+    let cached: Bool?
+    let stale: Bool?
+}
+
 private struct TubeTrackAPIEnvelope<Value: Decodable & Sendable>: Decodable, Sendable {
     let data: Value
+    let meta: TubeTrackAPIMetadata?
+
+    private enum CodingKeys: String, CodingKey { case data, meta }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        data = try container.decode(Value.self, forKey: .data)
+        // Metadata was absent in older API versions. An incompatible optional
+        // field must not break otherwise valid data for existing API callers.
+        meta = try? container.decodeIfPresent(TubeTrackAPIMetadata.self, forKey: .meta)
+    }
 }
 
 actor TubeTrackAPIClient {
@@ -66,6 +92,20 @@ actor TubeTrackAPIClient {
         forceRefresh: Bool = false,
         as type: Value.Type = Value.self
     ) async throws -> Value {
+        try await getSnapshot(
+            path,
+            queryItems: queryItems,
+            forceRefresh: forceRefresh,
+            as: type
+        ).data
+    }
+
+    func getSnapshot<Value: Decodable & Sendable>(
+        _ path: String,
+        queryItems: [URLQueryItem] = [],
+        forceRefresh: Bool = false,
+        as type: Value.Type = Value.self
+    ) async throws -> TubeTrackAPIResponse<Value> {
         guard var components = URLComponents(
             url: baseURL.appending(path: path),
             resolvingAgainstBaseURL: false
@@ -105,12 +145,23 @@ actor TubeTrackAPIClient {
 
         let decoder = JSONDecoder.tfl
         do {
-            return try decoder.decode(TubeTrackAPIEnvelope<Value>.self, from: data).data
+            let envelope = try decoder.decode(TubeTrackAPIEnvelope<Value>.self, from: data)
+            return TubeTrackAPIResponse(
+                data: envelope.data,
+                updatedAt: envelope.meta?.updatedAt ?? .now,
+                cached: envelope.meta?.cached ?? false,
+                stale: envelope.meta?.stale ?? false
+            )
         } catch let envelopeError {
             // Raw decoding keeps local URLProtocol fixtures useful and allows a
             // controlled transition if an older API instance is encountered.
             do {
-                return try decoder.decode(Value.self, from: data)
+                return TubeTrackAPIResponse(
+                    data: try decoder.decode(Value.self, from: data),
+                    updatedAt: .now,
+                    cached: false,
+                    stale: false
+                )
             } catch {
                 throw TubeTrackAPIClientError.decoding(
                     "\(envelopeError.localizedDescription); \(error.localizedDescription)"

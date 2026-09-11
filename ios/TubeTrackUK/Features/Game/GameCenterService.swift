@@ -7,6 +7,7 @@ enum GameCenterLeaderboard: String, CaseIterable, Identifiable, Sendable {
     case stationsEaten
     case linesCleared
     case terminusStationsReached
+    case timeSurvived
 
     var id: String {
         switch self {
@@ -18,6 +19,8 @@ enum GameCenterLeaderboard: String, CaseIterable, Identifiable, Sendable {
             "stationchase.lines.v1"
         case .terminusStationsReached:
             "stationchase.termini.v1"
+        case .timeSurvived:
+            "stationchase.time.v1"
         }
     }
 
@@ -27,6 +30,7 @@ enum GameCenterLeaderboard: String, CaseIterable, Identifiable, Sendable {
         case .stationsEaten: "Stations Eaten"
         case .linesCleared: "Lines Cleared"
         case .terminusStationsReached: "Terminus Stations Reached"
+        case .timeSurvived: "Time Survived"
         }
     }
 }
@@ -40,9 +44,17 @@ enum GameCenterAuthenticationState: Equatable {
 
 enum GameCenterSubmissionState: Equatable {
     case idle
+    case queued(recordID: UUID)
     case submitting(recordID: UUID)
     case submitted(recordID: UUID)
     case failed(recordID: UUID)
+
+    var recordID: UUID? {
+        switch self {
+        case .idle: nil
+        case let .queued(id), let .submitting(id), let .submitted(id), let .failed(id): id
+        }
+    }
 }
 
 @MainActor
@@ -51,25 +63,66 @@ final class GameCenterService {
     private(set) var authenticationState: GameCenterAuthenticationState = .notStarted
     private(set) var submissionState: GameCenterSubmissionState = .idle
     private(set) var availableLeaderboardIDs: Set<String> = []
+    private(set) var isOffline = false
+    private(set) var pendingScoreRecords: [TubeGameScoreRecord]
 
     @ObservationIgnored private var hasStartedAuthentication = false
+    @ObservationIgnored private var hasRequestedAuthentication = false
+    @ObservationIgnored private var synchronizationTask: Task<Void, Never>?
+    @ObservationIgnored private var synchronizationRequested = false
+    @ObservationIgnored private var synchronizeAfterCurrentSubmissions = false
+    @ObservationIgnored private var submittingRecordIDs: Set<UUID> = []
+    @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let storageKey: String
+
+    init(
+        defaults: UserDefaults = .standard,
+        storageKey: String = "TubeTrackUK.StationChase.pendingGameCenterScores.v1"
+    ) {
+        self.defaults = defaults
+        self.storageKey = storageKey
+        pendingScoreRecords = defaults.data(forKey: storageKey)
+            .flatMap { try? JSONDecoder().decode([TubeGameScoreRecord].self, from: $0) } ?? []
+    }
 
     var isAuthenticated: Bool {
         GKLocalPlayer.local.isAuthenticated
     }
 
     var rankingsAvailable: Bool {
-        isAuthenticated && Self.requiredLeaderboardIDs.isSubset(of: availableLeaderboardIDs)
+        !isOffline && isAuthenticated && Self.requiredLeaderboardIDs.isSubset(of: availableLeaderboardIDs)
+    }
+
+    func setOffline(_ offline: Bool) {
+        guard offline != isOffline else { return }
+        isOffline = offline
+        synchronizationTask?.cancel()
+        if offline {
+            if !isAuthenticated {
+                hasStartedAuthentication = false
+            }
+            if case let .submitting(recordID) = submissionState {
+                submissionState = .queued(recordID: recordID)
+            }
+        } else if hasRequestedAuthentication {
+            authenticate()
+        }
     }
 
     func authenticate() {
-        guard !hasStartedAuthentication else { return }
+        hasRequestedAuthentication = true
+        guard !isOffline else { return }
+        if hasStartedAuthentication {
+            guard isAuthenticated else { return }
+            requestSynchronization()
+            return
+        }
         hasStartedAuthentication = true
         authenticationState = .authenticating
 
         GKLocalPlayer.local.authenticateHandler = { [weak self] viewController, error in
             Task { @MainActor [weak self] in
-                guard let self else { return }
+                guard let self, !self.isOffline else { return }
 
                 if let viewController {
                     self.authenticationState = .authenticating
@@ -78,7 +131,7 @@ final class GameCenterService {
                 }
 
                 if GKLocalPlayer.local.isAuthenticated {
-                    await self.validateConfiguration()
+                    self.requestSynchronization()
                 } else {
                     _ = error
                     self.availableLeaderboardIDs = []
@@ -90,48 +143,72 @@ final class GameCenterService {
 
     @discardableResult
     func submit(_ record: TubeGameScoreRecord) async -> [TubeGameAchievement] {
+        guard record.endReason != .manualQuit else { return [] }
+        if !pendingScoreRecords.contains(where: { $0.id == record.id }) {
+            pendingScoreRecords.append(record)
+            persistPendingScores()
+        }
+        submissionState = .queued(recordID: record.id)
+        guard !isOffline else { return [] }
+        return await submitPendingRecord(record, includeAchievements: true)
+    }
+
+    private func submitPendingRecord(
+        _ record: TubeGameScoreRecord,
+        includeAchievements: Bool
+    ) async -> [TubeGameAchievement] {
+        guard !isOffline, !Task.isCancelled,
+              submittingRecordIDs.insert(record.id).inserted else { return [] }
+        defer {
+            submittingRecordIDs.remove(record.id)
+            if synchronizeAfterCurrentSubmissions, submittingRecordIDs.isEmpty {
+                synchronizeAfterCurrentSubmissions = false
+                if !pendingScoreRecords.isEmpty {
+                    requestSynchronization()
+                }
+            }
+        }
         guard rankingsAvailable else {
-            submissionState = .failed(recordID: record.id)
+            if submissionState.recordID == record.id {
+                submissionState = .failed(recordID: record.id)
+            }
             return []
         }
-        submissionState = .submitting(recordID: record.id)
+        if submissionState.recordID == record.id {
+            submissionState = .submitting(recordID: record.id)
+        }
 
         // Read before submitting: after submission the new score is already the
         // baseline, which would hide precisely the record we want to celebrate.
-        let achievements = await personalBestsBeaten(by: record)
-        guard !Task.isCancelled else { return [] }
+        let achievements = includeAchievements ? await personalBestsBeaten(by: record) : []
         do {
-            try await GKLeaderboard.submitScore(
-                record.score,
-                context: record.rulesVersion,
-                player: GKLocalPlayer.local,
-                leaderboardIDs: [GameCenterLeaderboard.score.id]
-            )
-            try await GKLeaderboard.submitScore(
-                record.stationsEaten,
-                context: record.rulesVersion,
-                player: GKLocalPlayer.local,
-                leaderboardIDs: [GameCenterLeaderboard.stationsEaten.id]
-            )
-            try await GKLeaderboard.submitScore(
-                record.linesCleared,
-                context: record.rulesVersion,
-                player: GKLocalPlayer.local,
-                leaderboardIDs: [GameCenterLeaderboard.linesCleared.id]
-            )
-            try await GKLeaderboard.submitScore(
-                record.terminusStationsReached,
-                context: record.rulesVersion,
-                player: GKLocalPlayer.local,
-                leaderboardIDs: [GameCenterLeaderboard.terminusStationsReached.id]
-            )
-            if submissionState == .submitting(recordID: record.id) {
+            let scores: [(GameCenterLeaderboard, Int)] = [
+                (.score, record.score), (.stationsEaten, record.stationsEaten),
+                (.linesCleared, record.linesCleared),
+                (.terminusStationsReached, record.terminusStationsReached),
+                (.timeSurvived, record.timeSurvivedSeconds),
+            ]
+            for (leaderboard, score) in scores {
+                try Task.checkCancellation()
+                guard !isOffline else { throw CancellationError() }
+                try await GKLeaderboard.submitScore(
+                    score,
+                    context: record.rulesVersion,
+                    player: GKLocalPlayer.local,
+                    leaderboardIDs: [leaderboard.id]
+                )
+            }
+            pendingScoreRecords.removeAll { $0.id == record.id }
+            persistPendingScores()
+            if submissionState.recordID == record.id {
                 submissionState = .submitted(recordID: record.id)
             }
             return achievements
         } catch {
-            if submissionState == .submitting(recordID: record.id) {
-                submissionState = .failed(recordID: record.id)
+            if submissionState.recordID == record.id {
+                submissionState = isOffline || Task.isCancelled
+                    ? .queued(recordID: record.id)
+                    : .failed(recordID: record.id)
             }
             return []
         }
@@ -148,7 +225,7 @@ final class GameCenterService {
                 (.allTime, "personal"), (.week, "weekly personal"), (.today, "daily personal"),
             ]
             for (scope, period) in periods {
-                guard !Task.isCancelled else { return [] }
+                guard !Task.isCancelled, !isOffline else { return [] }
                 do {
                     let (localEntry, _, _) = try await board.loadEntries(
                         for: .global, timeScope: scope, range: NSRange(location: 1, length: 1)
@@ -175,6 +252,7 @@ final class GameCenterService {
         case .stationsEaten: metric = ("stations", record.stationsEaten)
         case .linesCleared: metric = ("lines cleared", record.linesCleared)
         case .terminusStationsReached: metric = ("termini", record.terminusStationsReached)
+        case .timeSurvived: metric = ("time survived", record.timeSurvivedSeconds)
         }
         guard record.endReason != .manualQuit, metric.1 > max(0, previousScore ?? 0) else { return nil }
         return .init(category: metric.0, period: period, value: metric.1, isGameCenter: true)
@@ -191,23 +269,62 @@ final class GameCenterService {
     }
 
     private func validateConfiguration() async {
+        guard !isOffline, !Task.isCancelled else { return }
         do {
             let leaderboards = try await GKLeaderboard.loadLeaderboards(
                 IDs: GameCenterLeaderboard.allCases.map(\.id)
             )
+            guard !isOffline, !Task.isCancelled else { return }
             availableLeaderboardIDs = Set(leaderboards.map(\.baseLeaderboardID))
 
             if rankingsAvailable {
                 authenticationState = .authenticated(
                     displayName: GKLocalPlayer.local.displayName
                 )
+                // Local records survive app termination, including runs that did
+                // not make the local top ten. Retry only after Game Center is ready.
+                for record in pendingScoreRecords {
+                    guard !isOffline, !Task.isCancelled else { return }
+                    if submittingRecordIDs.contains(record.id) {
+                        // A score submitted by the results screen may still be
+                        // finishing its pre-disconnection GameKit request.
+                        synchronizeAfterCurrentSubmissions = true
+                        continue
+                    }
+                    _ = await submitPendingRecord(record, includeAchievements: false)
+                    if pendingScoreRecords.contains(where: { $0.id == record.id }) {
+                        break // Avoid repeating requests while Game Center is unavailable.
+                    }
+                }
             } else {
                 authenticationState = .unavailable
             }
         } catch {
+            guard !isOffline, !Task.isCancelled else { return }
             availableLeaderboardIDs = []
             authenticationState = .unavailable
         }
+    }
+
+    private func requestSynchronization() {
+        synchronizationRequested = true
+        guard !isOffline, synchronizationTask == nil else { return }
+        synchronizationRequested = false
+        synchronizationTask = Task { [weak self] in
+            await self?.validateConfiguration()
+            guard let self else { return }
+            self.synchronizationTask = nil
+            if self.synchronizationRequested, !self.isOffline {
+                // Keep the cancelled task until it actually finishes, so rapid
+                // disconnect/reconnect transitions cannot orphan its successor.
+                self.requestSynchronization()
+            }
+        }
+    }
+
+    private func persistPendingScores() {
+        guard let data = try? JSONEncoder().encode(pendingScoreRecords) else { return }
+        defaults.set(data, forKey: storageKey)
     }
 
     private static let requiredLeaderboardIDs = Set(

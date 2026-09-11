@@ -84,6 +84,7 @@ struct WorkDetailView: View {
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.bordered)
+                        .requiresNetwork(appState.isOffline)
                     }
                 }
                 .padding(20)

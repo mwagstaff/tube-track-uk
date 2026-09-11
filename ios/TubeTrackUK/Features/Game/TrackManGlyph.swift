@@ -1,9 +1,9 @@
 import SwiftUI
 
-/// An original, compact "chomper" mark for the Track Attack easter egg.
+/// An original, compact "chomper" mark for the Track-Man easter egg.
 /// It deliberately avoids branded character details while remaining legible
 /// beside the map's other toolbar symbols.
-struct TrackAttackGlyph: View {
+struct TrackManGlyph: View {
     var mouthAngle: Double = 34
 
     var body: some View {

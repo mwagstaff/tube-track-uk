@@ -15,6 +15,10 @@ struct ClosestStationMapSection: View {
         ).first
     }
 
+    private var departuresTaskID: String {
+        "\(closestStation?.id ?? ""):\(appState.isOffline)"
+    }
+
     var body: some View {
         Group {
             if let graph = appState.graph, let closestStation {
@@ -40,19 +44,19 @@ struct ClosestStationMapSection: View {
             guard !Task.isCancelled else { return }
             locationProvider.requestLocation()
         }
-        .task(id: closestStation?.id) {
-            guard let station = closestStation?.station else { return }
+        .task(id: departuresTaskID) {
+            guard !appState.isOffline, let station = closestStation?.station else { return }
             await appState.refreshNearbyArrivals(for: [station])
         }
-        .task(id: closestStation?.id) {
-            guard let station = closestStation?.station else { return }
+        .task(id: departuresTaskID) {
+            guard !appState.isOffline, let station = closestStation?.station else { return }
             while !Task.isCancelled {
                 do {
                     try await Task.sleep(for: .seconds(30))
                 } catch {
                     return
                 }
-                guard !Task.isCancelled else { return }
+                guard !Task.isCancelled, !appState.isOffline else { return }
                 await appState.refreshNearbyArrivals(for: [station])
             }
         }
@@ -182,7 +186,9 @@ private struct ClosestStationMapPanel: View {
 
     @ViewBuilder
     private func departures(now: Date) -> some View {
-        if appState.nearbyArrivalsLoadingStationIDs.contains(station.id), arrivals.isEmpty {
+        if appState.isOffline {
+            compactMessage("Live departures unavailable offline.", systemImage: "wifi.slash")
+        } else if appState.nearbyArrivalsLoadingStationIDs.contains(station.id), arrivals.isEmpty {
             compactMessage("Loading live departures…", systemImage: nil, showsProgress: true)
         } else if appState.nearbyArrivalsErrorsByStationID[station.id] != nil, arrivals.isEmpty {
             compactMessage(

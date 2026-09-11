@@ -2,7 +2,7 @@ import CoreGraphics
 import Testing
 @testable import TubeTrackUK
 
-@Suite("Track Attack input")
+@Suite("Track-Man input")
 struct TubeGameInputTests {
     @Test func swipeUsesATightDeadZoneThenResolvesAllEightSectors() {
         #expect(TubeGameGestureIntent.swipeDirection(

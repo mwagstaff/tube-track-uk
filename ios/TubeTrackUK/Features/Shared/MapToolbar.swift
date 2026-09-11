@@ -47,14 +47,14 @@ struct MapHeaderControls: View {
             Button {
                 guard let graph = appState.graph else { return }
                 appState.setGameActive(true)
-                presentedDestination = .trackAttack(graph)
+                presentedDestination = .trackMan(graph)
             } label: {
-                TrackAttackGlyph()
+                TrackManGlyph()
             }
             .mapDockButtonStyle()
             .disabled(appState.graph == nil)
-            .accessibilityLabel("Play Track Attack")
-            .accessibilityValue(trackAttackAccessibilityValue)
+            .accessibilityLabel("Play Track-Man")
+            .accessibilityValue(trackManAccessibilityValue)
             .accessibilityHint("Opens a 60-second game on the Tube network")
 
             Menu {
@@ -77,13 +77,13 @@ struct MapHeaderControls: View {
             switch destination {
             case .backgroundPhoto:
                 AppBackgroundImageViewer()
-            case let .trackAttack(graph):
+            case let .trackMan(graph):
                 TubeGameScreen(graph: graph)
             }
         }
     }
 
-    private var trackAttackAccessibilityValue: String {
+    private var trackManAccessibilityValue: String {
         let score = gameHighScoreStore.bestScore
         return "Local best, \(score) point\(score == 1 ? "" : "s")"
     }
@@ -100,12 +100,12 @@ struct MapHeaderControls: View {
 
 private enum MapHeaderDestination: Identifiable {
     case backgroundPhoto
-    case trackAttack(TubeGraph)
+    case trackMan(TubeGraph)
 
     var id: Int {
         switch self {
         case .backgroundPhoto: 0
-        case .trackAttack: 1
+        case .trackMan: 1
         }
     }
 }
@@ -271,6 +271,7 @@ struct MapActionButtons: View {
             }
             .mapDockButtonStyle()
             .accessibilityLabel(appState.mapPresentationMode.switchActionTitle)
+            .requiresNetwork(appState.isOffline && destinationMode == .realWorld)
 
             Button {
                 let showsLiveTrains = !appState.showLiveTrains
@@ -280,7 +281,7 @@ struct MapActionButtons: View {
                 ))
                 appState.setLiveTrains(showsLiveTrains)
             } label: {
-                if appState.isLoadingLiveTrains {
+                if appState.isLoadingLiveTrains && !appState.isOffline {
                     ProgressView()
                         .controlSize(.small)
                         .tint(.blue)
@@ -291,10 +292,11 @@ struct MapActionButtons: View {
             }
             .mapDockButtonStyle()
             .accessibilityLabel(
-                appState.isLoadingLiveTrains
+                appState.isLoadingLiveTrains && !appState.isOffline
                     ? "Loading live trains"
                     : appState.showLiveTrains ? "Hide live trains" : "Show live trains"
             )
+            .requiresNetwork(appState.isOffline)
 
             Button {
                 onAction(MapActionNotice(

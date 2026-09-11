@@ -55,6 +55,34 @@ struct TubeTrackAPIClientTests {
         #expect(arrivals.first?.destinationNaptanId == "940GZZLUBXN")
     }
 
+    @Test func snapshotPreservesTheServersTimestampAndStaleFlag() async throws {
+        APIClientURLProtocol.prepare(body: Data(
+            #"{"data":[1,2,3],"meta":{"updatedAt":"2023-11-14T22:13:20.000Z","cached":true,"stale":true}}"#.utf8
+        ))
+
+        let snapshot: TubeTrackAPIResponse<[Int]> = try await makeClient().getSnapshot("/api/v1/status")
+
+        #expect(snapshot.data == [1, 2, 3])
+        #expect(snapshot.updatedAt == Date(timeIntervalSince1970: 1_700_000_000))
+        #expect(snapshot.cached)
+        #expect(snapshot.stale)
+    }
+
+    @Test func metadataFreeResponsesUseTheReceiptTime() async throws {
+        for fixture in [#"{"data":[1,2,3]}"#, "[1,2,3]"] {
+            APIClientURLProtocol.prepare(body: Data(fixture.utf8))
+            let before = Date.now
+
+            let snapshot: TubeTrackAPIResponse<[Int]> = try await makeClient().getSnapshot("/api/v1/status")
+
+            #expect(snapshot.data == [1, 2, 3])
+            #expect(snapshot.updatedAt >= before)
+            #expect(snapshot.updatedAt <= Date.now)
+            #expect(!snapshot.cached)
+            #expect(!snapshot.stale)
+        }
+    }
+
     private func makeClient() -> TubeTrackAPIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [APIClientURLProtocol.self]

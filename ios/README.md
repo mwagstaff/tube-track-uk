@@ -49,6 +49,69 @@ xcodebuild test \
 Tests cover bundled graph integrity, disruption section resolution and safe
 fallback, API response decoding, train interpolation and works deduplication.
 
+## Offline use
+
+The network map, station search, mobile coverage overlay and Track-Man use
+bundled data and work on a first launch without internet access. Losing the
+connection returns an open real-world map to the network map. Location can
+still use the phone's GPS. Live trains, departures, directions, online maps and
+Game Center rankings become unavailable; their controls appear disabled.
+
+Status and planned works load immediately from saved snapshots before any
+network request. Each successful response is saved in Application Support,
+with migration from older caches, and retains the server's update time. While
+the app is active and online, it checks status every 30 seconds and planned
+works every 5 minutes, and refreshes on returning to the app or reconnecting.
+The server may reuse its own cached results. Offline snapshots have no expiry;
+the banner shows their age, and dates outside the saved works range are marked
+as incomplete. A first launch with no snapshot says no data has been saved.
+
+Game scores and achievements remain local offline. Completed runs are also
+queued for Game Center and retried when a connection and authentication are
+available. Playing never requires sign-in.
+
+For simulator checks, launch a Debug build with `-DebugOffline` to exercise
+offline presentation and suppress app API requests. Check station search,
+selection, map pan/pinch/momentum, both mobile coverage modes, game completion
+and restart, light/dark appearance, and larger Dynamic Type. On a device,
+repeat with Wi-Fi and cellular disabled, then reconnect and verify that live
+controls and disruption updates resume.
+
+## Profiling network-map navigation
+
+The network map retains viewport-sized Canvas surfaces with a 240-point buffer
+for routes, station labels and trains. `BeckMapLayerCamera` moves their Core
+Animation layers directly during pan, pinch and momentum. Camera motion is not
+observable SwiftUI state; only a buffer refresh, selection, data or appearance
+change rebuilds the drawing. Buffer refreshes present synchronously so the drawing and
+its camera transform stay aligned. Label hit testing uses the rendered buffer's
+coordinates, including when a tap stops momentum.
+
+Touch-driven pan and pinch updates are applied directly from UIKit, including
+the movement already accumulated when recognition begins. CADisplayLink is used
+only for momentum and programmatic camera animations. Touch-down catches a
+coasting map immediately; changing from momentum to a new gesture does not
+publish an intermediate viewport or briefly restore the map furniture.
+
+For on-device verification, run a Release build with Instruments' Animation
+Hitches and Time Profiler templates. Record repeated drags, long flicks and
+pinches near each screen corner, with live trains off and on. Include drags from
+rest, grabbing the map during momentum and catching an automatic zoom with a
+touch; check the delay before the first visible movement as well as steady motion.
+Check 60 Hz and
+ProMotion devices, light/dark appearance, larger Dynamic Type and Reduce Motion.
+Steady motion should spend time in layer transforms, with `BeckMapCanvas.body`
+and label collision layout appearing only at buffer refreshes or other content
+changes. Inspect memory as well as hitch duration; surfaces are bounded to the
+viewport plus padding rather than the full network at maximum zoom.
+
+The September 2026 layout comparison used 144-label dense scenes and 300
+iterations of optimized Swift on the development Mac. Early-exit candidate
+selection took 0.754/0.524/0.331 ms versus 0.945/0.866/0.507 ms for the previous
+exhaustive search at fixture scales 0.65/1/1.6. These are layout-only timings,
+not on-device frame rates. Regression tests compare placement results with the
+previous algorithm and replay 240 camera frames without observation invalidation.
+
 ## Refreshing the bundled graph
 
 `Tools/TubeGraphBuilder/build_graph.py` compiles the current Tube, DLR,

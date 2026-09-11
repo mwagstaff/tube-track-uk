@@ -43,6 +43,7 @@ private struct GameCenterRankingRow: Identifiable, Equatable {
 
 struct GameCenterRankingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(TubeAppState.self) private var appState
 
     @State private var leaderboard: GameCenterLeaderboard
     @State private var period: GameCenterRankingPeriod = .allTime
@@ -60,9 +61,16 @@ struct GameCenterRankingsView: View {
         NavigationStack {
             VStack(spacing: 0) {
                 controls
+                    .disabled(appState.isOffline)
 
                 Group {
-                    if isLoading {
+                    if appState.isOffline {
+                        ContentUnavailableView(
+                            "Rankings need a connection",
+                            systemImage: "wifi.slash",
+                            description: Text("Your game and local best scores are still available offline.")
+                        )
+                    } else if isLoading {
                         ProgressView("Loading rankings…")
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                     } else if let errorMessage {
@@ -103,7 +111,7 @@ struct GameCenterRankingsView: View {
     @State private var reloadToken = 0
 
     private var loadID: String {
-        "\(leaderboard.id)-\(period.rawValue)-\(reloadToken)"
+        "\(leaderboard.id)-\(period.rawValue)-\(reloadToken)-\(appState.isOffline)"
     }
 
     private var controls: some View {
@@ -171,11 +179,16 @@ struct GameCenterRankingsView: View {
 
     @MainActor
     private func loadRankings() async {
+        guard !appState.isOffline else {
+            isLoading = false
+            return
+        }
         isLoading = true
         errorMessage = nil
 
         do {
             let leaderboards = try await GKLeaderboard.loadLeaderboards(IDs: [leaderboard.id])
+            guard !Task.isCancelled, !appState.isOffline else { return }
             guard let loadedLeaderboard = leaderboards.first else {
                 throw GameCenterRankingsError.leaderboardUnavailable
             }

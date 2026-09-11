@@ -970,7 +970,7 @@ struct TubeGamePlayfield: View {
             : " Next junction: " + snapshot.availableSwipes.map {
                 "\(TubeGameSwipeHintPresentation.spokenName(for: $0.direction)) for \($0.lineID.displayName)"
             }.joined(separator: ", ") + "."
-        return "Track Attack at \(snapshot.player.stationName)\(destination)\(line). Score \(snapshot.score). \(seconds) seconds remaining. \(snapshot.remainingStationCount) stations remaining.\(swipeChoices)\(danger)\(latestEaten)"
+        return "Track-Man at \(snapshot.player.stationName)\(destination)\(line). Score \(snapshot.score). \(seconds) seconds remaining. \(snapshot.remainingStationCount) stations remaining.\(swipeChoices)\(danger)\(latestEaten)"
     }
 }
 

@@ -8,7 +8,7 @@ struct EngineeringWorksSnapshot: Codable, Sendable {
 }
 
 actor EngineeringWorksService {
-    private static let freshLifetime: TimeInterval = 6 * 60 * 60
+    private static let freshLifetime: TimeInterval = 5 * 60
 
     private let client: TubeTrackAPIClient
     private let cache: SnapshotCache
@@ -21,11 +21,25 @@ actor EngineeringWorksService {
         self.repository = repository
     }
 
+    /// Makes saved works available immediately, retaining their actual date range.
+    func cachedSnapshot() async -> EngineeringWorksSnapshot? {
+        if let latestSnapshot {
+            return latestSnapshot.asCached
+        }
+        guard let saved = try? await cache.load(EngineeringWorksSnapshot.self, named: "works.json") else {
+            return nil
+        }
+        let snapshot = (latestSnapshot ?? saved).asCached
+        latestSnapshot = snapshot
+        return snapshot
+    }
+
     func fetch(
         through requestedDate: Date? = nil,
         days: Int = 60,
         forceRefresh: Bool = false
     ) async throws -> EngineeringWorksSnapshot {
+        try Task.checkCancellation()
         let now = Date.now
         let calendar = LondonRailDate.calendar
         let start = calendar.startOfDay(for: now)
@@ -35,22 +49,15 @@ actor EngineeringWorksService {
 
         if !forceRefresh,
            let latestSnapshot,
-           snapshot(latestSnapshot, covers: end, defaultDays: days),
+           snapshot(latestSnapshot, covers: end),
            now.timeIntervalSince(latestSnapshot.fetchedAt) < Self.freshLifetime {
             return latestSnapshot
         }
         if !forceRefresh,
-           let cached = try? await cache.load(EngineeringWorksSnapshot.self, named: "works.json"),
-           snapshot(cached, covers: end, defaultDays: days),
+           let cached = await cachedSnapshot(),
+           snapshot(cached, covers: end),
            now.timeIntervalSince(cached.fetchedAt) < Self.freshLifetime {
-            let snapshot = EngineeringWorksSnapshot(
-                works: cached.works,
-                fetchedAt: cached.fetchedAt,
-                cached: true,
-                requestedThrough: cached.requestedThrough
-            )
-            latestSnapshot = snapshot
-            return snapshot
+            return cached
         }
 
         do {
@@ -59,7 +66,7 @@ actor EngineeringWorksService {
             formatter.calendar = calendar
             formatter.timeZone = LondonRailDate.timeZone
             formatter.dateFormat = "yyyy-MM-dd"
-            let statuses: [TfLLineStatus] = try await client.get(
+            let response: TubeTrackAPIResponse<[TfLLineStatus]> = try await client.getSnapshot(
                 "/api/v1/planned-works",
                 queryItems: [
                     URLQueryItem(name: "from", value: formatter.string(from: start)),
@@ -67,32 +74,31 @@ actor EngineeringWorksService {
                 ],
                 forceRefresh: forceRefresh
             )
-            let fetchedAt = Date.now
+            try Task.checkCancellation()
+            let fetchedAt = response.updatedAt
             let works = EngineeringWorksBuilder(repository: repository).works(
-                from: statuses,
+                from: response.data,
                 fetchedAt: fetchedAt
             )
             let deduplicated = EngineeringWorksNormalizer().deduplicatedAndSorted(works)
             let snapshot = EngineeringWorksSnapshot(
                 works: deduplicated,
                 fetchedAt: fetchedAt,
-                cached: false,
+                cached: response.cached || response.stale,
                 requestedThrough: end
             )
-            try? await cache.save(snapshot, named: "works.json")
             latestSnapshot = snapshot
+            try? await cache.save(snapshot, named: "works.json")
             return snapshot
         } catch {
-            if let cached = try? await cache.load(EngineeringWorksSnapshot.self, named: "works.json"),
-               snapshot(cached, covers: end, defaultDays: days) {
-                let snapshot = EngineeringWorksSnapshot(
-                    works: cached.works,
-                    fetchedAt: cached.fetchedAt,
-                    cached: true,
-                    requestedThrough: cached.requestedThrough
-                )
-                latestSnapshot = snapshot
-                return snapshot
+            try Task.checkCancellation()
+            if error is CancellationError { throw error }
+            // Keep the available works usable even if today's rolling horizon
+            // or a newly selected date extends beyond the saved range. The
+            // unchanged requestedThrough lets the UI describe that limitation.
+            if let cached = await cachedSnapshot() {
+                latestSnapshot = cached
+                return cached
             }
             throw error
         }
@@ -100,15 +106,22 @@ actor EngineeringWorksService {
 
     private func snapshot(
         _ snapshot: EngineeringWorksSnapshot,
-        covers requestedEnd: Date,
-        defaultDays: Int
+        covers requestedEnd: Date
     ) -> Bool {
-        let calendar = LondonRailDate.calendar
-        let fallbackEnd = calendar.date(
-            byAdding: .day,
-            value: defaultDays,
-            to: calendar.startOfDay(for: snapshot.fetchedAt)
-        ) ?? snapshot.fetchedAt
-        return (snapshot.requestedThrough ?? fallbackEnd) >= requestedEnd
+        // A legacy snapshot without a recorded range is useful offline, but
+        // cannot establish that an arbitrary future date has been checked.
+        guard let requestedThrough = snapshot.requestedThrough else { return false }
+        return requestedThrough >= requestedEnd
+    }
+}
+
+private extension EngineeringWorksSnapshot {
+    var asCached: EngineeringWorksSnapshot {
+        EngineeringWorksSnapshot(
+            works: works,
+            fetchedAt: fetchedAt,
+            cached: true,
+            requestedThrough: requestedThrough
+        )
     }
 }

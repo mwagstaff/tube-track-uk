@@ -12,7 +12,7 @@ struct TubeGameScoreCard: View {
                 .clipShape(.rect(cornerRadius: 20))
             VStack(spacing: 8) {
                 Text("TubeTrack UK").font(.system(size: 25, weight: .bold))
-                Text("TRACK ATTACK").font(.system(size: 12, weight: .bold)).tracking(4)
+                Text("TRACK-MAN").font(.system(size: 12, weight: .bold)).tracking(4)
                     .foregroundStyle(.white.opacity(0.65))
             }
             VStack(spacing: 0) {
@@ -34,11 +34,14 @@ struct TubeGameScoreCard: View {
                 .padding(16)
                 .background(.white.opacity(0.06), in: .rect(cornerRadius: 18))
             }
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 22) {
-                metric("STATIONS", record.stationsEaten)
-                metric("LINES CLEARED", record.linesCleared)
-                metric("TERMINI", record.terminusStationsReached)
-                metric("BEST COMBO", record.maxCombo)
+            VStack(spacing: 22) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 22) {
+                    metric("STATIONS", record.stationsEaten.formatted())
+                    metric("LINES CLEARED", record.linesCleared.formatted())
+                    metric("TERMINI", record.terminusStationsReached.formatted())
+                    metric("BEST COMBO", record.maxCombo.formatted())
+                }
+                metric("TIME SURVIVED", "\(record.timeSurvivedSeconds)s")
             }
             Rectangle().fill(.white.opacity(0.15)).frame(height: 1)
             Text("Your next stop: beat my score.")
@@ -69,9 +72,9 @@ struct TubeGameScoreCard: View {
         .environment(\.dynamicTypeSize, .large)
     }
 
-    private func metric(_ title: String, _ value: Int) -> some View {
+    private func metric(_ title: String, _ value: String) -> some View {
         VStack(spacing: 4) {
-            Text(value.formatted()).font(.system(size: 28, weight: .bold, design: .rounded))
+            Text(value).font(.system(size: 28, weight: .bold, design: .rounded))
             Text(title).font(.system(size: 10, weight: .bold)).tracking(1)
                 .foregroundStyle(.white.opacity(0.65))
         }

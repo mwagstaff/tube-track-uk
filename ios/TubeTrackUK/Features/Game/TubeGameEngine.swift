@@ -9,9 +9,9 @@ enum TubeGameEngineError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case .invalidConfiguration:
-            "Track Attack has an invalid gameplay configuration."
+            "Track-Man has an invalid gameplay configuration."
         case let .unavailableStartStation(stationID):
-            "Track Attack cannot start at station \(stationID)."
+            "Track-Man cannot start at station \(stationID)."
         }
     }
 }

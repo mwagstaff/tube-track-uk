@@ -19,6 +19,7 @@ enum AppStartupPresentation {
 }
 
 struct RootTabView: View {
+    @Environment(GameCenterService.self) private var gameCenter
     @Environment(TubeAppState.self) private var appState
     @Environment(AppBackgroundImageStore.self) private var backgroundImageStore
     @Environment(\.scenePhase) private var scenePhase
@@ -35,47 +36,61 @@ struct RootTabView: View {
         AppStartupPresentation.initiallyShowsChrome
     @State private var closestStationPanelHidden = false
     @State private var mapNavigationActive = false
+    @State private var profileShowsImageBackground = false
 
     var body: some View {
         @Bindable var state = appState
 
         ZStack {
-            TabView(selection: $state.selectedTab) {
-                Group {
-                    if appState.selectedTab == .map {
-                        UnifiedMapScreen(
-                            closestStationPanelHidden: $closestStationPanelHidden,
-                            mapNavigationActive: $mapNavigationActive
-                        )
-                    } else {
-                        Color.clear
-                    }
+            VStack(spacing: 0) {
+                if appState.isOffline,
+                   appState.selectedTab != .map,
+                   appState.selectedTab != .works {
+                    OfflineStatusBanner(
+                        updatedAt: offlineBannerShowsWorks
+                            ? appState.worksUpdatedAt : appState.statusUpdatedAt,
+                        isWorks: offlineBannerShowsWorks
+                    )
                 }
-                .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
-                .tag(AppTab.map)
 
-                NearMeScreen()
-                    .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
-                    .tag(AppTab.nearMe)
+                TabView(selection: $state.selectedTab) {
+                    Group {
+                        if appState.selectedTab == .map {
+                            UnifiedMapScreen(
+                                closestStationPanelHidden: $closestStationPanelHidden,
+                                mapNavigationActive: $mapNavigationActive
+                            )
+                        } else {
+                            Color.clear
+                        }
+                    }
+                    .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
+                    .tag(AppTab.map)
 
-                WorksScreen()
-                    .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
-                    .tag(AppTab.works)
+                    NearMeScreen()
+                        .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
+                        .tag(AppTab.nearMe)
 
-                ProfileScreen()
-                    .tabItem { Label(AppTab.profile.title, systemImage: AppTab.profile.symbol) }
-                    .tag(AppTab.profile)
-            }
-            .tint(colorScheme == .dark ? .white : .tubeBlue)
-            .toolbarBackground(Color(uiColor: tabBarBackgroundColor), for: .tabBar)
-            .toolbarBackground(.visible, for: .tabBar)
-            .background {
-                TabBarBackgroundConfigurator(
-                    backgroundColor: tabBarBackgroundColor,
-                    screenFurnitureVisible: !mapNavigationActive,
-                    reduceMotion: reduceMotion
-                )
-                .frame(width: 0, height: 0)
+                    WorksScreen()
+                        .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
+                        .tag(AppTab.works)
+
+                    ProfileScreen(showsImageBackground: $profileShowsImageBackground)
+                        .tabItem { Label(AppTab.profile.title, systemImage: AppTab.profile.symbol) }
+                        .tag(AppTab.profile)
+                }
+                .tint(colorScheme == .dark ? .white : .tubeBlue)
+                .toolbarBackground(Color(uiColor: tabBarBackgroundColor), for: .tabBar)
+                .toolbarBackground(.visible, for: .tabBar)
+                .background {
+                    TabBarBackgroundConfigurator(
+                        backgroundColor: tabBarBackgroundColor,
+                        backgroundIsTransparent: tabBarBackgroundIsTransparent,
+                        screenFurnitureVisible: !mapNavigationActive,
+                        reduceMotion: reduceMotion
+                    )
+                    .frame(width: 0, height: 0)
+                }
             }
 
             if backgroundRevealPresented {
@@ -114,6 +129,9 @@ struct RootTabView: View {
                 backgroundImageStore.appDidBecomeInactive()
             }
         }
+        .onChange(of: appState.isOffline, initial: true) { _, offline in
+            gameCenter.setOffline(offline)
+        }
         .onChange(of: backgroundImageStore.mapRevealGeneration) {
             revealBackgroundIfNeeded()
         }
@@ -150,8 +168,16 @@ struct RootTabView: View {
         }
     }
 
+    private var offlineBannerShowsWorks: Bool {
+        appState.selectedTab == .works || !appState.isViewingLiveStatus
+    }
+
     private var tabBarBackgroundColor: UIColor {
-        switch appState.selectedTab {
+        if tabBarBackgroundIsTransparent {
+            return .clear
+        }
+
+        return switch appState.selectedTab {
         case .works:
             .systemGroupedBackground
         case .profile:
@@ -159,6 +185,10 @@ struct RootTabView: View {
         case .map, .nearMe:
             .systemBackground
         }
+    }
+
+    private var tabBarBackgroundIsTransparent: Bool {
+        appState.selectedTab == .profile && profileShowsImageBackground
     }
 
     private func revealBackgroundIfNeeded() {
@@ -274,6 +304,7 @@ private struct AppStartupBackgroundChrome: View {
 
 private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
     let backgroundColor: UIColor
+    let backgroundIsTransparent: Bool
     let screenFurnitureVisible: Bool
     let reduceMotion: Bool
 
@@ -286,6 +317,7 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
         context: Context
     ) {
         viewController.backgroundColor = backgroundColor
+        viewController.backgroundIsTransparent = backgroundIsTransparent
         viewController.screenFurnitureVisible = screenFurnitureVisible
         viewController.reduceMotion = reduceMotion
         viewController.applyAppearanceWhenAttached()
@@ -295,6 +327,7 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
 @MainActor
 private final class TabBarAppearanceController: UIViewController {
     var backgroundColor = UIColor.systemBackground
+    var backgroundIsTransparent = false
     var screenFurnitureVisible = true
     var reduceMotion = false
     private weak var configuredTabBar: UITabBar?
@@ -318,10 +351,14 @@ private final class TabBarAppearanceController: UIViewController {
         }
 
         let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
+        if backgroundIsTransparent {
+            appearance.configureWithTransparentBackground()
+        } else {
+            appearance.configureWithOpaqueBackground()
+        }
         appearance.backgroundColor = backgroundColor
 
-        tabBar.isTranslucent = false
+        tabBar.isTranslucent = backgroundIsTransparent
         tabBar.standardAppearance = appearance
         tabBar.scrollEdgeAppearance = appearance
 

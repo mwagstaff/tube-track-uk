@@ -413,7 +413,10 @@ struct AppBackgroundImageViewer: View {
                     .padding(.vertical, 7)
                     .background(.black.opacity(0.5), in: Capsule())
                 }
-                .accessibilityHint("Opens this photograph on Unsplash in your browser")
+                .requiresNetwork(
+                    appState.isOffline,
+                    onlineHint: "Opens this photograph on Unsplash in your browser"
+                )
             }
         }
         .padding(.horizontal, 12)

@@ -13,6 +13,9 @@ struct TubeGameAchievement: Equatable, Identifiable, Sendable {
             ? "New \(period) best on Game Center: \(category)!"
             : "New \(period) best: \(category)!"
     }
+    var formattedValue: String {
+        category == "time survived" ? "\(value)s" : value.formatted()
+    }
 
     static func merging(local: [Self], gameCenter: [Self]) -> [Self] {
         gameCenter + local.filter { local in !gameCenter.contains { $0.category == local.category } }
@@ -42,6 +45,7 @@ struct TubeGamePersonalBests: Codable {
             ("lines cleared", record.linesCleared),
             ("termini", record.terminusStationsReached),
             ("combo", record.maxCombo),
+            ("time survived", record.timeSurvivedSeconds),
         ]
         var achievements: [TubeGameAchievement] = []
         for (category, value) in metrics {

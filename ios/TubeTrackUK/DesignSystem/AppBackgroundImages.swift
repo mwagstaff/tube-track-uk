@@ -308,9 +308,8 @@ private struct AppBackgroundPageModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .scrollContentBackground(.hidden)
-            .background {
-                AppBackgroundImage(scrimOpacity: 0.34)
-            }
+            .background(Color.clear)
+            .containerBackground(.clear, for: .navigation)
             .toolbarColorScheme(.dark, for: .navigationBar)
     }
 }

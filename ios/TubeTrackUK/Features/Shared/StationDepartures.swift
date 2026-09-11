@@ -278,6 +278,7 @@ struct StationDeparturesSection: View {
     let arrivals: [TfLArrivalPrediction]
     let statuses: [TfLLineStatus]
     let isLoading: Bool
+    let isOffline: Bool
     let errorMessage: String?
     let warning: StationDepartureWarning?
     let maxDeparturesHeight: CGFloat?
@@ -291,6 +292,7 @@ struct StationDeparturesSection: View {
         arrivals: [TfLArrivalPrediction],
         statuses: [TfLLineStatus],
         isLoading: Bool = false,
+        isOffline: Bool = false,
         errorMessage: String? = nil,
         warning: StationDepartureWarning? = nil,
         maxDeparturesHeight: CGFloat? = nil,
@@ -303,6 +305,7 @@ struct StationDeparturesSection: View {
         self.arrivals = arrivals
         self.statuses = statuses
         self.isLoading = isLoading
+        self.isOffline = isOffline
         self.errorMessage = errorMessage
         self.warning = warning
         self.maxDeparturesHeight = maxDeparturesHeight
@@ -341,6 +344,7 @@ struct StationDeparturesSection: View {
                     lineIDs: lineIDs,
                     selectedLineID: selectedLineID,
                     statuses: statuses,
+                    isOffline: isOffline,
                     onSelect: select,
                     onShowStatus: { presentedStatusLineID = $0 }
                 )
@@ -367,7 +371,8 @@ struct StationDeparturesSection: View {
         .sheet(item: $presentedStatusLineID) { lineID in
             LineStatusDetailSheet(
                 lineID: lineID,
-                lineStatus: statuses.first { $0.id == lineID }
+                lineStatus: statuses.first { $0.id == lineID },
+                isOffline: isOffline
             )
         }
         .onAppear {
@@ -402,7 +407,22 @@ struct StationDeparturesSection: View {
 
     @ViewBuilder
     private func departuresContent(now: Date) -> some View {
-        if isLoading, arrivals.isEmpty {
+        if isOffline {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Live departures unavailable offline")
+                        .font(.appSubheadline(.semibold))
+                    Text("Departures will update when you’re back online.")
+                        .font(.appCaption())
+                }
+            } icon: {
+                Image(systemName: "wifi.slash")
+            }
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 6)
+            .accessibilityElement(children: .combine)
+        } else if isLoading, arrivals.isEmpty {
             HStack(spacing: 9) {
                 ProgressView()
                 Text("Loading live departures…")
@@ -496,6 +516,7 @@ private struct StationLinePicker: View {
     let lineIDs: [TubeLineID]
     let selectedLineID: TubeLineID?
     let statuses: [TfLLineStatus]
+    let isOffline: Bool
     let onSelect: (TubeLineID) -> Void
     let onShowStatus: (TubeLineID) -> Void
 
@@ -515,15 +536,17 @@ private struct StationLinePicker: View {
             .scrollIndicators(.hidden)
 
             if let selectedLineID {
+                let status = statuses.first { $0.id == selectedLineID }
                 let condition = LineServiceCondition.condition(
-                    for: statuses.first { $0.id == selectedLineID }
+                    for: status
                 )
+                let hasNoSavedStatus = isOffline && (status?.lineStatuses.isEmpty ?? true)
                 Button {
                     onShowStatus(selectedLineID)
                 } label: {
-                    Image(systemName: statusPresentation(for: condition).symbol)
+                    Image(systemName: hasNoSavedStatus ? "wifi.slash" : statusPresentation(for: condition).symbol)
                         .font(.appSubheadline(.semibold))
-                        .foregroundStyle(statusPresentation(for: condition).color)
+                        .foregroundStyle(hasNoSavedStatus ? .secondary : statusPresentation(for: condition).color)
                         .frame(width: 44, height: 44)
                         .background(Color(uiColor: .tertiarySystemFill), in: .circle)
                         .overlay {
@@ -532,7 +555,7 @@ private struct StationLinePicker: View {
                 }
                 .buttonStyle(StationDepartureButtonStyle())
                 .accessibilityLabel(
-                    "\(selectedLineID.displayName) status, \(condition.accessibilityDescription)"
+                    "\(selectedLineID.displayName) status, \(hasNoSavedStatus ? "No saved status" : condition.accessibilityDescription)"
                 )
                 .accessibilityHint("Shows full service status")
             }
@@ -751,6 +774,7 @@ private struct LineStatusDetailSheet: View {
 
     let lineID: TubeLineID
     let lineStatus: TfLLineStatus?
+    let isOffline: Bool
 
     private var entries: [TfLStatusEntry] {
         lineStatus?.lineStatuses ?? []
@@ -764,9 +788,13 @@ private struct LineStatusDetailSheet: View {
 
                     if entries.isEmpty {
                         ContentUnavailableView(
-                            "Status updating",
-                            systemImage: "arrow.clockwise",
-                            description: Text("Service details for this line aren’t available yet.")
+                            isOffline ? "No saved status" : "Status updating",
+                            systemImage: isOffline ? "wifi.slash" : "arrow.clockwise",
+                            description: Text(
+                                isOffline
+                                    ? "Connect to the internet to check this line’s service status."
+                                    : "Service details for this line aren’t available yet."
+                            )
                         )
                         .frame(maxWidth: .infinity, minHeight: 220)
                     } else {
@@ -808,7 +836,7 @@ private struct LineStatusDetailSheet: View {
             } else {
                 Text(
                     entry.isGoodService
-                        ? "TfL is reporting normal service."
+                        ? (isOffline ? "Normal service was reported in the saved update." : "TfL is reporting normal service.")
                         : "No additional details were reported."
                 )
                 .font(.appBody())

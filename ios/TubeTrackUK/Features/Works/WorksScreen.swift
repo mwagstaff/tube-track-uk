@@ -45,10 +45,20 @@ struct WorksScreen: View {
     var body: some View {
         NavigationStack {
             Group {
-                if appState.isRefreshingWorks && filteredWorks.isEmpty {
+                if !appState.isOffline && appState.isRefreshingWorks && filteredWorks.isEmpty {
                     ProgressView("Loading planned works…")
                 } else if filteredWorks.isEmpty {
-                    emptyState
+                    if appState.isOffline {
+                        VStack(spacing: 0) {
+                            dateHeading
+                                .padding(.horizontal, 16)
+                                .padding(.top, 16)
+                            emptyState
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        }
+                    } else {
+                        emptyState
+                    }
                 } else {
                     worksList
                 }
@@ -76,6 +86,7 @@ struct WorksScreen: View {
                 .background(.bar)
             }
             .refreshable {
+                guard !appState.isOffline else { return }
                 await appState.refreshWorks(
                     through: selectedDate,
                     forceRefresh: true
@@ -105,18 +116,34 @@ struct WorksScreen: View {
 
                     showDisruptedLinesButton
                 } header: {
-                    Text(LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM"))
-                        .font(.appSubheadline(.bold))
-                        .textCase(.uppercase)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.vertical, 7)
-                        .background(Color(.systemGroupedBackground))
+                    dateHeading
                 }
             }
             .padding(16)
         }
         .scrollIndicators(.hidden)
+    }
+
+    private var dateHeading: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM"))
+                .font(.appSubheadline(.bold))
+                .textCase(.uppercase)
+                .foregroundStyle(.secondary)
+
+            if appState.isOffline {
+                OfflineStatusMessage(updatedAt: appState.worksUpdatedAt, isWorks: true)
+
+                if !appState.hasSavedWorks(for: selectedDate) {
+                    Text("This date hasn’t been fully saved. Connect to check for more work.")
+                        .font(.appCaption())
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 7)
+        .background(Color(.systemGroupedBackground))
     }
 
     private var showDisruptedLinesButton: some View {
@@ -217,11 +244,14 @@ struct WorksScreen: View {
     private var emptyState: some View {
         ContentUnavailableView {
             Label(
-                appState.worksError == nil ? "No planned works" : "Works unavailable",
-                systemImage: appState.worksError == nil ? "checkmark.circle" : "wifi.slash"
+                appState.isOffline
+                    ? "No saved works for this date"
+                    : appState.worksError == nil ? "No planned works" : "Works unavailable",
+                systemImage: appState.isOffline || appState.worksError != nil
+                    ? "wifi.slash" : "checkmark.circle"
             )
         } description: {
-            Text(appState.worksError ?? emptyStateDescription)
+            Text(appState.isOffline ? emptyStateDescription : appState.worksError ?? emptyStateDescription)
         } actions: {
             Button("Refresh") {
                 Task {
@@ -232,11 +262,15 @@ struct WorksScreen: View {
                 }
             }
             .buttonStyle(.borderedProminent)
+            .requiresNetwork(appState.isOffline)
         }
     }
 
     private var emptyStateDescription: String {
         let date = LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM")
+        if appState.isOffline {
+            return "Your saved data has no matching work for \(date). Connect to check for updates."
+        }
         if let selectedLine {
             return "No TfL engineering work is reported for the \(selectedLine.displayName) line on \(date)."
         }

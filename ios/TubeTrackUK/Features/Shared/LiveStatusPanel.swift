@@ -12,10 +12,15 @@ struct LiveStatusDock: View {
                 appState.selectedDisruptionDate,
                 dateFormat: "EEE d MMM"
             )
-            if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
+            if appState.isOffline,
+               !appState.hasSavedWorks(for: appState.selectedDisruptionDate),
+               appState.plannedWorksForSelectedDate.isEmpty {
+                return ("wifi.slash", .secondary, "No saved planned work", "Connect to check for updates")
+            }
+            if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty && !appState.isOffline {
                 return ("arrow.trianglehead.2.clockwise.rotate.90", .blue, "Loading planned work", date)
             }
-            if let error = appState.worksError, appState.engineeringWorks.isEmpty {
+            if let error = appState.worksError, appState.engineeringWorks.isEmpty, !appState.isOffline {
                 return ("wifi.slash", .orange, "Planned work unavailable", error)
             }
             let count = appState.currentIssueCount
@@ -28,14 +33,20 @@ struct LiveStatusDock: View {
                 )
             }
             if appState.plannedWorksForSelectedDate.isEmpty {
-                return ("checkmark.circle.fill", .green, "No planned work reported", date)
+                return (
+                    "checkmark.circle.fill", .green,
+                    appState.isOffline ? "No work in saved update" : "No planned work reported", date
+                )
             }
             if appState.selectedDisruptionTimeWindows.isEmpty {
                 return ("clock.badge.questionmark", .blue, "Choose a time window", date)
             }
             return ("clock.badge.xmark", .secondary, "No work in selected times", date)
         }
-        if appState.isLoadingInitialStatus {
+        if appState.isOffline && appState.statusUpdatedAt == nil {
+            return ("wifi.slash", .secondary, "No saved service status", "Connect to check for updates")
+        }
+        if appState.isLoadingInitialStatus && !appState.isOffline {
             return (
                 "arrow.trianglehead.2.clockwise.rotate.90",
                 .blue,
@@ -43,20 +54,31 @@ struct LiveStatusDock: View {
                 "Checking live network status"
             )
         }
-        if let error = appState.disruptionDataError, appState.statuses.isEmpty {
+        if let error = appState.disruptionDataError, appState.statuses.isEmpty, !appState.isOffline {
             return ("wifi.slash", .orange, "Live status unavailable", error)
         }
         if appState.currentIssueCount > 0 {
             let count = appState.currentIssueCount
-            return ("exclamationmark.triangle.fill", .red, "\(count) issue\(count == 1 ? "" : "s")", nil)
+            return (
+                "exclamationmark.triangle.fill", .red,
+                "\(count) \(appState.isOffline ? "saved " : "")issue\(count == 1 ? "" : "s")", nil
+            )
         }
         let overnight = !appState.statuses.isEmpty && appState.statuses.allSatisfy {
             $0.lineStatuses.allSatisfy(\.isOvernightClosure)
         }
         if overnight {
-            return ("moon.zzz.fill", .indigo, "Rail services closed", "Service resumes later this morning")
+            return (
+                "moon.zzz.fill", .indigo,
+                appState.isOffline ? "Rail services closed in saved update" : "Rail services closed",
+                appState.isOffline ? "Connect to check current service" : "Service resumes later this morning"
+            )
         }
-        return ("checkmark.circle.fill", .green, "Good service", "\(appState.goodServiceLineCount) of \(TubeLineID.allCases.count) lines reporting normally")
+        return (
+            "checkmark.circle.fill", .green,
+            appState.isOffline ? "No disruptions in saved update" : "Good service",
+            "\(appState.goodServiceLineCount) of \(TubeLineID.allCases.count) lines reporting normally"
+        )
     }
 
     var body: some View {
@@ -113,7 +135,7 @@ struct LiveStatusDock: View {
 
     @ViewBuilder
     private var statusIcon: some View {
-        if appState.isLoadingInitialStatus {
+        if appState.isLoadingInitialStatus && !appState.isOffline {
             ProgressView()
                 .controlSize(.small)
                 .tint(.blue)
@@ -122,7 +144,7 @@ struct LiveStatusDock: View {
             Image(systemName: summary.symbol)
                 .font(.appHeadline())
                 .foregroundStyle(summary.color)
-                .symbolEffect(.pulse, isActive: appState.isRefreshingStatus)
+                .symbolEffect(.pulse, isActive: appState.isRefreshingStatus && !appState.isOffline)
         }
     }
 
@@ -456,7 +478,7 @@ struct LiveStatusPanel: View {
                     )
                 }
 
-                if appState.isViewingLiveStatus {
+                if appState.isViewingLiveStatus && !appState.isOffline {
                     StaleLiveStatusNotice(updatedAt: appState.statusUpdatedAt)
                 }
 
@@ -489,7 +511,14 @@ struct LiveStatusPanel: View {
 
     @ViewBuilder
     private var liveDisruptionsContent: some View {
-        if appState.isLoadingInitialStatus {
+        if appState.isOffline && appState.statusUpdatedAt == nil {
+            ContentUnavailableView(
+                "No saved disruptions",
+                systemImage: "wifi.slash",
+                description: Text("Connect to the internet to check service status.")
+            )
+            .frame(maxWidth: .infinity, minHeight: 160)
+        } else if appState.isLoadingInitialStatus && !appState.isOffline {
             ProgressView("Loading disruptions from TfL…")
                 .tint(.blue)
                 .frame(maxWidth: .infinity, minHeight: 160)
@@ -512,7 +541,16 @@ struct LiveStatusPanel: View {
 
     @ViewBuilder
     private var plannedWorksContent: some View {
-        if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
+        if appState.isOffline,
+           !appState.hasSavedWorks(for: appState.selectedDisruptionDate),
+           appState.selectedEngineeringWorks.isEmpty {
+            ContentUnavailableView(
+                "No saved planned work",
+                systemImage: "wifi.slash",
+                description: Text("Connect to the internet to check planned work.")
+            )
+            .frame(maxWidth: .infinity, minHeight: 170)
+        } else if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty && !appState.isOffline {
             ProgressView("Loading planned work…")
                 .frame(maxWidth: .infinity, minHeight: 170)
         } else if appState.selectedEngineeringWorks.isEmpty {
@@ -523,6 +561,13 @@ struct LiveStatusPanel: View {
             let hasWorkOnDate = !appState.plannedWorksForSelectedDate.isEmpty
             let hasSelectedWindows = !appState.selectedDisruptionTimeWindows.isEmpty
             let emptyState: (title: String, symbol: String, description: String) = {
+                if appState.isOffline {
+                    return (
+                        "No saved work matches",
+                        "calendar",
+                        "Your saved data has no work matching the selected date and times. Connect to check for updates."
+                    )
+                }
                 if let error = appState.worksError {
                     return ("Planned work unavailable", "wifi.slash", error)
                 }
@@ -555,6 +600,14 @@ struct LiveStatusPanel: View {
         } else {
             ScrollView {
                 LazyVStack(spacing: 10) {
+                    if appState.isOffline && !appState.hasSavedWorks(for: appState.selectedDisruptionDate) {
+                        Label(
+                            "This date hasn’t been fully saved. Connect to check for more work.",
+                            systemImage: "wifi.slash"
+                        )
+                        .font(.appCaption())
+                        .foregroundStyle(.secondary)
+                    }
                     ForEach(appState.selectedEngineeringWorks) { work in
                         PlannedWorkRow(work: work) {
                             withAnimation(.spring(duration: 0.35)) { expanded = false }
@@ -590,9 +643,13 @@ struct LiveStatusPanel: View {
             .frame(maxHeight: 230)
         } else {
             ContentUnavailableView(
-                "Good service",
+                appState.isOffline ? "No saved disruptions" : "Good service",
                 systemImage: "checkmark.circle.fill",
-                description: Text("No live rail disruptions are currently reported.")
+                description: Text(
+                    appState.isOffline
+                        ? "No disruptions were reported in the last saved update."
+                        : "No live rail disruptions are currently reported."
+                )
             )
             .frame(height: 160)
         }

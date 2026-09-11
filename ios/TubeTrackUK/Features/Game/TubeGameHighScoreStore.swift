@@ -102,12 +102,21 @@ struct TubeGameScoreRecord: Codable, Identifiable, Equatable, Sendable {
         rulesVersion = try container.decode(Int.self, forKey: .rulesVersion)
     }
 
+    var timeSurvivedSeconds: Int {
+        guard elapsedTime.isFinite, configuredDuration.isFinite else { return 0 }
+        let boundedElapsedTime = min(max(0, elapsedTime), max(0, configuredDuration))
+        return Int(boundedElapsedTime.rounded(.down))
+    }
+
     var shareText: String {
         let stationDescription = stationsEaten == 1 ? "1 station" : "\(stationsEaten) stations"
         let terminusDescription = terminusStationsReached == 1
             ? "1 terminus"
             : "\(terminusStationsReached) termini"
-        return "I scored \(score) points in Track Attack on TubeTrack UK, eating \(stationDescription) and reaching \(terminusDescription), with a best combo of \(maxCombo). Can you beat my score?"
+        let timeDescription = timeSurvivedSeconds == 1
+            ? "1 second"
+            : "\(timeSurvivedSeconds) seconds"
+        return "I scored \(score) points in Track-Man on TubeTrack UK, eating \(stationDescription), reaching \(terminusDescription), and surviving for \(timeDescription), with a best combo of \(maxCombo). Can you beat my score?"
     }
 
     fileprivate var isValid: Bool {
@@ -252,6 +261,9 @@ final class TubeGameHighScoreStore {
         }
         if lhs.maxCombo != rhs.maxCombo {
             return lhs.maxCombo > rhs.maxCombo
+        }
+        if lhs.timeSurvivedSeconds != rhs.timeSurvivedSeconds {
+            return lhs.timeSurvivedSeconds > rhs.timeSurvivedSeconds
         }
         if lhs.playedAt != rhs.playedAt {
             return lhs.playedAt < rhs.playedAt

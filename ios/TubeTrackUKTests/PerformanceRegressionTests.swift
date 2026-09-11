@@ -457,16 +457,18 @@ struct PerformanceRegressionTests {
     }
 
     @Test func schematicPanCacheRefreshesFarLessOftenThanGestureUpdates() {
-        #expect(BeckMapArtworkCachePolicy.rebaseDistance < BeckMapArtworkCachePolicy.overscan)
-
+        let viewportSize = CGSize(width: 430, height: 932)
         var renderOffset = CGSize.zero
         var refreshCount = 0
         let gestureOffsets = stride(from: CGFloat.zero, through: 360, by: 4).map {
             CGSize(width: $0, height: $0 * 0.35)
         }
         for cameraOffset in gestureOffsets where BeckMapArtworkCachePolicy.shouldRebase(
+            cameraScale: 1,
             cameraOffset: cameraOffset,
-            renderOffset: renderOffset
+            renderScale: 1,
+            renderOffset: renderOffset,
+            viewportSize: viewportSize
         ) {
             refreshCount += 1
             renderOffset = cameraOffset
@@ -479,48 +481,168 @@ struct PerformanceRegressionTests {
 
     @Test func schematicPinchUsesCachedArtworkBetweenCoverageRebases() {
         let viewportSize = CGSize(width: 430, height: 932)
+        let focalPoint = CGPoint(x: viewportSize.width / 2, y: viewportSize.height / 2)
         let zoomOutScales = Array(stride(from: CGFloat(1), through: 0.2, by: -0.01))
 
-        var renderScale: CGFloat = 1
-        var zoomOutRefreshCount = 0
-        for cameraScale in zoomOutScales where BeckMapArtworkCachePolicy.shouldRebaseZoom(
-            cameraScale: cameraScale,
-            renderScale: renderScale,
-            viewportSize: viewportSize
-        ) {
-            zoomOutRefreshCount += 1
-            renderScale = cameraScale
+        func refreshCount(for scales: [CGFloat]) -> Int {
+            var renderScale: CGFloat = 1
+            var renderOffset = CGSize.zero
+            var count = 0
+            for cameraScale in scales {
+                let cameraOffset = CGSize(
+                    width: focalPoint.x * (1 - cameraScale),
+                    height: focalPoint.y * (1 - cameraScale)
+                )
+                if BeckMapArtworkCachePolicy.shouldRebase(
+                    cameraScale: cameraScale,
+                    cameraOffset: cameraOffset,
+                    renderScale: renderScale,
+                    renderOffset: renderOffset,
+                    viewportSize: viewportSize
+                ) {
+                    count += 1
+                    renderScale = cameraScale
+                    renderOffset = cameraOffset
+                }
+            }
+            return count
         }
 
-        let zoomInRefreshCount = stride(from: CGFloat(1), through: 3.8, by: 0.02).reduce(into: 0) {
-            if BeckMapArtworkCachePolicy.shouldRebaseZoom(
-                cameraScale: $1,
-                renderScale: 1,
-                viewportSize: viewportSize
-            ) {
-                $0 += 1
-            }
-        }
+        let zoomOutRefreshCount = refreshCount(for: zoomOutScales)
+        let zoomInScales = Array(stride(from: CGFloat(1), through: 3.8, by: 0.02))
+        let zoomInRefreshCount = refreshCount(for: zoomInScales)
 
         #expect(zoomOutScales.count > 75)
         #expect(zoomOutRefreshCount <= 6)
         #expect(zoomOutRefreshCount * 10 < zoomOutScales.count)
-        #expect(zoomInRefreshCount == 0)
+        // Periodic zoom-in refreshes restore sharp text without redrawing every frame.
+        #expect(zoomInRefreshCount > 0)
+        #expect(zoomInRefreshCount <= 3)
+        #expect(zoomInRefreshCount * 20 < zoomInScales.count)
     }
 
-    @Test func schematicStationLabelsStayVisibleDuringNavigation() {
-        #expect(BeckMapInteractionOverlayPolicy.showsStationLabels(
-            isFingerDown: true,
-            isPinching: false
-        ))
-        #expect(BeckMapInteractionOverlayPolicy.showsStationLabels(
-            isFingerDown: false,
-            isPinching: false
-        ))
-        #expect(BeckMapInteractionOverlayPolicy.showsStationLabels(
-            isFingerDown: false,
-            isPinching: true
-        ))
+    @Test func schematicLabelLayoutIncludesTheOffscreenNavigationBuffer() {
+        let viewportSize = CGSize(width: 430, height: 932)
+        let overscan = BeckMapArtworkCachePolicy.overscan
+        let canvasSize = CGSize(
+            width: viewportSize.width + overscan * 2,
+            height: viewportSize.height + overscan * 2
+        )
+        let labelViewport = BeckMapArtworkCachePolicy.labelViewport(in: canvasSize)
+        let visibleViewport = CGRect(origin: CGPoint(x: overscan, y: overscan), size: viewportSize)
+
+        #expect(labelViewport.contains(visibleViewport))
+        #expect(labelViewport.minX < visibleViewport.minX - 100)
+        #expect(labelViewport.minY < visibleViewport.minY - 100)
+        #expect(labelViewport.maxX > visibleViewport.maxX + 100)
+        #expect(labelViewport.maxY > visibleViewport.maxY + 100)
+        #expect(CGRect(origin: .zero, size: canvasSize).contains(labelViewport))
+    }
+
+    @Test func schematicCacheRefreshesBeforeAPanExposesTheCanvasEdge() {
+        let viewportSize = CGSize(width: 430, height: 932)
+        let availableTravel = BeckMapArtworkCachePolicy.overscan - 48
+        for direction: CGFloat in [-1, 1] {
+            #expect(!BeckMapArtworkCachePolicy.shouldRebase(
+                cameraScale: 1,
+                cameraOffset: CGSize(width: direction * (availableTravel - 1), height: 0),
+                renderScale: 1,
+                renderOffset: .zero,
+                viewportSize: viewportSize
+            ))
+            #expect(BeckMapArtworkCachePolicy.shouldRebase(
+                cameraScale: 1,
+                cameraOffset: CGSize(width: direction * (availableTravel + 1), height: 0),
+                renderScale: 1,
+                renderOffset: .zero,
+                viewportSize: viewportSize
+            ))
+        }
+    }
+
+    @Test func schematicCornerPinchesRetainCoverageUntilTheNextCacheRefresh() {
+        let viewportSize = CGSize(width: 430, height: 932)
+        let focalPoints = [
+            CGPoint.zero,
+            CGPoint(x: viewportSize.width, y: 0),
+            CGPoint(x: 0, y: viewportSize.height),
+            CGPoint(x: viewportSize.width, y: viewportSize.height),
+        ]
+        for focalPoint in focalPoints {
+            var renderScale: CGFloat = 1
+            var renderOffset = CGSize.zero
+            var refreshCount = 0
+            for cameraScale in stride(from: CGFloat(1), through: 0.2, by: -0.01) {
+                let cameraOffset = CGSize(
+                    width: focalPoint.x * (1 - cameraScale),
+                    height: focalPoint.y * (1 - cameraScale)
+                )
+                if BeckMapArtworkCachePolicy.shouldRebase(
+                    cameraScale: cameraScale, cameraOffset: cameraOffset,
+                    renderScale: renderScale, renderOffset: renderOffset,
+                    viewportSize: viewportSize
+                ) {
+                    renderScale = cameraScale
+                    renderOffset = cameraOffset
+                    refreshCount += 1
+                }
+                #expect(cachedCoverage(
+                    cameraScale: cameraScale, cameraOffset: cameraOffset,
+                    renderScale: renderScale, renderOffset: renderOffset,
+                    viewportSize: viewportSize
+                ).contains(CGRect(origin: .zero, size: viewportSize).insetBy(dx: -48, dy: -48)))
+            }
+            #expect(refreshCount > 0)
+            #expect(refreshCount < 15)
+        }
+    }
+
+    @Test func schematicCombinedPanAndZoomKeepsTheViewportCovered() {
+        let viewportSize = CGSize(width: 430, height: 932)
+        var renderScale: CGFloat = 1
+        var renderOffset = CGSize.zero
+        var refreshCount = 0
+
+        for frame in 0..<240 {
+            let cameraScale = 1 + CGFloat(sin(Double(frame) / 40)) * 0.5
+            let cameraOffset = CGSize(
+                width: CGFloat(frame) * 4 + viewportSize.width / 2 * (1 - cameraScale),
+                height: CGFloat(sin(Double(frame) / 30)) * 240 + viewportSize.height / 2 * (1 - cameraScale)
+            )
+            if BeckMapArtworkCachePolicy.shouldRebase(
+                cameraScale: cameraScale, cameraOffset: cameraOffset,
+                renderScale: renderScale, renderOffset: renderOffset,
+                viewportSize: viewportSize
+            ) {
+                renderScale = cameraScale
+                renderOffset = cameraOffset
+                refreshCount += 1
+            }
+            #expect(cachedCoverage(
+                cameraScale: cameraScale, cameraOffset: cameraOffset,
+                renderScale: renderScale, renderOffset: renderOffset,
+                viewportSize: viewportSize
+            ).contains(CGRect(origin: .zero, size: viewportSize).insetBy(dx: -48, dy: -48)))
+        }
+        #expect(refreshCount > 0)
+        #expect(refreshCount < 24)
+    }
+
+    private func cachedCoverage(
+        cameraScale: CGFloat, cameraOffset: CGSize,
+        renderScale: CGFloat, renderOffset: CGSize,
+        viewportSize: CGSize
+    ) -> CGRect {
+        let overscan = BeckMapArtworkCachePolicy.overscan
+        let ratio = cameraScale / renderScale
+        // Derive each screen edge from the cached camera independently of the
+        // production transform, catching wrong offset or focal-point handling.
+        return CGRect(
+            x: cameraOffset.width - (renderOffset.width + overscan) * ratio,
+            y: cameraOffset.height - (renderOffset.height + overscan) * ratio,
+            width: (viewportSize.width + overscan * 2) * ratio,
+            height: (viewportSize.height + overscan * 2) * ratio
+        )
     }
 
     @Test func schematicMomentumIsBoundedAndRefreshRateIndependent() throws {

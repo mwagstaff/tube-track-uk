@@ -94,7 +94,18 @@ struct MapDisruptionOverviewCard: View {
     }
 
     private var isLoadingTfLDisruptions: Bool {
-        appState.isViewingLiveStatus && appState.isLoadingInitialStatus
+        appState.isViewingLiveStatus && appState.isLoadingInitialStatus && !appState.isOffline
+    }
+
+    private var hasNoSavedDisruptionData: Bool {
+        guard appState.isOffline else { return false }
+        if appState.isViewingLiveStatus { return appState.statusUpdatedAt == nil }
+        return hasIncompleteSavedWorks && lineEntries.isEmpty
+    }
+
+    private var hasIncompleteSavedWorks: Bool {
+        appState.isOffline && !appState.isViewingLiveStatus
+            && !appState.hasSavedWorks(for: appState.selectedDisruptionDate)
     }
 
     var body: some View {
@@ -115,6 +126,17 @@ struct MapDisruptionOverviewCard: View {
                 .buttonStyle(.plain)
                 .contentShape(.rect)
                 .accessibilityHint("Shows current disruptions")
+            }
+
+            if appState.isOffline {
+                OfflineStatusMessage(
+                    updatedAt: appState.disruptionDataUpdatedAt,
+                    isWorks: !appState.isViewingLiveStatus
+                )
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, 14)
+                .padding(.top, 10)
+                .padding(.bottom, 12)
             }
 
             if !headlineOnly, expanded {
@@ -150,7 +172,11 @@ struct MapDisruptionOverviewCard: View {
                     .lineLimit(compactHeadline ? 1 : nil)
                     .minimumScaleFactor(compactHeadline ? 0.78 : 1)
                 if expanded {
-                    Text("Live status and planned engineering work")
+                    Text(
+                        appState.isOffline
+                            ? "Saved status and planned engineering work"
+                            : "Live status and planned engineering work"
+                    )
                         .font(.appCaption())
                         .foregroundStyle(.secondary)
                 }
@@ -191,7 +217,10 @@ struct MapDisruptionOverviewCard: View {
                             : .appHeadline(.bold)
                     )
                     .foregroundStyle(headlineColor)
-                    .symbolEffect(.pulse, isActive: appState.isRefreshingDisruptionData)
+                    .symbolEffect(
+                        .pulse,
+                        isActive: appState.isRefreshingDisruptionData && !appState.isOffline
+                    )
             }
         }
         .frame(
@@ -300,6 +329,15 @@ struct MapDisruptionOverviewCard: View {
 
     private var expandedContent: some View {
         VStack(spacing: 10) {
+            if hasIncompleteSavedWorks {
+                Label(
+                    "This date hasn’t been fully saved. Connect to check for more work.",
+                    systemImage: "wifi.slash"
+                )
+                .font(.appCaption())
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 14)
+            }
             if !appState.isViewingLiveStatus {
                 DisruptionTimeFilterBar(fillsAvailableWidth: true)
                     .padding(.horizontal, 14)
@@ -326,8 +364,8 @@ struct MapDisruptionOverviewCard: View {
                     .frame(maxWidth: .infinity, minHeight: 100)
                 } else if lineEntries.isEmpty {
                     ContentUnavailableView(
-                        "No disruptions",
-                        systemImage: "checkmark.circle",
+                        appState.isOffline ? "No saved disruptions" : "No disruptions",
+                        systemImage: hasNoSavedDisruptionData ? "wifi.slash" : "checkmark.circle",
                         description: Text(emptyMessage)
                     )
                     .frame(maxHeight: 140)
@@ -449,15 +487,22 @@ struct MapDisruptionOverviewCard: View {
 
     private var headline: String {
         let count = lineEntries.count
+        if hasNoSavedDisruptionData { return "No saved disruptions" }
         if isLoadingTfLDisruptions {
             return "Loading disruptions from TfL"
         }
         if !appState.isViewingLiveStatus,
+           !appState.isOffline,
            appState.isRefreshingDisruptionData,
            appState.visibleDisruptions.isEmpty {
             return "Loading planned disruptions"
         }
         if appState.isViewingLiveStatus {
+            if appState.isOffline {
+                return count == 0
+                    ? "No disruptions in saved update"
+                    : "\(count) saved disruption\(count == 1 ? "" : "s")"
+            }
             return count == 0
                 ? "No disruptions currently"
                 : "\(count) disruption\(count == 1 ? "" : "s") currently"
@@ -472,6 +517,14 @@ struct MapDisruptionOverviewCard: View {
     }
 
     private var emptyMessage: String {
+        if hasNoSavedDisruptionData {
+            return "Connect to the internet to check for disruptions."
+        }
+        if appState.isOffline {
+            return appState.isViewingLiveStatus
+                ? "No disruptions were reported in the last saved update."
+                : "No saved work matches the selected date and times."
+        }
         if appState.isViewingLiveStatus {
             if isLoadingTfLDisruptions {
                 return "Loading disruption data from TfL..."
@@ -482,12 +535,14 @@ struct MapDisruptionOverviewCard: View {
     }
 
     private var headlineSymbol: String {
-        lineEntries.isEmpty
+        if hasNoSavedDisruptionData { return "wifi.slash" }
+        return lineEntries.isEmpty
             ? "checkmark.circle.fill"
             : "exclamationmark.triangle.fill"
     }
 
     private var headlineColor: Color {
+        if hasNoSavedDisruptionData { return .secondary }
         if isLoadingTfLDisruptions { return .blue }
         return lineEntries.isEmpty ? .green : .red
     }
@@ -641,6 +696,7 @@ struct MapNetworkStatsCard: View {
     private func stat(_ filter: MapNetworkStatFilter) -> some View {
         let selected = appState.selectedMapNetworkStat == filter
         let value = appState.mapNetworkStatusSummary.count(for: filter)
+        let isUnavailable = hasUnavailableOfflineCount(for: filter, value: value)
 
         return Button {
             withAnimation(reduceMotion ? nil : .smooth(duration: 0.26)) {
@@ -659,8 +715,14 @@ struct MapNetworkStatsCard: View {
                     .font(.appCaption2(.bold))
                     .foregroundStyle(filter.color)
                     .frame(height: 12)
-                Text(value, format: .number)
-                    .font(.appTitle3(.bold).monospacedDigit())
+                Group {
+                    if isUnavailable {
+                        Text("—")
+                    } else {
+                        Text(value, format: .number)
+                    }
+                }
+                .font(.appTitle3(.bold).monospacedDigit())
                 Text(filter.title)
                     .font(.appCaption2())
                     .foregroundStyle(selected ? .primary : .secondary)
@@ -691,10 +753,22 @@ struct MapNetworkStatsCard: View {
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(filter.title), \(value)")
-        .accessibilityHint(statAccessibilityHint(for: filter, selected: selected))
+        .accessibilityLabel("\(filter.title), \(isUnavailable ? "No saved data" : String(value))")
+        .requiresNetwork(
+            isUnavailable,
+            onlineHint: statAccessibilityHint(for: filter, selected: selected)
+        )
         .accessibilityAddTraits(.isButton)
         .accessibilityAddTraits(selected ? .isSelected : [])
+    }
+
+    private func hasUnavailableOfflineCount(for filter: MapNetworkStatFilter, value: Int) -> Bool {
+        guard appState.isOffline, filter != .lines else { return false }
+        if appState.isViewingLiveStatus { return appState.statusUpdatedAt == nil }
+        guard !appState.hasSavedWorks(for: appState.selectedDisruptionDate) else { return false }
+        // Known saved disruptions remain inspectable even when the saved range
+        // is incomplete. An absent entry cannot establish good service.
+        return filter == .goodService || value == 0
     }
 
     private func statAccessibilityHint(

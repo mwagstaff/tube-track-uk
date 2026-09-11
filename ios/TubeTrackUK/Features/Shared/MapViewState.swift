@@ -160,7 +160,8 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
     init(
         statuses: [TfLLineStatus],
         disruptions: [ResolvedDisruption],
-        isViewingLiveStatus: Bool = true
+        isViewingLiveStatus: Bool = true,
+        hasPlannedStatus: Bool = true
     ) {
         let allLineIDs = Set(TubeLineID.allCases)
         let disrupted = Set(disruptions.map(\.lineID))
@@ -188,7 +189,7 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
         lineIDs = allLineIDs
         goodServiceLineIDs = isViewingLiveStatus
             ? liveGoodService
-            : allLineIDs.subtracting(disrupted)
+            : hasPlannedStatus ? allLineIDs.subtracting(disrupted) : []
         minorDelayLineIDs = isViewingLiveStatus ? liveMinorDelays : []
         majorIssueLineIDs = isViewingLiveStatus ? liveMajorIssues : []
         closedLineIDs = isViewingLiveStatus ? liveClosed : []

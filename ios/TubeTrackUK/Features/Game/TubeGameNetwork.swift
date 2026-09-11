@@ -145,13 +145,13 @@ enum TubeGameNetworkError: LocalizedError, Equatable {
     var errorDescription: String? {
         switch self {
         case let .missingStationMarker(stationID):
-            "Track Attack cannot find artwork for station \(stationID)."
+            "Track-Man cannot find artwork for station \(stationID)."
         case let .missingPath(segmentID, pathID):
-            "Track Attack segment \(segmentID) cannot find path \(pathID)."
+            "Track-Man segment \(segmentID) cannot find path \(pathID)."
         case let .invalidSegmentGeometry(segmentID):
-            "Track Attack segment \(segmentID) has no playable geometry."
+            "Track-Man segment \(segmentID) has no playable geometry."
         case let .missingRouteSegment(lineID, fromStationID, toStationID):
-            "Track Attack route on \(lineID.displayName) cannot join \(fromStationID) to \(toStationID)."
+            "Track-Man route on \(lineID.displayName) cannot join \(fromStationID) to \(toStationID)."
         }
     }
 }

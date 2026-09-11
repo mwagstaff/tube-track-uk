@@ -22,9 +22,16 @@ struct TubeGameHighScoreStoreTests {
         let restored = TubeGameHighScoreStore(defaults: suite.defaults)
         #expect(restored.scores == [record])
         #expect(restored.shareText(for: record) == record.shareText)
-        #expect(record.shareText.contains("Track Attack"))
+        #expect(record.shareText.contains("Track-Man"))
         #expect(record.shareText.contains("TubeTrack UK"))
+        #expect(record.shareText.contains("42 seconds"))
         #expect(!record.shareText.localizedCaseInsensitiveContains("Pac-Man"))
+    }
+
+    @Test func timeSurvivedIsClampedAndRoundedDown() {
+        #expect(makeRecord(score: 1, elapsedTime: 42.9).timeSurvivedSeconds == 42)
+        #expect(makeRecord(score: 1, elapsedTime: 75).timeSurvivedSeconds == 60)
+        #expect(makeRecord(score: 1, elapsedTime: -1).timeSurvivedSeconds == 0)
     }
 
     @Test @MainActor func leaderboardKeepsOnlyTheTenHighestScores() throws {
@@ -145,6 +152,7 @@ struct TubeGameHighScoreStoreTests {
         score: Int,
         stationsEaten: Int = 1,
         maxCombo: Int = 1,
+        elapsedTime: TimeInterval = 42,
         playedAt: TimeInterval = 100,
         endReason: TubeGameScoreEndReason = .collision
     ) -> TubeGameScoreRecord {
@@ -154,7 +162,7 @@ struct TubeGameHighScoreStoreTests {
             stationsEaten: stationsEaten,
             maxCombo: maxCombo,
             configuredDuration: 60,
-            elapsedTime: 42,
+            elapsedTime: elapsedTime,
             endReason: endReason,
             playedAt: Date(timeIntervalSince1970: playedAt),
             runSeed: 123,

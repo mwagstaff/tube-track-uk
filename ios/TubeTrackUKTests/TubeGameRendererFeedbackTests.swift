@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import TubeTrackUK
 
-@Suite("Track Attack renderer feedback")
+@Suite("Track-Man renderer feedback")
 struct TubeGameRendererFeedbackTests {
     @Test func gamePreservesKenningtonsAuthoredBranchRoundelsAndConnector() throws {
         let graph = try TubeGraph.bundled()

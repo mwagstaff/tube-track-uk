@@ -4,15 +4,24 @@ import Testing
 @testable import TubeTrackUK
 
 struct TubeGameAchievementsTests {
-    private func record(score: Int = 100, stations: Int = 5, lines: Int = 0, termini: Int = 0, combo: Int = 3, day: Int = 0) -> TubeGameScoreRecord {
-        .init(score: score, stationsEaten: stations, linesCleared: lines, terminusStationsReached: termini, maxCombo: combo, configuredDuration: 60, elapsedTime: 42, endReason: .collision, playedAt: Date(timeIntervalSince1970: 1_780_315_200 + Double(day) * 86_400), runSeed: 1, graphGeneratedAt: "test")
+    private func record(score: Int = 100, stations: Int = 5, lines: Int = 0, termini: Int = 0, combo: Int = 3, elapsed: TimeInterval = 42, day: Int = 0) -> TubeGameScoreRecord {
+        .init(score: score, stationsEaten: stations, linesCleared: lines, terminusStationsReached: termini, maxCombo: combo, configuredDuration: 60, elapsedTime: elapsed, endReason: .collision, playedAt: Date(timeIntervalSince1970: 1_780_315_200 + Double(day) * 86_400), runSeed: 1, graphGeneratedAt: "test")
     }
 
     @Test func tiesAndZeroMetricsDoNotCelebrate() {
         var bests = TubeGamePersonalBests()
-        #expect(bests.record(record()).map(\.category) == ["score", "stations", "combo"])
+        #expect(bests.record(record()).map(\.category) == ["score", "stations", "combo", "time survived"])
         #expect(bests.record(record()).isEmpty)
         #expect(bests.record(record(score: 0, stations: 0, combo: 0)).isEmpty)
+    }
+
+    @Test func timeSurvivedUsesOnlyCompletedSeconds() {
+        var bests = TubeGamePersonalBests()
+        let first = bests.record(record(score: 0, stations: 0, combo: 0, elapsed: 42.9))
+        #expect(first == [.init(category: "time survived", period: "personal", value: 42)])
+        #expect(first.first?.formattedValue == "42s")
+        #expect(bests.record(record(score: 0, stations: 0, combo: 0, elapsed: 42.99)).isEmpty)
+        #expect(bests.record(record(score: 0, stations: 0, combo: 0, elapsed: 43.1)).map(\.category) == ["time survived"])
     }
 
     @Test func dailyAndWeeklyRecordsResetWithoutLosingAllTimeRecords() {
@@ -55,7 +64,7 @@ struct TubeGameAchievementsTests {
         let png = try #require(image.pngData())
         #expect(png.count > 10_000)
         // Keep a rendered artifact for visual inspection in the simulator container.
-        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("TrackAttack-score-preview.png")
+        let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("Track-Man-score-preview.png")
         try png.write(to: url)
     }
 }

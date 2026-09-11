@@ -3,7 +3,7 @@ import Foundation
 import Testing
 @testable import TubeTrackUK
 
-@Suite("Track Attack engine")
+@Suite("Track-Man engine")
 struct TubeGameEngineTests {
 #if DEBUG
     @Test func debugPlaybackCanRunAtTenPercentSpeedOrFreezeCompletely() {

@@ -271,7 +271,9 @@ struct UnifiedMapScreen: View {
 
     private func setMapNavigation(active: Bool) {
         guard mapNavigationActive != active else { return }
-        if reduceMotion {
+        // Give a network-map drag immediate visual feedback and keep glass
+        // compositing work out of its first frame. Animate the furniture's return.
+        if reduceMotion || (active && appState.mapPresentationMode == .beck) {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) {
@@ -541,6 +543,7 @@ struct UnifiedMapScreen: View {
 }
 
 private struct OpenStreetMapAttribution: View {
+    @Environment(TubeAppState.self) private var appState
     var body: some View {
         Link(destination: URL(string: "https://www.openstreetmap.org/copyright")!) {
             Text("© OpenStreetMap contributors")
@@ -550,5 +553,6 @@ private struct OpenStreetMapAttribution: View {
                 .glassEffect(.regular, in: .capsule)
         }
         .foregroundStyle(.primary)
+        .requiresNetwork(appState.isOffline)
     }
 }

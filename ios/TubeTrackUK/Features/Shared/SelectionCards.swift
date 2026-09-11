@@ -67,6 +67,7 @@ struct StationDetailCard: View {
                     arrivals: appState.stationArrivals,
                     statuses: appState.statuses,
                     isLoading: appState.isRefreshingStationArrivals,
+                    isOffline: appState.isOffline,
                     errorMessage: appState.stationArrivalsError,
                     warning: stationWarning,
                     maxDeparturesHeight: 280,
@@ -665,11 +666,18 @@ struct LineDetailCard: View {
                 }
 
                 Label(
-                    status?.statusSeverityDescription ?? "Status updating",
-                    systemImage: status?.isGoodService == true ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
+                    status?.statusSeverityDescription
+                        ?? (appState.isOffline ? "No saved status" : "Status updating"),
+                    systemImage: status == nil && appState.isOffline
+                        ? "wifi.slash"
+                        : status?.isGoodService == true ? "checkmark.circle.fill" : "exclamationmark.triangle.fill"
                 )
                 .font(.appSubheadline(.semibold))
-                .foregroundStyle(status?.isGoodService == true ? .green : .orange)
+                .foregroundStyle(
+                    status == nil && appState.isOffline
+                        ? Color.secondary
+                        : status?.isGoodService == true ? .green : .orange
+                )
 
                 if let reason = status?.reason {
                     Text(reason)
@@ -688,6 +696,7 @@ struct LineDetailCard: View {
                             .frame(maxWidth: .infinity)
                     }
                     .buttonStyle(.bordered)
+                    .requiresNetwork(appState.isOffline)
                 }
             }
         }

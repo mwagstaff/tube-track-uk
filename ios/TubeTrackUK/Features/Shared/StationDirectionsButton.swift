@@ -2,6 +2,7 @@ import MapKit
 import SwiftUI
 
 struct StationDirectionsButton: View {
+    @Environment(TubeAppState.self) private var appState
     let station: TubeStation
     var iconOnly = false
 
@@ -25,7 +26,7 @@ struct StationDirectionsButton: View {
         .frame(minWidth: 44, minHeight: 44)
         .contentShape(.rect)
         .accessibilityLabel("Get directions to \(station.name)")
-        .accessibilityHint("Opens transit directions in Maps")
+        .requiresNetwork(appState.isOffline, onlineHint: "Opens transit directions in Maps")
     }
 
     private func openDirections() {

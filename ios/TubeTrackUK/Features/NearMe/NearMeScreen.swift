@@ -32,9 +32,17 @@ struct NearMeScreen: View {
             .toolbar {
                 if locationProvider.location != nil {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Refresh", systemImage: "arrow.clockwise") {
+                        Button(
+                            appState.isOffline ? "Update location" : "Refresh",
+                            systemImage: appState.isOffline ? "location.fill" : "arrow.clockwise"
+                        ) {
                             refresh()
                         }
+                        .accessibilityHint(
+                            appState.isOffline
+                                ? "Updates your location using your device"
+                                : "Updates your location and departures"
+                        )
                     }
                 }
             }
@@ -45,7 +53,8 @@ struct NearMeScreen: View {
         }
         .task(id: initialStationTaskID) {
             guard appState.selectedTab == .nearMe,
-                  appState.isViewingLiveStatus else {
+                  appState.isViewingLiveStatus,
+                  !appState.isOffline else {
                 return
             }
             visibleStationCount = Self.stationBatchSize
@@ -57,6 +66,7 @@ struct NearMeScreen: View {
         .task(id: nearbyArrivalsPollingTaskID) {
             guard appState.selectedTab == .nearMe,
                   appState.isViewingLiveStatus,
+                  !appState.isOffline,
                   !visibleNearbyStations.isEmpty else {
                 return
             }
@@ -69,7 +79,8 @@ struct NearMeScreen: View {
                 }
                 guard !Task.isCancelled,
                       appState.selectedTab == .nearMe,
-                      appState.isViewingLiveStatus else {
+                      appState.isViewingLiveStatus,
+                      !appState.isOffline else {
                     return
                 }
                 await appState.refreshNearbyArrivals(
@@ -100,12 +111,12 @@ struct NearMeScreen: View {
             .prefix(Self.stationBatchSize)
             .map(\.id)
             .joined(separator: ":")
-        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned")"
+        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned"):\(appState.isOffline)"
     }
 
     private var nearbyArrivalsPollingTaskID: String {
         let stationIDs = visibleStationIDs.sorted().joined(separator: ":")
-        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned")"
+        return "\(appState.selectedTab.rawValue):\(stationIDs):\(appState.isViewingLiveStatus ? "live" : "planned"):\(appState.isOffline)"
     }
 
     private var hasMoreStations: Bool {
@@ -155,6 +166,7 @@ struct NearMeScreen: View {
             }
             .refreshable {
                 locationProvider.requestLocation()
+                guard !appState.isOffline else { return }
                 if appState.isViewingLiveStatus {
                     await appState.refreshNearbyArrivals(
                         for: stationsForManualRefresh,
@@ -244,6 +256,7 @@ struct NearMeScreen: View {
 
     private func refresh() {
         locationProvider.requestLocation()
+        guard !appState.isOffline else { return }
         Task {
             if appState.isViewingLiveStatus {
                 let stations = stationsForManualRefresh
@@ -284,7 +297,7 @@ struct NearMeScreen: View {
     ) {
         if isVisible {
             let inserted = visibleStationIDs.insert(nearbyStation.id).inserted
-            guard inserted, appState.isViewingLiveStatus else { return }
+            guard inserted, appState.isViewingLiveStatus, !appState.isOffline else { return }
             Task {
                 await appState.refreshNearbyArrivals(for: [nearbyStation.station])
             }
@@ -337,6 +350,10 @@ private struct NearbyStationCard: View {
         )
     }
 
+    private var hasIncompleteSavedWorks: Bool {
+        appState.isOffline && !appState.hasSavedWorks(for: appState.selectedDisruptionDate)
+    }
+
     private var distanceText: String {
         NearbyDistanceFormatter.string(from: nearbyStation.distance)
     }
@@ -351,7 +368,11 @@ private struct NearbyStationCard: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("\(station.name), \(distanceText) away")
-                .accessibilityHint("Shows this station in the real-world map view")
+                .accessibilityHint(
+                    appState.isOffline
+                        ? "Shows this station in the network map"
+                        : "Shows this station in the real-world map view"
+                )
 
                 StationDirectionsButton(station: station, iconOnly: true)
                     .padding(.trailing, 8)
@@ -363,6 +384,7 @@ private struct NearbyStationCard: View {
                     arrivals: arrivals,
                     statuses: appState.statuses,
                     isLoading: appState.nearbyArrivalsLoadingStationIDs.contains(station.id),
+                    isOffline: appState.isOffline,
                     errorMessage: appState.nearbyArrivalsErrorsByStationID[station.id]
                 )
                 .id(station.id)
@@ -419,7 +441,11 @@ private struct NearbyStationCard: View {
 
     @ViewBuilder
     private var plannedDisruptionsContent: some View {
-        if appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
+        if hasIncompleteSavedWorks && appState.plannedWorksForSelectedDate.isEmpty {
+            Label("No saved planned disruptions for this date. Connect to check for updates.", systemImage: "wifi.slash")
+                .font(.appSubheadline())
+                .foregroundStyle(.secondary)
+        } else if !appState.isOffline && appState.isRefreshingWorks && appState.engineeringWorks.isEmpty {
             HStack(spacing: 9) {
                 ProgressView()
                 Text("Loading planned disruptions…")
@@ -428,7 +454,8 @@ private struct NearbyStationCard: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 8)
-        } else if let error = appState.worksError, appState.engineeringWorks.isEmpty {
+        } else if let error = appState.worksError,
+                  appState.engineeringWorks.isEmpty, !appState.isOffline {
             Label {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Planned disruptions unavailable")
@@ -443,6 +470,14 @@ private struct NearbyStationCard: View {
             }
         } else {
             VStack(alignment: .leading, spacing: 14) {
+                if hasIncompleteSavedWorks {
+                    Label(
+                        "This date hasn’t been fully saved. Connect to check for more work.",
+                        systemImage: "wifi.slash"
+                    )
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+                }
                 Text("Planned disruptions")
                     .font(.appCaption(.semibold))
                     .foregroundStyle(.secondary)
@@ -460,7 +495,7 @@ private struct NearbyStationCard: View {
     private func showOnMap() {
         appState.clearMapSelection()
         appState.select(station: station)
-        appState.mapPresentationMode = .realWorld
+        appState.mapPresentationMode = appState.isOffline ? .beck : .realWorld
         appState.selectedTab = .map
     }
 }
@@ -514,7 +549,7 @@ private struct NearbyLineDisruptionView: View {
 
             if group.works.isEmpty {
                 Label {
-                    Text("No planned disruption reported")
+                    Text(appState.isOffline ? "No planned disruption in saved data" : "No planned disruption reported")
                         .foregroundStyle(.secondary)
                 } icon: {
                     Image(systemName: "checkmark.circle.fill")

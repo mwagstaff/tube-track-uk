@@ -10,7 +10,7 @@
           "formatterSuffixSingular" : "line",
           "locale" : "en-GB",
           "localID" : "stationchase.lines.v1-en-GB",
-          "name" : "Lines Cleared"
+          "name" : "Track-Man Lines Cleared"
         }
       ],
       "stationchase.score.v1" : [
@@ -19,7 +19,7 @@
           "formatterSuffixSingular" : "point",
           "locale" : "en-GB",
           "localID" : "stationchase.score.v1-en-GB",
-          "name" : "High Score"
+          "name" : "Track-Man High Score"
         }
       ],
       "stationchase.stations.v1" : [
@@ -28,16 +28,26 @@
           "formatterSuffixSingular" : "station",
           "locale" : "en-GB",
           "localID" : "stationchase.stations.v1-en-GB",
-          "name" : "Stations Eaten"
+          "name" : "Track-Man Stations Eaten"
         }
       ],
       "stationchase.termini.v1" : [
         {
+          "description" : "Most unique Tube termini reached in one Track-Man run.",
           "formatterSuffix" : "termini",
           "formatterSuffixSingular" : "terminus",
           "locale" : "en-GB",
           "localID" : "stationchase.termini.v1-en-GB",
-          "name" : "Terminus Stations Reached"
+          "name" : "Track-Man Termini Reached"
+        }
+      ],
+      "stationchase.time.v1" : [
+        {
+          "formatterSuffix" : "seconds",
+          "formatterSuffixSingular" : "second",
+          "locale" : "en-GB",
+          "localID" : "stationchase.time.v1-en-GB",
+          "name" : "Track-Man Time Survived"
         }
       ]
     },
@@ -48,7 +58,7 @@
         },
         "archived" : false,
         "defaultFormatter" : "INTEGER",
-        "referenceName" : "Track Attack High Score",
+        "referenceName" : "Track-Man High Score",
         "scoreRangeEnd" : null,
         "scoreRangeStart" : null,
         "scoreSortType" : "DESC",
@@ -62,21 +72,7 @@
         },
         "archived" : false,
         "defaultFormatter" : "INTEGER",
-        "referenceName" : "Track Attack Stations Eaten",
-        "scoreRangeEnd" : null,
-        "scoreRangeStart" : null,
-        "scoreSortType" : "DESC",
-        "submissionType" : "BEST_SCORE",
-        "vendorIdentifier" : "stationchase.stations.v1",
-        "visibility" : "SHOW_FOR_ALL"
-      },
-      {
-        "activityProperties" : {
-
-        },
-        "archived" : false,
-        "defaultFormatter" : "INTEGER",
-        "referenceName" : "Track Attack Lines Cleared",
+        "referenceName" : "Track-Man Lines Cleared",
         "scoreRangeEnd" : null,
         "scoreRangeStart" : null,
         "scoreSortType" : "DESC",
@@ -90,12 +86,40 @@
         },
         "archived" : false,
         "defaultFormatter" : "INTEGER",
-        "referenceName" : "Track Attack Terminus Stations Reached",
+        "referenceName" : "Track-Man Stations Eaten",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.stations.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      },
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track-Man Terminus Stations Reached",
         "scoreRangeEnd" : null,
         "scoreRangeStart" : null,
         "scoreSortType" : "DESC",
         "submissionType" : "BEST_SCORE",
         "vendorIdentifier" : "stationchase.termini.v1",
+        "visibility" : "SHOW_FOR_ALL"
+      },
+      {
+        "activityProperties" : {
+
+        },
+        "archived" : false,
+        "defaultFormatter" : "INTEGER",
+        "referenceName" : "Track-Man Time Survived",
+        "scoreRangeEnd" : null,
+        "scoreRangeStart" : null,
+        "scoreSortType" : "DESC",
+        "submissionType" : "BEST_SCORE",
+        "vendorIdentifier" : "stationchase.time.v1",
         "visibility" : "SHOW_FOR_ALL"
       }
     ]
