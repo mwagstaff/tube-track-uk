@@ -1,0 +1,7 @@
+2026-09-15 22:48:27.094 xcodebuild[42106:47620887] [MT] IDEDistribution: -[IDEDistributionLogging _createLoggingBundleAtPath:]: Created bundle at path "/var/folders/zf/684g64wd5fzdfw3cpn2cn1kr0000gn/T/TubeTrackUK_2026-09-15_22-48-27.093.xcdistributionlogs".
+error: exportArchive No Accounts
+
+error: exportArchive No profiles for 'dev.skynolimit.TubeTrackUK' were found
+
+** EXPORT FAILED **
+

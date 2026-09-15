@@ -357,6 +357,9 @@ private final class TabBarAppearanceController: UIViewController {
             appearance.configureWithOpaqueBackground()
         }
         appearance.backgroundColor = backgroundColor
+        if backgroundIsTransparent {
+            appearance.shadowColor = .clear
+        }
 
         tabBar.isTranslucent = backgroundIsTransparent
         tabBar.standardAppearance = appearance

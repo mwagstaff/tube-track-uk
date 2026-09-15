@@ -1,0 +1,49 @@
+{
+  "devicesAndConfigurations" : [
+    {
+      "device" : {
+        "architecture" : "arm64",
+        "deviceId" : "F21F31AA-93B0-4AA4-ADBD-4F69BF02C321",
+        "deviceName" : "iPhone 17 Pro Max",
+        "modelName" : "iPhone 17 Pro Max",
+        "osBuildNumber" : "23F77",
+        "osVersion" : "26.5",
+        "platform" : "iOS Simulator"
+      },
+      "expectedFailures" : 0,
+      "failedTests" : 1,
+      "passedTests" : 0,
+      "skippedTests" : 0,
+      "testPlanConfiguration" : {
+        "configurationId" : "1",
+        "configurationName" : "Test Scheme Action"
+      }
+    }
+  ],
+  "environmentDescription" : "TubeTrackUK · Built with macOS 26.5.2",
+  "expectedFailures" : 0,
+  "failedTests" : 1,
+  "finishTime" : 1789509397.52,
+  "passedTests" : 0,
+  "result" : "Failed",
+  "skippedTests" : 0,
+  "startTime" : 1789509364.888,
+  "statistics" : [
+
+  ],
+  "testFailures" : [
+    {
+      "failureText" : "Expectation failed: (host.presentedViewController → nil) as? (UIActivityViewController → Optional<UIViewController>)",
+      "targetName" : "TubeTrackUKTests",
+      "testIdentifier" : 1,
+      "testIdentifierString" : "TubeGameShareButtonTests/tapPresentsImageShareSheetFromPausedGameAndCanReopen()",
+      "testIdentifierURL" : "test://com.apple.xcode/TubeTrackUK/TubeTrackUKTests/TubeGameShareButtonTests/tapPresentsImageShareSheetFromPausedGameAndCanReopen()",
+      "testName" : "tapPresentsImageShareSheetFromPausedGameAndCanReopen()"
+    }
+  ],
+  "title" : "Test - TubeTrackUK",
+  "topInsights" : [
+
+  ],
+  "totalTestCount" : 1
+}

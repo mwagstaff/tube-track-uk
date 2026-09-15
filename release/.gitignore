@@ -1,0 +1,4 @@
+*.xcarchive/
+*.xcresult/
+export/
+validation/*.log
