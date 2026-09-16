@@ -45,7 +45,7 @@ struct RootTabView: View {
             VStack(spacing: 0) {
                 if appState.isOffline,
                    appState.selectedTab != .map,
-                   appState.selectedTab != .works {
+                   appState.selectedTab != .journeys {
                     OfflineStatusBanner(
                         updatedAt: offlineBannerShowsWorks
                             ? appState.worksUpdatedAt : appState.statusUpdatedAt,
@@ -71,9 +71,9 @@ struct RootTabView: View {
                         .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
                         .tag(AppTab.nearMe)
 
-                    WorksScreen()
-                        .tabItem { Label(AppTab.works.title, systemImage: AppTab.works.symbol) }
-                        .tag(AppTab.works)
+                    JourneysScreen()
+                        .tabItem { Label(AppTab.journeys.title, systemImage: AppTab.journeys.symbol) }
+                        .tag(AppTab.journeys)
 
                     ProfileScreen(showsImageBackground: $profileShowsImageBackground)
                         .tabItem { Label(AppTab.profile.title, systemImage: AppTab.profile.symbol) }
@@ -81,7 +81,7 @@ struct RootTabView: View {
                 }
                 .tint(colorScheme == .dark ? .white : .tubeBlue)
                 .toolbarBackground(Color(uiColor: tabBarBackgroundColor), for: .tabBar)
-                .toolbarBackground(.visible, for: .tabBar)
+                .toolbarBackground(tabBarBackgroundIsTransparent ? .hidden : .visible, for: .tabBar)
                 .background {
                     TabBarBackgroundConfigurator(
                         backgroundColor: tabBarBackgroundColor,
@@ -108,6 +108,9 @@ struct RootTabView: View {
                     .allowsHitTesting(!appStartupCompleted)
                     .zIndex(10)
             }
+        }
+        .sheet(isPresented: $state.showsWorks) {
+            WorksScreen()
         }
         .onAppear {
             revealBackgroundIfNeeded()
@@ -169,7 +172,7 @@ struct RootTabView: View {
     }
 
     private var offlineBannerShowsWorks: Bool {
-        appState.selectedTab == .works || !appState.isViewingLiveStatus
+        !appState.isViewingLiveStatus
     }
 
     private var tabBarBackgroundColor: UIColor {
@@ -178,7 +181,7 @@ struct RootTabView: View {
         }
 
         return switch appState.selectedTab {
-        case .works:
+        case .journeys:
             .systemGroupedBackground
         case .profile:
             .secondarySystemBackground
@@ -188,7 +191,7 @@ struct RootTabView: View {
     }
 
     private var tabBarBackgroundIsTransparent: Bool {
-        appState.selectedTab == .profile && profileShowsImageBackground
+        appState.selectedTab == .journeys || (appState.selectedTab == .profile && profileShowsImageBackground)
     }
 
     private func revealBackgroundIfNeeded() {

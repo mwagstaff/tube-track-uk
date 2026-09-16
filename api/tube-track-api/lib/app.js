@@ -1,5 +1,6 @@
 import compression from 'compression';
 import express from 'express';
+import { JourneyError, JourneyPlanner } from './journey-planner.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 const LINE_IDS = [
@@ -53,7 +54,7 @@ function liveMetadata(state) {
     };
 }
 
-export function createApp({ cache, poller, metrics, logger, client, resourceCache }) {
+export function createApp({ cache, poller, metrics, logger, client, resourceCache, journeyPlanner = new JourneyPlanner({ client }) }) {
     const app = express();
     app.disable('x-powered-by');
     app.disable('etag');
@@ -63,6 +64,22 @@ export function createApp({ cache, poller, metrics, logger, client, resourceCach
     });
     app.use(metrics.middleware());
     app.use(compression({ threshold: 1_024 }));
+
+    app.get('/api/v1/stations', (req, res, next) => {
+        try {
+            const stations = journeyPlanner.search(req.query.query);
+            res.set('Cache-Control', 'public, max-age=86400');
+            res.json({ data: stations, meta: { source: 'tfl', count: stations.length } });
+        } catch (error) { next(error); }
+    });
+
+    app.get('/api/v1/journeys', async (req, res, next) => {
+        // Explicit server expiry, never a proxy's stale-if-error policy.
+        res.set('Cache-Control', 'no-store');
+        try {
+            res.json(await journeyPlanner.plan(req.query));
+        } catch (error) { next(error); }
+    });
 
     app.get('/healthcheck', (req, res) => {
         const state = cache.read();
@@ -257,6 +274,12 @@ export function createApp({ cache, poller, metrics, logger, client, resourceCach
     });
 
     app.use((error, req, res, next) => {
+        if (error instanceof JourneyError) {
+            if (error.status >= 500) logger?.error('journey_request_failed', { code: error.code, message: error.message });
+            if (error.status === 429) res.set('Retry-After', '30');
+            res.status(error.status).json({ error: { code: error.code, message: error.message } });
+            return;
+        }
         logger?.error('http_request_failed', {
             method: req.method,
             path: req.path,

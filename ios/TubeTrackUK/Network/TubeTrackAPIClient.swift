@@ -5,7 +5,17 @@ struct TubeTrackAPIConfiguration: Sendable {
     let baseURL: URL
 
     static var app: TubeTrackAPIConfiguration {
-        TubeTrackAPIConfiguration(
+        #if DEBUG
+        let arguments = ProcessInfo.processInfo.arguments
+        if let flag = arguments.firstIndex(of: "-DebugAPIBaseURL"),
+           arguments.indices.contains(flag + 1),
+           let url = URL(string: arguments[flag + 1]),
+           ["localhost", "127.0.0.1"].contains(url.host),
+           ["http", "https"].contains(url.scheme) {
+            return TubeTrackAPIConfiguration(baseURL: url)
+        }
+        #endif
+        return TubeTrackAPIConfiguration(
             baseURL: URL(string: "https://api.skynolimit.dev/tube-track")!
         )
     }
@@ -17,6 +27,7 @@ enum TubeTrackAPIClientError: LocalizedError, Sendable {
     case httpStatus(Int)
     case rateLimited(retryAfter: Date?)
     case decoding(String)
+    case serviceError(code: String, message: String)
 
     var errorDescription: String? {
         switch self {
@@ -25,6 +36,7 @@ enum TubeTrackAPIClientError: LocalizedError, Sendable {
         case .httpStatus: "Live transport data is temporarily unavailable."
         case .rateLimited: "Live data is temporarily unavailable."
         case let .decoding(message): "Live transport data could not be read: \(message)"
+        case let .serviceError(_, message): message
         }
     }
 }
@@ -140,6 +152,13 @@ actor TubeTrackAPIClient {
             throw TubeTrackAPIClientError.rateLimited(retryAfter: retryAfter)
         }
         guard (200 ..< 300).contains(response.statusCode) else {
+            if path == "/api/v1/journeys",
+               let failure = try? JSONDecoder().decode(JourneyAPIError.self, from: data),
+               [400, 422, 503].contains(response.statusCode) {
+                throw TubeTrackAPIClientError.serviceError(
+                    code: failure.error.code, message: failure.error.message
+                )
+            }
             throw TubeTrackAPIClientError.httpStatus(response.statusCode)
         }
 
@@ -188,4 +207,9 @@ actor TubeTrackAPIClient {
         formatter.dateFormat = "EEE',' dd MMM yyyy HH':'mm':'ss z"
         return formatter.date(from: value)
     }
+}
+
+private struct JourneyAPIError: Decodable {
+    struct Detail: Decodable { let code: String; let message: String }
+    let error: Detail
 }

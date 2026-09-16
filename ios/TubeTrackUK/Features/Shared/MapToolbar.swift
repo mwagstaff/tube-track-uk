@@ -207,13 +207,13 @@ struct MapActionButtons: View {
             Button {
                 onAction(MapActionNotice(
                     message: nextWorksNoticeMessage,
-                    symbol: AppTab.works.symbol
+                    symbol: "wrench.and.screwdriver"
                 ))
                 withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                     appState.setDisruptionHighlightScope(nextWorksScope)
                 }
             } label: {
-                Image(systemName: AppTab.works.symbol)
+                Image(systemName: "wrench.and.screwdriver")
                     .font(.appSubheadline(.semibold))
                     .foregroundStyle(worksSelected ? .white : .primary)
             }

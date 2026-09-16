@@ -6,9 +6,10 @@ import { LiveCache } from '../lib/live-cache.js';
 import { createMetrics } from '../lib/metrics.js';
 import { normaliseArrival } from '../lib/normalise-arrival.js';
 import { ResourceCache } from '../lib/resource-cache.js';
+import { JourneyError } from '../lib/journey-planner.js';
 import { prediction } from './helpers.js';
 
-async function withServer(run) {
+async function withServer(run, overrides = {}) {
     const cache = new LiveCache();
     const poller = {
         status: () => ({
@@ -28,7 +29,7 @@ async function withServer(run) {
         }
     };
     const resourceCache = new ResourceCache();
-    const app = createApp({ cache, poller, metrics, client, resourceCache });
+    const app = createApp({ cache, poller, metrics, client, resourceCache, ...overrides });
     const server = await new Promise((resolve) => {
         const listening = app.listen(0, '127.0.0.1', () => resolve(listening));
     });
@@ -132,4 +133,42 @@ test('returns a bounded JSON 404 for unknown paths', async () => {
         assert.equal(response.status, 404);
         assert.equal((await response.json()).error.code, 'NOT_FOUND');
     });
+});
+
+test('station catalogue is credential-free and journey input errors remain structured', async () => {
+    await withServer(async ({ baseUrl, upstreamRequests }) => {
+        const stationResponse = await fetch(`${baseUrl}/api/v1/stations?query=Waterloo`);
+        const stations = (await stationResponse.json()).data;
+        assert.equal(stationResponse.status, 200);
+        assert.ok(stations.some((station) => station.stopIds.includes('940GZZLUWLO')));
+        const invalid = await fetch(`${baseUrl}/api/v1/journeys?from=missing&to=940GZZLUKSX`);
+        assert.equal(invalid.status, 422);
+        assert.equal(invalid.headers.get('cache-control'), 'no-store');
+        assert.equal((await invalid.json()).error.code, 'UNKNOWN_STATION');
+        const duplicate = await fetch(`${baseUrl}/api/v1/journeys?from=940GZZLUWLO&from=940GZZLUKSX&to=940GZZLUKSX`);
+        assert.equal(duplicate.status, 400);
+        assert.equal(upstreamRequests.length, 0);
+    });
+});
+
+test('journey route preserves the normalized envelope and never permits HTTP stale fallback', async () => {
+    const plan = { data: { journeys: [], messages: ['No journeys found'] }, meta: { stale: false } };
+    let captured;
+    await withServer(async ({ baseUrl }) => {
+        const response = await fetch(`${baseUrl}/api/v1/journeys?from=940A&to=940B&timeMode=arriveBy&time=2026-09-19T12%3A00%3A00%2B01%3A00`);
+        assert.equal(response.status, 200);
+        assert.equal(response.headers.get('cache-control'), 'no-store');
+        assert.deepEqual(await response.json(), plan);
+        assert.equal(captured.time, '2026-09-19T12:00:00+01:00');
+    }, { journeyPlanner: { plan: async (query) => { captured = query; return plan; } } });
+});
+
+test('journey throttling provides a bounded retry time and no cached result', async () => {
+    await withServer(async ({ baseUrl }) => {
+        const response = await fetch(`${baseUrl}/api/v1/journeys?from=940A&to=940B`);
+        assert.equal(response.status, 429);
+        assert.equal(response.headers.get('retry-after'), '30');
+        assert.equal(response.headers.get('cache-control'), 'no-store');
+        assert.equal((await response.json()).error.code, 'RATE_LIMITED');
+    }, { journeyPlanner: { plan: async () => { throw new JourneyError('RATE_LIMITED', 'Busy', 429); } } });
 });

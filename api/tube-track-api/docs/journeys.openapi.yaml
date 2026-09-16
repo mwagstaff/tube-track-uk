@@ -1,0 +1,198 @@
+openapi: 3.1.0
+info:
+  title: TubeTrack UK Journey API
+  version: 1.0.0
+  description: London rail journey planning for TubeTrack UK and TrainTrack UK. Estimates supplied by TfL; alternatives and live adjustments are not guaranteed.
+servers:
+  - url: https://api.skynolimit.dev/tube-track
+paths:
+  /api/v1/stations:
+    get:
+      operationId: searchRailStations
+      description: Returns the supported rail catalogue, grouping interchange members. Omit query to retrieve all stations. CRS codes are not supported.
+      parameters:
+        - name: query
+          in: query
+          schema: { type: string, maxLength: 100 }
+          example: Paddington
+      responses:
+        '200':
+          description: Matching stations. Cacheable for one day.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data: { type: array, items: { $ref: '#/components/schemas/Station' } }
+                  meta:
+                    type: object
+                    properties:
+                      source: { const: tfl }
+                      count: { type: integer }
+        '400': { $ref: '#/components/responses/Error' }
+  /api/v1/journeys:
+    get:
+      operationId: planRailJourney
+      description: Returns up to three distinct routes, retaining a less-disrupted alternative when available. Departing searches favour earliest estimated arrival; arrive-by searches favour latest feasible departure. Never returns expired cached results after an upstream failure. No credentials are required from our native apps; the server holds the TfL key.
+      parameters:
+        - name: from
+          in: query
+          required: true
+          description: Catalogue station ID or one of its stopIds.
+          schema: { type: string }
+          example: 940GZZLUWLO
+        - name: to
+          in: query
+          required: true
+          schema: { type: string }
+          example: 940GZZLUKSX
+        - name: timeMode
+          in: query
+          schema: { type: string, enum: [now, departAt, arriveBy], default: now }
+        - name: time
+          in: query
+          description: Required for departAt/arriveBy and forbidden for now. ISO 8601 instant with seconds and Z or numeric offset, within the next 60 days. URL-encode plus signs.
+          schema: { type: string, format: date-time }
+          example: '2026-09-19T12:00:00+01:00'
+        - name: accessibility
+          in: query
+          description: TfL step-free preference; station-specific accessibility warnings still apply.
+          schema: { type: string, enum: [none, platform, train], default: none }
+      responses:
+        '200':
+          description: A plan, including an empty journeys array when no matching route is available. Cache-Control is no-store. Clients must check expiresAt and refresh explicitly.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: object
+                    required: [from, to, timeMode, requestedAt, accessibility, journeys, messages, expiresAt, attribution]
+                    properties:
+                      from: { $ref: '#/components/schemas/Station' }
+                      to: { $ref: '#/components/schemas/Station' }
+                      timeMode: { type: string, enum: [now, departAt, arriveBy] }
+                      requestedAt: { type: string, format: date-time }
+                      accessibility: { type: string, enum: [none, platform, train] }
+                      journeys: { type: array, maxItems: 3, items: { $ref: '#/components/schemas/Journey' } }
+                      messages: { type: array, items: { type: string } }
+                      expiresAt: { type: string, format: date-time }
+                      attribution: { type: string }
+                  meta:
+                    type: object
+                    required: [updatedAt, cached, stale, source, timezone]
+                    properties:
+                      updatedAt: { type: string, format: date-time }
+                      cached: { type: boolean }
+                      stale: { const: false }
+                      source: { const: tfl }
+                      timezone: { const: Europe/London }
+        '400': { $ref: '#/components/responses/Error' }
+        '422': { $ref: '#/components/responses/Error' }
+        '429':
+          description: Busy or upstream call budget exhausted. Respect Retry-After and retry with backoff.
+          headers:
+            Retry-After: { schema: { type: integer }, description: Seconds until retry. }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '503': { $ref: '#/components/responses/Error' }
+components:
+  responses:
+    Error:
+      description: 400 invalid input; 422 unknown/unresolved station; 503 provider unavailable. No stale route fallback.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+              enum: [INVALID_QUERY, UNKNOWN_STATION, SAME_STATION, INVALID_TIME_MODE, INVALID_TIME, INVALID_ACCESSIBILITY, STATION_UNRESOLVED, RATE_LIMITED, UPSTREAM_UNAVAILABLE, INTERNAL_ERROR]
+            message: { type: string }
+    Station:
+      type: object
+      required: [id, name, stopIds, aliases, lineIds, latitude, longitude]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        stopIds: { type: array, items: { type: string } }
+        aliases: { type: array, items: { type: string } }
+        lineIds: { type: array, items: { type: string } }
+        latitude: { type: number }
+        longitude: { type: number }
+    Point:
+      type: object
+      required: [id, name, platform]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        platform: { type: [string, 'null'] }
+    Warning:
+      type: object
+      required: [id, message, kind, severity]
+      properties:
+        id: { type: string }
+        message: { type: string }
+        kind: { type: string, enum: [accessibility, line, station, plannedWork, information] }
+        severity: { type: string, enum: [information, minor, severe] }
+    Journey:
+      type: object
+      required: [id, departureTime, arrivalTime, durationMinutes, changes, walkingMinutes, waitingMinutes, disruptionScore, warnings, legs, labels]
+      properties:
+        id: { type: string, description: Opaque identifier for this route and departure, not a booking reference. }
+        departureTime: { type: string, format: date-time }
+        arrivalTime: { type: string, format: date-time }
+        durationMinutes: { type: integer, minimum: 0 }
+        changes: { type: integer, minimum: 0 }
+        walkingMinutes: { type: integer, minimum: 0 }
+        waitingMinutes: { type: integer, minimum: 0, description: Wait from requested time until departure; zero for arrive-by searches. }
+        disruptionScore: { type: integer, minimum: 0, description: Heuristic warning comparison, not delay minutes or a reliability probability. }
+        warnings: { type: array, items: { $ref: '#/components/schemas/Warning' } }
+        labels:
+          type: array
+          items: { type: string, enum: [earliestArrival, latestDeparture, lessDisrupted] }
+        legs: { type: array, items: { $ref: '#/components/schemas/Leg' } }
+    Leg:
+      type: object
+      required: [id, mode, instruction, from, to, lines, departureTime, arrivalTime, scheduledDepartureTime, scheduledArrivalTime, timing, durationMinutes, warnings, stops]
+      properties:
+        id: { type: string }
+        mode: { type: string, enum: [tube, dlr, overground, elizabeth-line, tram, walking] }
+        instruction: { type: string }
+        from: { $ref: '#/components/schemas/Point' }
+        to: { $ref: '#/components/schemas/Point' }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [id, name, direction]
+            properties:
+              id: { type: string }
+              name: { type: string }
+              direction: { type: string }
+        departureTime: { type: string, format: date-time }
+        arrivalTime: { type: string, format: date-time }
+        scheduledDepartureTime: { type: [string, 'null'], format: date-time }
+        scheduledArrivalTime: { type: [string, 'null'], format: date-time }
+        timing: { type: string, enum: [estimated, adjusted], description: Adjusted means TfL times differ from scheduled values. Neither value guarantees live prediction coverage. }
+        durationMinutes: { type: integer, minimum: 0 }
+        warnings: { type: array, items: { $ref: '#/components/schemas/Warning' } }
+        stops:
+          type: array
+          items:
+            type: object
+            required: [id, name]
+            properties:
+              id: { type: string }
+              name: { type: string }

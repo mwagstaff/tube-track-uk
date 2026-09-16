@@ -400,7 +400,7 @@ struct MapDisruptionOverviewCard: View {
                     expanded = false
                 }
             } label: {
-                Label("Highlight disrupted lines", systemImage: AppTab.works.symbol)
+                Label("Highlight disrupted lines", systemImage: "wrench.and.screwdriver")
                     .font(.appSubheadline(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: 44)
@@ -412,6 +412,19 @@ struct MapDisruptionOverviewCard: View {
             .disabled(lineEntries.isEmpty)
             .opacity(lineEntries.isEmpty ? 0.5 : 1)
             .accessibilityHint("Collapses this panel and fits all affected sections on the map")
+
+            Button {
+                expanded = false
+                appState.showsWorks = true
+            } label: {
+                Label("Engineering works", systemImage: "wrench.and.screwdriver")
+                    .font(.appSubheadline(.semibold))
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.tubeBlue)
+            .accessibilityHint("Opens planned works by date and line")
 
             Button {
                 expanded = false
@@ -704,7 +717,7 @@ struct MapNetworkStatsCard: View {
                    !selected {
                     onAction(MapActionNotice(
                         message: disruptionScope.noticeMessage,
-                        symbol: AppTab.works.symbol
+                        symbol: "wrench.and.screwdriver"
                     ))
                 }
                 appState.toggleMapNetworkStat(filter)

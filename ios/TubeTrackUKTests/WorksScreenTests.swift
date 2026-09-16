@@ -50,12 +50,14 @@ struct WorksScreenTests {
     @Test @MainActor func showDisruptedLinesSyncsTheMapDateAndHighlightState() throws {
         let selectedDate = try #require(londonDate(year: 2026, month: 9, day: 6))
         let appState = TubeAppState()
-        appState.selectedTab = .works
+        appState.selectedTab = .map
+        appState.showsWorks = true
         appState.selectedMapNetworkStat = .majorIssues
 
         appState.showDisruptionsOnMap(for: .custom(selectedDate))
 
         #expect(appState.selectedTab == .map)
+        #expect(!appState.showsWorks)
         #expect(appState.disruptionDateSelection == .custom(selectedDate))
         #expect(appState.selectedDisruptionDate == selectedDate)
         #expect(appState.disruptionHighlightScope == .all)

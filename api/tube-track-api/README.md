@@ -25,6 +25,8 @@ Optional polling settings:
 - `GET /api/v1/planned-works?from=YYYY-MM-DD&to=YYYY-MM-DD`
 - `GET /api/v1/arrival-departures/:stopId?lineId=:lineId`
 - `GET /api/v1/timetables/:lineId/:stopId`
+- `GET /api/v1/stations?query=Waterloo`
+- `GET /api/v1/journeys?from=940GZZLUWLO&to=940GZZLUKSX&timeMode=now&accessibility=none`
 - `GET /healthcheck`
 - `GET /metrics`
 
@@ -40,6 +42,74 @@ TUBETRACK_UK_TFL_UNIFIED_API_KEY=... npm start
 ```
 
 Never commit the TfL key or a local `.env` file.
+
+## Journey planning for TubeTrack UK and TrainTrack UK
+
+Requires Node.js 20.3 or later for [combined cancellation signals](https://nodejs.org/api/globals.html#static-method-abortsignalanysignals).
+
+The existing public base URL is `https://api.skynolimit.dev/tube-track`.
+The new routes become available after deploying this service. Clients never
+receive or supply the TfL credential. This is an integration for our own apps,
+with the same access model as the existing read-only endpoints; there is no
+developer signup, third-party key issuance or public service guarantee.
+
+See [the OpenAPI contract](docs/journeys.openapi.yaml) for request/response
+schemas, error codes and examples. Both routes return `{data, meta}`.
+
+1. Search `/api/v1/stations?query=Paddington` (omit `query` for the catalogue).
+2. Submit the returned `id` to `/api/v1/journeys` as `from` or `to`.
+   The member NaPTAN IDs in `stopIds` are also accepted. Hub IDs are resolved
+   on the server into TfL journey-planner ICS codes; clients must not send hub
+   IDs directly to TfL. CRS codes are not accepted by this London-only API.
+3. Set `timeMode=now`, or `departAt`/`arriveBy` with an ISO 8601 `time`
+   including a UTC offset (URL-encode `+`). Times can be up to 60 days ahead.
+4. Optionally set `accessibility=platform` or `train`. Default is `none`.
+
+Scope is Tube, DLR, Elizabeth line, all six Overground lines and trams, with
+walking transfers. Bus, rail-replacement bus and National Rail itineraries are
+excluded. A valid search can return an empty `journeys` array. That differs
+from a 503 provider failure, a 422 unresolved station, or a 429 busy response.
+There is no guarantee that TfL supplies three distinct routes or an alternative
+avoiding disruption. No in-house routing or artificial delay penalties are used.
+
+Departing searches prioritize estimated arrival including waiting; arrive-by
+searches prioritize later departures meeting the deadline. Where available,
+one less-disrupted route is retained among up to three distinct choices. The
+comparison uses the severity of TfL's attached warnings, not a reliability
+probability. Broad station accessibility notices are preserved separately and
+are not counted as timing delays. Step-free preferences are sent to TfL, not
+inferred from the map; lift/platform notices must remain visible to passengers.
+`timing=adjusted` means TfL supplied a time different from its scheduled value;
+`estimated` does not assert a live prediction. Returned timestamps are UTC;
+display them in Europe/London. Upstream timezone-free timestamps are interpreted
+in London, anchored to the request/preceding leg at the autumn clock change.
+
+Journey responses use `Cache-Control: no-store`; apps must respect `expiresAt`,
+show stale/expired results explicitly and offer a fresh search. The service
+coalesces identical calls and uses a bounded in-memory cache (20 seconds for
+now, up to 60 seconds for future searches, capped by TfL's recommendation).
+It never serves expired cache entries on failure or already-departed journeys
+as new results. The whole search is bounded to 18 seconds (the app timeout is
+20 seconds). Cold station lookups have a 2-second limit and fall back to valid
+NaPTAN members if resolution is unavailable. The primary planner call has a
+12-second limit and may retry a transient timeout/network/502/503/504 failure
+once within the same overall deadline. Optional alternatives have a separate
+2.5-second limit; failure retains the successful primary result with a notice.
+Searches consume at most three planner calls plus two station lookups on a cold cache. At most two distinct searches run concurrently and
+journey-related upstream calls are limited to 180/minute per service process.
+Scale-out deployments must share or divide this budget. Retry 429 responses
+after `Retry-After`. The existing live-feed polling schedule is unchanged; requests share the TfL concurrency gate.
+
+Journey upstream metrics distinguish `journeys:station`, `journeys:primary`,
+`journeys:retry` and `journeys:alternative`. Locations are omitted from these metrics. Avoid recording full
+journey query strings in reverse-proxy/access logs as well. TfL attribution is
+included in responses and must be displayed in consuming apps. TfL's source
+licence: https://tfl.gov.uk/corporate/terms-and-conditions/transport-data-service
+
+The station catalogue is generated from the app's reviewed rail graph. After
+updating that graph, run `node scripts/build-journey-stations.js` from this API
+directory and commit `data/journey-stations.json` with the change. The deployed
+service needs only this directory, not the iOS source tree.
 
 ## Observability
 

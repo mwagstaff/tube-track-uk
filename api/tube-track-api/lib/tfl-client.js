@@ -55,14 +55,14 @@ export class TfLClient {
         return result;
     }
 
-    async fetchJSON(path, { query = {}, metricLabel = 'other', signal } = {}) {
+    async fetchJSON(path, { query = {}, metricLabel = 'other', metricUrl: safeMetricUrl, signal, timeoutMs = this.timeoutMs } = {}) {
         const requestUrl = new URL(path, this.baseUrl);
         for (const [name, value] of Object.entries(query)) {
             if (value !== undefined && value !== null && value !== '') {
                 requestUrl.searchParams.set(name, String(value));
             }
         }
-        const metricUrl = requestUrl.toString();
+        const metricUrl = safeMetricUrl ?? requestUrl.toString();
         requestUrl.searchParams.set('app_key', this.apiKey);
 
         const release = await this.#acquire(signal);
@@ -78,7 +78,7 @@ export class TfLClient {
         const timeout = setTimeout(() => {
             timedOut = true;
             controller.abort();
-        }, this.timeoutMs);
+        }, timeoutMs);
         timeout.unref?.();
 
         const startedAt = performance.now();

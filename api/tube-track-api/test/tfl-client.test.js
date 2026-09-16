@@ -104,3 +104,25 @@ test('queues requests beyond the configured TfL concurrency limit', async () => 
     await second;
     assert.equal(inFlight.at(-1), 0);
 });
+
+
+test('per-request deadline releases the shared concurrency gate without changing the client default', async () => {
+    const client = new TfLClient({
+        apiKey: 'test-key', timeoutMs: 1000, maxConcurrentRequests: 1,
+        fetchImpl: async (url, { signal }) => {
+            if (url.pathname === '/fast') return new Response('{}');
+            return new Promise((_, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+        }
+    });
+    const keepAlive = setTimeout(() => {}, 1500);
+    try {
+        const slow = client.fetchJSON('/slow', { timeoutMs: 10 });
+        const next = client.fetchJSON('/fast');
+        await assert.rejects(slow, error => error.code === 'TFL_TIMEOUT');
+        assert.deepEqual(await next, {});
+        assert.equal(client.activeRequests, 0);
+        assert.equal(client.timeoutMs, 1000);
+    } finally {
+        clearTimeout(keepAlive);
+    }
+});

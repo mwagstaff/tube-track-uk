@@ -83,6 +83,23 @@ struct TubeTrackAPIClientTests {
         }
     }
 
+    @Test func journeyValidationErrorsPreservePassengerSafeMessages() async throws {
+        APIClientURLProtocol.prepare(statusCode: 422, body: Data(
+            #"{"error":{"code":"UNKNOWN_STATION","message":"Choose a station from the London rail catalogue."}}"#.utf8
+        ))
+        do {
+            let _: JourneyPlan = try await makeClient().get("/api/v1/journeys")
+            Issue.record("Expected the journey to be rejected")
+        } catch let error as TubeTrackAPIClientError {
+            if case let .serviceError(code, message) = error {
+                #expect(code == "UNKNOWN_STATION")
+                #expect(message == "Choose a station from the London rail catalogue.")
+            } else {
+                Issue.record("Expected a structured journey error")
+            }
+        }
+    }
+
     private func makeClient() -> TubeTrackAPIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [APIClientURLProtocol.self]

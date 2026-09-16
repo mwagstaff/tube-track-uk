@@ -10,7 +10,7 @@ enum LiveDepartureWaitingCopy {
 enum AppTab: String, CaseIterable, Identifiable {
     case map
     case nearMe
-    case works
+    case journeys
     case profile
 
     var id: Self { self }
@@ -19,7 +19,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .map: "Map"
         case .nearMe: "Near Me"
-        case .works: "Works"
+        case .journeys: "Journeys"
         case .profile: "Profile"
         }
     }
@@ -28,7 +28,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         switch self {
         case .map: "map"
         case .nearMe: "location.fill"
-        case .works: "wrench.and.screwdriver"
+        case .journeys: "point.topleft.down.to.point.bottomright.curvepath"
         case .profile: "person.crop.circle"
         }
     }
@@ -91,6 +91,8 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
 @MainActor
 @Observable
 final class TubeAppState {
+    let journeyPlanner: JourneyPlannerModel
+    var showsWorks = false
     private static let appearanceModeKey = "appearanceMode"
     private static let nearbyArrivalsStaleLifetime: TimeInterval = 5 * 60
 
@@ -207,7 +209,9 @@ final class TubeAppState {
     ) {
         self.defaults = defaults
         self.trainService = trainService
-        self.apiClient = apiClient
+        let sharedClient = apiClient ?? TubeTrackAPIClient()
+        self.apiClient = sharedClient
+        self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient))
         self.snapshotCache = snapshotCache
         self.connectivityMonitor = monitorsConnectivity
             && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
@@ -429,6 +433,20 @@ final class TubeAppState {
             initialBeckMapDocument = startupContent.1
             mobileCoverage = startupContent.2
             graph = loadedGraph
+            #if DEBUG
+            let arguments = ProcessInfo.processInfo.arguments
+            func debugArgument(_ name: String) -> String? {
+                guard let index = arguments.firstIndex(of: name), arguments.indices.contains(index + 1) else { return nil }
+                return arguments[index + 1]
+            }
+            if let from = debugArgument("-DebugJourneyFrom"), let to = debugArgument("-DebugJourneyTo") {
+                journeyPlanner.from = loadedGraph.stationsByID[from]
+                journeyPlanner.to = loadedGraph.stationsByID[to]
+                if arguments.contains("-DebugJourneySearch") && !isOffline {
+                    journeyPlanner.startSearch()
+                }
+            }
+            #endif
             let repository = TubeNetworkRepository(graph: loadedGraph)
             let client = apiClient ?? TubeTrackAPIClient()
             apiClient = client
@@ -664,6 +682,7 @@ final class TubeAppState {
     }
 
     func showDisruptionsOnMap(for selection: DisruptionDateSelection) {
+        showsWorks = false
         setDisruptionDateSelection(selection)
         highlightAllDisruptionsOnMap()
         selectedTab = .map
@@ -850,6 +869,7 @@ final class TubeAppState {
     }
 
     func focus(on work: EngineeringWork, in tab: AppTab) {
+        showsWorks = false
         let workIsInSelectedPlannedDay = !isViewingLiveStatus
             && !LondonRailDate.works(
                 [work],

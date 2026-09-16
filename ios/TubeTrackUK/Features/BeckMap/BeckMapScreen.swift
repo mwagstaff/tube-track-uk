@@ -31,6 +31,7 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let mobileCoverageBySegmentID: [String: MobileCoverageAvailability]
     let mobileCoverageByStationID: [String: MobileCoverageAvailability]
     let stationOnlyCoverageStationIDs: Set<String>
+    var highlightsJourney = false
 
     var emphasizesIssues: Bool {
         disruptionDisplayMode == .issues
@@ -592,7 +593,11 @@ struct BeckMapCanvas: View {
                 guard proxy.size.width > 0, proxy.size.height > 0 else { return }
                 await Task.yield()
                 resetCamera(in: proxy.size)
-                if appState.sharedMapViewport != nil {
+                if presentation.highlightsJourney {
+                    let routeStations = document.segments.filter { presentation.affectedSegmentIDs.contains($0.id) }
+                        .flatMap { [$0.fromStationID, $0.toStationID] }
+                    focus(on: presentation.affectedStationIDs.union(routeStations), in: proxy.size)
+                } else if appState.sharedMapViewport != nil {
                     applySharedViewport(in: proxy.size)
                 } else if let selectedStationID = presentation.selectedStationID {
                     focus(on: [selectedStationID], in: proxy.size)
@@ -668,7 +673,7 @@ struct BeckMapCanvas: View {
                     }
                 }
 
-                ForEach(document.stationMarkers) { marker in
+                ForEach(document.stationMarkers.filter { !presentation.highlightsJourney || presentation.affectedStationIDs.contains($0.stationID) }) { marker in
                     if marker.lineIDs.isEmpty {
                         Button(stationAccessibilityLabel(marker: marker, lineID: nil)) {
                             onStationTap(marker.stationID, nil)
@@ -691,8 +696,9 @@ struct BeckMapCanvas: View {
         lineID: TubeLineID?
     ) -> String {
         var parts = [marker.name]
+        if presentation.highlightsJourney { parts.append("Journey station") }
         if let lineID {
-            parts.append("\(lineID.displayName) departures")
+            parts.append(presentation.highlightsJourney ? lineID.displayName : "\(lineID.displayName) departures")
         }
         guard presentation.showsMobileCoverage else {
             return parts.joined(separator: ", ")
@@ -935,7 +941,7 @@ struct BeckMapCanvas: View {
             for segment in renderedSegments where presentation.affectedSegmentIDs.contains(segment.id) {
                 mapContext.stroke(
                     segment.path,
-                    with: .color(.red.opacity(0.82)),
+                    with: .color(presentation.highlightsJourney ? palette.paper : .red.opacity(0.82)),
                     style: StrokeStyle(
                         lineWidth: document.styles.affectedOuterStrokeWidth,
                         lineCap: .round,
@@ -1258,7 +1264,7 @@ struct BeckMapCanvas: View {
         context: inout GraphicsContext,
         cameraScale: CGFloat
     ) {
-        let issuesActive = presentation.emphasizesIssues && !presentation.affectedSegmentIDs.isEmpty
+        let issuesActive = presentation.emphasizesIssues && (!presentation.affectedSegmentIDs.isEmpty || presentation.highlightsJourney)
 
         for marker in renderedStationMarkers {
             let affected = issuesActive && presentation.affectedStationIDs.contains(marker.stationID)
@@ -1266,10 +1272,11 @@ struct BeckMapCanvas: View {
             let stationOnly = presentation.showsMobileCoverage
                 && presentation.stationOnlyCoverageStationIDs.contains(marker.stationID)
             guard affected || selected || stationOnly else { continue }
-            let outline = affected ? Color.red : selected ? Color.blue : palette.stationOutline
+            let highlightColor: Color = presentation.highlightsJourney ? .blue : .red
+            let outline = affected ? highlightColor : selected ? Color.blue : palette.stationOutline
 
-            if selected {
-                let haloRadius = 19 / max(cameraScale, 0.01)
+            if selected || (affected && presentation.highlightsJourney) {
+                let haloRadius = (presentation.highlightsJourney ? 7.0 : 19.0) / max(cameraScale, 0.01)
                 let haloRect = CGRect(
                     x: marker.anchor.x - haloRadius,
                     y: marker.anchor.y - haloRadius,
@@ -1311,7 +1318,7 @@ struct BeckMapCanvas: View {
                 case let .circle(circle, path):
                     context.fill(
                         path,
-                        with: .color(affected ? Color.red.opacity(0.16) : palette.paper)
+                        with: .color(affected ? highlightColor.opacity(0.16) : palette.paper)
                     )
                     context.stroke(
                         path,
@@ -1321,7 +1328,7 @@ struct BeckMapCanvas: View {
                 case let .tick(tick, path):
                     context.stroke(
                         path,
-                        with: .color(affected ? .red : .tubeLine(tick.lineID)),
+                        with: .color(affected ? highlightColor : .tubeLine(tick.lineID)),
                         style: StrokeStyle(lineWidth: tick.width + (selected ? 1.8 : 0), lineCap: .butt)
                     )
                 }
@@ -1373,6 +1380,12 @@ struct BeckMapCanvas: View {
         }
     }
 
+    private func isJourneyLabel(_ label: BeckMapLabelRecord) -> Bool {
+        presentation.highlightsJourney && presentation.affectedStationIDs.contains {
+            label.represents(stationID: $0)
+        }
+    }
+
     private func drawLabels(
         context: inout GraphicsContext,
         viewport: CGSize,
@@ -1384,11 +1397,18 @@ struct BeckMapCanvas: View {
         if document.geometryStatus != .authored, cameraScale < max(0.48, minimumCameraScale) {
             return
         }
-        let viewportRect = BeckMapArtworkCachePolicy.labelViewport(in: viewport)
+        let viewportRect = presentation.highlightsJourney
+            ? CGRect(origin: .zero, size: viewport).insetBy(
+                dx: BeckMapArtworkCachePolicy.overscan + 8,
+                dy: BeckMapArtworkCachePolicy.overscan + 8
+            )
+            : BeckMapArtworkCachePolicy.labelViewport(in: viewport)
         let selectedStationID = presentation.selectedStationID
         let visibleLabels = renderedLabels.filter { renderedLabel in
             let label = renderedLabel.label
+            if presentation.highlightsJourney && cameraScale < 0.65 { return isJourneyLabel(label) }
             return label.represents(stationID: selectedStationID)
+                || isJourneyLabel(label)
                 || BeckMapLabelVisibilityPolicy.shows(
                     label.effectiveVisibilityTier,
                     at: cameraScale
@@ -1415,7 +1435,7 @@ struct BeckMapCanvas: View {
 
         for renderedLabel in visibleLabels {
             let label = renderedLabel.label
-            let selected = label.represents(stationID: selectedStationID)
+            let selected = label.represents(stationID: selectedStationID) || isJourneyLabel(label)
             let screenAnchor = screenPoint(
                 renderedLabel.artworkAnchor,
                 cameraScale: cameraScale,
@@ -1485,11 +1505,12 @@ struct BeckMapCanvas: View {
         let placements = StationLabelLayoutEngine.layout(
             inputs: layoutInputs,
             viewport: viewportRect,
-            markerBlockers: markerFrames,
-            lineBlockers: lineBlockers
+            markerBlockers: presentation.highlightsJourney
+                ? markerFrames.filter { presentation.affectedStationIDs.contains($0.stationID) } : markerFrames,
+            lineBlockers: presentation.highlightsJourney ? [] : lineBlockers
         )
         let selectedLabelIDs = Set(visibleLabels.compactMap { renderedLabel in
-            renderedLabel.label.represents(stationID: selectedStationID)
+            (renderedLabel.label.represents(stationID: selectedStationID) || isJourneyLabel(renderedLabel.label))
                 ? renderedLabel.label.id
                 : nil
         })
@@ -2071,7 +2092,9 @@ struct BeckMapCanvas: View {
         let selectedStationID = presentation.selectedStationID
         let visibleLabels = renderedLabels.filter { renderedLabel in
             let label = renderedLabel.label
+            if presentation.highlightsJourney && cameraScale < 0.65 { return isJourneyLabel(label) }
             return label.represents(stationID: selectedStationID)
+                || isJourneyLabel(label)
                 || BeckMapLabelVisibilityPolicy.shows(
                     label.effectiveVisibilityTier,
                     at: cameraScale
@@ -2079,7 +2102,12 @@ struct BeckMapCanvas: View {
         }
         guard !visibleLabels.isEmpty else { return [] }
 
-        let viewportRect = BeckMapArtworkCachePolicy.labelViewport(in: viewport)
+        let viewportRect = presentation.highlightsJourney
+            ? CGRect(origin: .zero, size: viewport).insetBy(
+                dx: BeckMapArtworkCachePolicy.overscan + 8,
+                dy: BeckMapArtworkCachePolicy.overscan + 8
+            )
+            : BeckMapArtworkCachePolicy.labelViewport(in: viewport)
         let markerFrames = markerExclusionFrames(cameraScale: cameraScale, cameraOffset: cameraOffset)
         let markerFramesByStationID = Dictionary(grouping: markerFrames, by: \.stationID)
             .mapValues { blockers in
@@ -2090,7 +2118,7 @@ struct BeckMapCanvas: View {
         let documentPadding = CGFloat(document.styles.labelPadding)
         let layoutInputs = visibleLabels.map { renderedLabel in
             let label = renderedLabel.label
-            let selected = label.represents(stationID: selectedStationID)
+            let selected = label.represents(stationID: selectedStationID) || isJourneyLabel(label)
             let tier = label.effectiveVisibilityTier
             let weight: AppFontWeight = selected || tier == .overview ? .semibold : .medium
             let fontSize = BeckMapLabelVisibilityPolicy.fontSize(
@@ -2150,8 +2178,9 @@ struct BeckMapCanvas: View {
         return StationLabelLayoutEngine.layout(
             inputs: layoutInputs,
             viewport: viewportRect,
-            markerBlockers: markerFrames,
-            lineBlockers: lineExclusionBlockers(
+            markerBlockers: presentation.highlightsJourney
+                ? markerFrames.filter { presentation.affectedStationIDs.contains($0.stationID) } : markerFrames,
+            lineBlockers: presentation.highlightsJourney ? [] : lineExclusionBlockers(
                 in: viewportRect, cameraScale: cameraScale, cameraOffset: cameraOffset
             )
         )

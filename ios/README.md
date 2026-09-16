@@ -49,6 +49,37 @@ xcodebuild test \
 Tests cover bundled graph integrity, disruption section resolution and safe
 fallback, API response decoding, train interpolation and works deduplication.
 
+## Journey planning
+
+The Journeys tab replaces the former Works tab. Choose two rail stations, then
+Leave now, Depart at or Arrive by. Step-free preferences distinguish access to
+the platform from access to the train. Results compare estimated arrival times
+and retain a less-disrupted alternative where TfL supplies one. Search progress
+is shown in the button, then route choices open on a separate screen with Back
+navigation. Results and leg details use labelled line-colour dots. Route details
+include changes, walking, stops and station/line notices. All times are shown
+in London time; journey results are estimates and have a short explicit expiry.
+
+Journey details can open a separate network map with the selected rail sections
+in line colours and blue rings around the start, end and change stations. This
+uses the bundled, immutable network artwork and an independent camera. The
+resolver follows TfL stop order through the known line routes, groups interchange
+aliases, and only accepts missing-ID name matches at a unique station hub.
+Ambiguous or unmatched legs are disclosed rather than guessed. Walking directions
+remain in the journey details. Refreshing keeps the previous choices visible,
+with their original expiry, while checking again.
+
+Engineering Works remains accessible through the expanded disruptions lozenge
+on the map. Its map actions dismiss Works and focus the affected sections.
+
+Deploy the companion API with `/api/v1/journeys` before releasing this app.
+For local simulator integration, Debug builds accept
+`-DebugAPIBaseURL http://127.0.0.1:3018`; this is limited to loopback hosts and
+is absent from Release builds. For visual QA, combine `-DebugJourneySearch`
+with `-DebugJourneyFrom <station ID>` and `-DebugJourneyTo <station ID>`.
+`-DebugJourneyDestination details` or `map` opens that screen after the search.
+These options are Debug-only. No TfL credential belongs in the app.
+
 ## Offline use
 
 The network map, station search, mobile coverage overlay and Track-Man use

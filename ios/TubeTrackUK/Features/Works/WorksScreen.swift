@@ -10,6 +10,7 @@ private struct WorksQuickDate: Identifiable {
 }
 
 struct WorksScreen: View {
+    @Environment(\.dismiss) private var dismiss
     @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var dateSelection: WorksDateSelection = .today
@@ -68,6 +69,9 @@ struct WorksScreen: View {
             .navigationTitle("Engineering Works")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Done") { dismiss() }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         draftDate = selectedDate
@@ -152,7 +156,7 @@ struct WorksScreen: View {
                 appState.showDisruptionsOnMap(for: dateSelection)
             }
         } label: {
-            Label("Show me the disrupted lines", systemImage: AppTab.works.symbol)
+            Label("Show me the disrupted lines", systemImage: "wrench.and.screwdriver")
                 .font(.appSubheadline(.semibold))
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity, minHeight: 44)

@@ -89,6 +89,8 @@ struct StationSearchSheet: View {
 
     let graph: TubeGraph
     let selectedStationID: String?
+    var title: String = "Find a station"
+    var selectionHint: String = "Selects and focuses this station on the map"
     let onSelect: (TubeStation) -> Void
 
     private var suggestions: [TubeStation] {
@@ -146,12 +148,12 @@ struct StationSearchSheet: View {
                         .buttonStyle(.plain)
                         .accessibilityLabel(station.name)
                         .accessibilityValue(lineIDs.map(\.displayName).joined(separator: ", "))
-                        .accessibilityHint("Selects and focuses this station on the map")
+                        .accessibilityHint(selectionHint)
                     }
                     .listStyle(.plain)
                 }
             }
-            .navigationTitle("Find a station")
+            .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
             .searchable(
                 text: $query,
