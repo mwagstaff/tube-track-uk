@@ -8,6 +8,7 @@ const stations = [
     { id: 'HUBA', name: 'Alpha', stopIds: ['940A', '910A'], aliases: ['Alpha Rail'], lineIds: ['victoria'] },
     { id: '940B', name: 'Beta', stopIds: ['940B'], aliases: [], lineIds: ['northern'] }
 ];
+const allGood = ['victoria', 'northern'].map(id => ({ id, lineStatuses: [{ statusSeverity: 10 }] }));
 const query = { from: '940A', to: '940B' };
 const request = { requestedAt: now, timeMode: 'now', accessibility: 'none' };
 
@@ -36,6 +37,7 @@ function makePlanner(options = {}) {
     const client = { fetchJSON: async (path, opts) => {
         calls.push({ path, ...opts });
         if (fail) throw new Error('Offline');
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) return { icsCode: path.endsWith('940A') ? '10001' : '10002' };
         return { recommendedMaxAgeMinutes: 2, journeys: [itinerary(), itinerary({ line: 'northern', end: '13:30' })], stopMessages: [] };
     } };
@@ -145,6 +147,7 @@ test('limits active planning requests without preventing cached results', async 
 test('uses a bounded fallback and reports when a less-disrupted route cannot be found', async () => {
     let count = 0;
     const { planner } = makePlanner({ client: { fetchJSON: async (path) => {
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) return { icsCode: '10001' };
         count += 1;
         return { journeys: [itinerary({ warnings: [severe] })] };
@@ -170,6 +173,7 @@ test('station lookup failure falls back to valid NaPTAN members and still return
     const paths = [];
     const { planner } = makePlanner({ client: { fetchJSON: async (path) => {
         paths.push(path);
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) throw Object.assign(new Error('Timed out'), { code: 'TFL_TIMEOUT' });
         return { journeys: [itinerary(), itinerary({ line: 'northern' })] };
     } } });
@@ -180,6 +184,7 @@ test('station lookup failure falls back to valid NaPTAN members and still return
 test('retries a transient primary failure once with privacy-safe phase metrics', async () => {
     const calls = [];
     const { planner } = makePlanner({ client: { fetchJSON: async (path, options) => {
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) return { icsCode: '10001' };
         calls.push(options);
         if (calls.length === 1) throw Object.assign(new Error('Service unavailable'), { status: 503 });
@@ -193,6 +198,7 @@ test('retries a transient primary failure once with privacy-safe phase metrics',
 test('timeouts return an actionable journey-specific 503 after one retry', async () => {
     let calls = 0;
     const { planner } = makePlanner({ client: { fetchJSON: async (path) => {
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) return {};
         calls += 1;
         throw Object.assign(new Error('Timeout'), { name: 'TfLRequestError', code: 'TFL_TIMEOUT' });
@@ -203,6 +209,7 @@ test('timeouts return an actionable journey-specific 503 after one retry', async
 
 test('a slow optional alternative cannot discard a successful primary result', async () => {
     const { planner } = makePlanner({ client: { fetchJSON: async (path, { query: q, signal }) => {
+        if (path.startsWith('/Line/')) return allGood;
         if (path.startsWith('/StopPoint')) return {};
         if (q.journeyPreference === 'LeastInterchange') {
             await new Promise((_, reject) => {
@@ -221,6 +228,7 @@ test('does not retry rate limiting or unresolved stations', async () => {
     for (const status of [300, 429]) {
         let calls = 0;
         const { planner } = makePlanner({ client: { fetchJSON: async (path) => {
+            if (path.startsWith('/Line/')) return allGood;
             if (path.startsWith('/StopPoint')) return {};
             calls += 1;
             throw Object.assign(new Error('Unavailable'), { name: 'TfLRequestError', status });
@@ -228,4 +236,14 @@ test('does not retry rate limiting or unresolved stations', async () => {
         await assert.rejects(planner.plan(query));
         assert.equal(calls, 1);
     }
+});
+
+test('planner all-clear notices are not normalized as disruptions', () => {
+    const result = normalizeJourney(itinerary({ warnings: [
+        { type: 'lineInfo', description: 'Victoria: Good service.' },
+        { type: 'lineInfo', description: 'No disruption reported.' },
+        { type: 'lineInfo', description: 'Minor delays northbound. Good service on other routes.' }
+    ] }), request);
+    assert.equal(result.warnings.length, 1);
+    assert.equal(result.warnings[0].severity, 'minor');
 });

@@ -1,0 +1,58 @@
+openapi: 3.1.0
+info:
+  title: TubeTrack UK Line Colours API
+  version: 1.0.0
+  description: Display colours for connection pills in TubeTrack UK and TrainTrack UK.
+servers:
+  - url: https://api.skynolimit.dev/tube-track
+paths:
+  /api/v1/line-colours:
+    get:
+      operationId: getLineColours
+      description: Returns all supported Tube, DLR, Elizabeth line, tram and named Overground lines. Uses TubeTrack UK's display palette rounded to 8-bit sRGB. No client credentials or upstream requests are needed; available while the live cache is empty. Join by id against station lineIds, arrival lineId or journey leg lines[].id. Unknown IDs should use a neutral client pill style.
+      responses:
+        '200':
+          description: Complete line colour catalogue, cacheable for one day.
+          headers:
+            Cache-Control:
+              schema: { type: string }
+              example: public, max-age=86400
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/LineColour' }
+                  meta:
+                    type: object
+                    required: [source, count]
+                    properties:
+                      source: { const: tubetrack }
+                      count: { type: integer, minimum: 0 }
+components:
+  schemas:
+    LineColour:
+      type: object
+      required: [id, name, mode, colour, textColour]
+      properties:
+        id:
+          type: string
+          description: Existing TfL line ID; Elizabeth line uses elizabeth.
+          example: victoria
+        name: { type: string, example: Victoria }
+        mode:
+          type: string
+          enum: [tube, dlr, elizabeth-line, tram, overground]
+        colour:
+          type: string
+          pattern: '^#[0-9A-F]{6}$'
+          description: 'Opaque sRGB pill background, in #RRGGBB format.'
+          example: '#00A1E0'
+        textColour:
+          type: string
+          enum: ['#000000', '#FFFFFF']
+          description: Label colour with at least 4.5:1 contrast against colour.
+          example: '#000000'

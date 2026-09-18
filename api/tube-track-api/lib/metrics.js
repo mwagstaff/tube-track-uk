@@ -123,6 +123,7 @@ function rollingGauge({ register, name, help, labelNames, rows }) {
 }
 
 function requestRoute(req) {
+    if (req.path === '/api/v1/line-colours') return '/api/v1/line-colours';
     if (req.path === '/api/v1/journeys') return '/api/v1/journeys';
     if (req.path === '/api/v1/stations') return '/api/v1/stations';
     if (req.path === '/api/v1/live') return '/api/v1/live';

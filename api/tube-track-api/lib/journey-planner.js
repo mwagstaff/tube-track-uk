@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { JourneyDisruptions } from './journey-disruptions.js';
 import { explicitInstant, parseJourneyTime, tflDateTime } from './journey-time.js';
 
 const catalogue = JSON.parse(readFileSync(new URL('../data/journey-stations.json', import.meta.url)));
@@ -19,7 +20,7 @@ export class JourneyError extends Error {
 }
 
 export class JourneyPlanner {
-    constructor({ client, clock = Date.now, stations = catalogue.stations } = {}) {
+    constructor({ client, clock = Date.now, stations = catalogue.stations, disruptions } = {}) {
         this.client = client;
         this.clock = clock;
         this.stations = stations;
@@ -29,6 +30,7 @@ export class JourneyPlanner {
         this.inFlight = new Map();
         this.active = 0;
         this.budget = { start: clock(), used: 0 };
+        this.disruptions = disruptions ?? new JourneyDisruptions({ fetch: (path, options) => this.fetch(path, options), stations, clock });
     }
 
     search(query = '') {
@@ -199,17 +201,24 @@ export class JourneyPlanner {
                 messages.push('Additional alternatives could not be checked.');
             }
         }
+        const snapshot = await this.disruptions.snapshot(journeys, signal);
+        journeys = this.disruptions.enrich(journeys, snapshot);
+        if (journeys.some(j => ['partial', 'unavailable'].includes(j.disruption.coverage))) {
+            messages.push('Some disruption information is unavailable. Check the notices before travelling.');
+        }
         const updatedAt = this.clock();
         const recommended = Number(response.recommendedMaxAgeMinutes) * 60_000;
         const lifetime = Math.min(request.timeMode === 'now' ? 20_000 : 60_000,
             Number.isFinite(recommended) && recommended > 0 ? recommended : 20_000);
-        return { journeys, messages, updatedAt, expiresAt: updatedAt + lifetime };
+        const sourceExpiry = Object.values(snapshot).filter(s => s.status !== 'notApplicable')
+            .map(s => s.expiresAt ?? updatedAt + 5_000);
+        return { journeys, messages, updatedAt, expiresAt: Math.min(updatedAt + lifetime, ...sourceExpiry) };
     }
 }
 
 function normalizeWarning(raw, index) {
     const message = clean(raw.description || raw.summary);
-    if (!message) return null;
+    if (!message || /^(?:[^:]+:\s*)?(?:good service(?: on (?:all|other) (?:lines|routes))?|no (?:issues|disruption)(?: reported)?)[.!]?$/i.test(message)) return null;
     const accessibility = raw.type !== 'lineInfo'
         && /step.free|\blift\b|elevator|escalator|accessible/i.test(message)
         && !/severe delays|minor delays|suspended|no service/i.test(message);
@@ -218,7 +227,7 @@ function normalizeWarning(raw, index) {
     // Accessibility notices are retained but don't imply a timing delay. TfL
     // can attach a notice about another platform at the same interchange.
     const severity = accessibility ? 'information'
-        : /severe delays|suspend|no service|part closure|closed|closure/i.test(message) ? 'severe'
+        : /severe delays|suspend|suspension|not running|no service|part closure|closed|closure/i.test(message) ? 'severe'
             : /minor delays|reduced service|delays/i.test(message) ? 'minor' : 'information';
     return { id: hash(`${index}:${message}`), message, kind, severity };
 }
@@ -282,7 +291,8 @@ export function selectJourneys(journeys, request, now) {
     const unique = [...new Map(valid.toReversed().map((j) => [j.routeKey, j])).values()].reverse();
     if (!unique.length) return [];
     const first = unique[0];
-    const lessDisrupted = unique.slice(1).filter((j) => j.disruptionScore < first.disruptionScore)
+    const lessDisrupted = unique.slice(1).filter((j) => j.disruptionScore < first.disruptionScore
+        && (!j.disruption || j.disruption.coverage === 'complete'))
         .sort((a, b) => a.disruptionScore - b.disruptionScore)[0];
     const selected = [first, ...(lessDisrupted ? [lessDisrupted] : []),
         ...unique.slice(1).filter((j) => j !== lessDisrupted)].slice(0, 3);

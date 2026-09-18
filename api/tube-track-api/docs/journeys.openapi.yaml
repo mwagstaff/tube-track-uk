@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: TubeTrack UK Journey API
-  version: 1.0.0
+  version: 1.1.0
   description: London rail journey planning for TubeTrack UK and TrainTrack UK. Estimates supplied by TfL; alternatives and live adjustments are not guaranteed.
 servers:
   - url: https://api.skynolimit.dev/tube-track
@@ -34,7 +34,7 @@ paths:
   /api/v1/journeys:
     get:
       operationId: planRailJourney
-      description: Returns up to three distinct routes, retaining a less-disrupted alternative when available. Departing searches favour earliest estimated arrival; arrive-by searches favour latest feasible departure. Never returns expired cached results after an upstream failure. No credentials are required from our native apps; the server holds the TfL key.
+      description: Returns up to three distinct routes, retaining a less-disrupted alternative when available. Departing searches favour earliest estimated arrival; arrive-by searches favour latest feasible departure. Each journey and leg includes disruption information from JourneyResults, realtime line status and date-filtered planned works. Missing disruption feeds do not discard valid routes; consult disruption.coverage independently of route freshness. Never returns expired cached results after an upstream failure. No credentials are required from our native apps; the server holds the TfL key.
       parameters:
         - name: from
           in: query
@@ -148,7 +148,7 @@ components:
         severity: { type: string, enum: [information, minor, severe] }
     Journey:
       type: object
-      required: [id, departureTime, arrivalTime, durationMinutes, changes, walkingMinutes, waitingMinutes, disruptionScore, warnings, legs, labels]
+      required: [id, departureTime, arrivalTime, durationMinutes, changes, walkingMinutes, waitingMinutes, disruptionScore, disruption, warnings, legs, labels]
       properties:
         id: { type: string, description: Opaque identifier for this route and departure, not a booking reference. }
         departureTime: { type: string, format: date-time }
@@ -158,14 +158,15 @@ components:
         walkingMinutes: { type: integer, minimum: 0 }
         waitingMinutes: { type: integer, minimum: 0, description: Wait from requested time until departure; zero for arrive-by searches. }
         disruptionScore: { type: integer, minimum: 0, description: Heuristic warning comparison, not delay minutes or a reliability probability. }
+        disruption: { $ref: '#/components/schemas/DisruptionSummary' }
         warnings: { type: array, items: { $ref: '#/components/schemas/Warning' } }
         labels:
           type: array
-          items: { type: string, enum: [earliestArrival, latestDeparture, lessDisrupted] }
+          items: { type: string, enum: [earliestArrival, latestDeparture, lessDisrupted], description: lessDisrupted requires complete disruption coverage for the alternative. }
         legs: { type: array, items: { $ref: '#/components/schemas/Leg' } }
     Leg:
       type: object
-      required: [id, mode, instruction, from, to, lines, departureTime, arrivalTime, scheduledDepartureTime, scheduledArrivalTime, timing, durationMinutes, warnings, stops]
+      required: [id, mode, instruction, from, to, lines, departureTime, arrivalTime, scheduledDepartureTime, scheduledArrivalTime, timing, durationMinutes, disruption, warnings, stops]
       properties:
         id: { type: string }
         mode: { type: string, enum: [tube, dlr, overground, elizabeth-line, tram, walking] }
@@ -187,6 +188,7 @@ components:
         scheduledArrivalTime: { type: [string, 'null'], format: date-time }
         timing: { type: string, enum: [estimated, adjusted], description: Adjusted means TfL times differ from scheduled values. Neither value guarantees live prediction coverage. }
         durationMinutes: { type: integer, minimum: 0 }
+        disruption: { $ref: '#/components/schemas/DisruptionSummary' }
         warnings: { type: array, items: { $ref: '#/components/schemas/Warning' } }
         stops:
           type: array
@@ -196,3 +198,76 @@ components:
             properties:
               id: { type: string }
               name: { type: string }
+    DisruptionSummary:
+      type: object
+      description: >-
+        Notices affecting the journey's lines and travel times. Line-level notices
+        indicate potential impact, not a confirmed delay on this exact section.
+        noIssues confirms no reported notices in applicable fresh feeds, not a
+        guarantee of disruption-free travel. For future legs, realtime is
+        notApplicable; planned works and planner notices still apply. Walking
+        legs do not require rail feed coverage. A fresh route (meta.stale=false)
+        may have incomplete disruption coverage.
+      required: [status, hasDisruption, summary, coverage, issues, sources]
+      properties:
+        status:
+          type: string
+          enum: [majorIssues, minorDelays, information, noIssues, unknown]
+        hasDisruption:
+          type: [boolean, 'null']
+          description: True if any fresh notice is reported, including informational/accessibility notices; false only when all applicable checks succeeded with no notices; null if no fresh notice is known and checks are incomplete.
+        summary: { type: string }
+        coverage: { type: string, enum: [complete, partial, unavailable, notApplicable] }
+        issues: { type: array, items: { $ref: '#/components/schemas/DisruptionIssue' } }
+        sources: { type: array, items: { $ref: '#/components/schemas/DisruptionSource' } }
+      example:
+        status: noIssues
+        hasDisruption: false
+        summary: No disruption reported.
+        coverage: complete
+        issues: []
+        sources:
+          - { source: realtime, status: available, checkedAt: '2026-09-17T12:00:00Z' }
+          - { source: plannedWorks, status: available, checkedAt: '2026-09-17T12:00:00Z' }
+    DisruptionSource:
+      type: object
+      required: [source, status, checkedAt]
+      properties:
+        source: { type: string, enum: [realtime, plannedWorks] }
+        status:
+          type: string
+          enum: [available, partial, stale, unavailable, notApplicable]
+          description: partial means a line or severity could not be checked fully. stale means a failed refresh left only last-known data. Neither permits an all-clear.
+        checkedAt: { type: [string, 'null'], format: date-time, description: Last successful source fetch; oldest applicable check in a journey summary. }
+    DisruptionIssue:
+      type: object
+      required: [id, sources, severity, kind, lineId, description, statusCode, statusDescription, scope, validityPeriods, stale]
+      properties:
+        id: { type: string, description: Opaque deduplication identifier. }
+        sources:
+          type: array
+          items: { type: string, enum: [journeyPlanner, realtime, plannedWorks] }
+          description: plannedWorks identifies the dated line-status feed; kind identifies whether the notice is classified as planned work.
+        severity:
+          type: string
+          enum: [information, minor, major]
+          description: Major includes severe delays, closures, suspensions and services not running. Minor includes minor delays and reduced service. Accessibility notices are informational. Legacy warnings use severe instead of major.
+        kind: { type: string, enum: [accessibility, line, station, plannedWork, information] }
+        lineId: { type: [string, 'null'] }
+        description: { type: string }
+        statusCode: { type: [integer, 'null'], description: Original TfL category code when supplied; not a numeric severity ordering. }
+        statusDescription: { type: [string, 'null'] }
+        scope:
+          type: string
+          enum: [journeyLeg, line, section, station]
+          description: journeyLeg is a planner-attached notice; station/section indicate matching station metadata; line means exact section impact is unconfirmed.
+        validityPeriods:
+          type: array
+          description: TfL periods as UTC instants. Notices are filtered against each leg; no invented duration or delay penalty is applied.
+          items:
+            type: object
+            required: [from, to]
+            properties:
+              from: { type: string, format: date-time }
+              to: { type: string, format: date-time }
+        stale: { type: boolean, description: Last-known notice from a failed feed refresh; excluded from confirmed severity and comparison score. }

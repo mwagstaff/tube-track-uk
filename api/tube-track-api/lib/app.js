@@ -1,14 +1,10 @@
 import compression from 'compression';
 import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
+import { LINE_COLOURS } from './line-colours.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
-const LINE_IDS = [
-    'bakerloo', 'central', 'circle', 'district', 'hammersmith-city',
-    'jubilee', 'metropolitan', 'northern', 'piccadilly', 'victoria',
-    'waterloo-city', 'dlr', 'elizabeth', 'tram', 'liberty', 'lioness',
-    'mildmay', 'suffragette', 'weaver', 'windrush'
-].join(',');
+const LINE_IDS = LINE_COLOURS.map((line) => line.id).join(',');
 
 function commaSeparated(value, { maximum = 25 } = {}) {
     if (typeof value !== 'string') return [];
@@ -64,6 +60,11 @@ export function createApp({ cache, poller, metrics, logger, client, resourceCach
     });
     app.use(metrics.middleware());
     app.use(compression({ threshold: 1_024 }));
+
+    app.get('/api/v1/line-colours', (req, res) => {
+        res.set('Cache-Control', 'public, max-age=86400');
+        res.json({ data: LINE_COLOURS, meta: { source: 'tubetrack', count: LINE_COLOURS.length } });
+    });
 
     app.get('/api/v1/stations', (req, res, next) => {
         try {
