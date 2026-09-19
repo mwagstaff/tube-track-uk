@@ -123,6 +123,7 @@ struct BeckMapGestureSurface: UIViewRepresentable {
             awaitingGestureAfterInterruption = true
             clearPanMotion()
             parent.onPan(.zero, .interrupted)
+            notifyInteractionIfNeeded()
         }
 
         func touchesEnded() {
@@ -172,6 +173,11 @@ struct BeckMapGestureSurface: UIViewRepresentable {
                     panMotion = .decelerating
                     parent.onPan(.zero, .decelerating)
                     startDisplayLink(on: screen)
+                    // Momentum is passive animation, not an active touch.
+                    // Release map chrome immediately so its controls respond
+                    // to the very next tap instead of consuming that tap to
+                    // stop the coast first.
+                    notifyInteractionIfNeeded()
                 } else {
                     finishPanMotion()
                 }
@@ -298,7 +304,11 @@ struct BeckMapGestureSurface: UIViewRepresentable {
         }
 
         private func notifyInteractionIfNeeded() {
-            let isInteracting = panMotion != .idle || isTrackingPinch || awaitingGestureAfterInterruption
+            let isInteracting = panMotion == .tracking || isTrackingPinch || awaitingGestureAfterInterruption
+            reportInteraction(isInteracting)
+        }
+
+        private func reportInteraction(_ isInteracting: Bool) {
             guard isInteracting != lastReportedInteractionState else { return }
             lastReportedInteractionState = isInteracting
             parent.onInteractionChange(isInteracting)

@@ -57,7 +57,7 @@ struct BeckMapGestureSurfaceTests {
         #expect(recorder.interactions == [true, false])
     }
 
-    @Test func draggingACoastingMapDoesNotFinishAndRestartTheInteraction() {
+    @Test func draggingACoastingMapStartsANewDirectInteraction() {
         let recorder = GestureRecorder()
         let coordinator = recorder.makeCoordinator()
         defer { coordinator.stopAllMotion() }
@@ -72,14 +72,14 @@ struct BeckMapGestureSurfaceTests {
         #expect(!coordinator.isDisplayLinkActive)
         #expect(recorder.camera.offset == CGSize(width: coastingOffset.width + 9, height: coastingOffset.height - 4))
         #expect(!recorder.panPhases.contains("ended"))
-        #expect(recorder.interactions == [true])
+        #expect(recorder.interactions == [true, false, true])
 
         coordinator.handlePan(state: .ended, translation: CGSize(width: 20, height: 5))
-        #expect(recorder.interactions == [true, false])
+        #expect(recorder.interactions == [true, false, true, false])
         #expect(recorder.panPhases.filter { $0 == "ended" }.count == 1)
     }
 
-    @Test func pinchingACoastingMapKeepsOneContinuousInteraction() {
+    @Test func pinchingACoastingMapStartsANewDirectInteraction() {
         let recorder = GestureRecorder()
         let coordinator = recorder.makeCoordinator()
         defer { coordinator.stopAllMotion() }
@@ -90,11 +90,11 @@ struct BeckMapGestureSurfaceTests {
         #expect(!coordinator.isDecelerating)
         #expect(!coordinator.isDisplayLinkActive)
         #expect(!recorder.panPhases.contains("ended"))
-        #expect(recorder.interactions == [true])
+        #expect(recorder.interactions == [true, false, true])
         coordinator.handlePinch(state: .changed, magnification: 1.2, location: CGPoint(x: 180, y: 280))
         #expect(abs(recorder.camera.scale - 0.42) < 0.000_001)
         coordinator.handlePinch(state: .ended, magnification: 1.2, location: CGPoint(x: 180, y: 280))
-        #expect(recorder.interactions == [true, false])
+        #expect(recorder.interactions == [true, false, true, false])
         #expect(recorder.pinchPhases.filter { $0 == "ended" }.count == 1)
     }
 
@@ -113,12 +113,12 @@ struct BeckMapGestureSurfaceTests {
         #expect(recorder.camera.offset == touchedOffset)
         #expect(recorder.panPhases.last == "interrupted")
         #expect(!recorder.panPhases.contains("ended"))
-        #expect(recorder.interactions == [true])
+        #expect(recorder.interactions == [true, false, true])
 
         coordinator.touchesEnded()
         coordinator.touchesEnded()
         #expect(recorder.panPhases.filter { $0 == "ended" }.count == 1)
-        #expect(recorder.interactions == [true, false])
+        #expect(recorder.interactions == [true, false, true, false])
     }
 
     @Test func touchDownThenDragPreservesTheCoastingCameraWithoutAnIntermediateEnd() {
@@ -132,7 +132,7 @@ struct BeckMapGestureSurfaceTests {
         coordinator.handlePan(state: .changed, translation: CGSize(width: 16, height: 13))
 
         #expect(recorder.camera.offset == CGSize(width: touchedOffset.width + 16, height: touchedOffset.height + 13))
-        #expect(recorder.interactions == [true])
+        #expect(recorder.interactions == [true, false, true])
         #expect(!recorder.panPhases.contains("ended"))
         #expect(!coordinator.isDisplayLinkActive)
     }
@@ -211,7 +211,7 @@ struct BeckMapGestureSurfaceTests {
         #expect(coordinator.isDecelerating)
         #expect(coordinator.isDisplayLinkActive)
         #expect(!recorder.panPhases.contains("ended"))
-        #expect(recorder.interactions == [true])
+        #expect(recorder.interactions == [true, false])
     }
 
     @Test func tappingAPausedCoastEndsOnceRegardlessOfUIKitCallbackOrder() {
@@ -232,7 +232,7 @@ struct BeckMapGestureSurfaceTests {
             }
 
             #expect(recorder.panPhases.filter { $0 == "ended" }.count == 1)
-            #expect(recorder.interactions == [true, false])
+            #expect(recorder.interactions == [true, false, true, false])
             #expect(recorder.taps == [location])
             #expect(!coordinator.isDisplayLinkActive)
         }

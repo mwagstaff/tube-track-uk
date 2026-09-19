@@ -36,6 +36,7 @@ struct RootTabView: View {
         AppStartupPresentation.initiallyShowsChrome
     @State private var closestStationPanelHidden = false
     @State private var mapNavigationActive = false
+    @State private var mapNavigation = MapTabNavigationState()
     @State private var profileShowsImageBackground = false
 
     var body: some View {
@@ -56,10 +57,22 @@ struct RootTabView: View {
                 TabView(selection: $state.selectedTab) {
                     Group {
                         if appState.selectedTab == .map {
-                            UnifiedMapScreen(
-                                closestStationPanelHidden: $closestStationPanelHidden,
-                                mapNavigationActive: $mapNavigationActive
-                            )
+                            NavigationStack {
+                                UnifiedMapScreen(
+                                    closestStationPanelHidden: $closestStationPanelHidden,
+                                    mapNavigationActive: $mapNavigationActive,
+                                    onShowDisruptions: {
+                                        mapNavigation.showDisruptions()
+                                    }
+                                )
+                                .toolbar(.hidden, for: .navigationBar)
+                                .navigationDestination(
+                                    isPresented: $mapNavigation.showsDisruptions
+                                ) {
+                                    MapDisruptionsScreen()
+                                        .toolbar(.visible, for: .navigationBar)
+                                }
+                            }
                         } else {
                             Color.clear
                         }
@@ -87,7 +100,10 @@ struct RootTabView: View {
                         backgroundColor: tabBarBackgroundColor,
                         backgroundIsTransparent: tabBarBackgroundIsTransparent,
                         screenFurnitureVisible: !mapNavigationActive,
-                        reduceMotion: reduceMotion
+                        reduceMotion: reduceMotion,
+                        onMapTabSelected: {
+                            mapNavigation.handleTabSelection(.map)
+                        }
                     )
                     .frame(width: 0, height: 0)
                 }
@@ -148,7 +164,9 @@ struct RootTabView: View {
             }
         }
         .onChange(of: appState.selectedTab) {
-            if appState.selectedTab != .map {
+            if appState.selectedTab == .map {
+                mapNavigation.handleTabSelection(.map)
+            } else {
                 mapNavigationActive = false
             }
             revealBackgroundIfNeeded()
@@ -191,7 +209,9 @@ struct RootTabView: View {
     }
 
     private var tabBarBackgroundIsTransparent: Bool {
-        appState.selectedTab == .journeys || (appState.selectedTab == .profile && profileShowsImageBackground)
+        appState.selectedTab == .map
+            || appState.selectedTab == .journeys
+            || (appState.selectedTab == .profile && profileShowsImageBackground)
     }
 
     private func revealBackgroundIfNeeded() {
@@ -264,6 +284,23 @@ struct RootTabView: View {
     }
 }
 
+struct MapTabNavigationState: Equatable {
+    var showsDisruptions = false
+
+    mutating func showDisruptions() {
+        showsDisruptions = true
+    }
+
+    mutating func returnToMap() {
+        showsDisruptions = false
+    }
+
+    mutating func handleTabSelection(_ tab: AppTab) {
+        guard tab == .map else { return }
+        returnToMap()
+    }
+}
+
 private struct AppStartupBackgroundChrome: View {
     var body: some View {
         GeometryReader { proxy in
@@ -310,6 +347,7 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
     let backgroundIsTransparent: Bool
     let screenFurnitureVisible: Bool
     let reduceMotion: Bool
+    let onMapTabSelected: () -> Void
 
     func makeUIViewController(context: Context) -> TabBarAppearanceController {
         TabBarAppearanceController()
@@ -323,17 +361,28 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
         viewController.backgroundIsTransparent = backgroundIsTransparent
         viewController.screenFurnitureVisible = screenFurnitureVisible
         viewController.reduceMotion = reduceMotion
+        viewController.onMapTabSelected = onMapTabSelected
         viewController.applyAppearanceWhenAttached()
+    }
+
+    static func dismantleUIViewController(
+        _ viewController: TabBarAppearanceController,
+        coordinator: Void
+    ) {
+        viewController.stopObservingSelection()
     }
 }
 
 @MainActor
-private final class TabBarAppearanceController: UIViewController {
+private final class TabBarAppearanceController: UIViewController, UITabBarControllerDelegate {
     var backgroundColor = UIColor.systemBackground
     var backgroundIsTransparent = false
     var screenFurnitureVisible = true
     var reduceMotion = false
+    var onMapTabSelected: () -> Void = {}
     private weak var configuredTabBar: UITabBar?
+    private weak var observedTabBarController: UITabBarController?
+    private var forwardingDelegate: (any UITabBarControllerDelegate)?
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -348,10 +397,12 @@ private final class TabBarAppearanceController: UIViewController {
     }
 
     private func applyAppearance() {
-        guard let tabBar = tabBarController?.tabBar
-            ?? view.window?.rootViewController?.descendantTabBarController?.tabBar else {
+        guard let resolvedTabBarController = tabBarController
+            ?? view.window?.rootViewController?.descendantTabBarController else {
             return
         }
+        let tabBar = resolvedTabBarController.tabBar
+        observeSelection(on: resolvedTabBarController)
 
         let appearance = UITabBarAppearance()
         if backgroundIsTransparent {
@@ -387,6 +438,46 @@ private final class TabBarAppearanceController: UIViewController {
             tabBar.alpha = targetAlpha
         }
         configuredTabBar = tabBar
+    }
+
+    func stopObservingSelection() {
+        guard let observedTabBarController,
+              observedTabBarController.delegate === self else { return }
+        observedTabBarController.delegate = forwardingDelegate
+        self.observedTabBarController = nil
+        forwardingDelegate = nil
+    }
+
+    private func observeSelection(on tabBarController: UITabBarController) {
+        guard observedTabBarController !== tabBarController
+                || tabBarController.delegate !== self else { return }
+
+        stopObservingSelection()
+        forwardingDelegate = tabBarController.delegate
+        observedTabBarController = tabBarController
+        tabBarController.delegate = self
+    }
+
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        shouldSelect viewController: UIViewController
+    ) -> Bool {
+        forwardingDelegate?.tabBarController?(
+            tabBarController,
+            shouldSelect: viewController
+        ) ?? true
+    }
+
+    func tabBarController(
+        _ tabBarController: UITabBarController,
+        didSelect viewController: UIViewController
+    ) {
+        forwardingDelegate?.tabBarController?(
+            tabBarController,
+            didSelect: viewController
+        )
+        guard tabBarController.viewControllers?.first === viewController else { return }
+        onMapTabSelected()
     }
 }
 

@@ -113,10 +113,18 @@ struct DisruptionDetailCard: View {
                     LineBadge(lineID: disruption.lineID)
                     Spacer()
                     Button("Close", systemImage: "xmark.circle.fill") {
+                        MapResetDiagnostics.logger.notice(
+                            "card-button received disruption=\(disruption.id, privacy: .public)"
+                        )
                         onClose()
                     }
                     .labelStyle(.iconOnly)
                     .foregroundStyle(.secondary)
+                    .font(.appTitle2())
+                    .frame(width: 44, height: 44)
+                    .contentShape(.rect)
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Closes disruption details and resets the map")
                 }
 
                 Label(disruption.title, systemImage: "exclamationmark.triangle.fill")
@@ -141,6 +149,14 @@ struct DisruptionDetailCard: View {
                     }
                 }
             }
+        }
+        // Make the complete visible card an opaque hit-test region so a tap
+        // beside a control cannot fall through to the UIKit map gesture layer.
+        .contentShape(.rect)
+        .background {
+            Color.clear
+                .contentShape(.rect)
+                .onTapGesture { }
         }
     }
 

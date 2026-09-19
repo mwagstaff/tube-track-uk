@@ -62,6 +62,30 @@ struct BeckMapTests {
         #expect(summary.closedLineIDs == [.district, .dlr, .lioness])
     }
 
+    @Test func disruptionHeadlineIncludesClosedLinesWhenPresent() {
+        #expect(
+            MapDisruptionSummaryText.liveHeadline(
+                disruptionCount: 1,
+                closedLineCount: 12,
+                isOffline: false
+            ) == "1 disruption currently, 12 lines closed"
+        )
+        #expect(
+            MapDisruptionSummaryText.liveHeadline(
+                disruptionCount: 2,
+                closedLineCount: 1,
+                isOffline: false
+            ) == "2 disruptions currently, 1 line closed"
+        )
+        #expect(
+            MapDisruptionSummaryText.liveHeadline(
+                disruptionCount: 1,
+                closedLineCount: 0,
+                isOffline: false
+            ) == "1 disruption currently"
+        )
+    }
+
     @Test func networkSummaryAssignsMixedSeverityLinesToOneHighestPriorityBucket() {
         let disruptedLineIDs: Set<TubeLineID> = [.elizabeth, .metropolitan, .victoria]
         let goodStatuses = TubeLineID.allCases

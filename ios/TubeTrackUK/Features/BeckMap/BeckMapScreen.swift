@@ -31,6 +31,7 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let mobileCoverageBySegmentID: [String: MobileCoverageAvailability]
     let mobileCoverageByStationID: [String: MobileCoverageAvailability]
     let stationOnlyCoverageStationIDs: Set<String>
+    var mapResetGeneration = 0
     var highlightsJourney = false
 
     var emphasizesIssues: Bool {
@@ -70,6 +71,7 @@ struct BeckMapScreen: View {
     let contentVerticalBias: CGFloat
     let onUserZoomIn: () -> Void
     let onInteractionChange: (Bool) -> Void
+    let onBackgroundTap: () -> Void
     @State private var document: BeckMapDocument?
     @State private var renderCache: BeckMapCanvas.RenderCache?
     @State private var documentLoadError: String?
@@ -123,7 +125,7 @@ struct BeckMapScreen: View {
                             appState.select(disruption: disruption)
                         }
                     },
-                    onBackgroundTap: appState.clearMapSelection
+                    onBackgroundTap: onBackgroundTap
                 )
                 .id("\(document.identifier):\(graph.generatedAt)")
                 .ignoresSafeArea(edges: .top)
@@ -270,7 +272,8 @@ struct BeckMapScreen: View {
             mobileCoverageByStationID: mobileCoverageByStationID(graph: graph),
             stationOnlyCoverageStationIDs: appState.mobileCoverageMode.isActive
                 ? appState.mobileCoverage?.stationOnlyCoverageStationIDs ?? []
-                : []
+                : [],
+            mapResetGeneration: appState.mapResetGeneration
         )
     }
 
@@ -445,6 +448,11 @@ struct BeckMapCanvas: View {
                         )
                     }
                 )
+                // The reset generation is committed by TubeAppState only after
+                // normal styling and cleared selection have both been applied.
+                // Using that generation here prevents a card-dismissal update
+                // from retaining pixels rendered from the pre-reset snapshot.
+                .id(presentation.mapResetGeneration)
                 .allowsHitTesting(false)
 
                 if !isReferenceOverlayActive {
@@ -610,6 +618,12 @@ struct BeckMapCanvas: View {
             .onChange(of: resetToken) { _, _ in
                 guard appState.mapPresentationMode == .beck else { return }
                 resetCamera(in: proxy.size, animated: true)
+            }
+            .onChange(of: presentation.mapResetGeneration) { _, generation in
+                let selectedDisruption = appState.selectedDisruptionID ?? "nil"
+                MapResetDiagnostics.logger.notice(
+                    "beck-renderer observed generation=\(generation) mode=\(self.presentation.disruptionDisplayMode.rawValue, privacy: .public) affectedSegments=\(self.presentation.affectedSegmentIDs.count) selectedDisruption=\(selectedDisruption, privacy: .public)"
+                )
             }
             .onChange(of: locationFocusRequest?.id) { _, _ in
                 guard appState.mapPresentationMode == .beck,

@@ -5,6 +5,19 @@ import Testing
 @testable import TubeTrackUK
 
 struct TubeTrackUKTests {
+    @Test func selectingMapReturnsFromTheDisruptionsScreen() {
+        var navigation = MapTabNavigationState()
+
+        navigation.showDisruptions()
+        #expect(navigation.showsDisruptions)
+
+        navigation.handleTabSelection(.nearMe)
+        #expect(navigation.showsDisruptions)
+
+        navigation.handleTabSelection(.map)
+        #expect(!navigation.showsDisruptions)
+    }
+
     @Test @MainActor func appearanceDefaultsToSystemAndPersistsOverrides() throws {
         let suiteName = "TubeTrackUKTests.Appearance.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
@@ -365,8 +378,8 @@ struct TubeTrackUKTests {
         #expect(appState.selectedStationDepartureLineID == nil)
     }
 
-    @Test func disruptionDisplayModesReverseSectionEmphasis() {
-        #expect(DisruptionDisplayMode.normal.mutesSegment(isAffected: true))
+    @Test func normalDisplayShowsEveryLineAndIssuesEmphasizesAffectedSections() {
+        #expect(!DisruptionDisplayMode.normal.mutesSegment(isAffected: true))
         #expect(!DisruptionDisplayMode.normal.mutesSegment(isAffected: false))
         #expect(!DisruptionDisplayMode.issues.mutesSegment(isAffected: true))
         #expect(DisruptionDisplayMode.issues.mutesSegment(isAffected: false))
@@ -412,6 +425,43 @@ struct TubeTrackUKTests {
 
         appState.select(disruption: selected)
         #expect(appState.disruptionSelectionGeneration == 2)
+    }
+
+    @Test @MainActor func resettingTheMapClearsADisruptionAndEveryMapMode() {
+        let disruption = disruption(id: "district-closure", severity: 5, segmentID: "district-segment")
+        let appState = TubeAppState()
+        appState.disruptions = [disruption]
+
+        appState.select(disruption: disruption)
+        appState.mobileCoverageMode = .allUsable
+        appState.selectedMapNetworkStat = .minorDelays
+
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.selectedDisruptionID == disruption.id)
+
+        let generation = appState.resetMapState(source: .disruptionCard)
+
+        #expect(appState.selectedDisruptionID == nil)
+        #expect(appState.selectedLineID == nil)
+        #expect(appState.focusedSegmentIDs.isEmpty)
+        #expect(appState.focusedStationIDs.isEmpty)
+        #expect(appState.focusedLineIDs.isEmpty)
+        #expect(appState.focusedResolutionConfidence == nil)
+        #expect(appState.disruptionDisplayMode == .normal)
+        #expect(appState.selectedMapNetworkStat == nil)
+        #expect(appState.mobileCoverageMode == .off)
+        #expect(generation == 1)
+        #expect(appState.mapResetGeneration == 1)
+        #expect(!MapNetworkRouteStyling.mutesSegment(
+            lineID: .district,
+            isAffected: true,
+            isFeaturedSection: false,
+            selectedFilter: appState.selectedMapNetworkStat,
+            featuredLineIDs: [],
+            sectionLineIDs: [],
+            closedLineIDs: [],
+            disruptionDisplayMode: appState.disruptionDisplayMode
+        ))
     }
 
     @Test func disruptionWithoutAResolvedSectionFocusesItsRelevantLine() throws {
@@ -469,6 +519,23 @@ struct TubeTrackUKTests {
 
         appState.highlightAllDisruptionsOnMap()
         #expect(appState.disruptionOverviewFocusGeneration == 2)
+    }
+
+    @Test @MainActor func allDisruptionHighlightButtonTogglesBackToEveryLine() {
+        let appState = TubeAppState()
+
+        appState.toggleAllDisruptionsOnMap()
+
+        #expect(appState.disruptionHighlightScope == .all)
+        #expect(appState.disruptionDisplayMode == .issues)
+        #expect(appState.disruptionOverviewFocusGeneration == 1)
+
+        appState.toggleAllDisruptionsOnMap()
+
+        #expect(appState.disruptionHighlightScope == nil)
+        #expect(appState.selectedMapNetworkStat == nil)
+        #expect(appState.disruptionDisplayMode == .normal)
+        #expect(appState.disruptionOverviewFocusGeneration == 1)
     }
 
     @Test @MainActor func disruptionHighlightToggleCyclesAllMajorMinorAndOff() {
@@ -1505,10 +1572,9 @@ struct TubeTrackUKTests {
         appState.setLiveTrains(false)
     }
 
-    @Test func mapDockControlsUseTheSharedCompactHeight() {
+    @Test func mapDockControlsUseFullWidthLayoutMetrics() {
         #expect(MapDockMetrics.controlSize == 44)
-        #expect(MapDockMetrics.contentColumnWidth(for: 390) == 314)
-        #expect(MapDockMetrics.contentColumnWidth(for: 60) == 0)
+        #expect(MapDockMetrics.horizontalPadding == 12)
     }
 
     @Test func beckMapTrainPathRespectsTravelAndAuthoredDirections() throws {

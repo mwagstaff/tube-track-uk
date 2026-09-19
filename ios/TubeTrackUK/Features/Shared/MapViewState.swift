@@ -212,6 +212,29 @@ struct MapNetworkStatusSummary: Equatable, Sendable {
     }
 }
 
+enum MapDisruptionSummaryText {
+    static func liveHeadline(
+        disruptionCount: Int,
+        closedLineCount: Int,
+        isOffline: Bool
+    ) -> String {
+        let disruptionText: String
+        if isOffline {
+            disruptionText = disruptionCount == 0
+                ? "No disruptions in saved update"
+                : "\(disruptionCount) saved disruption\(disruptionCount == 1 ? "" : "s")"
+        } else {
+            disruptionText = disruptionCount == 0
+                ? "No disruptions currently"
+                : "\(disruptionCount) disruption\(disruptionCount == 1 ? "" : "s") currently"
+        }
+
+        guard closedLineCount > 0 else { return disruptionText }
+        let closureText = "\(closedLineCount) line\(closedLineCount == 1 ? "" : "s") closed"
+        return "\(disruptionText), \(closureText)"
+    }
+}
+
 struct MapDisruptionLineGroups: Equatable, Sendable {
     let majorIssues: [ResolvedDisruption]
     let minorDelays: [ResolvedDisruption]

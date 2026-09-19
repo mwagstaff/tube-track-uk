@@ -2,36 +2,18 @@ import SwiftUI
 
 struct MapOverviewHeader: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-    @Binding var disruptionsExpanded: Bool
-    @Binding var zoomedDisruptionsExpanded: Bool
     let overviewOpacity: Double
     let compactForZoom: Bool
-    let onSelectDisruption: () -> Void
-
-    private var effectiveExpanded: Binding<Bool> {
-        Binding(
-            get: {
-                compactForZoom ? zoomedDisruptionsExpanded : disruptionsExpanded
-            },
-            set: { newValue in
-                if compactForZoom {
-                    zoomedDisruptionsExpanded = newValue
-                } else {
-                    disruptionsExpanded = newValue
-                }
-            }
-        )
-    }
+    let onShowDisruptions: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             if usesCompactTopRow {
                 HStack(spacing: 8) {
                     MapDisruptionOverviewCard(
-                        expanded: effectiveExpanded,
                         headlineOnly: true,
                         compactHeadline: true,
-                        onSelectDisruption: onSelectDisruption
+                        onExpand: onShowDisruptions
                     )
                     .layoutPriority(1)
 
@@ -59,10 +41,9 @@ struct MapOverviewHeader: View {
                 .frame(minHeight: MapDockMetrics.controlSize)
 
                 MapDisruptionOverviewCard(
-                    expanded: effectiveExpanded,
-                    headlineOnly: compactForZoom && !zoomedDisruptionsExpanded,
+                    headlineOnly: compactForZoom,
                     compactHeadline: false,
-                    onSelectDisruption: onSelectDisruption
+                    onExpand: onShowDisruptions
                 )
             }
         }
@@ -72,7 +53,6 @@ struct MapOverviewHeader: View {
 
     private var usesCompactTopRow: Bool {
         compactForZoom
-            && !effectiveExpanded.wrappedValue
             && !dynamicTypeSize.isAccessibilitySize
     }
 }
@@ -80,10 +60,9 @@ struct MapOverviewHeader: View {
 struct MapDisruptionOverviewCard: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Binding var expanded: Bool
     let headlineOnly: Bool
     let compactHeadline: Bool
-    let onSelectDisruption: () -> Void
+    let onExpand: () -> Void
 
     private var lineGroups: MapDisruptionLineGroups {
         MapDisruptionLineGroups(disruptions: appState.visibleDisruptions)
@@ -109,49 +88,32 @@ struct MapDisruptionOverviewCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            if expanded {
+        Button(action: onExpand) {
+            VStack(spacing: 0) {
                 headlineRow
-            } else {
-                Button {
-                    expanded = true
-                } label: {
-                    VStack(spacing: 0) {
-                        headlineRow
-                        if !headlineOnly {
-                            collapsedLinePills
-                        }
-                    }
+                if !headlineOnly {
+                    collapsedLinePills
                 }
-                .buttonStyle(.plain)
-                .contentShape(.rect)
-                .accessibilityHint("Shows current disruptions")
-            }
 
-            if appState.isOffline {
-                OfflineStatusMessage(
-                    updatedAt: appState.disruptionDataUpdatedAt,
-                    isWorks: !appState.isViewingLiveStatus
-                )
-                .frame(maxWidth: .infinity)
-                .padding(.horizontal, 14)
-                .padding(.top, 10)
-                .padding(.bottom, 12)
-            }
-
-            if !headlineOnly, expanded {
-                expandedContent
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                if appState.isOffline {
+                    OfflineStatusMessage(
+                        updatedAt: appState.disruptionDataUpdatedAt,
+                        isWorks: !appState.isViewingLiveStatus
+                    )
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 14)
+                    .padding(.top, 10)
+                    .padding(.bottom, 12)
+                }
             }
         }
+        .buttonStyle(.plain)
+        .contentShape(.rect)
+        .accessibilityHint("Opens disruptions full screen")
         .frame(maxWidth: .infinity)
         .glassEffect(
             .regular,
             in: .rect(cornerRadius: compactHeadline ? 18 : 24)
-        )
-        .animation(
-            reduceMotion ? nil : .spring(duration: 0.42, bounce: 0.12),
-            value: expanded
         )
         .animation(reduceMotion ? nil : .easeOut(duration: 0.24), value: headlineOnly)
         .accessibilityElement(children: .contain)
@@ -171,30 +133,17 @@ struct MapDisruptionOverviewCard: View {
                     .foregroundStyle(.primary)
                     .lineLimit(compactHeadline ? 1 : nil)
                     .minimumScaleFactor(compactHeadline ? 0.78 : 1)
-                if expanded {
-                    Text(
-                        appState.isOffline
-                            ? "Saved status and planned engineering work"
-                            : "Live status and planned engineering work"
-                    )
-                        .font(.appCaption())
-                        .foregroundStyle(.secondary)
-                }
             }
 
             Spacer(minLength: 6)
 
-            if expanded {
-                DisruptionDateMenu(compact: true, opensPickerDirectly: true)
-            } else {
-                Image(systemName: "chevron.down")
-                    .font(.appCaption(.bold))
-                    .foregroundStyle(.secondary)
-                    .frame(
-                        width: compactHeadline ? 24 : 32,
-                        height: compactHeadline ? 32 : 32
-                    )
-            }
+            Image(systemName: "chevron.right")
+                .font(.appCaption(.bold))
+                .foregroundStyle(.secondary)
+                .frame(
+                    width: compactHeadline ? 24 : 32,
+                    height: 32
+                )
         }
         .padding(.horizontal, compactHeadline ? 10 : 14)
         .padding(.vertical, compactHeadline ? 6 : 12)
@@ -327,8 +276,193 @@ struct MapDisruptionOverviewCard: View {
         return "Affected lines. " + groups.joined(separator: ". ")
     }
 
-    private var expandedContent: some View {
-        VStack(spacing: 10) {
+    private var headline: String {
+        let count = lineEntries.count
+        if hasNoSavedDisruptionData { return "No saved disruptions" }
+        if isLoadingTfLDisruptions {
+            return "Loading disruptions from TfL"
+        }
+        if !appState.isViewingLiveStatus,
+           !appState.isOffline,
+           appState.isRefreshingDisruptionData,
+           appState.visibleDisruptions.isEmpty {
+            return "Loading planned disruptions"
+        }
+        if appState.isViewingLiveStatus {
+            return MapDisruptionSummaryText.liveHeadline(
+                disruptionCount: count,
+                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count,
+                isOffline: appState.isOffline
+            )
+        }
+        let date = LondonRailDate.formatted(
+            appState.selectedDisruptionDate,
+            dateFormat: "EEE d MMM"
+        )
+        return count == 0
+            ? "No disruptions · \(date)"
+            : "\(count) disruption\(count == 1 ? "" : "s") · \(date)"
+    }
+
+    private var emptyMessage: String {
+        if hasNoSavedDisruptionData {
+            return "Connect to the internet to check for disruptions."
+        }
+        if appState.isOffline {
+            return appState.isViewingLiveStatus
+                ? "No disruptions were reported in the last saved update."
+                : "No saved work matches the selected date and times."
+        }
+        if appState.isViewingLiveStatus {
+            if isLoadingTfLDisruptions {
+                return "Loading disruption data from TfL..."
+            }
+            return "All lines are reporting normally... For now."
+        }
+        return "No planned work matches the selected date and times."
+    }
+
+    private var headlineSymbol: String {
+        if hasNoSavedDisruptionData { return "wifi.slash" }
+        return lineEntries.isEmpty
+            ? "checkmark.circle.fill"
+            : "exclamationmark.triangle.fill"
+    }
+
+    private var headlineColor: Color {
+        if hasNoSavedDisruptionData { return .secondary }
+        if isLoadingTfLDisruptions { return .blue }
+        return lineEntries.isEmpty ? .green : .red
+    }
+}
+
+struct MapDisruptionsScreen: View {
+    @Environment(TubeAppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var lineGroups: MapDisruptionLineGroups {
+        MapDisruptionLineGroups(disruptions: appState.visibleDisruptions)
+    }
+
+    private var lineEntries: [ResolvedDisruption] {
+        lineGroups.all
+    }
+
+    private var isLoadingTfLDisruptions: Bool {
+        appState.isViewingLiveStatus && appState.isLoadingInitialStatus && !appState.isOffline
+    }
+
+    private var hasIncompleteSavedWorks: Bool {
+        appState.isOffline && !appState.isViewingLiveStatus
+            && !appState.hasSavedWorks(for: appState.selectedDisruptionDate)
+    }
+
+    private var hasNoSavedDisruptionData: Bool {
+        guard appState.isOffline else { return false }
+        if appState.isViewingLiveStatus { return appState.statusUpdatedAt == nil }
+        return hasIncompleteSavedWorks && lineEntries.isEmpty
+    }
+
+    var body: some View {
+        ScrollView {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                statusSummary
+
+                if appState.isOffline {
+                    OfflineStatusMessage(
+                        updatedAt: appState.disruptionDataUpdatedAt,
+                        isWorks: !appState.isViewingLiveStatus
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+
+                filters
+
+                MapNetworkStatsCard(onSelect: { _ in dismiss() })
+                    .frame(maxWidth: 560)
+                    .frame(maxWidth: .infinity)
+
+                Divider()
+
+                disruptionContent
+
+                actions
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
+        }
+        .scrollIndicators(.hidden)
+        .background(Color(.systemBackground).ignoresSafeArea())
+        .navigationTitle("Disruptions")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private var statusSummary: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 12) {
+                    statusHeadline
+                    DisruptionDateMenu(compact: true, opensPickerDirectly: true)
+                }
+            } else {
+                HStack(spacing: 12) {
+                    statusHeadline
+                    Spacer(minLength: 8)
+                    DisruptionDateMenu(compact: true, opensPickerDirectly: true)
+                }
+            }
+        }
+        .accessibilityElement(children: .contain)
+    }
+
+    private var statusHeadline: some View {
+        HStack(spacing: 12) {
+            Group {
+                if isLoadingTfLDisruptions {
+                    ProgressView()
+                        .tint(.blue)
+                        .accessibilityHidden(true)
+                } else {
+                    Image(systemName: headlineSymbol)
+                        .font(.appHeadline(.bold))
+                        .foregroundStyle(headlineColor)
+                        .symbolEffect(
+                            .pulse,
+                            isActive: appState.isRefreshingDisruptionData && !appState.isOffline
+                        )
+                }
+            }
+            .frame(width: 40, height: 40)
+            .background(headlineColor.opacity(0.13), in: .circle)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(headline)
+                    .font(.appHeadline(.bold))
+                    .foregroundStyle(.primary)
+                if appState.isViewingLiveStatus {
+                    Text(
+                        appState.isOffline
+                            ? "Saved status and planned engineering work"
+                            : "Live status and planned engineering work"
+                    )
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+                } else {
+                    Label(
+                        "Planned works can change. Always check on the day.",
+                        systemImage: "info.circle"
+                    )
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+
+    private var filters: some View {
+        VStack(spacing: 12) {
             if hasIncompleteSavedWorks {
                 Label(
                     "This date hasn’t been fully saved. Connect to check for more work.",
@@ -336,108 +470,106 @@ struct MapDisruptionOverviewCard: View {
                 )
                 .font(.appCaption())
                 .foregroundStyle(.secondary)
-                .padding(.horizontal, 14)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
+
             if !appState.isViewingLiveStatus {
                 DisruptionTimeFilterBar(fillsAvailableWidth: true)
-                    .padding(.horizontal, 14)
             }
 
             MapDisruptionQuickDateFilter(
                 selection: appState.disruptionDateSelection,
                 onSelect: appState.setDisruptionDateSelection(_:)
             )
-            .padding(.horizontal, 12)
+        }
+    }
 
-            Divider()
-                .padding(.horizontal, 14)
-
-            Group {
-                if isLoadingTfLDisruptions {
-                    VStack(spacing: 10) {
-                        ProgressView()
-                            .tint(.blue)
-                        Text("TfL disruption data is still loading.")
-                            .font(.appCaption())
-                            .foregroundStyle(.secondary)
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 100)
-                } else if lineEntries.isEmpty {
-                    ContentUnavailableView(
-                        appState.isOffline ? "No saved disruptions" : "No disruptions",
-                        systemImage: hasNoSavedDisruptionData ? "wifi.slash" : "checkmark.circle",
-                        description: Text(emptyMessage)
-                    )
-                    .frame(maxHeight: 140)
-                } else {
-                    ScrollView {
-                        LazyVStack(spacing: 8) {
-                            ForEach(lineGroups.majorIssues) { disruption in
-                                expandedRow(disruption)
-                            }
-                            if !lineGroups.majorIssues.isEmpty,
-                               !lineGroups.minorDelays.isEmpty {
-                                minorDelaySeparator
-                            }
-                            ForEach(lineGroups.minorDelays) { disruption in
-                                expandedRow(disruption)
-                            }
-                        }
-                        .padding(.horizontal, 12)
-                    }
-                    .scrollIndicators(.hidden)
-                    .frame(maxHeight: 218)
+    @ViewBuilder
+    private var disruptionContent: some View {
+        if isLoadingTfLDisruptions {
+            VStack(spacing: 10) {
+                ProgressView()
+                    .tint(.blue)
+                Text("TfL disruption data is still loading.")
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity, minHeight: 180)
+        } else if lineEntries.isEmpty {
+            ContentUnavailableView(
+                appState.isOffline ? "No saved disruptions" : "No disruptions",
+                systemImage: hasNoSavedDisruptionData ? "wifi.slash" : "checkmark.circle",
+                description: Text(emptyMessage)
+            )
+            .frame(maxWidth: .infinity, minHeight: 220)
+        } else {
+            LazyVStack(spacing: 8) {
+                ForEach(lineGroups.majorIssues) { disruption in
+                    disruptionRow(disruption)
+                }
+                if !lineGroups.majorIssues.isEmpty,
+                   !lineGroups.minorDelays.isEmpty {
+                    minorDelaySeparator
+                }
+                ForEach(lineGroups.minorDelays) { disruption in
+                    disruptionRow(disruption)
                 }
             }
+        }
+    }
 
-            Divider()
-                .padding(.horizontal, 14)
-
+    private var actions: some View {
+        VStack(spacing: 8) {
             Button {
-                withAnimation(reduceMotion ? nil : .smooth(duration: 0.35)) {
-                    onSelectDisruption()
-                    appState.highlightAllDisruptionsOnMap()
-                    expanded = false
+                withAnimation(.smooth(duration: 0.26)) {
+                    appState.toggleAllDisruptionsOnMap()
                 }
+                dismiss()
             } label: {
-                Label("Highlight disrupted lines", systemImage: "wrench.and.screwdriver")
+                Label(
+                    appState.isViewingDisruptedLines
+                        ? "Show all lines"
+                        : "View disrupted lines",
+                    systemImage: appState.isViewingDisruptedLines
+                        ? "line.3.horizontal"
+                        : "wrench.and.screwdriver"
+                )
                     .font(.appSubheadline(.semibold))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .contentShape(.capsule)
             }
             .buttonStyle(.plain)
-            .glassEffect(.regular.tint(.orange).interactive(), in: .capsule)
-            .padding(.horizontal, 12)
-            .disabled(lineEntries.isEmpty)
-            .opacity(lineEntries.isEmpty ? 0.5 : 1)
-            .accessibilityHint("Collapses this panel and fits all affected sections on the map")
+            .glassEffect(
+                .regular
+                    .tint(appState.isViewingDisruptedLines ? Color.tubeBlue : .orange)
+                    .interactive(),
+                in: .capsule
+            )
+            .disabled(lineEntries.isEmpty && !appState.isViewingDisruptedLines)
+            .opacity(lineEntries.isEmpty && !appState.isViewingDisruptedLines ? 0.5 : 1)
+            .accessibilityHint(
+                appState.isViewingDisruptedLines
+                    ? "Returns to the map and shows every line"
+                    : "Returns to the map and highlights all affected sections"
+            )
 
             Button {
-                expanded = false
-                appState.showsWorks = true
+                dismiss()
+                Task { @MainActor in
+                    await Task.yield()
+                    appState.showsWorks = true
+                }
             } label: {
-                Label("Engineering works", systemImage: "wrench.and.screwdriver")
-                    .font(.appSubheadline(.semibold))
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .contentShape(.rect)
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(Color.tubeBlue)
-            .accessibilityHint("Opens planned works by date and line")
-
-            Button {
-                expanded = false
-            } label: {
-                Label("Show less", systemImage: "chevron.up")
+                Label("Engineering works", systemImage: "calendar.badge.exclamationmark")
                     .font(.appSubheadline(.semibold))
                     .foregroundStyle(Color.tubeBlue)
                     .frame(maxWidth: .infinity, minHeight: 44)
                     .contentShape(.rect)
             }
             .buttonStyle(.plain)
+            .accessibilityHint("Opens planned works by date and line")
         }
-        .padding(.bottom, 4)
     }
 
     private var minorDelaySeparator: some View {
@@ -449,18 +581,15 @@ struct MapDisruptionOverviewCard: View {
                 .fixedSize()
             Divider()
         }
-        .frame(height: 12)
+        .frame(height: 20)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Minor delays")
     }
 
-    private func expandedRow(_ disruption: ResolvedDisruption) -> some View {
+    private func disruptionRow(_ disruption: ResolvedDisruption) -> some View {
         Button {
-            withAnimation(.smooth(duration: 0.35)) {
-                onSelectDisruption()
-                appState.select(disruption: disruption)
-                expanded = false
-            }
+            appState.select(disruption: disruption)
+            dismiss()
         } label: {
             HStack(alignment: .top, spacing: 11) {
                 RoundedRectangle(cornerRadius: 3)
@@ -480,7 +609,7 @@ struct MapDisruptionOverviewCard: View {
                     Text(disruption.reason)
                         .font(.appCaption())
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(3)
                         .multilineTextAlignment(.leading)
                 }
 
@@ -489,21 +618,19 @@ struct MapDisruptionOverviewCard: View {
                     .foregroundStyle(.tertiary)
                     .padding(.top, 3)
             }
-            .padding(10)
-            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+            .padding(12)
+            .frame(maxWidth: .infinity, minHeight: 52, alignment: .leading)
             .background(.primary.opacity(0.055), in: .rect(cornerRadius: 14))
-            .contentShape(.rect)
+            .contentShape(.rect(cornerRadius: 14))
         }
         .buttonStyle(.plain)
-        .accessibilityHint("Highlights the affected line on the map")
+        .accessibilityHint("Returns to the map and highlights the affected line")
     }
 
     private var headline: String {
         let count = lineEntries.count
         if hasNoSavedDisruptionData { return "No saved disruptions" }
-        if isLoadingTfLDisruptions {
-            return "Loading disruptions from TfL"
-        }
+        if isLoadingTfLDisruptions { return "Loading disruptions from TfL" }
         if !appState.isViewingLiveStatus,
            !appState.isOffline,
            appState.isRefreshingDisruptionData,
@@ -511,14 +638,11 @@ struct MapDisruptionOverviewCard: View {
             return "Loading planned disruptions"
         }
         if appState.isViewingLiveStatus {
-            if appState.isOffline {
-                return count == 0
-                    ? "No disruptions in saved update"
-                    : "\(count) saved disruption\(count == 1 ? "" : "s")"
-            }
-            return count == 0
-                ? "No disruptions currently"
-                : "\(count) disruption\(count == 1 ? "" : "s") currently"
+            return MapDisruptionSummaryText.liveHeadline(
+                disruptionCount: count,
+                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count,
+                isOffline: appState.isOffline
+            )
         }
         let date = LondonRailDate.formatted(
             appState.selectedDisruptionDate,
@@ -569,6 +693,7 @@ private struct MapDisruptionQuickDate: Identifiable {
 }
 
 private struct MapDisruptionQuickDateFilter: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let selection: DisruptionDateSelection
     let onSelect: (DisruptionDateSelection) -> Void
 
@@ -582,9 +707,28 @@ private struct MapDisruptionQuickDateFilter: View {
     }
 
     var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                ScrollView(.horizontal) {
+                    buttons
+                }
+                .scrollIndicators(.hidden)
+            } else {
+                buttons
+            }
+        }
+    }
+
+    private var buttons: some View {
         HStack(spacing: 8) {
             ForEach(quickDates) { quickDate in
-                quickDateButton(quickDate)
+                if dynamicTypeSize.isAccessibilitySize {
+                    quickDateButton(quickDate)
+                        .frame(width: 116)
+                } else {
+                    quickDateButton(quickDate)
+                        .frame(maxWidth: .infinity)
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -666,6 +810,7 @@ struct MapNetworkStatsCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var onAction: (MapActionNotice) -> Void = { _ in }
+    var onSelect: (MapNetworkStatFilter) -> Void = { _ in }
 
     var body: some View {
         Group {
@@ -696,14 +841,16 @@ struct MapNetworkStatsCard: View {
     }
 
     private var visibleFilters: [MapNetworkStatFilter] {
-        if appState.isViewingLiveStatus {
-            return [.lines, .goodService, .minorDelays, .majorIssues, .closed]
+        var filters: [MapNetworkStatFilter] = [.lines, .goodService]
+        if appState.mapNetworkStatusSummary.count(for: .closed) > 0 {
+            filters.append(.closed)
         }
-        return [.lines, .goodService, .disrupted]
+        filters.append(.disrupted)
+        return filters
     }
 
     private var accessibilityWidth: CGFloat {
-        CGFloat(visibleFilters.count) * 108
+        CGFloat(visibleFilters.count) * 132
     }
 
     private func stat(_ filter: MapNetworkStatFilter) -> some View {
@@ -721,13 +868,14 @@ struct MapNetworkStatsCard: View {
                     ))
                 }
                 appState.toggleMapNetworkStat(filter)
+                onSelect(filter)
             }
         } label: {
             VStack(spacing: 4) {
                 Image(systemName: filter.symbol)
                     .font(.appCaption2(.bold))
                     .foregroundStyle(filter.color)
-                    .frame(height: 12)
+                    .frame(height: dynamicTypeSize.isAccessibilitySize ? nil : 12)
                 Group {
                     if isUnavailable {
                         Text("—")
@@ -742,14 +890,16 @@ struct MapNetworkStatsCard: View {
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
-                    .frame(height: 28, alignment: .top)
+                    .frame(
+                        minHeight: dynamicTypeSize.isAccessibilitySize ? nil : 28,
+                        alignment: .top
+                    )
             }
             .offset(y: filter == .lines ? 4 : 0)
             .padding(.horizontal, 4)
             .frame(
                 maxWidth: .infinity,
-                minHeight: Self.statHeight,
-                maxHeight: Self.statHeight
+                minHeight: Self.statHeight
             )
             .background {
                 RoundedRectangle(cornerRadius: 13)

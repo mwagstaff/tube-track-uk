@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import OSLog
 import SwiftUI
 
 enum LiveDepartureWaitingCopy {
@@ -41,11 +42,25 @@ enum DisruptionDisplayMode: String, CaseIterable, Sendable {
     func mutesSegment(isAffected: Bool) -> Bool {
         switch self {
         case .normal:
-            isAffected
+            false
         case .issues:
             !isAffected
         }
     }
+}
+
+enum MapResetSource: String, Sendable {
+    case disruptionCard
+    case mapBackground
+    case mapOptions
+    case unspecified
+}
+
+enum MapResetDiagnostics {
+    static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "dev.skynolimit.TubeTrackUK",
+        category: "MapReset"
+    )
 }
 
 enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
@@ -107,7 +122,17 @@ final class TubeAppState {
     var sharedMapViewport: SharedMapViewport?
     var beckMapCameraSnapshot: BeckMapCameraSnapshot?
     var mobileCoverageMode: MobileCoverageMode = .off
-    var disruptionDisplayMode: DisruptionDisplayMode = .normal
+    var disruptionDisplayMode: DisruptionDisplayMode = .normal {
+        didSet {
+            guard disruptionDisplayMode != oldValue else { return }
+            let selectedDisruption = selectedDisruptionID ?? "nil"
+            let selectedFilter = selectedMapNetworkStat.map { String(describing: $0) } ?? "nil"
+            MapResetDiagnostics.logger.notice(
+                "display-mode changed old=\(oldValue.rawValue, privacy: .public) new=\(self.disruptionDisplayMode.rawValue, privacy: .public) generation=\(self.mapResetGeneration) selectedDisruption=\(selectedDisruption, privacy: .public) filter=\(selectedFilter, privacy: .public)"
+            )
+        }
+    }
+    private(set) var mapResetGeneration = 0
     var selectedMapNetworkStat: MapNetworkStatFilter?
     var disruptionDateSelection: DisruptionDateSelection = .today
     var selectedDisruptionTimeWindows = DisruptionTimeWindow.defaultSelected
@@ -681,6 +706,14 @@ final class TubeAppState {
         disruptionOverviewFocusGeneration &+= 1
     }
 
+    func toggleAllDisruptionsOnMap() {
+        if isViewingDisruptedLines {
+            setDisruptionHighlightScope(nil)
+        } else {
+            highlightAllDisruptionsOnMap()
+        }
+    }
+
     func showDisruptionsOnMap(for selection: DisruptionDateSelection) {
         showsWorks = false
         setDisruptionDateSelection(selection)
@@ -851,6 +884,30 @@ final class TubeAppState {
         focusedResolutionConfidence = mapFocus.confidence
         disruptionDisplayMode = .issues
         disruptionSelectionGeneration &+= 1
+    }
+
+    @discardableResult
+    func resetMapState(source: MapResetSource = .unspecified) -> Int {
+        let selectedDisruption = selectedDisruptionID ?? "nil"
+        let selectedFilter = selectedMapNetworkStat.map { String(describing: $0) } ?? "nil"
+        MapResetDiagnostics.logger.notice(
+            "requested source=\(source.rawValue, privacy: .public) generation=\(self.mapResetGeneration) mode=\(self.disruptionDisplayMode.rawValue, privacy: .public) selectedDisruption=\(selectedDisruption, privacy: .public) filter=\(selectedFilter, privacy: .public)"
+        )
+
+        // Change the render mode before clearing the selection. The disruption
+        // card disappears as soon as its selection clears; making normal mode
+        // the first mutation prevents that teardown from presenting an
+        // unselected map with the previous disruption styling.
+        disruptionDisplayMode = .normal
+        mobileCoverageMode = .off
+        selectedMapNetworkStat = nil
+        clearMapSelection()
+        mapResetGeneration &+= 1
+
+        MapResetDiagnostics.logger.notice(
+            "committed source=\(source.rawValue, privacy: .public) generation=\(self.mapResetGeneration) mode=\(self.disruptionDisplayMode.rawValue, privacy: .public) selectedDisruption=nil filter=nil"
+        )
+        return mapResetGeneration
     }
 
     func toggleMapNetworkStat(_ filter: MapNetworkStatFilter) {

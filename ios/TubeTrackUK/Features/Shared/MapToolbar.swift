@@ -3,18 +3,7 @@ import SwiftUI
 
 enum MapDockMetrics {
     static let controlSize: CGFloat = 44
-    static let columnSpacing: CGFloat = 8
     static let horizontalPadding: CGFloat = 12
-
-    static func contentColumnWidth(for availableWidth: CGFloat) -> CGFloat {
-        max(
-            0,
-            availableWidth
-                - (horizontalPadding * 2)
-                - columnSpacing
-                - controlSize
-        )
-    }
 }
 
 struct MapActionNotice: Equatable, Identifiable, Sendable {
@@ -118,21 +107,27 @@ struct MapActionButtons: View {
     @State private var locationProvider = UserLocationProvider()
     @State private var locationErrorPresented = false
     @State private var resetRingExpanded = false
+    let showsLabels: Bool
     let showsReset: Bool
     let onReset: () -> Void
     let onFocusUserLocation: (CLLocation) -> Void
     let onAction: (MapActionNotice) -> Void
+    let onActionCompleted: () -> Void
 
     init(
+        showsLabels: Bool = false,
         showsReset: Bool = false,
         onReset: @escaping () -> Void = {},
         onFocusUserLocation: @escaping (CLLocation) -> Void = { _ in },
-        onAction: @escaping (MapActionNotice) -> Void = { _ in }
+        onAction: @escaping (MapActionNotice) -> Void = { _ in },
+        onActionCompleted: @escaping () -> Void = {}
     ) {
+        self.showsLabels = showsLabels
         self.showsReset = showsReset
         self.onReset = onReset
         self.onFocusUserLocation = onFocusUserLocation
         self.onAction = onAction
+        self.onActionCompleted = onActionCompleted
     }
 
     private var destinationMode: MapPresentationMode {
@@ -164,8 +159,25 @@ struct MapActionButtons: View {
         nextWorksScope?.noticeMessage ?? "Showing all lines"
     }
 
+    private var mobileCoverageActionTitle: String {
+        switch appState.mobileCoverageMode.next {
+        case .off: "Hide mobile coverage"
+        case .allUsable: "Show mobile coverage"
+        case .undergroundOnly: "Show underground coverage"
+        }
+    }
+
+    private var worksActionTitle: String {
+        switch nextWorksScope {
+        case .all: "Highlight all disruptions"
+        case .major: "Show major disruptions"
+        case .minor: "Show minor delays"
+        case nil: "Clear disruption highlights"
+        }
+    }
+
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: showsLabels ? 6 : 8) {
             Button {
                 let destinationMode = appState.mobileCoverageMode.next
                 onAction(MapActionNotice(
@@ -175,31 +187,38 @@ struct MapActionButtons: View {
                 withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                     appState.cycleMobileCoverageMode()
                 }
+                onActionCompleted()
             } label: {
-                ZStack(alignment: .bottomTrailing) {
-                    Image(systemName: "cellularbars")
-                        .font(.appSubheadline(.semibold))
+                mapActionLabel(mobileCoverageActionTitle) {
+                    ZStack(alignment: .bottomTrailing) {
+                        Image(systemName: "cellularbars")
+                            .font(.appSubheadline(.semibold))
 
-                    if appState.mobileCoverageMode == .undergroundOnly {
-                        Image(systemName: "arrow.down")
-                            .font(.system(size: 7, weight: .black))
-                            .foregroundStyle(mobileCoverageSelected ? mobileCoverageTint : .primary)
-                            .frame(width: 13, height: 13)
-                            .background(
-                                mobileCoverageSelected ? Color.white : Color(.systemBackground),
-                                in: .circle
-                            )
-                            .offset(x: 4, y: 4)
+                        if appState.mobileCoverageMode == .undergroundOnly {
+                            Image(systemName: "arrow.down")
+                                .font(.system(size: 7, weight: .black))
+                                .foregroundStyle(
+                                    mobileCoverageSelected ? mobileCoverageTint : .primary
+                                )
+                                .frame(width: 13, height: 13)
+                                .background(
+                                    mobileCoverageSelected
+                                        ? Color.white : Color(.systemBackground),
+                                    in: .circle
+                                )
+                                .offset(x: 4, y: 4)
+                        }
                     }
+                    .foregroundStyle(mobileCoverageSelected ? .white : .primary)
                 }
-                .foregroundStyle(mobileCoverageSelected ? .white : .primary)
             }
-            .mapDockButtonStyle(
+            .mapActionButtonStyle(
+                showsLabel: showsLabels,
                 isSelected: mobileCoverageSelected,
                 tint: mobileCoverageTint
             )
             .disabled(appState.mobileCoverage == nil)
-            .accessibilityLabel("Cycle mobile coverage")
+            .accessibilityLabel(mobileCoverageActionTitle)
             .accessibilityValue(appState.mobileCoverageMode.title)
             .accessibilityHint(appState.mobileCoverageMode.next.noticeMessage)
             .accessibilityAddTraits(mobileCoverageSelected ? .isSelected : [])
@@ -212,22 +231,26 @@ struct MapActionButtons: View {
                 withAnimation(reduceMotion ? nil : .smooth(duration: 0.3)) {
                     appState.setDisruptionHighlightScope(nextWorksScope)
                 }
+                onActionCompleted()
             } label: {
-                Image(systemName: "wrench.and.screwdriver")
-                    .font(.appSubheadline(.semibold))
-                    .foregroundStyle(worksSelected ? .white : .primary)
+                mapActionLabel(worksActionTitle) {
+                    Image(systemName: "wrench.and.screwdriver")
+                        .font(.appSubheadline(.semibold))
+                        .foregroundStyle(worksSelected ? .white : .primary)
+                }
             }
-            .mapDockButtonStyle(
-                isSelected: worksSelected && worksScope != .all,
-                tint: worksTint
+            .mapActionButtonStyle(
+                showsLabel: showsLabels,
+                isSelected: worksSelected && (showsLabels || worksScope != .all),
+                tint: worksScope == .all && showsLabels ? .orange : worksTint
             )
             .background {
-                if worksScope == .all {
+                if worksScope == .all, !showsLabels {
                     Circle()
                         .fill(allDisruptionsFill)
                 }
             }
-            .accessibilityLabel("Cycle disruption highlights")
+            .accessibilityLabel(worksActionTitle)
             .accessibilityValue(worksAccessibilityValue)
             .accessibilityHint(nextWorksNoticeMessage)
             .accessibilityAddTraits(worksSelected ? .isSelected : [])
@@ -243,16 +266,21 @@ struct MapActionButtons: View {
                     locationErrorPresented = true
                 }
             } label: {
-                if locationProvider.isRequesting {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(Color.tubeBlue)
-                } else {
-                    Image(systemName: "location.fill")
-                        .foregroundStyle(Color.tubeBlue)
+                mapActionLabel(
+                    locationProvider.isRequesting
+                        ? "Finding current location" : "Current location"
+                ) {
+                    if locationProvider.isRequesting {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(Color.tubeBlue)
+                    } else {
+                        Image(systemName: "location.fill")
+                            .foregroundStyle(Color.tubeBlue)
+                    }
                 }
             }
-            .mapDockButtonStyle()
+            .mapActionButtonStyle(showsLabel: showsLabels)
             .disabled(appState.graph == nil || locationProvider.isRequesting)
             .accessibilityLabel(
                 locationProvider.isRequesting
@@ -266,10 +294,15 @@ struct MapActionButtons: View {
                     symbol: destinationMode.symbol
                 ))
                 appState.mapPresentationMode = destinationMode
+                onActionCompleted()
             } label: {
-                Image(systemName: appState.mapPresentationMode.switchActionSymbol)
+                mapActionLabel(
+                    destinationMode == .realWorld ? "Geographic map" : "Tube map"
+                ) {
+                    Image(systemName: appState.mapPresentationMode.switchActionSymbol)
+                }
             }
-            .mapDockButtonStyle()
+            .mapActionButtonStyle(showsLabel: showsLabels)
             .accessibilityLabel(appState.mapPresentationMode.switchActionTitle)
             .requiresNetwork(appState.isOffline && destinationMode == .realWorld)
 
@@ -280,17 +313,26 @@ struct MapActionButtons: View {
                     symbol: showsLiveTrains ? "tram.fill" : "tram"
                 ))
                 appState.setLiveTrains(showsLiveTrains)
+                onActionCompleted()
             } label: {
-                if appState.isLoadingLiveTrains && !appState.isOffline {
-                    ProgressView()
-                        .controlSize(.small)
-                        .tint(.blue)
-                } else {
-                    Image(systemName: appState.showLiveTrains ? "tram.fill" : "tram")
-                        .foregroundStyle(appState.showLiveTrains ? .blue : .primary)
+                mapActionLabel(
+                    appState.showLiveTrains ? "Hide live trains" : "Show live trains"
+                ) {
+                    if appState.isLoadingLiveTrains && !appState.isOffline {
+                        ProgressView()
+                            .controlSize(.small)
+                            .tint(.blue)
+                    } else {
+                        Image(systemName: appState.showLiveTrains ? "tram.fill" : "tram")
+                            .foregroundStyle(appState.showLiveTrains ? .white : .primary)
+                    }
                 }
             }
-            .mapDockButtonStyle()
+            .mapActionButtonStyle(
+                showsLabel: showsLabels,
+                isSelected: appState.showLiveTrains,
+                tint: .blue
+            )
             .accessibilityLabel(
                 appState.isLoadingLiveTrains && !appState.isOffline
                     ? "Loading live trains"
@@ -305,9 +347,11 @@ struct MapActionButtons: View {
                 ))
                 stationSearchPresented = true
             } label: {
-                Image(systemName: "magnifyingglass")
+                mapActionLabel("Search stations") {
+                    Image(systemName: "magnifyingglass")
+                }
             }
-            .mapDockButtonStyle()
+            .mapActionButtonStyle(showsLabel: showsLabels)
             .disabled(appState.graph == nil)
             .accessibilityLabel("Station search")
 
@@ -318,17 +362,26 @@ struct MapActionButtons: View {
                         symbol: "scope"
                     ))
                     onReset()
+                    onActionCompleted()
                 } label: {
-                    Image(systemName: "scope")
-                        .foregroundStyle(.white)
+                    mapActionLabel("Reset map") {
+                        Image(systemName: "scope")
+                            .foregroundStyle(.white)
+                    }
                 }
-                .mapDockButtonStyle(isSelected: true, tint: Color.tubeBlue)
+                .mapActionButtonStyle(
+                    showsLabel: showsLabels,
+                    isSelected: true,
+                    tint: Color.tubeBlue
+                )
                 .shadow(color: Color.tubeBlue.opacity(0.28), radius: 8)
                 .overlay {
-                    Circle()
-                        .stroke(Color.tubeBlue.opacity(resetRingOpacity), lineWidth: 2)
-                        .scaleEffect(resetRingScale)
-                        .allowsHitTesting(false)
+                    if !showsLabels {
+                        Circle()
+                            .stroke(Color.tubeBlue.opacity(resetRingOpacity), lineWidth: 2)
+                            .scaleEffect(resetRingScale)
+                            .allowsHitTesting(false)
+                    }
                 }
                 .accessibilityLabel("Reset map view")
                 .accessibilityHint("Returns to the opening zoom and restores closest station")
@@ -340,6 +393,7 @@ struct MapActionButtons: View {
         .onChange(of: locationProvider.location) { _, location in
             guard let location else { return }
             onFocusUserLocation(location)
+            onActionCompleted()
         }
         .onChange(of: locationProvider.authorizationStatus) { _, status in
             if status == .denied || status == .restricted {
@@ -357,9 +411,11 @@ struct MapActionButtons: View {
             Text(locationErrorMessage)
         }
         .sheet(isPresented: $stationSearchPresented, onDismiss: {
-            guard let station = pendingStationSelection else { return }
-            pendingStationSelection = nil
-            appState.select(station: station)
+            if let station = pendingStationSelection {
+                pendingStationSelection = nil
+                appState.select(station: station)
+            }
+            onActionCompleted()
         }) {
             Group {
                 if let graph = appState.graph {
@@ -379,6 +435,28 @@ struct MapActionButtons: View {
             }
             .presentationDetents([.large])
             .presentationDragIndicator(.visible)
+        }
+    }
+
+    @ViewBuilder
+    private func mapActionLabel<Icon: View>(
+        _ title: String,
+        @ViewBuilder icon: () -> Icon
+    ) -> some View {
+        if showsLabels {
+            HStack(spacing: 10) {
+                icon()
+                    .frame(width: 22)
+                Text(title)
+                    .font(.appSubheadline(.semibold))
+                    .multilineTextAlignment(.leading)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 46, alignment: .leading)
+            .contentShape(.rect(cornerRadius: 12))
+        } else {
+            icon()
         }
     }
 
@@ -438,6 +516,117 @@ struct MapActionButtons: View {
         guard !reduceMotion else { return }
         withAnimation(.timingCurve(0.16, 1, 0.3, 1, duration: 0.48).delay(0.06)) {
             resetRingExpanded = true
+        }
+    }
+}
+
+struct MapControlDock: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var showsActions = false
+
+    let showsClosestStation: Bool
+    let closestStationOpacity: Double
+    let showsReset: Bool
+    let onReset: () -> Void
+    let onFocusUserLocation: (CLLocation) -> Void
+    let onAction: (MapActionNotice) -> Void
+
+    var body: some View {
+        Group {
+            if showsActions {
+                actionsPanel
+                    .transition(
+                        reduceMotion
+                            ? .opacity
+                            : .opacity.combined(with: .scale(scale: 0.97, anchor: .bottomTrailing))
+                    )
+            } else {
+                VStack(alignment: .trailing, spacing: 8) {
+                    Button {
+                        setActionsVisible(true)
+                    } label: {
+                        Image(systemName: "ellipsis")
+                            .font(.appHeadline(.bold))
+                            .frame(
+                                width: MapDockMetrics.controlSize,
+                                height: MapDockMetrics.controlSize
+                            )
+                            .glassEffect(.regular.interactive(), in: .circle)
+                            .frame(width: 60, height: 60)
+                            .contentShape(.rect)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Map options")
+                    .accessibilityHint("Shows labelled map controls")
+                    .zIndex(2)
+
+                    if showsClosestStation {
+                        ClosestStationMapSection()
+                            .opacity(closestStationOpacity)
+                            .allowsHitTesting(closestStationOpacity > 0.12)
+                            .accessibilityHidden(closestStationOpacity <= 0.12)
+                            .transition(.opacity)
+                    }
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .animation(
+            reduceMotion ? nil : .timingCurve(0.22, 1, 0.36, 1, duration: 0.26),
+            value: showsActions
+        )
+    }
+
+    private var actionsPanel: some View {
+        VStack(spacing: 8) {
+            HStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Map options")
+                        .font(.appHeadline(.bold))
+                    Text("Choose what to show on the map")
+                        .font(.appCaption())
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 8)
+
+                Button {
+                    setActionsVisible(false)
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.appSubheadline(.bold))
+                        .frame(width: 44, height: 44)
+                        .contentShape(.circle)
+                }
+                .buttonStyle(.plain)
+                .background(.primary.opacity(0.07), in: .circle)
+                .accessibilityLabel("Close map options")
+            }
+
+            MapActionButtons(
+                showsLabels: true,
+                showsReset: showsReset,
+                onReset: onReset,
+                onFocusUserLocation: onFocusUserLocation,
+                onAction: onAction,
+                onActionCompleted: {
+                    setActionsVisible(false)
+                }
+            )
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity)
+        .glassEffect(.regular, in: .rect(cornerRadius: 20))
+        .accessibilityElement(children: .contain)
+    }
+
+    private func setActionsVisible(_ isVisible: Bool) {
+        if reduceMotion {
+            showsActions = isVisible
+        } else {
+            withAnimation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.26)) {
+                showsActions = isVisible
+            }
         }
     }
 }
@@ -538,7 +727,46 @@ struct MobileCoverageLegend: View {
     }
 }
 
+private struct MapActionButtonStyleModifier: ViewModifier {
+    @Environment(\.isEnabled) private var isEnabled
+    let showsLabel: Bool
+    let isSelected: Bool
+    let tint: Color
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if showsLabel {
+            content
+                .buttonStyle(.plain)
+                .foregroundStyle(isSelected ? Color.white : Color.primary)
+                .background {
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(
+                            isSelected
+                                ? tint
+                                : Color.primary.opacity(0.055)
+                        )
+                }
+                .opacity(isEnabled ? 1 : 0.45)
+        } else {
+            content.mapDockButtonStyle(isSelected: isSelected, tint: tint)
+        }
+    }
+}
+
 private extension View {
+    func mapActionButtonStyle(
+        showsLabel: Bool,
+        isSelected: Bool = false,
+        tint: Color = .clear
+    ) -> some View {
+        modifier(MapActionButtonStyleModifier(
+            showsLabel: showsLabel,
+            isSelected: isSelected,
+            tint: tint
+        ))
+    }
+
     func mapDockButtonStyle(
         isSelected: Bool = false,
         tint: Color = .clear
