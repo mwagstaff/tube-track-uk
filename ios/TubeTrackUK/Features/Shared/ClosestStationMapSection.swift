@@ -3,7 +3,7 @@ import SwiftUI
 
 struct ClosestStationMapSection: View {
     @Environment(TubeAppState.self) private var appState
-    @State private var locationProvider = UserLocationProvider()
+    @Environment(UserLocationProvider.self) private var locationProvider
 
     private var closestStation: NearbyStation? {
         guard let graph = appState.graph,

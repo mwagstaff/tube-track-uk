@@ -101,10 +101,10 @@ private enum MapHeaderDestination: Identifiable {
 
 struct MapActionButtons: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(UserLocationProvider.self) private var locationProvider
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var stationSearchPresented = false
     @State private var pendingStationSelection: TubeStation?
-    @State private var locationProvider = UserLocationProvider()
     @State private var locationErrorPresented = false
     @State private var resetRingExpanded = false
     let showsLabels: Bool

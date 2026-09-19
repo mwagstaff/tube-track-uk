@@ -5,9 +5,9 @@ struct NearMeScreen: View {
     private static let stationBatchSize = 3
 
     @Environment(TubeAppState.self) private var appState
+    @Environment(UserLocationProvider.self) private var locationProvider
     @Environment(\.openURL) private var openURL
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var locationProvider = UserLocationProvider()
     @State private var visibleStationCount = Self.stationBatchSize
     @State private var visibleStationIDs: Set<String> = []
 
@@ -22,8 +22,12 @@ struct NearMeScreen: View {
                     permissionUnavailable
                 } else if let errorMessage = locationProvider.errorMessage {
                     locationUnavailable(message: errorMessage)
-                } else {
+                } else if locationProvider.isRequesting || !locationProvider.hasRequestedLocation {
                     ProgressView("Finding nearby stations…")
+                } else {
+                    locationUnavailable(
+                        message: "We couldn’t determine your location. Please try again."
+                    )
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

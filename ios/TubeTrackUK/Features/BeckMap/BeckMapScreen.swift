@@ -84,7 +84,7 @@ struct BeckMapScreen: View {
 
     var body: some View {
         ZStack {
-            Color(.systemGroupedBackground).ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
 
             if let graph = appState.graph,
                let document,
