@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
 
+import { OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
+
 import {
+    lineCellsFrom,
     mergePlannedWorks,
     normalizeUnifiedAPIWorks,
     parsePlannedTrackClosurePages,
@@ -64,6 +67,56 @@ test('fails closed when a PDF no longer contains a credible schedule', () => {
         (error) => error instanceof PlannedWorksSourceError
             && /expected at least 50/.test(error.message)
     );
+});
+
+test('uses merged line-cell bounds instead of inheriting the previous line', () => {
+    const parsed = parsePlannedTrackClosurePages([{
+        number: 9,
+        lineCells: [
+            { bottom: 703.56, top: 744.36 },
+            { bottom: 607.32, top: 702.96 }
+        ],
+        items: [
+            item('Correct at date of publication Friday 18 September 2026', 72, 790),
+            item('Northern', 77, 733.8),
+            item('Monday 26', 173, 733.8),
+            item('October', 173, 720.1),
+            item('Sunday 8', 255, 733.8),
+            item('November', 255, 720.1),
+            item('Trains will not stop at Burnt Oak', 340, 733.8),
+            item('Wednesday', 173, 692.4),
+            item('28 October', 173, 678.8),
+            item('Friday 30', 255, 692.4),
+            item('October', 255, 678.8),
+            item('Cockfosters to Uxbridge', 340, 692.4),
+            item('Piccadilly', 77, 651.7),
+            item('Saturday 31', 173, 651.1),
+            item('October', 173, 637.6),
+            item('Sunday 1', 255, 651.1),
+            item('November', 255, 637.6),
+            item('No service on the entire line', 340, 651.1)
+        ]
+    }], { minimumEvents: 1, minimumHorizonDays: 0 });
+
+    const closure = parsed.works.find((work) => work.description === 'Cockfosters to Uxbridge');
+    assert.equal(closure?.lineId, 'piccadilly');
+    assert.deepEqual(closure?.dateRange, { start: '2026-10-28', end: '2026-10-30' });
+});
+
+test('recognizes both TfL line-column widths and ignores text clipping paths', () => {
+    const operatorList = {
+        fnArray: [OPS.constructPath, OPS.constructPath, OPS.constructPath],
+        argsArray: [
+            [[OPS.rectangle], [72.24, 612, 91.68, 82.08]],
+            [[OPS.rectangle], [72.24, 607.32, 95.04, 95.64]],
+            [[OPS.rectangle], [77.4, 648.6, 84.72, 13.68]]
+        ]
+    };
+
+    assert.deepEqual(lineCellsFrom(operatorList), [
+        { bottom: 612, top: 694.08 },
+        { bottom: 607.32, top: 702.96 }
+    ].sort((left, right) => right.top - left.top));
 });
 
 test('hashes the downloaded PDF before the parser detaches its ArrayBuffer', async () => {

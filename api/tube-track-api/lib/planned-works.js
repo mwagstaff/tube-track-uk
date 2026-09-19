@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
+import { getDocument, OPS } from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export const PLANNED_TRACK_CLOSURES_URL =
     'https://content.tfl.gov.uk/planned-track-closures.pdf';
@@ -94,6 +94,26 @@ function textFor(items, targetColumn, { preserveParagraphs = false } = {}) {
     return normalizeWhitespace(result.replaceAll('\n ', '\n'));
 }
 
+export function lineCellsFrom(operatorList) {
+    const cells = new Map();
+    for (let index = 0; index < operatorList.fnArray.length; index += 1) {
+        if (operatorList.fnArray[index] !== OPS.constructPath) continue;
+        const [pathOperations, coordinates] = operatorList.argsArray[index] ?? [];
+        if (pathOperations?.length !== 1
+            || pathOperations[0] !== OPS.rectangle
+            || coordinates?.length < 4) continue;
+        const [x, y, width, height] = coordinates;
+        // The coloured line-name column is a 92-95pt-wide rectangle beginning
+        // at roughly x=72. Smaller rectangles here are text clipping paths.
+        if (x < 69 || x > 75 || width < 90 || width > 98 || Math.abs(height) < 20) continue;
+        const bottom = Math.min(y, y + height);
+        const top = Math.max(y, y + height);
+        const key = `${bottom.toFixed(2)}:${top.toFixed(2)}`;
+        cells.set(key, { bottom, top });
+    }
+    return [...cells.values()].sort((left, right) => right.top - left.top);
+}
+
 function isoDate(date) {
     return date.toISOString().slice(0, 10);
 }
@@ -173,10 +193,16 @@ export function parsePlannedTrackClosurePages(
         for (const [index, top] of eventTops.entries()) {
             const nextTop = eventTops[index + 1] ?? 80;
             const rowItems = items.filter((item) => item.y <= top + 2 && item.y > nextTop + 2);
-            const label = textFor(rowItems, 'line');
+            const lineCell = page.lineCells?.find((cell) =>
+                top <= cell.top + 2 && top >= cell.bottom - 2
+            );
+            const lineItems = lineCell
+                ? items.filter((item) => item.y <= lineCell.top + 2 && item.y >= lineCell.bottom - 2)
+                : rowItems;
+            const label = textFor(lineItems, 'line');
             if (label) {
                 let parsedLineIDs = lineIDsForLabel(label);
-                if (parsedLineIDs.length === 0) {
+                if (parsedLineIDs.length === 0 && !lineCell) {
                     const expandedLabel = textFor(
                         items.filter((item) => item.y <= top + 75 && item.y > nextTop + 2),
                         'line'
@@ -272,9 +298,13 @@ export async function parsePlannedTrackClosuresPDF(data, options) {
         const pages = [];
         for (let pageNumber = 1; pageNumber <= document.numPages; pageNumber += 1) {
             const page = await document.getPage(pageNumber);
-            const content = await page.getTextContent();
+            const [content, operatorList] = await Promise.all([
+                page.getTextContent(),
+                page.getOperatorList()
+            ]);
             pages.push({
                 number: pageNumber,
+                lineCells: lineCellsFrom(operatorList),
                 items: content.items.map((item) => ({
                     str: item.str,
                     x: item.transform[4],
