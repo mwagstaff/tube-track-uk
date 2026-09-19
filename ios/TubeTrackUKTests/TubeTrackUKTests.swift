@@ -877,6 +877,25 @@ struct TubeTrackUKTests {
         #expect(Set(works.map(\.startDate)) == [firstStart, secondStart])
     }
 
+    @Test func longRangePlannedWorkKeepsInclusiveDatesWithoutInventingTimes() throws {
+        let graph = try TubeGraph.bundled()
+        let json = """
+        [{"id":"district-october","lineId":"district","title":"Planned closure","description":"Edgware Road and Embankment to Ealing Broadway, Kensington (Olympia), Richmond and Wimbledon","dateRange":{"start":"2026-10-24","end":"2026-10-25"},"validFrom":null,"validTo":null,"timingPrecision":"date","provisional":true,"severity":null,"affectedRoutes":[],"affectedStops":[],"sources":[{"kind":"tfl-planned-track-closures-pdf"}]}]
+        """
+        let records = try JSONDecoder.tfl.decode([PlannedWorkV2].self, from: Data(json.utf8))
+
+        let work = try #require(EngineeringWorksBuilder(
+            repository: TubeNetworkRepository(graph: graph)
+        ).works(from: records).first)
+
+        #expect(work.source == .plannedTrackClosuresPDF)
+        #expect(work.isDateOnly)
+        #expect(LondonRailDate.formatted(work.startDate, dateFormat: "yyyy-MM-dd") == "2026-10-24")
+        #expect(LondonRailDate.formatted(work.displayEndDate, dateFormat: "yyyy-MM-dd") == "2026-10-25")
+        #expect(LondonRailDate.formatted(work.endDate, dateFormat: "yyyy-MM-dd") == "2026-10-26")
+        #expect(work.confidence == .inferred)
+    }
+
     @Test func routineOvernightClosureIsNotAnActionableDisruption() {
         let closure = TfLStatusEntry(
             id: 20, statusSeverity: 20, statusSeverityDescription: "Service Closed",

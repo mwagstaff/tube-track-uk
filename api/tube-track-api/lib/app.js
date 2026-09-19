@@ -2,6 +2,7 @@ import compression from 'compression';
 import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
 import { LINE_COLOURS } from './line-colours.js';
+import { plannedWorksV2Response, PlannedWorksSourceError } from './planned-works.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 const LINE_IDS = LINE_COLOURS.map((line) => line.id).join(',');
@@ -50,7 +51,16 @@ function liveMetadata(state) {
     };
 }
 
-export function createApp({ cache, poller, metrics, logger, client, resourceCache, journeyPlanner = new JourneyPlanner({ client }) }) {
+export function createApp({
+    cache,
+    poller,
+    metrics,
+    logger,
+    client,
+    resourceCache,
+    plannedTrackClosuresSource,
+    journeyPlanner = new JourneyPlanner({ client })
+}) {
     const app = express();
     app.disable('x-powered-by');
     app.disable('etag');
@@ -215,6 +225,54 @@ export function createApp({ cache, poller, metrics, logger, client, resourceCach
         }
     });
 
+    // V2 adds TfL's six-month PDF schedule and normalized coverage metadata.
+    // V1 deliberately remains unchanged for already-released app versions.
+    app.get('/api/v2/planned-works', async (req, res, next) => {
+        const { from, to } = req.query;
+        if (!isDate(from) || !isDate(to) || from > to) {
+            res.status(400).json({
+                error: { code: 'INVALID_DATE_RANGE', message: 'from and to must be a valid date range' }
+            });
+            return;
+        }
+        if (!plannedTrackClosuresSource) {
+            res.status(503).json({
+                error: { code: 'PLANNED_WORKS_V2_UNAVAILABLE', message: 'Long-range planned works are unavailable' }
+            });
+            return;
+        }
+        try {
+            const pdfSnapshotPromise = plannedTrackClosuresSource.get();
+            const apiResultPromise = resourceCache.get(`planned-works:${from}:${to}`, {
+                freshForMs: 6 * 60 * 60 * 1_000,
+                load: () => client.fetchJSON(`/Line/${LINE_IDS}/Status/${from}/to/${to}`, {
+                    query: { detail: 'true' },
+                    metricLabel: 'planned-works'
+                })
+            }).catch((error) => {
+                logger?.warn('planned_works_unified_api_unavailable', { error });
+                return {
+                    data: [],
+                    meta: {
+                        updatedAt: new Date().toISOString(),
+                        cached: false,
+                        stale: true,
+                        unavailable: true
+                    }
+                };
+            });
+            const [pdfSnapshot, apiResult] = await Promise.all([
+                pdfSnapshotPromise,
+                apiResultPromise
+            ]);
+            const response = plannedWorksV2Response({ from, to, pdfSnapshot, apiResult });
+            res.set('Cache-Control', 'public, max-age=3600, stale-if-error=86400');
+            res.json(response);
+        } catch (error) {
+            next(error);
+        }
+    });
+
     app.get('/api/v1/arrival-departures/:stopId', async (req, res, next) => {
         const lineID = req.query.lineId;
         if (!isIdentifier(req.params.stopId) || !isIdentifier(lineID)) {
@@ -290,7 +348,8 @@ export function createApp({ cache, poller, metrics, logger, client, resourceCach
             next(error);
             return;
         }
-        const upstreamFailure = error?.name === 'TfLRequestError';
+        const upstreamFailure = error?.name === 'TfLRequestError'
+            || error instanceof PlannedWorksSourceError;
         res.status(upstreamFailure ? 503 : 500).json({
             error: {
                 code: upstreamFailure ? 'UPSTREAM_UNAVAILABLE' : 'INTERNAL_ERROR',

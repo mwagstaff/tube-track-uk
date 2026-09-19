@@ -246,13 +246,17 @@ struct WorksScreen: View {
     }
 
     private var emptyState: some View {
-        ContentUnavailableView {
+        let hasPublishedCoverage = appState.hasSavedWorks(for: selectedDate)
+        return ContentUnavailableView {
             Label(
                 appState.isOffline
                     ? "No saved works for this date"
-                    : appState.worksError == nil ? "No planned works" : "Works unavailable",
+                    : appState.worksError != nil
+                        ? "Works unavailable"
+                        : hasPublishedCoverage ? "No planned works" : "Schedule not published yet",
                 systemImage: appState.isOffline || appState.worksError != nil
-                    ? "wifi.slash" : "checkmark.circle"
+                    ? "wifi.slash"
+                    : hasPublishedCoverage ? "checkmark.circle" : "calendar.badge.clock"
             )
         } description: {
             Text(appState.isOffline ? emptyStateDescription : appState.worksError ?? emptyStateDescription)
@@ -274,6 +278,13 @@ struct WorksScreen: View {
         let date = LondonRailDate.formatted(selectedDate, dateFormat: "EEEE d MMMM")
         if appState.isOffline {
             return "Your saved data has no matching work for \(date). Connect to check for updates."
+        }
+        if !appState.hasSavedWorks(for: selectedDate) {
+            if let through = appState.worksCachedThrough {
+                let horizon = LondonRailDate.formatted(through, dateFormat: "d MMMM yyyy")
+                return "TfL’s published closure schedule currently runs through \(horizon). Check again nearer the date."
+            }
+            return "TfL’s long-range closure schedule is not available. Check again shortly."
         }
         if let selectedLine {
             return "No TfL engineering work is reported for the \(selectedLine.displayName) line on \(date)."
@@ -364,14 +375,14 @@ private struct WorkCard: View {
     }
 
     private var dateRange: String {
-        if LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.endDate) {
+        if LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.displayEndDate) {
             return LondonRailDate.formatted(
                 work.startDate,
-                dateFormat: "EEE d MMM, HH:mm"
+                dateFormat: work.isDateOnly ? "EEE d MMM" : "EEE d MMM, HH:mm"
             )
         }
         let start = LondonRailDate.formatted(work.startDate, dateFormat: "d MMM")
-        let end = LondonRailDate.formatted(work.endDate, dateFormat: "d MMM")
+        let end = LondonRailDate.formatted(work.displayEndDate, dateFormat: "d MMM")
         return "\(start) – \(end)"
     }
 }

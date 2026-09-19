@@ -1,0 +1,109 @@
+openapi: 3.0.3
+info:
+  title: TubeTrack UK planned works
+  version: 2.0.0
+paths:
+  /api/v2/planned-works:
+    get:
+      summary: Returns normalized planned rail closures from TfL's long- and short-range sources
+      parameters:
+        - in: query
+          name: from
+          required: true
+          schema: { type: string, format: date }
+        - in: query
+          name: to
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200':
+          description: Planned works overlapping the requested inclusive date range
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Response'
+        '400':
+          description: Invalid date range
+        '503':
+          description: No validated long-range schedule is available
+components:
+  schemas:
+    Response:
+      type: object
+      required: [data, meta]
+      properties:
+        data:
+          type: object
+          required: [works, coverage]
+          properties:
+            works:
+              type: array
+              items: { $ref: '#/components/schemas/PlannedWork' }
+            coverage:
+              type: object
+              required: [requestedFrom, requestedTo, publishedFrom, publishedThrough, sources]
+              properties:
+                requestedFrom: { type: string, format: date }
+                requestedTo: { type: string, format: date }
+                publishedFrom: { type: string, format: date }
+                publishedThrough: { type: string, format: date }
+                sources:
+                  type: array
+                  items: { $ref: '#/components/schemas/Source' }
+        meta:
+          type: object
+          required: [updatedAt, cached, stale, count, schemaVersion]
+          properties:
+            updatedAt: { type: string, format: date-time }
+            cached: { type: boolean }
+            stale: { type: boolean }
+            count: { type: integer }
+            schemaVersion: { type: integer, enum: [2] }
+    PlannedWork:
+      type: object
+      required:
+        - id
+        - lineId
+        - title
+        - description
+        - dateRange
+        - timingPrecision
+        - provisional
+        - affectedRoutes
+        - affectedStops
+        - sources
+      properties:
+        id: { type: string }
+        lineId: { type: string }
+        title: { type: string }
+        description: { type: string }
+        dateRange:
+          type: object
+          required: [start, end]
+          properties:
+            start: { type: string, format: date }
+            end: { type: string, format: date, description: Inclusive London calendar date }
+        validFrom: { type: string, format: date-time, nullable: true }
+        validTo: { type: string, format: date-time, nullable: true, description: Exclusive instant }
+        timingPrecision: { type: string, enum: [date, exact] }
+        provisional: { type: boolean }
+        severity: { type: integer, nullable: true }
+        affectedRoutes: { type: array, items: { type: object, additionalProperties: true } }
+        affectedStops: { type: array, items: { type: object, additionalProperties: true } }
+        sources:
+          type: array
+          items: { $ref: '#/components/schemas/Source' }
+    Source:
+      type: object
+      required: [kind, url]
+      properties:
+        kind:
+          type: string
+          enum: [tfl-planned-track-closures-pdf, tfl-unified-api]
+        url: { type: string, format: uri }
+        publishedAt: { type: string, format: date }
+        fetchedAt: { type: string, format: date-time }
+        horizonStart: { type: string, format: date }
+        horizonEnd: { type: string, format: date }
+        cached: { type: boolean }
+        stale: { type: boolean }

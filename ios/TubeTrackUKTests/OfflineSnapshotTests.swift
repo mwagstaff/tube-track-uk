@@ -172,8 +172,12 @@ struct OfflineSnapshotTests {
         let directory = temporaryDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let cache = SnapshotCache(directory: directory)
-        let service = makeWorksService(cache: cache, response: Data("[]".utf8))
         let requestedThrough = LondonRailDate.calendar.date(byAdding: .day, value: 120, to: .now)!
+        let publishedThrough = LondonRailDate.calendar.date(byAdding: .day, value: 180, to: .now)!
+        let service = makeWorksService(
+            cache: cache,
+            response: v2WorksResponse(publishedThrough: publishedThrough)
+        )
 
         let latest = try await service.fetch(through: requestedThrough, forceRefresh: true)
         let restarted = makeWorksService(cache: SnapshotCache(directory: directory))
@@ -181,7 +185,8 @@ struct OfflineSnapshotTests {
 
         #expect(!latest.cached)
         #expect(saved.cached)
-        #expect(saved.requestedThrough == LondonRailDate.calendar.startOfDay(for: requestedThrough))
+        #expect(saved.requestedThrough == LondonRailDate.calendar.startOfDay(for: publishedThrough))
+        #expect(saved.coverageKind == .publishedSchedule)
         #expect(abs(saved.fetchedAt.timeIntervalSince(latest.fetchedAt)) < 1)
         #expect(OfflineSnapshotURLProtocol.requestCount == 0)
     }
@@ -240,8 +245,8 @@ struct OfflineSnapshotTests {
         let snapshot = try await service.fetch(days: 120)
 
         #expect(!snapshot.cached)
-        #expect(snapshot.requestedThrough != nil)
-        #expect(OfflineSnapshotURLProtocol.requestCount == 1)
+        #expect(snapshot.requestedThrough == nil)
+        #expect(OfflineSnapshotURLProtocol.requestCount == 2)
     }
 
     @Test func failedWorksRefreshReturnsAvailableWorksWithoutExtendingTheirRange() async throws {
@@ -262,7 +267,7 @@ struct OfflineSnapshotTests {
         #expect(fallback.works == saved.works)
         #expect(fallback.fetchedAt == saved.fetchedAt)
         #expect(fallback.requestedThrough == saved.requestedThrough)
-        #expect(OfflineSnapshotURLProtocol.requestCount == 1)
+        #expect(OfflineSnapshotURLProtocol.requestCount == 2)
     }
 
     @Test func cancelledRefreshDoesNotTurnIntoASuccessfulCacheFallback() async throws {
@@ -328,6 +333,17 @@ struct OfflineSnapshotTests {
     private func statusResponse(severity: Int) -> Data {
         Data("""
         [{"id":"victoria","name":"Victoria","lineStatuses":[{"id":1,"statusSeverity":\(severity),"statusSeverityDescription":"Delays","reason":"Victoria line: delays"}]}]
+        """.utf8)
+    }
+
+    private func v2WorksResponse(publishedThrough: Date) -> Data {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = LondonRailDate.calendar
+        formatter.timeZone = LondonRailDate.timeZone
+        formatter.dateFormat = "yyyy-MM-dd"
+        return Data("""
+        {"data":{"works":[],"coverage":{"publishedThrough":"\(formatter.string(from: publishedThrough))"}},"meta":{"updatedAt":"2026-09-19T08:00:00.000Z","cached":false,"stale":false}}
         """.utf8)
     }
 

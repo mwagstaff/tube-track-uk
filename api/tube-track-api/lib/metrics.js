@@ -129,6 +129,7 @@ function requestRoute(req) {
     if (req.path === '/api/v1/live') return '/api/v1/live';
     if (req.path === '/api/v1/status') return '/api/v1/status';
     if (req.path === '/api/v1/planned-works') return '/api/v1/planned-works';
+    if (req.path === '/api/v2/planned-works') return '/api/v2/planned-works';
     if (req.path === '/api/v1/arrivals') return '/api/v1/arrivals';
     if (req.path.startsWith('/api/v1/arrivals/')) return '/api/v1/arrivals/:stopId';
     if (req.path.startsWith('/api/v1/arrival-departures/')) {

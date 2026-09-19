@@ -4,6 +4,7 @@ import { LiveCache } from './lib/live-cache.js';
 import { LivePoller } from './lib/live-poller.js';
 import { createLogger } from './lib/logger.js';
 import { createMetrics } from './lib/metrics.js';
+import { PlannedTrackClosuresSource } from './lib/planned-works.js';
 import { ResourceCache } from './lib/resource-cache.js';
 import { TfLClient } from './lib/tfl-client.js';
 
@@ -27,6 +28,7 @@ async function main() {
         metrics
     });
     const resourceCache = new ResourceCache();
+    const plannedTrackClosuresSource = new PlannedTrackClosuresSource();
     const poller = new LivePoller({
         modes: LIVE_MODES,
         client,
@@ -36,7 +38,15 @@ async function main() {
         pollIntervalMs: config.pollIntervalMs,
         requestStaggerMs: config.requestStaggerMs
     });
-    const app = createApp({ cache, poller, metrics, logger, client, resourceCache });
+    const app = createApp({
+        cache,
+        poller,
+        metrics,
+        logger,
+        client,
+        resourceCache,
+        plannedTrackClosuresSource
+    });
 
     const server = app.listen(config.port, config.host, () => {
         logger.info('server_started', {

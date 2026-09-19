@@ -42,7 +42,7 @@ struct AboutScreen: View {
 
                 Section {
                     Link(destination: URL(string: "https://tfl.gov.uk/info-for/open-data-users/")!) {
-                        Label("Data provided by Transport for London", systemImage: "tram.fill")
+                        Label("Powered by TfL Open Data", systemImage: "tram.fill")
                     }
                     .requiresNetwork(appState.isOffline)
                     Text("Live status, arrival predictions, station topology and planned works use TfL open data. Train markers are estimates interpolated from predictions; they are not GPS locations.")

@@ -31,21 +31,29 @@ struct WorkDetailView: View {
 
                     GlassPanel {
                         VStack(spacing: 12) {
-                            LabeledContent(
-                                "From",
-                                value: LondonRailDate.formatted(
-                                    work.startDate,
-                                    dateFormat: "d MMM yyyy, HH:mm"
+                            if work.isDateOnly {
+                                LabeledContent("Dates", value: dateOnlyRange)
+                                Text("Advance schedule; exact operating times may be added closer to travel.")
+                                    .font(.appCaption())
+                                    .foregroundStyle(.secondary)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            } else {
+                                LabeledContent(
+                                    "From",
+                                    value: LondonRailDate.formatted(
+                                        work.startDate,
+                                        dateFormat: "d MMM yyyy, HH:mm"
+                                    )
                                 )
-                            )
-                            Divider()
-                            LabeledContent(
-                                "Until",
-                                value: LondonRailDate.formatted(
-                                    work.endDate,
-                                    dateFormat: "d MMM yyyy, HH:mm"
+                                Divider()
+                                LabeledContent(
+                                    "Until",
+                                    value: LondonRailDate.formatted(
+                                        work.endDate,
+                                        dateFormat: "d MMM yyyy, HH:mm"
+                                    )
                                 )
-                            )
+                            }
                             Divider()
                             LabeledContent("Source", value: work.source.title)
                             Divider()
@@ -98,5 +106,13 @@ struct WorkDetailView: View {
                 }
             }
         }
+    }
+
+    private var dateOnlyRange: String {
+        let start = LondonRailDate.formatted(work.startDate, dateFormat: "d MMM yyyy")
+        let end = LondonRailDate.formatted(work.displayEndDate, dateFormat: "d MMM yyyy")
+        return LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.displayEndDate)
+            ? start
+            : "\(start) – \(end)"
     }
 }

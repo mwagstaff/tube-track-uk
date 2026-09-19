@@ -29,7 +29,8 @@ struct EngineeringWorksNormalizer: Sendable {
     private func sourceScore(_ source: EngineeringWorkSource) -> Int {
         switch source {
         case .unifiedAPI: 30
-        case .tubeThisWeekend: 20
+        case .tubeThisWeekend: 25
+        case .plannedTrackClosuresPDF: 20
         case .cached: 0
         }
     }

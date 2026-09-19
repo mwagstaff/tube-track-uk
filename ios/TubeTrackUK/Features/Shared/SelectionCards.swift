@@ -213,8 +213,8 @@ struct PlannedWorkDetailCard: View {
 
     private var validityLabel: String {
         let start = LondonRailDate.formatted(work.startDate, dateFormat: "EEE d MMM")
-        let end = LondonRailDate.formatted(work.endDate, dateFormat: "EEE d MMM")
-        return LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.endDate)
+        let end = LondonRailDate.formatted(work.displayEndDate, dateFormat: "EEE d MMM")
+        return LondonRailDate.calendar.isDate(work.startDate, inSameDayAs: work.displayEndDate)
             ? start
             : "\(start) – \(end)"
     }

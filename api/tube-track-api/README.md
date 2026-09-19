@@ -24,6 +24,7 @@ Optional polling settings:
 - `GET /api/v1/status`
 - `GET /api/v1/line-colours`
 - `GET /api/v1/planned-works?from=YYYY-MM-DD&to=YYYY-MM-DD`
+- `GET /api/v2/planned-works?from=YYYY-MM-DD&to=YYYY-MM-DD`
 - `GET /api/v1/arrival-departures/:stopId?lineId=:lineId`
 - `GET /api/v1/timetables/:lineId/:stopId`
 - `GET /api/v1/stations?query=Waterloo`
@@ -33,6 +34,26 @@ Optional polling settings:
 
 The production Caddy route strips the public `/tube-track` prefix before
 proxying requests to this service.
+
+## Long-range planned works (v2)
+
+`/api/v1/planned-works` is intentionally unchanged for released clients. It
+continues to proxy TfL's dated Unified API response.
+
+`/api/v2/planned-works` adds TfL's six-month planned-track-closures PDF and
+returns normalized events plus the PDF's actual published horizon. PDF-only
+events are date-precision and provisional. When TfL later publishes an
+overlapping Unified API record, the exact API times and structured route data
+take precedence while both source records remain identified.
+
+The PDF is fetched at most every 12 hours using ETag/Last-Modified validators.
+The parser rejects unexpectedly small schedules or a horizon shorter than 120
+days and keeps the last successfully parsed copy on transient failure. See
+[the v2 OpenAPI contract](docs/planned-works-v2.openapi.yaml).
+
+Deploy the API before releasing the app version that requests v2. That app
+falls back to v1 if v2 is unavailable; older installed apps continue to call
+v1 and are unaffected.
 
 ## Development
 

@@ -145,6 +145,63 @@ test('caches status requests and validates planned-work dates', async () => {
     });
 });
 
+test('keeps v1 unchanged while v2 adds normalized long-range coverage', async () => {
+    const publishedWork = {
+        id: 'tfl-planned:district:2026-10-24:test',
+        lineId: 'district',
+        title: 'Planned closure',
+        description: 'Embankment to Wimbledon',
+        dateRange: { start: '2026-10-24', end: '2026-10-25' },
+        validFrom: null,
+        validTo: null,
+        timingPrecision: 'date',
+        provisional: true,
+        severity: null,
+        affectedRoutes: [],
+        affectedStops: [],
+        sources: [{
+            kind: 'tfl-planned-track-closures-pdf',
+            url: 'https://content.tfl.gov.uk/planned-track-closures.pdf',
+            publishedAt: '2026-09-18'
+        }]
+    };
+    const source = {
+        get: async () => ({
+            works: [publishedWork],
+            meta: {
+                kind: 'tfl-planned-track-closures-pdf',
+                url: 'https://content.tfl.gov.uk/planned-track-closures.pdf',
+                publishedAt: '2026-09-18',
+                fetchedAt: '2026-09-19T08:00:00.000Z',
+                horizonStart: '2026-09-14',
+                horizonEnd: '2027-03-29',
+                documentHash: 'abc',
+                cached: false,
+                stale: false
+            }
+        })
+    };
+
+    await withServer(async ({ baseUrl, upstreamRequests }) => {
+        const v1 = await fetch(`${baseUrl}/api/v1/planned-works?from=2026-10-24&to=2026-10-26`);
+        assert.equal(v1.status, 200);
+        assert.deepEqual((await v1.json()).data, []);
+
+        const v2 = await fetch(`${baseUrl}/api/v2/planned-works?from=2026-10-24&to=2026-10-26`);
+        assert.equal(v2.status, 200);
+        assert.equal(v2.headers.get('cache-control'), 'public, max-age=3600, stale-if-error=86400');
+        const body = await v2.json();
+        assert.equal(body.meta.schemaVersion, 2);
+        assert.equal(body.data.works.length, 1);
+        assert.equal(body.data.works[0].lineId, 'district');
+        assert.equal(body.data.coverage.publishedThrough, '2027-03-29');
+        assert.equal(upstreamRequests.length, 1);
+
+        const metrics = await fetch(`${baseUrl}/metrics`);
+        assert.match(await metrics.text(), /route="\/api\/v2\/planned-works",status="200"/);
+    }, { plannedTrackClosuresSource: source });
+});
+
 test('serves normalised live data, health state, conditional responses and metrics', async () => {
     await withServer(async ({ baseUrl, cache }) => {
         const arrival = normaliseArrival(prediction(), 'tube');
