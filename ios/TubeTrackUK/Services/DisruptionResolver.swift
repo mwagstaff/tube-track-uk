@@ -133,6 +133,7 @@ struct DisruptionResolver: Sendable {
     private func normalize(_ value: String) -> String {
         value.lowercased()
             .replacingOccurrences(of: " underground station", with: "")
+            .replacingOccurrences(of: " dlr station", with: "")
             .replacingOccurrences(of: " tram stop", with: "")
             .replacingOccurrences(of: "&", with: "and")
             .replacingOccurrences(of: ".", with: "")

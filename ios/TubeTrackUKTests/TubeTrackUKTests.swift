@@ -188,6 +188,25 @@ struct TubeTrackUKTests {
         #expect(result.affectedStationIDs.contains(graph.stations.first { $0.name == "Edgware" }?.id ?? ""))
     }
 
+    @Test func disruptionResolverFindsTowerGatewayToShadwellDLRSection() throws {
+        let graph = try TubeGraph.bundled()
+        let repository = TubeNetworkRepository(graph: graph)
+        let resolver = DisruptionResolver(repository: repository)
+        let result = resolver.resolve(
+            status(reason: "Tower Gateway to Shadwell"),
+            lineID: .dlr
+        )
+        let expectedSegment = try #require(repository.segment(
+            between: "940GZZDLTWG",
+            and: "940GZZDLSHA",
+            on: .dlr
+        ))
+
+        #expect(result.confidence == .inferred)
+        #expect(result.affectedStationIDs == Set(["940GZZDLTWG", "940GZZDLSHA"]))
+        #expect(result.affectedSegmentIDs == Set([expectedSegment.id]))
+    }
+
     @Test func ambiguousDisruptionFallsBackToWholeLine() throws {
         let graph = try TubeGraph.bundled()
         let resolver = DisruptionResolver(repository: TubeNetworkRepository(graph: graph))
@@ -961,6 +980,27 @@ struct TubeTrackUKTests {
         #expect(LondonRailDate.formatted(work.displayEndDate, dateFormat: "yyyy-MM-dd") == "2026-10-25")
         #expect(LondonRailDate.formatted(work.endDate, dateFormat: "yyyy-MM-dd") == "2026-10-26")
         #expect(work.confidence == .inferred)
+    }
+
+    @Test func longRangeDLRClosureHighlightsOnlyTheNamedSection() throws {
+        let graph = try TubeGraph.bundled()
+        let repository = TubeNetworkRepository(graph: graph)
+        let json = """
+        [{"id":"dlr-october","lineId":"dlr","title":"Planned closure","description":"Tower Gateway to Shadwell","dateRange":{"start":"2026-10-25","end":"2026-10-25"},"validFrom":null,"validTo":null,"timingPrecision":"date","provisional":true,"severity":null,"affectedRoutes":[],"affectedStops":[],"sources":[{"kind":"tfl-planned-track-closures-pdf"}]}]
+        """
+        let records = try JSONDecoder.tfl.decode([PlannedWorkV2].self, from: Data(json.utf8))
+        let expectedSegment = try #require(repository.segment(
+            between: "940GZZDLTWG",
+            and: "940GZZDLSHA",
+            on: .dlr
+        ))
+
+        let work = try #require(EngineeringWorksBuilder(repository: repository)
+            .works(from: records).first)
+
+        #expect(work.confidence == .inferred)
+        #expect(work.affectedSegmentIDs == Set([expectedSegment.id]))
+        #expect(work.affectedStationIDs == Set(["940GZZDLTWG", "940GZZDLSHA"]))
     }
 
     @Test func routineOvernightClosureIsNotAnActionableDisruption() {
