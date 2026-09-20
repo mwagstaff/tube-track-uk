@@ -9,6 +9,7 @@ import {
     mergePlannedWorks,
     normalizeUnifiedAPIWorks,
     parsePlannedTrackClosurePages,
+    plannedWorksV2Response,
     PlannedTrackClosuresSource,
     PlannedWorksSourceError
 } from '../lib/planned-works.js';
@@ -182,4 +183,47 @@ test('exact Unified API records supersede overlapping provisional PDF records', 
     ]);
     assert.equal(merged.find((work) => work.id === 'unrelated-same-weekend')?.description,
         'Barking to Upminster');
+});
+
+test('v2 enriches the recurring Tower Gateway to Shadwell closure for released clients', () => {
+    const work = {
+        id: 'tfl-planned:dlr:2026-10-25:test',
+        lineId: 'dlr',
+        title: 'Planned closure',
+        description: 'Tower Gateway to Shadwell',
+        dateRange: { start: '2026-10-25', end: '2026-10-25' },
+        validFrom: null,
+        validTo: null,
+        timingPrecision: 'date',
+        provisional: true,
+        severity: null,
+        affectedRoutes: [],
+        affectedStops: [],
+        sources: [{ kind: 'tfl-planned-track-closures-pdf', url: 'https://content.tfl.gov.uk/planned-track-closures.pdf' }]
+    };
+    const response = plannedWorksV2Response({
+        from: '2026-10-25',
+        to: '2026-10-25',
+        pdfSnapshot: {
+            works: [work],
+            meta: {
+                fetchedAt: '2026-09-20T12:00:00.000Z',
+                horizonStart: '2026-09-20',
+                horizonEnd: '2027-03-29',
+                cached: false,
+                stale: false
+            }
+        },
+        apiResult: { data: [], meta: {} }
+    });
+
+    const enriched = response.data.works[0];
+    assert.equal(enriched.affectedRoutes[0].isEntireRouteSection, false);
+    assert.deepEqual(
+        enriched.affectedRoutes[0].routeSectionNaptanEntrySequence.map((entry) => entry.stopPoint.naptanId),
+        ['940GZZDLTWG', '940GZZDLSHA']
+    );
+    assert.deepEqual(enriched.affectedStops.map((stop) => stop.commonName), [
+        'Tower Gateway DLR Station', 'Shadwell DLR Station'
+    ]);
 });

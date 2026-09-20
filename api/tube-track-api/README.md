@@ -46,6 +46,10 @@ events are date-precision and provisional. When TfL later publishes an
 overlapping Unified API record, the exact API times and structured route data
 take precedence while both source records remain identified.
 
+Known PDF-only sections may also be enriched with an ordered NaPTAN route
+sequence. This is additive v2 data that lets already-released clients highlight
+the affected section instead of falling back to the whole line.
+
 The PDF is fetched at most every 12 hours using ETag/Last-Modified validators.
 The parser rejects unexpectedly small schedules or a horizon shorter than 120
 days and keeps the last successfully parsed copy on transient failure. See

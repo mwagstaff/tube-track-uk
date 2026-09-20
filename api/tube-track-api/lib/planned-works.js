@@ -34,6 +34,14 @@ const LINE_IDS = new Map([
     ['weaver', 'weaver'],
     ['windrush', 'windrush']
 ]);
+const PLANNED_SECTION_OVERRIDES = [{
+    lineId: 'dlr',
+    description: 'tower gateway to shadwell',
+    stops: [
+        { id: '940GZZDLTWG', name: 'Tower Gateway DLR Station' },
+        { id: '940GZZDLSHA', name: 'Shadwell DLR Station' }
+    ]
+}];
 
 export class PlannedWorksSourceError extends Error {
     constructor(message, { cause } = {}) {
@@ -414,6 +422,38 @@ function compareWorks(left, right) {
         || left.description.localeCompare(right.description);
 }
 
+function enrichPlannedWorkSections(works) {
+    return works.map((work) => {
+        if (work.affectedRoutes?.length) return work;
+        const override = PLANNED_SECTION_OVERRIDES.find((candidate) =>
+            candidate.lineId === work.lineId
+            && candidate.description === normalizeWhitespace(work.description).toLowerCase()
+        );
+        if (!override) return work;
+
+        const stops = override.stops.map((stop) => ({
+            naptanId: stop.id,
+            id: stop.id,
+            commonName: stop.name
+        }));
+        return {
+            ...work,
+            affectedRoutes: [{
+                id: `planned-section:${work.lineId}:${override.stops.map((stop) => stop.id).join(':')}`,
+                name: work.description,
+                originationName: override.stops[0].name,
+                destinationName: override.stops.at(-1).name,
+                isEntireRouteSection: false,
+                routeSectionNaptanEntrySequence: stops.map((stopPoint, ordinal) => ({
+                    ordinal,
+                    stopPoint
+                }))
+            }],
+            affectedStops: stops
+        };
+    });
+}
+
 export function mergePlannedWorks(pdfWorks, apiWorks) {
     const matchedPDFIDs = new Set();
     const enrichedAPIWorks = apiWorks.map((apiWork) => {
@@ -537,7 +577,7 @@ export class PlannedTrackClosuresSource {
 
 export function plannedWorksV2Response({ from, to, pdfSnapshot, apiResult }) {
     const apiWorks = normalizeUnifiedAPIWorks(apiResult.data);
-    const works = mergePlannedWorks(pdfSnapshot.works, apiWorks)
+    const works = mergePlannedWorks(enrichPlannedWorkSections(pdfSnapshot.works), apiWorks)
         .filter((work) => work.dateRange.start <= to && work.dateRange.end >= from);
     const updatedAt = [pdfSnapshot.meta.fetchedAt, apiResult.meta?.updatedAt]
         .filter(Boolean)
