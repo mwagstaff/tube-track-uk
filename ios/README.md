@@ -80,6 +80,42 @@ with `-DebugJourneyFrom <station ID>` and `-DebugJourneyTo <station ID>`.
 `-DebugJourneyDestination details` or `map` opens that screen after the search.
 These options are Debug-only. No TfL credential belongs in the app.
 
+## Home and Lock Screen widgets
+
+The `TubeTrackWidgets` extension ships two configurable widgets:
+
+- **Line Status** — the lines you choose (Edit Widget → Lines), disrupted
+  lines first. Small, medium and large Home Screen sizes plus the three Lock
+  Screen families. Refreshes every 15 minutes and falls back to the app's
+  last `status.json` snapshot from the App Group when offline.
+- **Station Departures** — next trains in each direction from a chosen station,
+  optionally filtered to one of its lines. One fetch produces ten one-minute
+  timeline entries so the countdowns tick without extra reloads; the widget
+  reloads roughly every 10 minutes and keeps a 15-minute cache per station.
+
+Both widgets have a refresh button (medium and large), open the app in context
+via `tubetrack://` links (`status`, `line/<id>`, `station/<naptan>?line=<id>`),
+and drop line colours for short codes in tinted and Lock Screen rendering so
+status is never colour-only.
+
+Shared code lives in the local `TubeTrackCore` package (API client, TfL
+models, departure grouping, the slim `StationIndex.json`). Regenerate the
+station index whenever `TubeGraph.json` changes:
+
+```sh
+python3 Tools/StationIndexBuilder/build_station_index.py
+```
+
+`StationIndexTests` fails if the index and the graph drift apart. The App
+Intents entities and configuration intents in `TubeTrackIntents/` are compiled
+into both the app and the extension because the configuration UI resolves
+them in the app process.
+
+Simulator note: on the iOS 26.5 simulator runtime, `linkd` cannot identify
+ad-hoc-signed processes ("Unable to get teamId"), so widget configuration
+entities never resolve and every widget renders its defaults. Use the iOS 26.3
+or 26.4 runtime, or a device, to test configuration.
+
 ## Offline use
 
 The network map, station search, mobile coverage overlay and Track-Man use

@@ -1,10 +1,16 @@
 import Foundation
 import OSLog
 
-struct TubeTrackAPIConfiguration: Sendable {
-    let baseURL: URL
+public struct TubeTrackAPIConfiguration: Sendable {
+    public let baseURL: URL
 
-    static var app: TubeTrackAPIConfiguration {
+    public init(
+        baseURL: URL
+    ) {
+        self.baseURL = baseURL
+    }
+
+    public static var app: TubeTrackAPIConfiguration {
         #if DEBUG
         let arguments = ProcessInfo.processInfo.arguments
         if let flag = arguments.firstIndex(of: "-DebugAPIBaseURL"),
@@ -21,7 +27,7 @@ struct TubeTrackAPIConfiguration: Sendable {
     }
 }
 
-enum TubeTrackAPIClientError: LocalizedError, Sendable {
+public enum TubeTrackAPIClientError: LocalizedError, Sendable {
     case invalidURL
     case invalidResponse
     case httpStatus(Int)
@@ -29,7 +35,7 @@ enum TubeTrackAPIClientError: LocalizedError, Sendable {
     case decoding(String)
     case serviceError(code: String, message: String)
 
-    var errorDescription: String? {
+    public var errorDescription: String? {
         switch self {
         case .invalidURL: "The Tube Track request could not be created."
         case .invalidResponse: "The Tube Track API returned an invalid response."
@@ -41,13 +47,20 @@ enum TubeTrackAPIClientError: LocalizedError, Sendable {
     }
 }
 
-struct TubeTrackAPIResponse<Value: Sendable>: Sendable {
-    let data: Value
+public struct TubeTrackAPIResponse<Value: Sendable>: Sendable {
+    public let data: Value
     /// When the server last fetched the underlying data, not when this phone
     /// received a potentially cached HTTP response.
-    let updatedAt: Date
-    let cached: Bool
-    let stale: Bool
+    public let updatedAt: Date
+    public let cached: Bool
+    public let stale: Bool
+
+    public init(data: Value, updatedAt: Date, cached: Bool, stale: Bool) {
+        self.data = data
+        self.updatedAt = updatedAt
+        self.cached = cached
+        self.stale = stale
+    }
 }
 
 private struct TubeTrackAPIMetadata: Decodable, Sendable {
@@ -71,7 +84,7 @@ private struct TubeTrackAPIEnvelope<Value: Decodable & Sendable>: Decodable, Sen
     }
 }
 
-actor TubeTrackAPIClient {
+public actor TubeTrackAPIClient {
     private static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "TubeTrackUK",
         category: "TubeTrackAPIClient"
@@ -80,7 +93,7 @@ actor TubeTrackAPIClient {
     private let baseURL: URL
     private let session: URLSession
 
-    init(
+    public init(
         configuration: TubeTrackAPIConfiguration = .app,
         session: URLSession? = nil
     ) {
@@ -88,7 +101,7 @@ actor TubeTrackAPIClient {
         self.session = session ?? URLSession(configuration: Self.defaultSessionConfiguration())
     }
 
-    nonisolated static func defaultSessionConfiguration() -> URLSessionConfiguration {
+    public nonisolated static func defaultSessionConfiguration() -> URLSessionConfiguration {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.urlCache = URLCache(
             memoryCapacity: 16 * 1_024 * 1_024,
@@ -98,7 +111,7 @@ actor TubeTrackAPIClient {
         return configuration
     }
 
-    func get<Value: Decodable & Sendable>(
+    public func get<Value: Decodable & Sendable>(
         _ path: String,
         queryItems: [URLQueryItem] = [],
         forceRefresh: Bool = false,
@@ -112,7 +125,7 @@ actor TubeTrackAPIClient {
         ).data
     }
 
-    func getSnapshot<Value: Decodable & Sendable>(
+    public func getSnapshot<Value: Decodable & Sendable>(
         _ path: String,
         queryItems: [URLQueryItem] = [],
         forceRefresh: Bool = false,

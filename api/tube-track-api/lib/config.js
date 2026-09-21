@@ -13,7 +13,8 @@ const DEFAULTS = Object.freeze({
     requestStaggerMs: 1_000,
     requestTimeoutMs: 10_000,
     maxConcurrentRequests: 8,
-    staleAfterMs: 90_000
+    staleAfterMs: 90_000,
+    refreshTimeoutMs: 120_000
 });
 
 function positiveInteger(value, fallback, name, { maximum = Number.MAX_SAFE_INTEGER } = {}) {
@@ -62,11 +63,20 @@ export function loadConfig(env = process.env) {
         'TUBETRACK_UK_LIVE_STALE_AFTER_MS'
     );
 
+    const refreshTimeoutMs = positiveInteger(
+        env.TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS,
+        DEFAULTS.refreshTimeoutMs,
+        'TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS'
+    );
+
     if (requestStaggerMs * (LIVE_MODES.length - 1) >= pollIntervalMs) {
         throw new Error('TfL request staggering must fit inside the live polling interval');
     }
     if (staleAfterMs < pollIntervalMs) {
         throw new Error('Live cache stale threshold must not be shorter than the polling interval');
+    }
+    if (refreshTimeoutMs <= requestTimeoutMs) {
+        throw new Error('Live refresh timeout must be longer than a single TfL request timeout');
     }
 
     return Object.freeze({
@@ -77,6 +87,7 @@ export function loadConfig(env = process.env) {
         requestStaggerMs,
         requestTimeoutMs,
         maxConcurrentRequests,
-        staleAfterMs
+        staleAfterMs,
+        refreshTimeoutMs
     });
 }

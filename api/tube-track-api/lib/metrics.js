@@ -330,6 +330,27 @@ export function createMetrics({
         },
         registers: [register]
     });
+    const cacheStale = new Gauge({
+        name: 'tube_track_live_cache_stale',
+        help: '1 when the live cache is older than its stale threshold (or has never been populated), otherwise 0',
+        collect() {
+            const state = cache?.read();
+            this.set(!state || state.stale ? 1 : 0);
+        },
+        registers: [register]
+    });
+    // Cross-app convention picked up by the generic Alertmanager rules
+    // (server-tooling/monitoring/install-alerting.zsh): 1 healthy, 0 failing.
+    const appCheckOk = new Gauge({
+        name: 'app_check_ok',
+        help: 'Application health checks: 1 when the named check passes, 0 when it fails',
+        labelNames: ['check'],
+        collect() {
+            const state = cache?.read();
+            this.set({ check: 'live_cache_fresh' }, state && !state.stale ? 1 : 0);
+        },
+        registers: [register]
+    });
 
     return Object.freeze({
         middleware() {
@@ -391,6 +412,8 @@ export function createMetrics({
         },
         render: () => register.metrics(),
         register,
-        cacheAge
+        cacheAge,
+        cacheStale,
+        appCheckOk
     });
 }

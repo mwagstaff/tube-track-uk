@@ -106,7 +106,7 @@ export function createApp({
         }
 
         res.json({
-            status: 'ok',
+            status: state.stale ? 'degraded' : 'ok',
             ready: true,
             liveCache: liveMetadata(state),
             polling

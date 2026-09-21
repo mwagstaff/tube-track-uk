@@ -10,23 +10,6 @@ extension Color {
     })
 }
 
-struct TubeLineDot: View {
-    let lineID: TubeLineID
-    var size: CGFloat = 10
-
-    var body: some View {
-        Circle()
-            .fill(Color.tubeLine(lineID))
-            .frame(width: size, height: size)
-            .overlay {
-                if lineID == .northern || lineID == .jubilee {
-                    Circle().stroke(.white.opacity(0.75), lineWidth: 1)
-                }
-            }
-            .accessibilityHidden(true)
-    }
-}
-
 struct LineBadge: View {
     let lineID: TubeLineID
     var showsName = true
@@ -117,26 +100,3 @@ enum LiveStatusStaleness {
     }
 }
 
-struct StatusSymbol: View {
-    let severity: Int
-    var size: CGFloat = 24
-
-    private var configuration: (String, Color) {
-        switch severity {
-        case 10: ("checkmark", .green)
-        case 9: ("exclamationmark", .yellow)
-        case 6, 1...5: ("exclamationmark.triangle.fill", .red)
-        case 20: ("moon.zzz.fill", .indigo)
-        default: ("info", .gray)
-        }
-    }
-
-    var body: some View {
-        Image(systemName: configuration.0)
-            .font(.system(size: size * 0.46, weight: .bold))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(configuration.1, in: .circle)
-            .accessibilityHidden(true)
-    }
-}

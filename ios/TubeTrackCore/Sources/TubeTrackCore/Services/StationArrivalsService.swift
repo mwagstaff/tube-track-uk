@@ -1,12 +1,31 @@
 import Foundation
 
-struct StationArrivalsSnapshot: Sendable {
-    let arrivals: [TfLArrivalPrediction]
-    let fetchedAt: Date
-    let cached: Bool
+public struct StationArrivalsSnapshot: Sendable {
+    public let arrivals: [TfLArrivalPrediction]
+    public let fetchedAt: Date
+    public let cached: Bool
+    /// When the Tube Track server last refreshed these predictions from TfL.
+    /// Older than `fetchedAt` whenever the server is serving from its cache.
+    public let serverUpdatedAt: Date?
+    /// The server flagged its own data as stale (its TfL poller has fallen behind).
+    public let isStale: Bool
+
+    public init(
+        arrivals: [TfLArrivalPrediction],
+        fetchedAt: Date,
+        cached: Bool,
+        serverUpdatedAt: Date? = nil,
+        isStale: Bool = false
+    ) {
+        self.arrivals = arrivals
+        self.fetchedAt = fetchedAt
+        self.cached = cached
+        self.serverUpdatedAt = serverUpdatedAt
+        self.isStale = isStale
+    }
 }
 
-actor StationArrivalsService {
+public actor StationArrivalsService {
     private static let arrivalsFreshLifetime: TimeInterval = 30
     private static let arrivalsStaleLifetime: TimeInterval = 5 * 60
     private static let destinationCacheLifetime: TimeInterval = 24 * 60 * 60
@@ -25,11 +44,11 @@ actor StationArrivalsService {
     private var destinationsByLineAndStation: [DepartureDestinationKey: CachedDepartureDestination] = [:]
     private var arrivalsByStationSet: [String: CachedStationArrivals] = [:]
 
-    init(client: TubeTrackAPIClient) {
+    public init(client: TubeTrackAPIClient) {
         self.client = client
     }
 
-    func fetch(
+    public func fetch(
         stationIDs: [String],
         forceRefresh: Bool = false
     ) async throws -> [TfLArrivalPrediction] {
@@ -39,7 +58,7 @@ actor StationArrivalsService {
         ).arrivals
     }
 
-    func fetchSnapshot(
+    public func fetchSnapshot(
         stationIDs: [String],
         forceRefresh: Bool = false
     ) async throws -> StationArrivalsSnapshot {
@@ -52,20 +71,26 @@ actor StationArrivalsService {
             return StationArrivalsSnapshot(
                 arrivals: aged(cached, now: now),
                 fetchedAt: cached.fetchedAt,
-                cached: true
+                cached: true,
+                serverUpdatedAt: cached.serverUpdatedAt,
+                isStale: cached.isStale
             )
         }
 
         var predictions: [TfLArrivalPrediction] = []
+        var serverUpdatedAt: Date?
+        var isStale = false
         do {
             for stationID in sortedStationIDs {
-                let arrivals: [TfLArrivalPrediction] = try await client.get(
+                let response: TubeTrackAPIResponse<[TfLArrivalPrediction]> = try await client.getSnapshot(
                     "/api/v1/arrivals/\(stationID)",
                     forceRefresh: forceRefresh
                 )
+                serverUpdatedAt = min(serverUpdatedAt ?? response.updatedAt, response.updatedAt)
+                isStale = isStale || response.stale
                 predictions.append(
                     contentsOf: try await correctingSelfReferentialDestinations(
-                        in: arrivals,
+                        in: response.data,
                         requestedStationID: stationID,
                         forceRefresh: forceRefresh
                     )
@@ -82,13 +107,17 @@ actor StationArrivalsService {
                 .sorted(by: arrivesSooner)
             arrivalsByStationSet[cacheKey] = CachedStationArrivals(
                 arrivals: result,
-                fetchedAt: now
+                fetchedAt: now,
+                serverUpdatedAt: serverUpdatedAt,
+                isStale: isStale
             )
             pruneArrivalsCache(now: now)
             return StationArrivalsSnapshot(
                 arrivals: result,
                 fetchedAt: now,
-                cached: false
+                cached: false,
+                serverUpdatedAt: serverUpdatedAt,
+                isStale: isStale
             )
         } catch {
             try Task.checkCancellation()
@@ -97,7 +126,9 @@ actor StationArrivalsService {
                 return StationArrivalsSnapshot(
                     arrivals: aged(cached, now: now),
                     fetchedAt: cached.fetchedAt,
-                    cached: true
+                    cached: true,
+                    serverUpdatedAt: cached.serverUpdatedAt,
+                    isStale: cached.isStale
                 )
             }
             throw error
@@ -463,6 +494,8 @@ private struct CachedDepartureDestination: Sendable {
 private struct CachedStationArrivals: Sendable {
     let arrivals: [TfLArrivalPrediction]
     let fetchedAt: Date
+    var serverUpdatedAt: Date? = nil
+    var isStale = false
 }
 
 private struct DepartureDestination: Sendable {

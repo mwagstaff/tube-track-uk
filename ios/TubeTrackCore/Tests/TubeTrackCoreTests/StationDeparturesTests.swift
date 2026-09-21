@@ -1,6 +1,6 @@
 import Foundation
 import Testing
-@testable import TubeTrackUK
+@testable import TubeTrackCore
 
 struct StationDeparturesTests {
     @Test func selectedLineGroupsProvideThreeRowPreviewsAndKeepExpansionData() throws {

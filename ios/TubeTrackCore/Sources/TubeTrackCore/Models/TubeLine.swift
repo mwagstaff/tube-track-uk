@@ -1,6 +1,6 @@
 import SwiftUI
 
-enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
+public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case bakerloo
     case central
     case circle
@@ -22,9 +22,9 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case weaver
     case windrush
 
-    var id: String { rawValue }
+    public var id: String { rawValue }
 
-    var displayName: String {
+    public var displayName: String {
         switch self {
         case .bakerloo: "Bakerloo"
         case .central: "Central"
@@ -49,9 +49,36 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
+    /// Short labels for constrained layouts (small widgets, accented
+    /// rendering) where line colours may be unavailable.
+    public var shortCode: String {
+        switch self {
+        case .bakerloo: "Bak"
+        case .central: "Cen"
+        case .circle: "Cir"
+        case .district: "Dis"
+        case .hammersmithCity: "H&C"
+        case .jubilee: "Jub"
+        case .metropolitan: "Met"
+        case .northern: "Nor"
+        case .piccadilly: "Pic"
+        case .victoria: "Vic"
+        case .waterlooCity: "W&C"
+        case .dlr: "DLR"
+        case .elizabeth: "Eliz"
+        case .tram: "Tram"
+        case .liberty: "Lib"
+        case .lioness: "Lio"
+        case .mildmay: "Mil"
+        case .suffragette: "Suf"
+        case .weaver: "Wea"
+        case .windrush: "Win"
+        }
+    }
 
-    static var liveTrainFilterCases: [Self] {
+    public static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
+
+    public static var liveTrainFilterCases: [Self] {
         allCases
             .filter(\.supportsEstimatedTrains)
             .sorted {
@@ -59,7 +86,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
             }
     }
 
-    var isUnderground: Bool {
+    public var isUnderground: Bool {
         switch self {
         case .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
              .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity:
@@ -70,7 +97,7 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    var modeName: String {
+    public var modeName: String {
         switch self {
         case .dlr: "dlr"
         case .elizabeth: "elizabeth-line"
@@ -80,13 +107,13 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    var usesParallelSchematicStroke: Bool { !isUnderground }
+    public var usesParallelSchematicStroke: Bool { !isUnderground }
 
-    var supportsEstimatedTrains: Bool {
+    public var supportsEstimatedTrains: Bool {
         true
     }
 
-    var liveTrainMarkerAssetName: String {
+    public var liveTrainMarkerAssetName: String {
         switch self {
         case .dlr:
             "TrainMarkerDLR"
@@ -102,9 +129,9 @@ enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
 }
 
 extension Color {
-    static let tubeBlue = Color(red: 0.04, green: 0.17, blue: 0.43)
+    public static let tubeBlue = Color(red: 0.04, green: 0.17, blue: 0.43)
 
-    static func tubeLine(_ line: TubeLineID) -> Color {
+    public static func tubeLine(_ line: TubeLineID) -> Color {
         switch line {
         case .bakerloo: Color(red: 0.55, green: 0.27, blue: 0.07)
         case .central: Color(red: 0.88, green: 0.12, blue: 0.14)
@@ -130,54 +157,3 @@ extension Color {
     }
 }
 
-enum LiveTrainMarkerRenderer {
-    static func draw(
-        presentation: LiveTrainServicePresentation,
-        lineID: TubeLineID,
-        context: inout GraphicsContext,
-        in rect: CGRect
-    ) {
-        guard presentation == .lineClosed else {
-            let markerImage = context.resolve(Image(lineID.liveTrainMarkerAssetName))
-            context.draw(markerImage, in: rect)
-            return
-        }
-
-        let badge = Path(ellipseIn: rect)
-        context.fill(badge, with: .color(.white))
-        context.stroke(badge, with: .color(.tubeBlue.opacity(0.72)), lineWidth: 1.25)
-
-        let ghostRect = rect.insetBy(dx: rect.width * 0.22, dy: rect.height * 0.16)
-        context.fill(ghostPath(in: ghostRect), with: .color(.tubeBlue))
-
-        let eyeDiameter = max(1.5, ghostRect.width * 0.16)
-        for horizontalPosition in [0.34, 0.66] {
-            let eye = CGRect(
-                x: ghostRect.minX + ghostRect.width * horizontalPosition - eyeDiameter / 2,
-                y: ghostRect.minY + ghostRect.height * 0.38 - eyeDiameter / 2,
-                width: eyeDiameter,
-                height: eyeDiameter
-            )
-            context.fill(Path(ellipseIn: eye), with: .color(.white))
-        }
-    }
-
-    private static func ghostPath(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.midY))
-        path.addCurve(
-            to: CGPoint(x: rect.maxX, y: rect.midY),
-            control1: CGPoint(x: rect.minX, y: rect.minY),
-            control2: CGPoint(x: rect.maxX, y: rect.minY)
-        )
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.17, y: rect.maxY - rect.height * 0.14))
-        path.addLine(to: CGPoint(x: rect.maxX - rect.width * 0.33, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY - rect.height * 0.14))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.33, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX + rect.width * 0.17, y: rect.maxY - rect.height * 0.14))
-        path.closeSubpath()
-        return path
-    }
-}

@@ -4,6 +4,19 @@
 <dict>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Viewer</string>
+            <key>CFBundleURLName</key>
+            <string>dev.skynolimit.TubeTrackUK</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>tubetrack</string>
+            </array>
+        </dict>
+    </array>
     <key>UILaunchScreen</key>
     <dict>
         <key>UIColorName</key>

@@ -2,6 +2,7 @@ import Foundation
 import Observation
 import OSLog
 import SwiftUI
+import WidgetKit
 
 enum LiveDepartureWaitingCopy {
     static let title = "Waiting for live data"
@@ -484,6 +485,11 @@ final class TubeAppState {
             stationArrivalsService = StationArrivalsService(client: client)
             isLoadingGraph = false
 
+            if let link = pendingDeepLink {
+                pendingDeepLink = nil
+                handle(link)
+            }
+
             await restoreCachedDisruptions()
             guard !Task.isCancelled else { return }
 
@@ -746,9 +752,45 @@ final class TubeAppState {
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
         stationArrivalsError = nil
+        AppGroup.recordRecentStation(id: station.hubID ?? station.id)
         if selectedTab == .map {
             requestStationArrivals(for: station.id)
             startStationArrivalsPolling()
+        }
+    }
+
+    /// A link that arrived before the bundled graph finished loading (a cold
+    /// launch from a widget). Applied as soon as `start()` has the graph.
+    @ObservationIgnored private var pendingDeepLink: DeepLink?
+
+    /// Opens the app in the context a widget linked to. Unknown stations fall
+    /// back to the map so a stale link never strands the passenger.
+    func handle(_ link: DeepLink) {
+        guard graph != nil else {
+            pendingDeepLink = link
+            selectedTab = .map
+            return
+        }
+        switch link {
+        case .status:
+            selectedTab = .map
+            highlightAllDisruptionsOnMap()
+        case let .line(lineID):
+            selectedTab = .map
+            if let disruption = disruptions.first(where: { $0.lineID == lineID }) {
+                select(disruption: disruption)
+            } else {
+                setDisruptionHighlightScope(nil)
+                selectedLineID = lineID
+            }
+        case let .station(id, lineID):
+            selectedTab = .map
+            guard let station = graph?.stationsByID[id]
+                ?? graph?.stations.first(where: { $0.hubID == id }) else {
+                return
+            }
+            setDisruptionHighlightScope(nil)
+            select(station: station, preferredDepartureLineID: lineID)
         }
     }
 
@@ -977,6 +1019,9 @@ final class TubeAppState {
             updateLiveTrainPollingVisibility()
             updateSelectedStationArrivalsVisibility()
         } else {
+            // The app has just written its freshest snapshots; let the widgets
+            // pick them up rather than waiting for their own refresh window.
+            WidgetCenter.shared.reloadAllTimelines()
             initialRefreshTask?.cancel()
             statusPollingTask?.cancel()
             statusPollingTask = nil

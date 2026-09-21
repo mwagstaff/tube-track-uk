@@ -1,0 +1,51 @@
+# Prometheus alert rules for tube-track-api. Installed on the monitoring host
+# as rules/tube-track-api.yml by deploy/node_project.zsh (full deploy) and
+# delivered by Alertmanager; see server-tooling/monitoring/install-alerting.zsh.
+# The generic rules (TargetDown, AppCheckFailing on app_check_ok) also apply.
+groups:
+  - name: tube-track-api
+    rules:
+      - alert: TubeTrackLiveCacheStale
+        expr: tube_track_live_cache_age_seconds{job="tube-track-api"} > 300
+        for: 5m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api live arrivals are {{ $value | humanizeDuration }} old'
+          description: >-
+            The live cache has not refreshed for over 5 minutes, so clients are
+            showing stale departures flagged with meta.stale=true. Check
+            /healthcheck (polling.refreshing, lastError) and the
+            live_cache_stale log lines.
+
+      - alert: TubeTrackLiveCacheStaleCritical
+        expr: tube_track_live_cache_age_seconds{job="tube-track-api"} > 1800
+        for: 5m
+        labels:
+          severity: critical
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api live arrivals are {{ $value | humanizeDuration }} old'
+          description: >-
+            The live cache has been stale for over 30 minutes. Every
+            expectedArrival served is in the past; the poller is most likely
+            wedged or TfL is down. Restart the service if lastError is empty
+            and refreshing stays true.
+
+      - alert: TubeTrackLiveRefreshFailing
+        expr: >-
+          sum(increase(tube_track_live_refreshes_total{job="tube-track-api",status=~"failure|timeout"}[15m]))
+            /
+          clamp_min(sum(increase(tube_track_live_refreshes_total{job="tube-track-api"}[15m])), 1)
+            > 0.5
+        for: 15m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api: over half of live refreshes failed in the last 15m'
+          description: >-
+            {{ $value | humanizePercentage }} of refresh attempts failed or
+            timed out. TfL is probably degraded (see tube_track_tfl_requests_total
+            by status); the cache keeps serving the last good snapshot meanwhile.

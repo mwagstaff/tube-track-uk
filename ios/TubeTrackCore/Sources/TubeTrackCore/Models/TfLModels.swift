@@ -1,28 +1,54 @@
 import Foundation
 
-struct TfLLineStatus: Codable, Identifiable, Equatable, Sendable {
-    let id: TubeLineID
-    let name: String
-    let lineStatuses: [TfLStatusEntry]
+public struct TfLLineStatus: Codable, Identifiable, Equatable, Sendable {
+    public let id: TubeLineID
+    public let name: String
+    public let lineStatuses: [TfLStatusEntry]
+
+    public init(
+        id: TubeLineID,
+        name: String,
+        lineStatuses: [TfLStatusEntry]
+    ) {
+        self.id = id
+        self.name = name
+        self.lineStatuses = lineStatuses
+    }
 }
 
-struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
-    let id: Int
-    let statusSeverity: Int
-    let statusSeverityDescription: String
-    let reason: String?
-    let validityPeriods: [TfLValidityPeriod]?
-    let disruption: TfLDisruption?
+public struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
+    public let id: Int
+    public let statusSeverity: Int
+    public let statusSeverityDescription: String
+    public let reason: String?
+    public let validityPeriods: [TfLValidityPeriod]?
+    public let disruption: TfLDisruption?
 
-    var isGoodService: Bool { statusSeverity == 10 || statusSeverity == 18 }
+    public init(
+        id: Int,
+        statusSeverity: Int,
+        statusSeverityDescription: String,
+        reason: String? = nil,
+        validityPeriods: [TfLValidityPeriod]? = nil,
+        disruption: TfLDisruption? = nil
+    ) {
+        self.id = id
+        self.statusSeverity = statusSeverity
+        self.statusSeverityDescription = statusSeverityDescription
+        self.reason = reason
+        self.validityPeriods = validityPeriods
+        self.disruption = disruption
+    }
 
-    var isServiceClosed: Bool {
+    public var isGoodService: Bool { statusSeverity == 10 || statusSeverity == 18 }
+
+    public var isServiceClosed: Bool {
         statusSeverity == 20
             || statusSeverityDescription.localizedCaseInsensitiveCompare("Service Closed")
                 == .orderedSame
     }
 
-    var isOvernightClosure: Bool {
+    public var isOvernightClosure: Bool {
         guard statusSeverity == 20 else { return false }
         let text = reason?.lowercased() ?? ""
         return text.contains("service will resume")
@@ -30,71 +56,137 @@ struct TfLStatusEntry: Codable, Identifiable, Equatable, Sendable {
             || text.contains("service is closed")
     }
 
-    var isActionableIssue: Bool {
+    public var isActionableIssue: Bool {
         !isGoodService && !isOvernightClosure
     }
 }
 
-enum LineServiceClosurePolicy {
-    static func closedLineIDs(in statuses: [TfLLineStatus]) -> Set<TubeLineID> {
+public enum LineServiceClosurePolicy {
+    public static func closedLineIDs(in statuses: [TfLLineStatus]) -> Set<TubeLineID> {
         Set(statuses.compactMap { line in
             line.lineStatuses.contains(where: \.isServiceClosed) ? line.id : nil
         })
     }
 }
 
-struct TfLValidityPeriod: Codable, Equatable, Sendable {
-    let fromDate: Date?
-    let toDate: Date?
-    let isNow: Bool?
+public struct TfLValidityPeriod: Codable, Equatable, Sendable {
+    public let fromDate: Date?
+    public let toDate: Date?
+    public let isNow: Bool?
+
+    public init(
+        fromDate: Date? = nil,
+        toDate: Date? = nil,
+        isNow: Bool? = nil
+    ) {
+        self.fromDate = fromDate
+        self.toDate = toDate
+        self.isNow = isNow
+    }
 }
 
-struct TfLDisruption: Codable, Equatable, Sendable {
-    let category: String?
-    let categoryDescription: String?
-    let description: String?
-    let affectedRoutes: [TfLDisruptedRoute]?
-    let affectedStops: [TfLStopPoint]?
-    let closureText: String?
+public struct TfLDisruption: Codable, Equatable, Sendable {
+    public let category: String?
+    public let categoryDescription: String?
+    public let description: String?
+    public let affectedRoutes: [TfLDisruptedRoute]?
+    public let affectedStops: [TfLStopPoint]?
+    public let closureText: String?
+
+    public init(
+        category: String? = nil,
+        categoryDescription: String? = nil,
+        description: String? = nil,
+        affectedRoutes: [TfLDisruptedRoute]? = nil,
+        affectedStops: [TfLStopPoint]? = nil,
+        closureText: String? = nil
+    ) {
+        self.category = category
+        self.categoryDescription = categoryDescription
+        self.description = description
+        self.affectedRoutes = affectedRoutes
+        self.affectedStops = affectedStops
+        self.closureText = closureText
+    }
 }
 
-struct TfLDisruptedRoute: Codable, Equatable, Sendable {
-    let id: String?
-    let name: String?
-    let direction: String?
-    let originationName: String?
-    let destinationName: String?
-    let isEntireRouteSection: Bool?
-    let routeSectionNaptanEntrySequence: [TfLRouteStopEntry]?
+public struct TfLDisruptedRoute: Codable, Equatable, Sendable {
+    public let id: String?
+    public let name: String?
+    public let direction: String?
+    public let originationName: String?
+    public let destinationName: String?
+    public let isEntireRouteSection: Bool?
+    public let routeSectionNaptanEntrySequence: [TfLRouteStopEntry]?
+
+    public init(
+        id: String? = nil,
+        name: String? = nil,
+        direction: String? = nil,
+        originationName: String? = nil,
+        destinationName: String? = nil,
+        isEntireRouteSection: Bool? = nil,
+        routeSectionNaptanEntrySequence: [TfLRouteStopEntry]? = nil
+    ) {
+        self.id = id
+        self.name = name
+        self.direction = direction
+        self.originationName = originationName
+        self.destinationName = destinationName
+        self.isEntireRouteSection = isEntireRouteSection
+        self.routeSectionNaptanEntrySequence = routeSectionNaptanEntrySequence
+    }
 }
 
-struct TfLRouteStopEntry: Codable, Equatable, Sendable {
-    let ordinal: Int?
-    let stopPoint: TfLStopPoint?
+public struct TfLRouteStopEntry: Codable, Equatable, Sendable {
+    public let ordinal: Int?
+    public let stopPoint: TfLStopPoint?
+
+    public init(
+        ordinal: Int? = nil,
+        stopPoint: TfLStopPoint? = nil
+    ) {
+        self.ordinal = ordinal
+        self.stopPoint = stopPoint
+    }
 }
 
-struct TfLStopPoint: Codable, Equatable, Sendable {
-    let naptanId: String?
-    let id: String?
-    let commonName: String?
-    let lat: Double?
-    let lon: Double?
+public struct TfLStopPoint: Codable, Equatable, Sendable {
+    public let naptanId: String?
+    public let id: String?
+    public let commonName: String?
+    public let lat: Double?
+    public let lon: Double?
+
+    public init(
+        naptanId: String? = nil,
+        id: String? = nil,
+        commonName: String? = nil,
+        lat: Double? = nil,
+        lon: Double? = nil
+    ) {
+        self.naptanId = naptanId
+        self.id = id
+        self.commonName = commonName
+        self.lat = lat
+        self.lon = lon
+    }
 }
 
-struct TfLArrivalPrediction: Codable, Sendable {
-    let id: String
-    let vehicleId: String?
-    let lineId: String
-    let stationName: String?
-    let naptanId: String?
-    let platformName: String?
-    let direction: String?
-    let destinationName: String?
-    let destinationNaptanId: String?
-    let towards: String?
-    let expectedArrival: Date?
-    let timeToStation: Int?
-    let currentLocation: String?
+public struct TfLArrivalPrediction: Codable, Sendable {
+    public let id: String
+    public let vehicleId: String?
+    public let lineId: String
+    public let stationName: String?
+    public let naptanId: String?
+    public let platformName: String?
+    public let direction: String?
+    public let destinationName: String?
+    public let destinationNaptanId: String?
+    public let towards: String?
+    public let expectedArrival: Date?
+    public let timeToStation: Int?
+    public let currentLocation: String?
 
     private enum CodingKeys: String, CodingKey {
         case id, vehicleId, lineId, stationName, naptanId, stopId, platformName
@@ -102,7 +194,7 @@ struct TfLArrivalPrediction: Codable, Sendable {
         case towards, expectedArrival, timeToStation, currentLocation
     }
 
-    init(
+    public init(
         id: String,
         vehicleId: String?,
         lineId: String,
@@ -132,7 +224,7 @@ struct TfLArrivalPrediction: Codable, Sendable {
         self.currentLocation = currentLocation
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(String.self, forKey: .id)
         vehicleId = try container.decodeIfPresent(String.self, forKey: .vehicleId)
@@ -151,7 +243,7 @@ struct TfLArrivalPrediction: Codable, Sendable {
         currentLocation = try container.decodeIfPresent(String.self, forKey: .currentLocation)
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(id, forKey: .id)
         try container.encodeIfPresent(vehicleId, forKey: .vehicleId)
@@ -172,7 +264,7 @@ struct TfLArrivalPrediction: Codable, Sendable {
     /// particular, can reuse one value for an entire station board, so use the
     /// fields that describe an individual prediction whenever the app needs a
     /// stable identity or removes exact duplicates.
-    var departureIdentity: DepartureIdentity {
+    public var departureIdentity: DepartureIdentity {
         DepartureIdentity(
             sourceID: id,
             vehicleID: Self.normalized(vehicleId),
@@ -188,18 +280,18 @@ struct TfLArrivalPrediction: Codable, Sendable {
         )
     }
 
-    struct DepartureIdentity: Hashable, Sendable {
-        let sourceID: String
-        let vehicleID: String?
-        let lineID: String
-        let stationID: String?
-        let platformName: String?
-        let direction: String?
-        let destinationID: String?
-        let destinationName: String?
-        let towards: String?
-        let expectedArrival: Date?
-        let fallbackTimeToStation: Int?
+    public struct DepartureIdentity: Hashable, Sendable {
+        public let sourceID: String
+        public let vehicleID: String?
+        public let lineID: String
+        public let stationID: String?
+        public let platformName: String?
+        public let direction: String?
+        public let destinationID: String?
+        public let destinationName: String?
+        public let towards: String?
+        public let expectedArrival: Date?
+        public let fallbackTimeToStation: Int?
     }
 
     private static func normalized(_ value: String?) -> String? {
@@ -214,17 +306,17 @@ struct TfLArrivalPrediction: Codable, Sendable {
 /// The subset of a TfL arrival prediction needed to estimate a vehicle's
 /// position. Keeping this separate from station departures avoids decoding
 /// thousands of unused strings and ISO-8601 dates on every network-wide poll.
-struct TfLLiveTrainPrediction: Decodable, Sendable {
-    let vehicleId: String?
-    let lineId: String
-    let naptanId: String?
-    let direction: String?
-    let destinationName: String?
-    let destinationNaptanId: String?
-    let towards: String?
-    let timeToStation: Int?
-    let currentLocation: String?
-    let platformName: String?
+public struct TfLLiveTrainPrediction: Decodable, Sendable {
+    public let vehicleId: String?
+    public let lineId: String
+    public let naptanId: String?
+    public let direction: String?
+    public let destinationName: String?
+    public let destinationNaptanId: String?
+    public let towards: String?
+    public let timeToStation: Int?
+    public let currentLocation: String?
+    public let platformName: String?
 
     private enum CodingKeys: String, CodingKey {
         case vehicleId, lineId, naptanId, stopId, direction, destinationName
@@ -232,7 +324,7 @@ struct TfLLiveTrainPrediction: Decodable, Sendable {
         case currentLocation, platformName
     }
 
-    init(
+    public init(
         vehicleId: String?,
         lineId: String,
         naptanId: String?,
@@ -256,7 +348,7 @@ struct TfLLiveTrainPrediction: Decodable, Sendable {
         self.platformName = platformName
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         vehicleId = try container.decodeIfPresent(String.self, forKey: .vehicleId)
         lineId = try container.decode(String.self, forKey: .lineId)
@@ -274,7 +366,7 @@ struct TfLLiveTrainPrediction: Decodable, Sendable {
 }
 
 extension JSONDecoder {
-    static var tfl: JSONDecoder {
+    public static var tfl: JSONDecoder {
         let decoder = JSONDecoder()
         decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
@@ -290,13 +382,13 @@ extension JSONDecoder {
 }
 
 extension ISO8601DateFormatter {
-    nonisolated(unsafe) static let tfl: ISO8601DateFormatter = {
+    public nonisolated(unsafe) static let tfl: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
 
-    nonisolated(unsafe) static let tflWithoutFractionalSeconds: ISO8601DateFormatter = {
+    public nonisolated(unsafe) static let tflWithoutFractionalSeconds: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
         return formatter

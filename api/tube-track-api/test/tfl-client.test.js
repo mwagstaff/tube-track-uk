@@ -126,3 +126,58 @@ test('per-request deadline releases the shared concurrency gate without changing
         clearTimeout(keepAlive);
     }
 });
+
+test('deadline settles a request whose fetch ignores the abort signal and frees its slot', async () => {
+    // Regression for the 2026-09-21 production stall: Node's fetch left a body
+    // read pending forever after abort, so the abort alone cannot be relied on.
+    const observations = [];
+    let abortRequests = 0;
+    const client = new TfLClient({
+        apiKey: 'test-key', maxConcurrentRequests: 1,
+        fetchImpl: (url, { signal }) => {
+            if (url.pathname === '/next') return Promise.resolve(new Response('[]'));
+            signal.addEventListener('abort', () => { abortRequests += 1; }, { once: true });
+            return new Promise(() => {}); // never settles, abort or not
+        },
+        metrics: { observeTflRequest: (value) => observations.push(value) }
+    });
+
+    await assert.rejects(
+        client.fetchJSON('/stuck', { timeoutMs: 20 }),
+        (error) => error instanceof TfLRequestError && error.code === 'TFL_TIMEOUT'
+    );
+    assert.equal(abortRequests, 1);
+    assert.equal(client.activeRequests, 0);
+    assert.equal(observations.at(-1).status, 'timeout');
+
+    // The next request gets the slot immediately rather than queueing behind the zombie.
+    assert.deepEqual(await client.fetchJSON('/next'), []);
+});
+
+test('deadline also settles a body read that never completes', async () => {
+    const client = new TfLClient({
+        apiKey: 'test-key',
+        fetchImpl: async () => new Response(new ReadableStream({ pull() { return new Promise(() => {}); } }), {
+            status: 200
+        })
+    });
+
+    await assert.rejects(
+        client.fetchJSON('/stalled-body', { timeoutMs: 20 }),
+        (error) => error.code === 'TFL_TIMEOUT'
+    );
+    assert.equal(client.activeRequests, 0);
+});
+
+test('caller cancellation settles a request whose fetch ignores the abort signal', async () => {
+    const client = new TfLClient({
+        apiKey: 'test-key',
+        fetchImpl: () => new Promise(() => {})
+    });
+    const controller = new AbortController();
+    const pending = client.fetchJSON('/stuck', { signal: controller.signal, timeoutMs: 5_000 });
+    controller.abort(new Error('caller gave up'));
+
+    await assert.rejects(pending, /caller gave up/);
+    assert.equal(client.activeRequests, 0);
+});

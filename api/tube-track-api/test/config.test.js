@@ -18,6 +18,11 @@ test('loads safe defaults and all supported modes', () => {
     assert.equal(config.port, 3018);
     assert.equal(config.pollIntervalMs, 30_000);
     assert.equal(config.maxConcurrentRequests, 8);
+    assert.equal(config.refreshTimeoutMs, 120_000);
+    assert.equal(
+        loadConfig({ ...{ TUBETRACK_UK_TFL_UNIFIED_API_KEY: 'test-key' }, TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS: '45000' }).refreshTimeoutMs,
+        45_000
+    );
     assert.deepEqual(LIVE_MODES, [
         'tube',
         'dlr',
@@ -51,5 +56,13 @@ test('rejects invalid timing and port configuration', () => {
             TUBETRACK_UK_TFL_MAX_CONCURRENT_REQUESTS: '0'
         }),
         /MAX_CONCURRENT_REQUESTS/
+    );
+    assert.throws(
+        () => loadConfig({
+            ...base,
+            TUBETRACK_UK_TFL_TIMEOUT_MS: '10000',
+            TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS: '10000'
+        }),
+        /refresh timeout/
     );
 });

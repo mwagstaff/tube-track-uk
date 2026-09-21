@@ -216,6 +216,7 @@ test('serves normalised live data, health state, conditional responses and metri
         const healthBody = await health.json();
         assert.equal(healthBody.status, 'ok');
         assert.equal(healthBody.liveCache.count, 1);
+        assert.equal(healthBody.liveCache.stale, false);
 
         const live = await fetch(`${baseUrl}/api/v1/live`);
         assert.equal(live.status, 200);
@@ -232,7 +233,9 @@ test('serves normalised live data, health state, conditional responses and metri
 
         const metrics = await fetch(`${baseUrl}/metrics`);
         assert.equal(metrics.status, 200);
-        assert.match(await metrics.text(), /tube_track_http_requests_total/);
+        const metricsText = await metrics.text();
+        assert.match(metricsText, /tube_track_http_requests_total/);
+        assert.match(metricsText, /app_check_ok\{[^}]*check="live_cache_fresh"[^}]*\} 1/);
     });
 });
 
@@ -280,4 +283,34 @@ test('journey throttling provides a bounded retry time and no cached result', as
         assert.equal(response.headers.get('cache-control'), 'no-store');
         assert.equal((await response.json()).error.code, 'RATE_LIMITED');
     }, { journeyPlanner: { plan: async () => { throw new JourneyError('RATE_LIMITED', 'Busy', 429); } } });
+});
+
+test('healthcheck reports degraded (still ready) and the stale gauge flips when the live cache is stale', async () => {
+    await withServer(async ({ baseUrl, cache }) => {
+        const staleAgo = Date.now() - 6 * 60 * 60 * 1_000;
+        cache.replace([normaliseArrival(prediction(), 'tube')], {
+            startedAt: staleAgo - 100,
+            completedAt: staleAgo,
+            modeCounts: { tube: 1 }
+        });
+
+        const health = await fetch(`${baseUrl}/healthcheck`);
+        assert.equal(health.status, 200);
+        const body = await health.json();
+        assert.equal(body.status, 'degraded');
+        assert.equal(body.ready, true);
+        assert.equal(body.liveCache.stale, true);
+        assert.ok(body.liveCache.ageSeconds >= 6 * 60 * 60);
+
+        // Clients still get the last snapshot, flagged stale, so they can degrade gracefully.
+        const live = await fetch(`${baseUrl}/api/v1/live`);
+        assert.equal(live.status, 200);
+        const liveBody = await live.json();
+        assert.equal(liveBody.meta.stale, true);
+        assert.equal(liveBody.data.length, 1);
+
+        const metrics = await (await fetch(`${baseUrl}/metrics`)).text();
+        assert.match(metrics, /tube_track_live_cache_stale\{service_name="tube-track-api"\} 1/);
+        assert.match(metrics, /app_check_ok\{[^}]*check="live_cache_fresh"[^}]*\} 0/);
+    });
 });

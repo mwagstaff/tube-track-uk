@@ -136,6 +136,10 @@ struct RootTabView: View {
             scheduleStartupDeadline()
             await appState.start()
         }
+        .onOpenURL { url in
+            guard let link = DeepLink(url: url) else { return }
+            appState.handle(link)
+        }
         .onChange(of: scenePhase) { _, phase in
             appState.setActive(phase == .active)
             if phase == .active {

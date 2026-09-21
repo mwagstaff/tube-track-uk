@@ -15,6 +15,33 @@ Optional polling settings:
 - `TUBETRACK_UK_TFL_TIMEOUT_MS` (default `10000`)
 - `TUBETRACK_UK_TFL_MAX_CONCURRENT_REQUESTS` (default `8`)
 - `TUBETRACK_UK_LIVE_STALE_AFTER_MS` (default `90000`)
+- `TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS` (default `120000`; must exceed the
+  TfL request timeout)
+
+### Live cache staleness
+
+Live routes always serve the last complete snapshot; `meta.stale` is `true`
+once it is older than `TUBETRACK_UK_LIVE_STALE_AFTER_MS`, and clients should
+degrade rather than trust `expectedArrival` values that are already in the
+past. Each poll attempt is bounded by `TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS`
+and each TfL request by `TUBETRACK_UK_TFL_TIMEOUT_MS`; both deadlines settle
+the call themselves rather than relying on `fetch` honouring its abort signal
+(a stalled response body was observed ignoring abort for hours on
+2026-09-21). A timed-out or failed attempt never stops the next one.
+
+A watchdog independent of the polling loop logs `live_cache_stale` (warn) every
+poll interval while the cache is stale, with the age, the current attempt and
+the last error, and `live_cache_recovered` (info) when it refreshes again.
+`/healthcheck` reports `status: "degraded"` (still HTTP 200 and `ready: true`)
+while stale, and `/metrics` exposes `tube_track_live_cache_stale` (0/1) and
+`app_check_ok{check="live_cache_fresh"}` alongside
+`tube_track_live_cache_age_seconds` for alerting.
+
+Alert rules live in `observability/prometheus/rules.yml` and are installed on
+the monitoring host by a full deployment (`rules/tube-track-api.yml`, reloaded
+into Prometheus and delivered by Alertmanager via email). The generic rules
+from `server-tooling/monitoring/install-alerting.zsh` (`TargetDown`,
+`AppCheckFailing` on `app_check_ok`) apply as well.
 
 ## Routes
 

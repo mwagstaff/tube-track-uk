@@ -36,7 +36,8 @@ async function main() {
         metrics,
         logger,
         pollIntervalMs: config.pollIntervalMs,
-        requestStaggerMs: config.requestStaggerMs
+        requestStaggerMs: config.requestStaggerMs,
+        refreshTimeoutMs: config.refreshTimeoutMs
     });
     const app = createApp({
         cache,
@@ -54,6 +55,8 @@ async function main() {
             port: config.port,
             modes: LIVE_MODES,
             pollIntervalMs: config.pollIntervalMs,
+            refreshTimeoutMs: config.refreshTimeoutMs,
+            staleAfterMs: config.staleAfterMs,
             maxConcurrentRequests: config.maxConcurrentRequests
         });
         poller.start();

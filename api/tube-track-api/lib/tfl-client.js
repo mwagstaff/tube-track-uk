@@ -67,9 +67,19 @@ export class TfLClient {
 
         const release = await this.#acquire(signal);
 
+        // Aborting the fetch controller is advisory: Node's fetch has been
+        // observed (production, 2026-09-21) leaving a stalled body read pending
+        // for hours after abort. The bail promise therefore settles this call
+        // on its own, and whatever the underlying request does later is ignored.
         const controller = new AbortController();
         let timedOut = false;
-        const abortFromCaller = () => controller.abort(signal.reason);
+        let bail;
+        const bailed = new Promise((_, reject) => { bail = reject; });
+        bailed.catch(() => {});
+        const abortFromCaller = () => {
+            controller.abort(signal.reason);
+            bail(signal.reason ?? new Error('TfL request cancelled'));
+        };
         if (signal?.aborted) {
             abortFromCaller();
         } else {
@@ -78,6 +88,7 @@ export class TfLClient {
         const timeout = setTimeout(() => {
             timedOut = true;
             controller.abort();
+            bail(new TfLRequestError('TfL request timed out', { code: 'TFL_TIMEOUT' }));
         }, timeoutMs);
         timeout.unref?.();
 
@@ -86,15 +97,18 @@ export class TfLClient {
         let responseBytes = 0;
 
         try {
-            const response = await this.fetchImpl(requestUrl, {
-                signal: controller.signal,
-                headers: {
-                    accept: 'application/json',
-                    'user-agent': 'tube-track-api/0.1'
-                }
-            });
+            const response = await Promise.race([
+                this.fetchImpl(requestUrl, {
+                    signal: controller.signal,
+                    headers: {
+                        accept: 'application/json',
+                        'user-agent': 'tube-track-api/0.1'
+                    }
+                }),
+                bailed
+            ]);
             status = String(response.status);
-            const body = await response.text();
+            const body = await Promise.race([response.text(), bailed]);
             responseBytes = Buffer.byteLength(body);
 
             if (!response.ok) {
@@ -121,6 +135,9 @@ export class TfLClient {
             }
             if (timedOut) {
                 status = 'timeout';
+                if (error instanceof TfLRequestError && error.code === 'TFL_TIMEOUT') {
+                    throw error;
+                }
                 throw new TfLRequestError(
                     'TfL request timed out',
                     { code: 'TFL_TIMEOUT', cause: error }
