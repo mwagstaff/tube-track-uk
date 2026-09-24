@@ -282,3 +282,58 @@ test('watchdog restarts a polling loop that stopped without being asked', async 
     await settled(() => cache.read() !== null);
     await poller.stop();
 });
+
+test('a notifier that throws cannot fail a refresh that already succeeded', async () => {
+    const errors = [];
+    const poller = new LivePoller({
+        modes: ['tube'],
+        client: { fetchArrivals: async () => [prediction()] },
+        cache: new LiveCache(),
+        logger: { info: () => {}, error: (event) => errors.push(event), warn: () => {} },
+        notifier: {
+            notify() {
+                throw new Error('push exploded');
+            }
+        },
+        requestStaggerMs: 0
+    });
+
+    const result = await poller.refreshOnce();
+    assert.equal(result.skipped, false);
+    assert.equal(result.state.snapshot.arrivals.length, 1);
+    assert.deepEqual(errors, ['push_notify_failed']);
+});
+
+test('a notifier that rejects cannot fail a refresh either', async () => {
+    const errors = [];
+    const poller = new LivePoller({
+        modes: ['tube'],
+        client: { fetchArrivals: async () => [prediction()] },
+        cache: new LiveCache(),
+        logger: { info: () => {}, error: (event) => errors.push(event), warn: () => {} },
+        notifier: { notify: async () => { throw new Error('apns down'); } },
+        requestStaggerMs: 0
+    });
+
+    const result = await poller.refreshOnce();
+    assert.equal(result.skipped, false);
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.deepEqual(errors, ['push_notify_failed']);
+});
+
+test('the snapshot handed to the notifier is the one just published', async () => {
+    const seen = [];
+    const poller = new LivePoller({
+        modes: ['tube'],
+        client: { fetchArrivals: async () => [prediction()] },
+        cache: new LiveCache(),
+        logger: { info: () => {}, error: () => {}, warn: () => {} },
+        notifier: { notify: async (snapshot) => seen.push(snapshot) },
+        requestStaggerMs: 0
+    });
+
+    const result = await poller.refreshOnce();
+    await new Promise((resolve) => setImmediate(resolve));
+    assert.equal(seen.length, 1);
+    assert.equal(seen[0], result.state.snapshot);
+});

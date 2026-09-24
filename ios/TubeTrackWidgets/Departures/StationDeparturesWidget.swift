@@ -91,13 +91,40 @@ private struct DepartureRow: View {
                     .lineLimit(1)
             }
             Spacer(minLength: 6)
-            Text(time)
+            timeText(countdown: time)
                 .font(timeFont)
                 .monospacedDigit()
                 .contentTransition(.numericText())
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(group.direction) to \(destination), \(time)")
+        .accessibilityLabel(accessibilityLabel(destination: destination, countdown: time))
+    }
+
+    /// Once the snapshot is too old to count down from, the row falls back to
+    /// the time the train was *predicted* to leave. That stays true however
+    /// stale the data gets, where "2 min" would quietly become a lie.
+    @ViewBuilder
+    private func timeText(countdown: String) -> some View {
+        if entry.freshness.showsCountdowns {
+            Text(countdown)
+        } else if let expected = arrival.expectedArrival {
+            Text(expected, style: .time)
+                .foregroundStyle(.secondary)
+        } else {
+            Text("—")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func accessibilityLabel(destination: String, countdown: String) -> String {
+        guard !entry.freshness.showsCountdowns else {
+            return "\(group.direction) to \(destination), \(countdown)"
+        }
+        guard let expected = arrival.expectedArrival else {
+            return "\(group.direction) to \(destination), time unavailable"
+        }
+        let formatted = expected.formatted(date: .omitted, time: .shortened)
+        return "\(group.direction) to \(destination), predicted \(formatted)"
     }
 }
 
@@ -204,7 +231,18 @@ private struct DeparturesSmallView: View {
                 .font(.headline)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
-            if groups.isEmpty {
+            if let focus = entry.focusedGroup {
+                // A direction was chosen, so the board is one queue of trains:
+                // spend the space on departures rather than repeated headers.
+                DirectionHeader(group: focus, showsLineName: entry.lineFilter == nil)
+                ForEach(focus.arrivals.prefix(3), id: \.departureIdentity) { arrival in
+                    DepartureRow(
+                        group: focus, arrival: arrival, entry: entry,
+                        showsPlatform: false, destinationFont: .caption, timeFont: .callout.weight(.semibold)
+                    )
+                }
+                Spacer(minLength: 0)
+            } else if groups.isEmpty {
                 DeparturesStateView(entry: entry, compact: true)
             } else {
                 ForEach(groups) { group in
@@ -259,7 +297,15 @@ private struct DeparturesBoardView: View {
                 }
             }
             let groups = groups
-            if groups.isEmpty {
+            if let focus = entry.focusedGroup {
+                VStack(alignment: .leading, spacing: 2) {
+                    DirectionHeader(group: focus, showsLineName: entry.lineFilter == nil)
+                    ForEach(focus.arrivals.prefix(style == .large ? 6 : 3), id: \.departureIdentity) { arrival in
+                        DepartureRow(group: focus, arrival: arrival, entry: entry)
+                    }
+                }
+                .invalidatableContent()
+            } else if groups.isEmpty {
                 DeparturesStateView(entry: entry, compact: false)
             } else {
                 VStack(alignment: .leading, spacing: style == .large ? 8 : 4) {
@@ -276,8 +322,8 @@ private struct DeparturesBoardView: View {
             }
             Spacer(minLength: 0)
             WidgetFooter(
-                updatedAt: entry.updatedAt,
-                isCached: entry.isCached,
+                freshness: entry.freshness,
+                now: entry.date,
                 failed: entry.failed,
                 showsRefresh: !entry.needsConfiguration
             )

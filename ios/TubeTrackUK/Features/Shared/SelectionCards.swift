@@ -71,6 +71,11 @@ struct StationDetailCard: View {
                     errorMessage: appState.stationArrivalsError,
                     warning: stationWarning,
                     maxDeparturesHeight: 280,
+                    tracking: DepartureTrackingContext(
+                        hubID: station.hubID ?? station.id,
+                        stationName: station.name,
+                        updatedAt: appState.stationArrivalsUpdatedAt
+                    ),
                     onShowWarning: showStationIssue,
                     onSelectLine: appState.selectDepartureLine
                 )

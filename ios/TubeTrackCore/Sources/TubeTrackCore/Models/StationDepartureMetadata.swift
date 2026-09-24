@@ -41,6 +41,22 @@ public enum StationDepartureMetadata {
         return platform
     }
 
+    /// The platform on its own, for surfaces whose heading already says which
+    /// way the train is going. TfL writes "Eastbound - Platform 2"; on a Lock
+    /// Screen that repeats the heading and then truncates the part that matters.
+    public static func compactPlatformLabel(for arrival: TfLArrivalPrediction) -> String? {
+        guard let label = platformLabel(for: arrival) else { return nil }
+        if let platform = label.range(of: "platform", options: .caseInsensitive) {
+            return String(label[platform.lowerBound...])
+                .trimmingCharacters(in: .whitespaces)
+        }
+        if let separator = label.range(of: " - ") {
+            return String(label[separator.upperBound...])
+                .trimmingCharacters(in: .whitespaces)
+        }
+        return label
+    }
+
     public static func destinationLabel(for arrival: TfLArrivalPrediction) -> String {
         let stationID = normalized(arrival.naptanId)?.uppercased()
         let destinationID = normalized(arrival.destinationNaptanId)?.uppercased()

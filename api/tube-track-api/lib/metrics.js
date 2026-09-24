@@ -138,6 +138,11 @@ function requestRoute(req) {
     if (req.path.startsWith('/api/v1/timetables/')) {
         return '/api/v1/timetables/:lineId/:stopId';
     }
+    if (req.path === '/api/v1/push/live-activities') return '/api/v1/push/live-activities';
+    if (req.path.startsWith('/api/v1/push/live-activities/')) {
+        return '/api/v1/push/live-activities/:activityId';
+    }
+    if (req.path === '/api/v1/push/widgets') return '/api/v1/push/widgets';
     if (req.path === '/healthcheck') return '/healthcheck';
     if (req.path === '/metrics') return '/metrics';
     return 'unmatched';
@@ -339,6 +344,50 @@ export function createMetrics({
         },
         registers: [register]
     });
+    const pushSent = new Counter({
+        name: 'tube_track_push_sent_total',
+        help: 'Push notifications dispatched, by type and outcome',
+        labelNames: ['type', 'result'],
+        registers: [register]
+    });
+    const pushDuration = new Histogram({
+        name: 'tube_track_push_duration_seconds',
+        help: 'Time spent sending one push',
+        labelNames: ['type'],
+        buckets: [0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10],
+        registers: [register]
+    });
+    const pushTokens = new Gauge({
+        name: 'tube_track_push_tokens',
+        help: 'Registered push tokens currently held',
+        labelNames: ['type'],
+        registers: [register]
+    });
+    const pushChanges = new Counter({
+        name: 'tube_track_push_changes_detected_total',
+        help: 'Board changes judged worth a push, by reason',
+        labelNames: ['reason'],
+        registers: [register]
+    });
+    // Suppressions are how we tell "quiet" from "over budget" — the second is
+    // a passenger whose board has stopped updating.
+    const pushSuppressed = new Counter({
+        name: 'tube_track_push_suppressed_total',
+        help: 'Pushes withheld because the hourly budget was already spent',
+        labelNames: ['reason'],
+        registers: [register]
+    });
+    const pushAuthFailures = new Counter({
+        name: 'tube_track_push_auth_failures_total',
+        help: 'Registration attempts rejected for a bad client key',
+        registers: [register]
+    });
+    const pushStoreWriteFailures = new Counter({
+        name: 'tube_track_push_store_write_failures_total',
+        help: 'Failures writing the push token store to disk',
+        registers: [register]
+    });
+
     // Cross-app convention picked up by the generic Alertmanager rules
     // (server-tooling/monitoring/install-alerting.zsh): 1 healthy, 0 failing.
     const appCheckOk = new Gauge({
@@ -356,10 +405,15 @@ export function createMetrics({
         middleware() {
             return (req, res, next) => {
                 const startedAt = performance.now();
+                // Resolved on the way in, not on finish: mounting a sub-router
+                // rewrites req.url relative to its mount point, so by the time
+                // the response finishes the original path is gone and every
+                // routed request would be labelled 'unmatched'.
+                const route = requestRoute(req);
                 res.on('finish', () => {
                     const labels = {
                         method: req.method,
-                        route: requestRoute(req),
+                        route,
                         status: String(res.statusCode)
                     };
                     inboundRequests.inc(labels);
@@ -406,6 +460,31 @@ export function createMetrics({
         setCache({ itemCount, updatedAtMs }) {
             cacheItems.set(itemCount);
             cacheUpdated.set(updatedAtMs / 1_000);
+        },
+        recordPushSent({ type, result }) {
+            pushSent.inc({ type: String(type), result: String(result) });
+        },
+        observePushDuration({ type, durationSeconds }) {
+            pushDuration.observe({ type: String(type) }, durationSeconds);
+        },
+        setPushTokens(counts = {}) {
+            pushTokens.set({ type: 'liveActivity' }, counts.liveActivity ?? 0);
+            pushTokens.set({ type: 'widget' }, counts.widget ?? 0);
+        },
+        recordChangeDetected({ reason }) {
+            pushChanges.inc({ reason: String(reason) });
+        },
+        recordPushSuppressed({ reason }) {
+            pushSuppressed.inc({ reason: String(reason) });
+        },
+        recordPushAuthFailure() {
+            pushAuthFailures.inc();
+        },
+        recordPushStoreWriteFailure() {
+            pushStoreWriteFailures.inc();
+        },
+        recordPushFailure({ stage }) {
+            pushSent.inc({ type: 'liveActivity', result: `failed_${stage}` });
         },
         get contentType() {
             return register.contentType;

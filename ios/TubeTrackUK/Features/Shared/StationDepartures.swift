@@ -5,6 +5,15 @@ struct StationDepartureWarning {
     let detail: String
 }
 
+/// What a departure board needs to know to hand a direction to a Live
+/// Activity. Absent on boards that aren't the passenger's current station —
+/// Near Me shows several at once, and tracking is a decision about one.
+struct DepartureTrackingContext: Equatable {
+    let hubID: String
+    let stationName: String
+    let updatedAt: Date?
+}
+
 struct StationDeparturesSection: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var requestedLineID: TubeLineID?
@@ -20,6 +29,7 @@ struct StationDeparturesSection: View {
     let errorMessage: String?
     let warning: StationDepartureWarning?
     let maxDeparturesHeight: CGFloat?
+    let tracking: DepartureTrackingContext?
     let onShowWarning: (() -> Void)?
     let onSelectLine: ((TubeLineID) -> Void)?
 
@@ -34,6 +44,7 @@ struct StationDeparturesSection: View {
         errorMessage: String? = nil,
         warning: StationDepartureWarning? = nil,
         maxDeparturesHeight: CGFloat? = nil,
+        tracking: DepartureTrackingContext? = nil,
         onShowWarning: (() -> Void)? = nil,
         onSelectLine: ((TubeLineID) -> Void)? = nil
     ) {
@@ -47,6 +58,7 @@ struct StationDeparturesSection: View {
         self.errorMessage = errorMessage
         self.warning = warning
         self.maxDeparturesHeight = maxDeparturesHeight
+        self.tracking = tracking
         self.onShowWarning = onShowWarning
         self.onSelectLine = onSelectLine
         _requestedLineID = State(initialValue: preferredLineID.flatMap {
@@ -196,7 +208,9 @@ struct StationDeparturesSection: View {
         } else {
             VStack(spacing: 13) {
                 ForEach(Array(selectedGroups.enumerated()), id: \.element.id) { index, group in
-                    StationDepartureGroupView(group: group, now: now)
+                    StationDepartureGroupView(
+                        group: group, now: now, statuses: statuses, tracking: tracking
+                    )
                     if index < selectedGroups.count - 1 {
                         Divider()
                     }
@@ -411,10 +425,13 @@ private struct StationDepartureWarningView: View {
 
 private struct StationDepartureGroupView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
     @State private var isExpanded = false
 
     let group: StationDepartureGroup
     let now: Date
+    var statuses: [TfLLineStatus] = []
+    var tracking: DepartureTrackingContext?
 
     private var visibleArrivals: ArraySlice<TfLArrivalPrediction> {
         isExpanded ? group.arrivals[...] : group.collapsedArrivals
@@ -423,15 +440,22 @@ private struct StationDepartureGroupView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
             HStack(spacing: 7) {
-                TubeLineDot(lineID: group.lineID, size: 9)
-                Text(group.lineID.displayName)
-                    .font(.appSubheadline(.bold))
-                Text(group.direction)
-                    .font(.appSubheadline())
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 7) {
+                    TubeLineDot(lineID: group.lineID, size: 9)
+                    Text(group.lineID.displayName)
+                        .font(.appSubheadline(.bold))
+                    Text(group.direction)
+                        .font(.appSubheadline())
+                        .foregroundStyle(.secondary)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityAddTraits(.isHeader)
+
+                if let tracking, let boardActivity, boardActivity.areActivitiesEnabled {
+                    Spacer(minLength: 6)
+                    trackButton(tracking: tracking, controller: boardActivity)
+                }
             }
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isHeader)
 
             VStack(spacing: 8) {
                 ForEach(visibleArrivals, id: \.departureIdentity) { arrival in
@@ -456,6 +480,69 @@ private struct StationDepartureGroupView: View {
                 .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
             }
         }
+    }
+
+    /// One tap yields station, line and direction — exactly the identity a
+    /// tracked board needs — so there is nothing further to configure.
+    @ViewBuilder
+    private func trackButton(
+        tracking: DepartureTrackingContext,
+        controller: StationBoardActivityController
+    ) -> some View {
+        let isTracking = controller.isTracking(
+            hubID: tracking.hubID,
+            lineID: group.lineID,
+            direction: group.direction
+        )
+        Button {
+            Task { await toggleTracking(tracking, controller: controller, isTracking: isTracking) }
+        } label: {
+            Label(
+                isTracking ? "Tracking" : "Track",
+                systemImage: isTracking ? "dot.radiowaves.left.and.right" : "pin"
+            )
+            .font(.appCaption(.semibold))
+            .labelStyle(.titleAndIcon)
+            .padding(.horizontal, 10)
+            .frame(minHeight: 30)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .capsule)
+        .foregroundStyle(isTracking ? Color.departureAccent : .secondary)
+        .accessibilityLabel(
+            isTracking
+                ? "Stop tracking \(group.lineID.displayName) \(group.direction) departures"
+                : "Track \(group.lineID.displayName) \(group.direction) departures"
+        )
+        .accessibilityHint(
+            isTracking
+                ? "Removes the departure board from the Lock Screen"
+                : "Shows this departure board on the Lock Screen"
+        )
+    }
+
+    private func toggleTracking(
+        _ tracking: DepartureTrackingContext,
+        controller: StationBoardActivityController,
+        isTracking: Bool
+    ) async {
+        guard !isTracking else {
+            await controller.end(reason: .userEnded)
+            return
+        }
+        await controller.start(
+            hubID: tracking.hubID,
+            stationName: tracking.stationName,
+            lineID: group.lineID,
+            direction: DepartureDirectionFilter.resolve(label: group.direction),
+            directionLabel: group.direction,
+            arrivals: group.arrivals,
+            statuses: statuses,
+            // A board with no timestamp is one we just fetched; treating it as
+            // older than it is would start the activity already stale.
+            updatedAt: tracking.updatedAt ?? .now
+        )
     }
 
     private func departureRow(

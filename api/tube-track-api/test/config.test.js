@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { LIVE_MODES, loadConfig } from '../lib/config.js';
+import { LIVE_MODES, loadConfig, loadPushConfig } from '../lib/config.js';
 
 test('requires the server-side TfL key', () => {
     assert.throws(
@@ -64,5 +64,46 @@ test('rejects invalid timing and port configuration', () => {
             TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS: '10000'
         }),
         /refresh timeout/
+    );
+});
+
+test('push stays off, and harmless, when APNs is not configured', () => {
+    const push = loadPushConfig({});
+    assert.equal(push.enabled, false);
+    assert.equal(push.clientSecret, null);
+    assert.equal(push.liveActivityTopic, 'dev.skynolimit.TubeTrackUK.push-type.liveactivity');
+});
+
+test('a half-configured push setup is an error, not a silent no-op', () => {
+    assert.throws(
+        () => loadPushConfig({ APNS_KEY_ID: 'K', APNS_TEAM_ID: 'T' }),
+        /Push needs all of/
+    );
+});
+
+test('push turns on once every credential is present', () => {
+    const push = loadPushConfig({
+        APNS_KEY_ID: 'KEY123456',
+        APNS_TEAM_ID: 'SJ8X4DLAN9',
+        APNS_AUTH_KEY_PATH: '/home/someone/.certs/AuthKey.p8',
+        TUBETRACK_UK_PUSH_CLIENT_SECRET: 'secret'
+    });
+    assert.equal(push.enabled, true);
+    assert.equal(push.environment, 'production');
+    assert.equal(push.keyPath, '/home/someone/.certs/AuthKey.p8');
+});
+
+test('the sandbox is opt-in and validated', () => {
+    const credentials = {
+        APNS_KEY_ID: 'KEY123456',
+        APNS_TEAM_ID: 'SJ8X4DLAN9',
+        APNS_AUTH_KEY: '-----BEGIN PRIVATE KEY-----',
+        TUBETRACK_UK_PUSH_CLIENT_SECRET: 'secret'
+    };
+    assert.equal(loadPushConfig({ ...credentials, APNS_USE_SANDBOX: 'true' }).environment, 'sandbox');
+    assert.equal(loadPushConfig({ ...credentials, APNS_ENVIRONMENT: 'sandbox' }).environment, 'sandbox');
+    assert.throws(
+        () => loadPushConfig({ ...credentials, APNS_ENVIRONMENT: 'staging' }),
+        /APNS_ENVIRONMENT must be one of/
     );
 });

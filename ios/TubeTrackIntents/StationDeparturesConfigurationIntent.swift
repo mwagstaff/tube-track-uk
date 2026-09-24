@@ -11,10 +11,14 @@ struct StationDeparturesConfigurationIntent: WidgetConfigurationIntent {
     @Parameter(title: "Line")
     var line: StationLineEntity?
 
+    @Parameter(title: "Direction", default: .any)
+    var direction: DepartureDirection?
+
     static var parameterSummary: some ParameterSummary {
         When(\.$station, .hasAnyValue) {
             Summary("Departures from \(\.$station)") {
                 \.$line
+                \.$direction
             }
         } otherwise: {
             Summary("Departures from \(\.$station)")
@@ -26,5 +30,9 @@ struct StationDeparturesConfigurationIntent: WidgetConfigurationIntent {
     var selectedLineID: TubeLineID? {
         guard let lineID = line?.lineID, let station else { return nil }
         return station.lineIDs.contains(lineID) ? lineID : nil
+    }
+
+    var selectedDirection: DepartureDirectionFilter {
+        direction?.filter ?? .any
     }
 }

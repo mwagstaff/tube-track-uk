@@ -49,3 +49,52 @@ groups:
             {{ $value | humanizePercentage }} of refresh attempts failed or
             timed out. TfL is probably degraded (see tube_track_tfl_requests_total
             by status); the cache keeps serving the last good snapshot meanwhile.
+
+      - alert: TubeTrackPushSendFailing
+        expr: >-
+          sum(increase(tube_track_push_sent_total{job="tube-track-api",result!="ok"}[15m]))
+            /
+          clamp_min(sum(increase(tube_track_push_sent_total{job="tube-track-api"}[15m])), 1)
+            > 0.25
+        for: 15m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api: {{ $value | humanizePercentage }} of pushes failed in the last 15m'
+          description: >-
+            Live Activity pushes are being rejected. Break down by result:
+            "dead" is normal churn as activities end; a spike in "rejected"
+            usually means the provider token or topic is wrong, and
+            "retryable" means APNs is throttling or degraded. Passengers see
+            departure boards that dim and stop updating.
+
+      - alert: TubeTrackPushStoreWriteFailing
+        expr: increase(tube_track_push_store_write_failures_total{job="tube-track-api"}[30m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api cannot write its push token store'
+          description: >-
+            The token store has failed to write to disk. Registrations still
+            work in memory but will not survive a restart. Check the data
+            directory exists and is writable — it lives outside the project
+            directory precisely because deploys rsync --delete over that.
+
+      - alert: TubeTrackPushBudgetExhausted
+        expr: >-
+          sum(increase(tube_track_push_suppressed_total{job="tube-track-api"}[1h])) > 20
+        for: 30m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api is withholding Live Activity pushes to stay inside the iOS budget'
+          description: >-
+            {{ $value }} pushes were suppressed in the last hour. Tracked
+            boards are changing faster than the ~8 pushes/hour iOS allows, so
+            passengers will see boards dim between updates. Check whether
+            predictions are flapping (tube_track_push_changes_detected_total by
+            reason) before raising the thresholds.

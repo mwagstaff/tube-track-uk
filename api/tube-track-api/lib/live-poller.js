@@ -39,6 +39,7 @@ export class LivePoller {
         cache,
         metrics,
         logger,
+        notifier = null,
         pollIntervalMs = 30_000,
         requestStaggerMs = 1_000,
         refreshTimeoutMs = 120_000,
@@ -50,6 +51,7 @@ export class LivePoller {
         this.cache = cache;
         this.metrics = metrics;
         this.logger = logger;
+        this.notifier = notifier;
         this.pollIntervalMs = pollIntervalMs;
         this.requestStaggerMs = requestStaggerMs;
         this.refreshTimeoutMs = refreshTimeoutMs;
@@ -66,6 +68,17 @@ export class LivePoller {
         this.lastSuccessAt = null;
         this.lastError = null;
         this.staleSince = null;
+    }
+
+    #notify(snapshot) {
+        if (!this.notifier) return;
+        try {
+            Promise.resolve(this.notifier.notify(snapshot)).catch((error) => {
+                this.logger?.error('push_notify_failed', { error: error?.message ?? String(error) });
+            });
+        } catch (error) {
+            this.logger?.error('push_notify_failed', { error: error?.message ?? String(error) });
+        }
     }
 
     status() {
@@ -166,6 +179,10 @@ export class LivePoller {
                 itemCount: state.snapshot.arrivals.length,
                 modeCounts
             });
+            // Push is a consumer of the snapshot, never a participant in
+            // producing it: a notifier that hangs or throws must not delay or
+            // fail a refresh that has already succeeded.
+            this.#notify(state.snapshot);
             return { skipped: false, state };
         } catch (error) {
             const completedAtMs = this.clock();

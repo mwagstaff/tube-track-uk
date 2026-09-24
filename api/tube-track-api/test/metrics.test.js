@@ -41,3 +41,68 @@ test('exports TfL request, timeout, queue, age, latency, URL, and payload metric
     assert.match(output, /tube_track_tfl_large_url_p95_response_bytes\{/);
     assert.doesNotMatch(output, /app_key/);
 });
+
+test('a routed request keeps its own label instead of becoming unmatched', async () => {
+    const metrics = createMetrics({ collectProcessMetrics: false });
+    const middleware = metrics.middleware();
+
+    // Express rewrites req.url relative to a router's mount point while the
+    // request is in flight, so the label has to be taken on the way in.
+    const req = { method: 'POST', path: '/api/v1/push/live-activities' };
+    const listeners = [];
+    const res = { statusCode: 201, on: (event, handler) => listeners.push([event, handler]) };
+
+    middleware(req, res, () => {});
+    req.path = '/live-activities';
+    for (const [event, handler] of listeners) {
+        if (event === 'finish') handler();
+    }
+
+    const rendered = await metrics.render();
+    assert.match(rendered, /route="\/api\/v1\/push\/live-activities"/);
+    assert.doesNotMatch(rendered, /route="unmatched"/);
+});
+
+test('push metrics cover sends, changes, suppressions and token counts', async () => {
+    const metrics = createMetrics({ collectProcessMetrics: false });
+
+    metrics.recordPushSent({ type: 'liveActivity', result: 'ok' });
+    metrics.recordPushSent({ type: 'liveActivity', result: 'dead' });
+    metrics.observePushDuration({ type: 'liveActivity', durationSeconds: 0.12 });
+    metrics.setPushTokens({ liveActivity: 3, widget: 2 });
+    metrics.recordChangeDetected({ reason: 'lead_departure' });
+    metrics.recordPushSuppressed({ reason: 'heartbeat' });
+    metrics.recordPushAuthFailure();
+    metrics.recordPushStoreWriteFailure();
+
+    const rendered = await metrics.render();
+    assert.match(rendered, /tube_track_push_sent_total\{[^}]*result="ok"[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_sent_total\{[^}]*result="dead"[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_tokens\{[^}]*type="liveActivity"[^}]*\} 3/);
+    assert.match(rendered, /tube_track_push_tokens\{[^}]*type="widget"[^}]*\} 2/);
+    assert.match(rendered, /tube_track_push_changes_detected_total\{[^}]*reason="lead_departure"[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_suppressed_total\{[^}]*reason="heartbeat"[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_auth_failures_total\{[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_store_write_failures_total\{[^}]*\} 1/);
+});
+
+test('every alert rule names a metric the service actually exports', async () => {
+    const { readFile } = await import('node:fs/promises');
+    const rules = await readFile(
+        new URL('../observability/prometheus/rules.yml', import.meta.url),
+        'utf8'
+    );
+    const metrics = createMetrics({ collectProcessMetrics: false });
+    metrics.recordPushSent({ type: 'liveActivity', result: 'ok' });
+    metrics.recordPushSuppressed({ reason: 'heartbeat' });
+    metrics.recordPushStoreWriteFailure();
+    const rendered = await metrics.render();
+
+    const referenced = new Set(rules.match(/tube_track_[a-z_]+/g) ?? []);
+    for (const name of referenced) {
+        assert.ok(
+            rendered.includes(name),
+            `${name} is alerted on but never exported — the alert can never fire`
+        );
+    }
+});

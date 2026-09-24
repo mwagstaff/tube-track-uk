@@ -18,6 +18,10 @@ struct LineStatusEntry: TimelineEntry, Sendable {
     let isCached: Bool
     let failed: Bool
 
+    var freshness: Freshness {
+        .evaluate(updatedAt: updatedAt, now: date, isCached: isCached)
+    }
+
     /// Rows ordered worst first, for the summary-style families.
     var rowsBySeverity: [LineStatusRow] {
         rows.sorted { left, right in
@@ -32,7 +36,6 @@ struct LineStatusEntry: TimelineEntry, Sendable {
 }
 
 struct LineStatusProvider: AppIntentTimelineProvider {
-    static let refreshInterval: TimeInterval = 15 * 60
     static let retryInterval: TimeInterval = 5 * 60
 
     private static let logger = Logger(subsystem: "dev.skynolimit.TubeTrackUK.Widgets", category: "LineStatus")
@@ -48,8 +51,12 @@ struct LineStatusProvider: AppIntentTimelineProvider {
 
     func timeline(for configuration: LineStatusConfigurationIntent, in context: Context) async -> Timeline<LineStatusEntry> {
         let entry = await load(configuration)
-        let interval = entry.failed && entry.updatedAt == nil ? Self.retryInterval : Self.refreshInterval
-        return Timeline(entries: [entry], policy: .after(entry.date.addingTimeInterval(interval)))
+        guard !(entry.failed && entry.updatedAt == nil) else {
+            return Timeline(entries: [entry], policy: .after(entry.date.addingTimeInterval(Self.retryInterval)))
+        }
+        // Status changes are rare and mostly arrive by push; spend the reload
+        // budget where it earns its keep rather than on a fixed short interval.
+        return Timeline(entries: [entry], policy: .after(WidgetRefreshPolicy.nextReload(after: entry.date)))
     }
 
     private func load(_ configuration: LineStatusConfigurationIntent) async -> LineStatusEntry {

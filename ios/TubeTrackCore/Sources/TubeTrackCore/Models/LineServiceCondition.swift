@@ -90,4 +90,18 @@ extension LineServiceCondition {
         case .good: 4
         }
     }
+
+    /// Rebuilds a condition from the rank and headline that survive a push
+    /// payload, so a Live Activity tints and captions itself exactly as the
+    /// widgets and the app do.
+    public init(severityRank: Int, headline: String?) {
+        let description = headline ?? ""
+        switch severityRank {
+        case 0: self = .majorDisruption(description.isEmpty ? "Severe delays" : description)
+        case 1: self = .minorDisruption(description.isEmpty ? "Minor delays" : description)
+        case 2: self = .overnightClosure(description.isEmpty ? "Service closed" : description)
+        case 3: self = .updating
+        default: self = .good(description.isEmpty ? "Good service" : description)
+        }
+    }
 }

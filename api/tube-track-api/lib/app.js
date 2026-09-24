@@ -3,6 +3,7 @@ import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { plannedWorksV2Response, PlannedWorksSourceError } from './planned-works.js';
+import { createPushRoutes } from './push-routes.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 const LINE_IDS = LINE_COLOURS.map((line) => line.id).join(',');
@@ -59,6 +60,8 @@ export function createApp({
     client,
     resourceCache,
     plannedTrackClosuresSource,
+    pushTokenStore = null,
+    pushClientSecret = null,
     journeyPlanner = new JourneyPlanner({ client })
 }) {
     const app = express();
@@ -200,6 +203,19 @@ export function createApp({
             next(error);
         }
     });
+
+    // Mounted only when push is configured, so an API without APNs credentials
+    // answers 404 rather than pretending to accept registrations it will never
+    // act on.
+    if (pushTokenStore && pushClientSecret) {
+        app.use('/api/v1/push', createPushRoutes({
+            store: pushTokenStore,
+            clientSecret: pushClientSecret,
+            isKnownStop: (id) => journeyPlanner.byId.has(id),
+            logger,
+            metrics
+        }));
+    }
 
     app.get('/api/v1/planned-works', async (req, res, next) => {
         const { from, to } = req.query;

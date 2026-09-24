@@ -48,10 +48,20 @@
 /* Begin PBXFileReference section */
 		A10000000000000000000002 /* TubeTrackUK.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeTrackUK.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000003 /* TubeTrackUKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TubeTrackUKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		A10000000000000000000070 /* TubeTrackWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TubeTrackWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000040 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
+		A10000000000000000000070 /* TubeTrackWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TubeTrackWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = GameCenterResources.gamekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		A10000000000000000000079 /* Exceptions for "TubeTrackWidgets" folder in "TubeTrackWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A10000000000000000000071 /* TubeTrackWidgets */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A10000000000000000000004 /* TubeTrackUK */ = {
@@ -78,16 +88,6 @@
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
-
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		A10000000000000000000079 /* Exceptions for "TubeTrackWidgets" folder in "TubeTrackWidgets" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = A10000000000000000000071 /* TubeTrackWidgets */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A10000000000000000000011 /* Frameworks */ = {
@@ -361,28 +361,6 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		A10000000000000000000060 /* XCLocalSwiftPackageReference "TubeTrackCore" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = TubeTrackCore;
-		};
-/* End XCLocalSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		A10000000000000000000061 /* TubeTrackCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TubeTrackCore;
-		};
-		A10000000000000000000063 /* TubeTrackCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TubeTrackCore;
-		};
-		A10000000000000000000065 /* TubeTrackCore */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TubeTrackCore;
-		};
-/* End XCSwiftPackageProductDependency section */
-
 /* Begin XCBuildConfiguration section */
 		A10000000000000000000009 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -621,6 +599,28 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		A10000000000000000000060 /* XCLocalSwiftPackageReference "TubeTrackCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = TubeTrackCore;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A10000000000000000000061 /* TubeTrackCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TubeTrackCore;
+		};
+		A10000000000000000000063 /* TubeTrackCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TubeTrackCore;
+		};
+		A10000000000000000000065 /* TubeTrackCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TubeTrackCore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = A10000000000000000000001 /* Project object */;
 }

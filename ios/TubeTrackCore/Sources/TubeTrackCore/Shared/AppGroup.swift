@@ -28,6 +28,24 @@ public enum AppGroup {
         defaults?.stringArray(forKey: recentStationIDsKey) ?? []
     }
 
+    private static let trackedActivityKey = "trackedLiveActivityID"
+
+    /// The Live Activity currently tracking a departure board, if any. Shared
+    /// so the widget extension can tell whether a board is already being
+    /// tracked without asking ActivityKit.
+    public static var trackedActivityID: String? {
+        defaults?.string(forKey: trackedActivityKey)
+    }
+
+    public static func recordTrackedActivity(id: String?) {
+        guard let defaults else { return }
+        if let id {
+            defaults.set(id, forKey: trackedActivityKey)
+        } else {
+            defaults.removeObject(forKey: trackedActivityKey)
+        }
+    }
+
     public static func recordRecentStation(id: String) {
         guard let defaults else { return }
         var identifiers = recentStationIDs.filter { $0 != id }

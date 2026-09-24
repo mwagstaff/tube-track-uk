@@ -4,6 +4,14 @@
 <dict>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+    <key>TubeTrackPushClientSecret</key>
+    <string>$(TUBETRACK_PUSH_CLIENT_SECRET)</string>
+    <key>NSSupportsLiveActivities</key>
+    <true/>
+    <!-- Departure predictions change minute to minute; without frequent
+         updates a tracked board dims between the few pushes iOS allows. -->
+    <key>NSSupportsLiveActivitiesFrequentUpdates</key>
+    <true/>
     <key>CFBundleURLTypes</key>
     <array>
         <dict>

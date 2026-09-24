@@ -22,6 +22,7 @@ struct RootTabView: View {
     @Environment(GameCenterService.self) private var gameCenter
     @Environment(TubeAppState.self) private var appState
     @Environment(AppBackgroundImageStore.self) private var backgroundImageStore
+    @Environment(StationBoardActivityController.self) private var boardActivity
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -142,6 +143,9 @@ struct RootTabView: View {
         }
         .onChange(of: scenePhase) { _, phase in
             appState.setActive(phase == .active)
+            // An activity whose board emptied or whose cap passed while the app
+            // was away should not be waiting on the next refresh to notice.
+            Task { await boardActivity.endIfExpired() }
             if phase == .active {
                 if backgroundImageStore.appDidBecomeActive() {
                     appState.selectedTab = .map
@@ -181,6 +185,20 @@ struct RootTabView: View {
         .onChange(of: appState.stationSelectionGeneration) {
             guard appState.selectedStationID != nil else { return }
             closestStationPanelHidden = true
+        }
+        // Feeding the tracked board from the poll the app is already doing is
+        // free and unbudgeted, so a Live Activity is exact whenever the app is
+        // open — pushes only have to cover the gaps.
+        .onChange(of: appState.stationArrivalsUpdatedAt) { _, updatedAt in
+            guard let updatedAt, let station = appState.selectedStation else { return }
+            Task {
+                await boardActivity.update(
+                    hubID: station.hubID ?? station.id,
+                    arrivals: appState.stationArrivals,
+                    statuses: appState.statuses,
+                    updatedAt: updatedAt
+                )
+            }
         }
         .onDisappear {
             backgroundRevealTask?.cancel()

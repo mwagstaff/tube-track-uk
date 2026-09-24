@@ -197,8 +197,8 @@ private struct LineStatusListView: View {
             }
             Spacer(minLength: 0)
             WidgetFooter(
-                updatedAt: entry.updatedAt,
-                isCached: entry.isCached,
+                freshness: entry.freshness,
+                now: entry.date,
                 failed: entry.failed,
                 showsRefresh: true
             )

@@ -44,4 +44,43 @@ public enum DepartureTimeline {
             return expected.timeIntervalSince(date) > -departedGrace
         }
     }
+
+    /// The most entries one snapshot is ever worth rendering into.
+    public static let maximumEntries = 12
+
+    /// When a widget should re-render the same snapshot.
+    ///
+    /// Countdowns change on the minute, so an entry per minute keeps the board
+    /// exact without touching the network. There is no point rendering minutes
+    /// beyond the snapshot's own shelf life, so the run stops at the staleness
+    /// threshold and a final entry switches the board to its stale
+    /// presentation — which is what the widget then shows until WidgetKit
+    /// grants the next reload.
+    public static func entryDates(
+        now: Date,
+        updatedAt: Date?,
+        limit: Int = maximumEntries
+    ) -> [Date] {
+        guard limit > 0 else { return [now] }
+        guard let updatedAt else { return [now] }
+
+        let goesStaleAt = updatedAt.addingTimeInterval(Freshness.staleThreshold)
+        guard goesStaleAt > now else { return [now] }
+
+        var dates = [now]
+        // Step in whole minutes from the snapshot, so entry boundaries line up
+        // with the minute the labels actually change on.
+        var candidate = updatedAt
+        while candidate <= now {
+            candidate.addTimeInterval(60)
+        }
+        while candidate < goesStaleAt, dates.count < limit - 1 {
+            dates.append(candidate)
+            candidate.addTimeInterval(60)
+        }
+        if dates.count < limit {
+            dates.append(goesStaleAt)
+        }
+        return dates
+    }
 }

@@ -1,29 +1,31 @@
 import SwiftUI
+import TubeTrackCore
 import WidgetKit
 
-/// "Updated 09:41" plus a cached/offline marker, with an optional refresh
-/// button. Sits at the bottom of medium and large widgets.
+/// How old the data is, in words, with an optional refresh button. Sits at the
+/// bottom of medium and large widgets.
+///
+/// A widget cannot fetch on demand, so this is the passenger's only way to tell
+/// a live board from a remembered one. It is never decorative.
 struct WidgetFooter: View {
-    let updatedAt: Date?
-    let isCached: Bool
+    let freshness: Freshness
+    /// The moment this entry renders — the footer ages with the timeline.
+    let now: Date
     let failed: Bool
     var showsRefresh = false
 
     var body: some View {
         HStack(spacing: 6) {
-            if failed && updatedAt == nil {
+            if failed && freshness.updatedAt == nil {
                 Label("Offline", systemImage: "wifi.slash")
                     .foregroundStyle(.red)
-            } else if let updatedAt {
-                if isCached || failed {
-                    Label {
-                        Text("Cached \(updatedAt, style: .time)")
-                    } icon: {
-                        Image(systemName: "clock.arrow.circlepath")
-                    }
-                } else {
-                    Text("Updated \(updatedAt, style: .time)")
+            } else {
+                Label {
+                    Text(freshness.summary(at: now))
+                } icon: {
+                    Image(systemName: freshness.symbolName)
                 }
+                .foregroundStyle(freshness.tier == .stale ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
             }
             Spacer(minLength: 0)
             if showsRefresh {
