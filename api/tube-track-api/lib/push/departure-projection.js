@@ -149,6 +149,74 @@ function expectedAtMs(arrival) {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
+function isSelfReferential(arrival) {
+    const stopId = trimmed(arrival.stopId)?.toUpperCase();
+    const destinationId = trimmed(arrival.destinationStopId)?.toUpperCase();
+    if (stopId && destinationId === stopId) return true;
+
+    const stationName = normalisedStopName(arrival.stationName);
+    return stationName !== null
+        && [arrival.destinationName, arrival.towards].some((value) =>
+            referencesStation(value, stationName));
+}
+
+function sameTerminatingTrain(left, right) {
+    if (left.lineId !== right.lineId
+        || String(left.stopId).toUpperCase() !== String(right.stopId).toUpperCase()
+        || Math.abs(expectedAtMs(left) - expectedAtMs(right)) > 2_000) {
+        return false;
+    }
+    const leftVehicle = trimmed(left.vehicleId)?.toLowerCase();
+    const rightVehicle = trimmed(right.vehicleId)?.toLowerCase();
+    if (leftVehicle || rightVehicle) {
+        return Boolean(leftVehicle && leftVehicle === rightVehicle);
+    }
+    const sourceId = trimmed(left.id)?.toLowerCase();
+    return Boolean(sourceId && sourceId === trimmed(right.id)?.toLowerCase());
+}
+
+function commonDirectionalPlatform(left, right) {
+    return CARDINAL_DIRECTIONS.find((direction) =>
+        (left ?? '').toLowerCase().includes(direction)
+        && (right ?? '').toLowerCase().includes(direction))?.replace(/^./, (letter) =>
+        letter.toUpperCase()) ?? null;
+}
+
+// TfL may publish one incoming terminus train against several possible
+// platforms. The iPhone's StationArrivalsService merges those predictions
+// before creating a local activity; pushes must do the same.
+function uniquePredictions(arrivals) {
+    const retained = [];
+    const exact = new Set();
+    for (const arrival of arrivals) {
+        const identity = JSON.stringify([
+            arrival.id, trimmed(arrival.vehicleId), arrival.lineId,
+            trimmed(arrival.stopId), trimmed(arrival.platformName),
+            trimmed(arrival.direction), trimmed(arrival.destinationStopId),
+            trimmed(arrival.destinationName), trimmed(arrival.towards),
+            expectedAtMs(arrival)
+        ]);
+        if (exact.has(identity)) continue;
+        exact.add(identity);
+
+        const index = isSelfReferential(arrival)
+            ? retained.findIndex((candidate) =>
+                isSelfReferential(candidate) && sameTerminatingTrain(candidate, arrival))
+            : -1;
+        if (index < 0) {
+            retained.push(arrival);
+        } else {
+            retained[index] = {
+                ...retained[index],
+                platformName: commonDirectionalPlatform(
+                    retained[index].platformName, arrival.platformName
+                )
+            };
+        }
+    }
+    return retained;
+}
+
 /**
  * The top departures for one tracked board.
  *
@@ -168,16 +236,16 @@ export function projectBoard({
     const matching = arrivals.filter((arrival) => {
         if (arrival.lineId !== lineId) return false;
         if (stops.size > 0 && !stops.has(String(arrival.stopId).toUpperCase())) return false;
-        return matchesDirection(directionLabel(arrival), direction);
+        return expectedAtMs(arrival) !== null;
     });
 
-    return matching
-        .filter((arrival) => expectedAtMs(arrival) !== null)
-        .sort((left, right) => {
-            const difference = expectedAtMs(left) - expectedAtMs(right);
-            if (difference !== 0) return difference;
-            return String(left.id).localeCompare(String(right.id));
-        })
+    matching.sort((left, right) => {
+        const difference = expectedAtMs(left) - expectedAtMs(right);
+        if (difference !== 0) return difference;
+        return String(left.id).localeCompare(String(right.id));
+    });
+    return uniquePredictions(matching)
+        .filter((arrival) => matchesDirection(directionLabel(arrival), direction))
         .slice(0, limit)
         .map((arrival) => ({
             id: arrival.vehicleId ?? arrival.id,

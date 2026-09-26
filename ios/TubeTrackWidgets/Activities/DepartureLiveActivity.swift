@@ -40,7 +40,7 @@ struct DepartureLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 2) {
-                        ForEach(Array(context.followingDepartures.enumerated()), id: \.element.id) { index, departure in
+                        ForEach(Array(context.followingDepartures.enumerated()), id: \.offset) { index, departure in
                             DepartureActivityRow(
                                 departure: departure, position: index + 2,
                                 isStale: context.isStale, font: .system(.caption, design: .monospaced)
@@ -82,58 +82,125 @@ private struct DepartureActivityContent: View {
     }
 }
 
-/// The Watch Smart Stack has room for the next train's destination, so make
-/// that the primary information instead of reusing the Dynamic Island icon.
+/// The Watch Smart Stack shows two trains under a compact station and line header.
 private struct DepartureActivityWatchView: View {
     let context: ActivityViewContext<DepartureActivityAttributes>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(context.attributes.stationName)
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+        DepartureActivityWatchCard(
+            stationName: context.attributes.stationName,
+            lineID: context.lineID,
+            direction: context.attributes.direction,
+            directionFilter: context.attributes.directionFilter,
+            condition: context.condition,
+            departures: Array(context.visibleDepartures.prefix(2)),
+            isStale: context.isStale,
+            deepLink: context.deepLink
+        )
+    }
+}
 
-            if let departure = context.nextDeparture {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text(departure.destination)
-                        .font(.headline.weight(.semibold))
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.75)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    DepartureCountdown(
-                        departure: departure, isStale: context.isStale,
-                        font: .headline.weight(.bold)
-                    )
-                    .fixedSize(horizontal: true, vertical: false)
-                }
-                Text(context.isStale
-                    ? "Last prediction"
-                    : "\(context.lineID.watchShortName) · \(context.attributes.direction)")
-                    .font(.caption2)
+private struct DepartureActivityWatchCard: View {
+    let stationName: String
+    let lineID: TubeLineID
+    let direction: String
+    let directionFilter: DepartureDirectionFilter
+    let condition: LineServiceCondition
+    let departures: [DepartureActivityAttributes.ContentState.Departure]
+    let isStale: Bool
+    let deepLink: URL
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 5) {
+            HStack(spacing: 4) {
+                Text(stationName)
+                    .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-            } else {
+                    .minimumScaleFactor(0.7)
+                if isStale {
+                    Image(systemName: "clock.arrow.circlepath")
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                }
+                Spacer(minLength: 2)
+                HStack(spacing: 3) {
+                    Text(shortLineName)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                    DepartureActivityStatusIcon(condition: condition)
+                        .font(.system(size: 11))
+                    Text(shortDirection)
+                        .fixedSize(horizontal: true, vertical: false)
+                }
+                .font(.caption2.weight(.semibold))
+                .layoutPriority(1)
+            }
+
+            if departures.isEmpty {
                 Text("No trains due")
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
+            } else {
+                VStack(spacing: 4) {
+                    ForEach(Array(departures.enumerated()), id: \.offset) { index, departure in
+                        HStack(alignment: .firstTextBaseline, spacing: 6) {
+                            Text("\(index + 1)")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Text(departure.destination)
+                                .font(.subheadline.weight(.semibold))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                            DepartureCountdown(
+                                departure: departure, isStale: isStale,
+                                font: .subheadline.weight(.bold)
+                            )
+                            .fixedSize(horizontal: true, vertical: false)
+                        }
+                    }
+                }
             }
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
         .foregroundStyle(DepartureBoardStyle.yellow)
-        .widgetURL(context.deepLink)
+        .widgetURL(deepLink)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(accessibilityLabel)
     }
 
-    private var accessibilityLabel: String {
-        guard let departure = context.nextDeparture else {
-            return "\(context.attributes.stationName), no trains due"
+    private var shortLineName: String {
+        let name = lineID.watchShortName
+        return name.count <= 8 ? name : lineID.shortCode
+    }
+
+    private var shortDirection: String {
+        switch directionFilter {
+        case .northbound: "N"
+        case .southbound: "S"
+        case .eastbound: "E"
+        case .westbound: "W"
+        case .inbound: "In"
+        case .outbound: "Out"
+        case .any: "All"
         }
-        let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
-        return "\(context.attributes.stationName), \(context.lineID.displayName), \(context.attributes.direction), "
-            + "\(departure.destination), \(context.isStale ? "last predicted" : "due") \(prediction)"
+    }
+
+    private var accessibilityLabel: String {
+        let heading = "\(stationName), \(lineID.displayName), "
+            + "\(direction), \(condition.accessibilityDescription)"
+        let staleDescription = isStale ? ". Live updates paused" : ""
+        guard !departures.isEmpty else { return heading + ", no trains due" + staleDescription }
+        let trains = departures.enumerated().map { index, departure in
+            let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+            return "\(index == 0 ? "Next" : "Then") \(departure.destination), "
+                + "\(isStale ? "last predicted" : "due") \(prediction)"
+        }
+        return heading + ", " + trains.joined(separator: "; ")
+            + staleDescription
     }
 }
 
@@ -154,7 +221,7 @@ private struct DepartureActivityLockScreenView: View {
                     .font(.system(.subheadline, design: .monospaced))
             } else {
                 VStack(spacing: 4) {
-                    ForEach(Array(context.visibleDepartures.enumerated()), id: \.element.id) { index, departure in
+                    ForEach(Array(context.visibleDepartures.enumerated()), id: \.offset) { index, departure in
                         DepartureActivityRow(
                             departure: departure, position: index + 1, isStale: context.isStale
                         )
@@ -362,6 +429,23 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
     DepartureActivityAttributes.ContentState.previewEmpty
 }
 
+#Preview("Watch Smart Stack") {
+    let attributes = DepartureActivityAttributes.previewWatch
+    DepartureActivityWatchCard(
+        stationName: attributes.stationName,
+        lineID: .district,
+        direction: attributes.direction,
+        directionFilter: attributes.directionFilter,
+        condition: .good("Good service"),
+        departures: DepartureActivityAttributes.ContentState.previewWatch.departures,
+        isStale: false,
+        deepLink: DeepLink.station(id: attributes.stationHubID, line: .district).url
+    )
+    .frame(width: 190, height: 80)
+    .background(DepartureBoardStyle.background, in: .rect(cornerRadius: 14))
+    .environment(\.colorScheme, .dark)
+}
+
 #Preview("Island expanded", as: .dynamicIsland(.expanded), using: DepartureActivityAttributes.preview) {
     DepartureLiveActivity()
 } contentStates: {
@@ -388,6 +472,19 @@ extension DepartureActivityAttributes {
             hardEndsAt: .now.addingTimeInterval(DepartureActivityPolicy.maximumDuration)
         )
     }
+
+    static var previewWatch: DepartureActivityAttributes {
+        DepartureActivityAttributes(
+            activityID: "watch-preview",
+            stationHubID: "HUBMON",
+            stationName: "Monument",
+            lineID: .district,
+            direction: "Westbound",
+            directionFilter: .westbound,
+            startedAt: .now,
+            hardEndsAt: .now.addingTimeInterval(DepartureActivityPolicy.maximumDuration)
+        )
+    }
 }
 
 extension DepartureActivityAttributes.ContentState {
@@ -405,6 +502,16 @@ extension DepartureActivityAttributes.ContentState {
                 departure("2", "Epping", 3),
                 departure("3", "Hainault via Newbury Park", 5),
                 departure("4", "Epping", 7),
+            ],
+            updatedAt: .now, conditionRank: 4, conditionHeadline: nil, sequence: 1
+        )
+    }
+
+    static var previewWatch: Self {
+        .init(
+            departures: [
+                departure("1", "Ealing Broadway", 0.5),
+                departure("2", "Richmond", 4),
             ],
             updatedAt: .now, conditionRank: 4, conditionHeadline: nil, sequence: 1
         )

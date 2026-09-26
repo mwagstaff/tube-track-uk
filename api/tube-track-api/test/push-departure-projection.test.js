@@ -128,6 +128,52 @@ test('predictions with no expected time cannot reach a countdown', () => {
     assert.deepEqual(board.map((row) => row.id), ['known']);
 });
 
+test('a push merges alternative platforms for one terminating train', () => {
+    const common = {
+        stopId: '940GZZLUBPS',
+        stationName: 'Battersea Power Station Underground Station',
+        lineId: 'northern',
+        destinationStopId: '940GZZLUBPS',
+        destinationName: 'Battersea Power Station Underground Station'
+    };
+    const board = projectBoard({
+        arrivals: [
+            arrival({ ...common, id: 'first-platform', vehicleId: 'train-1',
+                platformName: 'Northbound - Platform 1', seconds: 180 }),
+            arrival({ ...common, id: 'second-platform', vehicleId: 'train-1',
+                platformName: 'Northbound - Platform 2', seconds: 181 }),
+            arrival({ ...common, id: 'next-train', vehicleId: 'train-2',
+                platformName: 'Northbound - Platform 1', seconds: 225 })
+        ],
+        lineId: 'northern',
+        direction: 'northbound'
+    });
+    assert.deepEqual(board.map((row) => row.id), ['train-1', 'train-2']);
+    assert.equal(board[0].platform, null);
+});
+
+test('same-looking minute labels do not merge different trains', () => {
+    const board = projectBoard({
+        arrivals: [
+            arrival({ id: 'one', vehicleId: 'train-1', seconds: 181 }),
+            arrival({ id: 'two', vehicleId: 'train-2', seconds: 220 })
+        ],
+        lineId: 'central',
+        direction: 'eastbound'
+    });
+    assert.deepEqual(board.map((row) => row.id), ['train-1', 'train-2']);
+});
+
+test('identical predictions only occupy one Live Activity row', () => {
+    const prediction = arrival({ id: 'repeated', seconds: 120 });
+    const board = projectBoard({
+        arrivals: [prediction, { ...prediction }, arrival({ id: 'next', seconds: 180 })],
+        lineId: 'central',
+        direction: 'eastbound'
+    });
+    assert.deepEqual(board.map((row) => row.id), ['repeated', 'next']);
+});
+
 test('platform labels drop the direction the heading already carries', () => {
     assert.equal(compactPlatformLabel(arrival({ platformName: 'Eastbound - Platform 2' })), 'Platform 2');
     assert.equal(compactPlatformLabel(arrival({ platformName: 'Platform 8' })), 'Platform 8');

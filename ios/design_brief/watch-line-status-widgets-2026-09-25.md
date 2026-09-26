@@ -25,9 +25,10 @@ trigger it. The Watch widgets request a new timeline every five minutes at
 all hours. WidgetKit controls the actual reload time and may defer requests.
 
 For tracked station departures, the iPhone Live Activity opts into the Watch
-Smart Stack's small activity family. That layout shows the next train's
-destination beside its countdown, with the tracked station and direction as
-context. The iPhone Lock Screen and Dynamic Island keep their own layouts.
+Smart Stack's small activity family. That layout shows the next two trains'
+destinations beside their countdowns, with the tracked station at top left
+and a compact line, service-status icon, and direction at top right. The
+iPhone Lock Screen and Dynamic Island keep their own layouts.
 
 ## Goal
 

@@ -1,10 +1,9 @@
 # TubeTrack UK 1.2 — App Store release candidate
 
-Prepared 26 September 2026 for App Store app ID 6808680996. The 1.2 (1) build
-was uploaded to Apple and selected in the 1.2 App Store Connect draft. It has
-not been submitted for review. The source working tree contains other
-uncommitted changes, so record a reviewed commit before treating this binary
-as the final release.
+Prepared 26 September 2026 for App Store app ID 6808680996. Builds 1.2 (1)
+and 1.2 (2) were uploaded to Apple; build 2 is selected in the 1.2 App Store
+Connect draft. The local IPA documented below is build 1. The version has not
+been submitted for review.
 
 ## Binary and validation
 
@@ -44,6 +43,18 @@ The signed Xcode archive and test result bundle are retained on this Mac at
 also retained here in `export/`.
 
 ## Before App Review
+
+App Store Connect currently blocks **Add for Review** with “You must add the
+com.apple.developer.game-center key in Xcode.” This conflicts with the build
+metadata Apple displays for both 1.2 (1) and 1.2 (2): the main iOS app has
+`com.apple.developer.game-center: true`. The local build 1 IPA's signed app and
+App Store provisioning profile also contain the entitlement, and the Xcode
+project enables the Game Center capability. Build 2, uploaded 26 September at
+5:33 PM BST, is validated and remains selected. Re-selecting either build,
+refreshing the Game Center checkbox, reloading, and retrying Add for Review did
+not clear the error. Game Center remains enabled. This is an App Store Connect
+validation inconsistency that should be raised with
+[Apple Developer Support](https://developer.apple.com/support/app-store/).
 
 1. Review the App Privacy answers and privacy policy. Version 1.2 sends a
    random installation ID and app-open/feature-open events to the first-party
