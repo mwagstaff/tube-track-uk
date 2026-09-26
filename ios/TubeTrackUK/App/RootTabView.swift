@@ -223,6 +223,13 @@ struct RootTabView: View {
                 )
             }
         }
+        .onChange(of: appState.river.selectedBoard?.updatedAt) { _, _ in
+            guard !appState.isOffline, let pier = appState.river.selectedPier,
+                  let board = appState.river.selectedBoard else { return }
+            Task {
+                await boardActivity.update(pierID: pier.id, board: board, statuses: appState.river.statuses)
+            }
+        }
         .onDisappear {
             locationProvider.setMapTracking(false)
             backgroundRevealTask?.cancel()

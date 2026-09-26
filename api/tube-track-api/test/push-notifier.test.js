@@ -365,3 +365,73 @@ test('each subscription gets only the board it asked for', async () => {
     );
     assert.deepEqual(boards.sort(), [['ve'], ['vw']].sort());
 });
+
+function riverPrediction(overrides = {}) {
+    return {
+        id: 'river-1', pierId: '930GCAD', lineId: 'rb6', destinationName: 'Putney Pier',
+        expectedArrival: new Date(NOW_MS + 900_000).toISOString(),
+        observedAt: new Date(NOW_MS).toISOString(), expiresAt: null, terminatesHere: false,
+        ...overrides
+    };
+}
+const riverSubscription = () => subscription({ id: 'river', hubId: '930GCAD', stopIds: ['930GCAD'], lineId: 'rb6', direction: 'any' });
+const riverSource = (predictions, updatedAtMs = NOW_MS, stale = false) => ({
+    data: predictions, meta: { updatedAt: new Date(updatedAtMs).toISOString(), stale }
+});
+
+test('river pushes use their own source, expiry rules and service status', async () => {
+    const { notifier, client } = await fixture({ rows: [riverSubscription()] });
+    notifier.river = {
+        arrivals: async () => riverSource([
+            riverPrediction(), riverPrediction({ id: 'terminal', terminatesHere: true }),
+            riverPrediction({ id: 'other-pier', pierId: '930GOTH' }),
+            riverPrediction({ id: 'other-line', lineId: 'rb1' }),
+            riverPrediction({ id: 'expired', expiresAt: new Date(NOW_MS - 1).toISOString() }),
+            riverPrediction({ id: 'old', observedAt: new Date(NOW_MS - 91_000).toISOString() })
+        ], NOW_MS - 30_000),
+        status: async () => ({ data: [{ id: 'rb6', entries: [{ severity: 9, description: 'Minor delays' }] }] })
+    };
+    await notifier.notify(snapshotWith([arrival()]));
+    assert.equal(client.sends.length, 1);
+    const aps = client.sends[0].payload.aps;
+    assert.deepEqual(aps['content-state'].departures, [{
+        id: 'river-1', destination: 'Putney Pier', platform: null, expectedAtEpoch: NOW_MS / 1000 + 900
+    }]);
+    assert.equal(aps['content-state'].updatedAtEpoch, NOW_MS / 1000 - 30);
+    assert.equal(aps['stale-date'], NOW_MS / 1000 + 60);
+    assert.equal(aps['content-state'].conditionRank, 1);
+    assert.equal(aps['content-state'].conditionHeadline, 'Minor delays');
+});
+
+test('stale or failing river data never empties the pier board or prevents rail updates', async () => {
+    const { notifier, client } = await fixture({ rows: [riverSubscription(), subscription()] });
+    for (const source of [
+        async () => { throw new Error('offline'); },
+        async () => riverSource([], NOW_MS, true),
+        async () => riverSource([], NOW_MS - 91_000)
+    ]) {
+        notifier.river = { arrivals: source };
+        await notifier.notify(snapshotWith([arrival({ vehicleId: String(client.sends.length) })]));
+    }
+    assert.equal(client.sends.length, 3);
+    assert.ok(client.sends.every((sent) => sent.payload.aps['content-state'].departures[0].destination === 'Hainault'));
+});
+
+test('a river empty poll needs a second distinct source update before replacing a valid board', async () => {
+    let nowMs = NOW_MS;
+    let source = riverSource([riverPrediction()]);
+    const { notifier, client } = await fixture({ rows: [riverSubscription()], clock: () => nowMs });
+    notifier.river = { arrivals: async () => source, status: async () => ({ data: [] }) };
+    await notifier.notify(snapshotWith([]));
+    nowMs += 30_000;
+    source = riverSource([], nowMs);
+    await notifier.notify(snapshotWith([]));
+    nowMs += 10_000;
+    await notifier.notify(snapshotWith([]));
+    assert.equal(client.sends.length, 1);
+    nowMs += 20_000;
+    source = riverSource([], nowMs);
+    await notifier.notify(snapshotWith([]));
+    assert.equal(client.sends.length, 2);
+    assert.deepEqual(client.sends[1].payload.aps['content-state'].departures, []);
+});

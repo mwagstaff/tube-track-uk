@@ -6,6 +6,8 @@ import {
 import { conditionsByLine } from './line-condition.js';
 import { liveActivityPayload } from './apns.js';
 import { MAXIMUM_DEPARTURES, projectBoard } from './departure-projection.js';
+import { isRiverBusLine } from '../river.js';
+import { projectRiverBoard, riverCondition } from './river-departure-projection.js';
 import { LINE_COLOURS } from '../line-colours.js';
 
 const ACTIVITY_MAX_DURATION_MS = 90 * 60 * 1_000;
@@ -29,6 +31,7 @@ export class LiveActivityNotifier {
         logger,
         metrics,
         statuses = async () => [],
+        river = null,
         clock = Date.now,
         maxDurationMs = ACTIVITY_MAX_DURATION_MS
     }) {
@@ -38,6 +41,7 @@ export class LiveActivityNotifier {
         this.logger = logger;
         this.metrics = metrics;
         this.statuses = statuses;
+        this.river = river;
         this.clock = clock;
         this.maxDurationMs = maxDurationMs;
     }
@@ -98,14 +102,44 @@ export class LiveActivityNotifier {
             return 'expired';
         }
 
-        const board = projectBoard({
-            arrivals: snapshot.arrivals,
-            stopIds: row.stopIds,
-            lineId: row.lineId,
-            direction: row.direction,
-            limit: MAXIMUM_DEPARTURES
-        });
-        const condition = conditions.get(row.lineId) ?? null;
+        const isRiver = isRiverBusLine(row.lineId);
+        let board;
+        let condition;
+        let sourceUpdatedAtMs = nowMs;
+        if (isRiver) {
+            // River failures must neither empty a tracked pier nor stop rail pushes.
+            if (!this.river) return 'unavailable';
+            try {
+                const result = await this.river.arrivals(row.hubId);
+                sourceUpdatedAtMs = Date.parse(result?.meta?.updatedAt);
+                if (!result || result.meta.stale || !Number.isFinite(sourceUpdatedAtMs)
+                    || nowMs - sourceUpdatedAtMs > 90_000
+                    || sourceUpdatedAtMs < (row.lastSourceUpdatedAtMs ?? 0)) return 'stale';
+                board = projectRiverBoard({ predictions: result.data, pierId: row.hubId,
+                    lineId: row.lineId, nowMs });
+                // One empty source update is inconclusive, just as in the app.
+                if (!board.length && row.lastBoard?.length
+                    && nowMs - (row.lastSourceUpdatedAtMs ?? 0) <= 90_000) {
+                    if (!row.riverEmptyUpdatedAtMs || sourceUpdatedAtMs <= row.riverEmptyUpdatedAtMs) {
+                        this.store.touch(row.id, { riverEmptyUpdatedAtMs: row.riverEmptyUpdatedAtMs ?? sourceUpdatedAtMs });
+                        return 'unconfirmed_empty';
+                    }
+                }
+                this.store.touch(row.id, { riverEmptyUpdatedAtMs: null });
+                let status;
+                try { status = await this.river.status(); } catch { /* A board can work without status. */ }
+                condition = riverCondition(status?.meta?.stale ? null : status?.data?.find((item) => item.id === row.lineId));
+            } catch (error) {
+                this.logger?.warn('push_river_unavailable', { error: error.message });
+                return 'unavailable';
+            }
+        } else {
+            board = projectBoard({
+                arrivals: snapshot.arrivals, stopIds: row.stopIds,
+                lineId: row.lineId, direction: row.direction, limit: MAXIMUM_DEPARTURES
+            });
+            condition = conditions.get(row.lineId) ?? null;
+        }
 
         const verdict = detectChange({
             previous: row.lastBoard ?? null,
@@ -125,17 +159,17 @@ export class LiveActivityNotifier {
         }
 
         this.metrics?.recordChangeDetected?.({ reason: verdict.reason });
-        return this.#send({ row, board, condition, verdict, nowMs });
+        return this.#send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver });
     }
 
-    async #send({ row, board, condition, verdict, nowMs }) {
+    async #send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver }) {
         const frequent = row.frequentPushesEnabled !== false;
         const updatedAtSeconds = Math.floor(nowMs / 1_000);
         const sequence = (row.sequence ?? 0) + 1;
 
         const contentState = {
             departures: board,
-            updatedAtEpoch: updatedAtSeconds,
+            updatedAtEpoch: Math.floor(sourceUpdatedAtMs / 1_000),
             conditionRank: condition?.rank ?? 3,
             conditionHeadline: condition?.headline ?? null,
             sequence
@@ -145,7 +179,8 @@ export class LiveActivityNotifier {
             event: 'update',
             contentState,
             timestampSeconds: updatedAtSeconds,
-            staleDateSeconds: updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1_000),
+            staleDateSeconds: isRiver ? Math.floor(sourceUpdatedAtMs / 1_000) + 90
+                : updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1_000),
             relevanceScore: relevanceScore(board, nowMs)
         });
 
@@ -209,6 +244,7 @@ export class LiveActivityNotifier {
             lastBoard: board,
             lastSeverityRank: condition?.rank ?? null,
             lastPushedAtMs: nowMs,
+            lastSourceUpdatedAtMs: sourceUpdatedAtMs,
             sequence,
             recentPushMs: [...(row.recentPushMs ?? []), nowMs]
                 .filter((at) => nowMs - at < PUSH_HISTORY_WINDOW_MS)

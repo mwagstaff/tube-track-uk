@@ -64,10 +64,8 @@ export function normaliseRiverArrivals(raw, network, now = Date.now()) {
     }).sort((a, b) => a.expectedArrival.localeCompare(b.expectedArrival));
 }
 
-export function createRiverRoutes({ client, resourceCache, clock = Date.now }) {
-    const router = Router();
-    const boats = new RiverBoatEstimator();
-    let fleetUpdatedAt = null;
+// Shared cached source for map cards, push validation and tracked pier boards.
+export function createRiverDataSource({ client, resourceCache, clock = Date.now }) {
     const fetch = (path) => client.fetchJSON(path, { metricLabel: 'river' });
     const network = () => resourceCache.get('river:network', {
         freshForMs: 24 * 60 * 60 * 1000,
@@ -92,6 +90,44 @@ export function createRiverRoutes({ client, resourceCache, clock = Date.now }) {
             return result;
         }
     });
+    const status = () => resourceCache.get('river:status', {
+        freshForMs: 60_000,
+        load: async () => {
+            const lines = await fetch('/Line/Mode/river-bus/Status');
+            if (!Array.isArray(lines)) throw new Error('Invalid river status');
+            return lines.filter((line) => isRiverBusLine(line.id)).map((line) => ({
+                id: line.id, name: line.name,
+                entries: (line.lineStatuses || []).map((entry) => ({
+                    description: entry.statusSeverityDescription || 'Status unavailable',
+                    reason: text(entry.reason), severity: entry.statusSeverity
+                }))
+            }));
+        }
+    });
+    const arrivals = async (pierId) => {
+        const catalogue = await network();
+        const pier = catalogue.data.piers.find((item) => item.id === pierId);
+        if (!pier) return null;
+        const result = await resourceCache.get(`river:arrivals:${pier.id}`, {
+            freshForMs: 30_000,
+            load: async () => {
+                const responses = await Promise.all(pier.arrivalStopIds.map((id) => fetch(`/StopPoint/${id}/Arrivals`)));
+                if (!responses.every(Array.isArray)) throw new Error('Invalid pier predictions');
+                return responses.flat();
+            }
+        });
+        return { ...result, data: normaliseRiverArrivals(result.data, catalogue.data, clock())
+            .filter((prediction) => prediction.pierId === pier.id) };
+    };
+    return { network, status, arrivals };
+}
+
+export function createRiverRoutes({ client, resourceCache, clock = Date.now }) {
+    const router = Router();
+    const boats = new RiverBoatEstimator();
+    let fleetUpdatedAt = null;
+    const { network, status, arrivals } = createRiverDataSource({ client, resourceCache, clock });
+    const fetch = (path) => client.fetchJSON(path, { metricLabel: 'river' });
     const respond = (handler) => async (req, res, next) => {
         try { await handler(req, res); } catch (error) {
             // Independent from the rail polling cycle and legacy response schema.
@@ -103,20 +139,7 @@ export function createRiverRoutes({ client, resourceCache, clock = Date.now }) {
         res.json(await network());
     }));
     router.get('/status', respond(async (req, res) => {
-        const result = await resourceCache.get('river:status', {
-            freshForMs: 60_000,
-            load: async () => {
-                const lines = await fetch('/Line/Mode/river-bus/Status');
-                if (!Array.isArray(lines)) throw new Error('Invalid river status');
-                return lines.filter((line) => isRiverBusLine(line.id)).map((line) => ({
-                    id: line.id, name: line.name,
-                    entries: (line.lineStatuses || []).map((status) => ({
-                        description: status.statusSeverityDescription || 'Status unavailable',
-                        reason: text(status.reason), severity: status.statusSeverity
-                    }))
-                }));
-            }
-        });
+        const result = await status();
         res.set('Cache-Control', 'public, max-age=30');
         res.json(result);
     }));
@@ -156,19 +179,10 @@ export function createRiverRoutes({ client, resourceCache, clock = Date.now }) {
         } });
     }));
     router.get('/arrivals/:pierId', respond(async (req, res) => {
-        const catalogue = await network();
-        const pier = catalogue.data.piers.find((pier) => pier.id === req.params.pierId);
-        if (!pier) { res.status(404).json({ error: { code: 'UNKNOWN_PIER', message: 'Pier not found' } }); return; }
-        const result = await resourceCache.get(`river:arrivals:${pier.id}`, {
-            freshForMs: 30_000,
-            load: async () => {
-                const responses = await Promise.all(pier.arrivalStopIds.map((id) => fetch(`/StopPoint/${id}/Arrivals`)));
-                if (!responses.every(Array.isArray)) throw new Error('Invalid pier predictions');
-                return responses.flat();
-            }
-        });
+        const result = await arrivals(req.params.pierId);
+        if (!result) { res.status(404).json({ error: { code: 'UNKNOWN_PIER', message: 'Pier not found' } }); return; }
         res.set('Cache-Control', 'no-store');
-        res.json({ ...result, data: normaliseRiverArrivals(result.data, catalogue.data).filter((p) => p.pierId === pier.id) });
+        res.json(result);
     }));
     return router;
 }

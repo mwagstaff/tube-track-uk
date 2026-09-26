@@ -4,7 +4,7 @@ import { JourneyError, JourneyPlanner } from './journey-planner.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { plannedWorksV2Response, PlannedWorksSourceError } from './planned-works.js';
 import { createPushRoutes } from './push-routes.js';
-import { createRiverRoutes } from './river.js';
+import { createRiverRoutes, createRiverDataSource } from './river.js';
 import { createCableCarRoutes } from './cable-car.js';
 import { clientMetadata, USAGE_FEATURES } from './usage.js';
 
@@ -269,6 +269,7 @@ export function createApp({
         app.use('/api/v1/push', createPushRoutes({
             store: pushTokenStore,
             isKnownStop: (id) => journeyPlanner.byId.has(id),
+            riverNetwork: async () => (await createRiverDataSource({ client, resourceCache }).network()).data,
             logger,
             metrics
         }));

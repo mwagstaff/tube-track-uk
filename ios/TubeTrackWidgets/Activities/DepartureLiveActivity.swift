@@ -89,7 +89,8 @@ private struct DepartureActivityWatchView: View {
     var body: some View {
         DepartureActivityWatchCard(
             stationName: context.attributes.stationName,
-            lineID: context.lineID,
+            lineID: context.attributes.lineID,
+            lineName: context.attributes.lineName,
             direction: context.attributes.direction,
             directionFilter: context.attributes.directionFilter,
             condition: context.condition,
@@ -102,7 +103,8 @@ private struct DepartureActivityWatchView: View {
 
 private struct DepartureActivityWatchCard: View {
     let stationName: String
-    let lineID: TubeLineID
+    let lineID: TubeLineID?
+    var lineName: String = ""
     let direction: String
     let directionFilter: DepartureDirectionFilter
     let condition: LineServiceCondition
@@ -139,7 +141,7 @@ private struct DepartureActivityWatchCard: View {
             }
 
             if departures.isEmpty {
-                Text("No trains due")
+                Text("No departures due")
                     .font(.subheadline.weight(.semibold))
             } else {
                 VStack(spacing: 4) {
@@ -173,6 +175,7 @@ private struct DepartureActivityWatchCard: View {
     }
 
     private var shortLineName: String {
+        guard let lineID else { return lineName }
         let name = lineID.watchShortName
         return name.count <= 8 ? name : lineID.shortCode
     }
@@ -190,10 +193,10 @@ private struct DepartureActivityWatchCard: View {
     }
 
     private var accessibilityLabel: String {
-        let heading = "\(stationName), \(lineID.displayName), "
+        let heading = "\(stationName), \(lineName.isEmpty ? lineID?.displayName ?? "" : lineName), "
             + "\(direction), \(condition.accessibilityDescription)"
         let staleDescription = isStale ? ". Live updates paused" : ""
-        guard !departures.isEmpty else { return heading + ", no trains due" + staleDescription }
+        guard !departures.isEmpty else { return heading + ", no departures due" + staleDescription }
         let trains = departures.enumerated().map { index, departure in
             let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
             return "\(index == 0 ? "Next" : "Then") \(departure.destination), "
@@ -211,7 +214,7 @@ private struct DepartureActivityLockScreenView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("\(context.attributes.stationName) · \(context.lineID.displayName) · \(context.attributes.direction)")
+            Text("\(context.attributes.stationName) · \(context.attributes.lineName) · \(context.attributes.direction)")
                 .font(.caption2.weight(.medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -391,7 +394,6 @@ private struct DepartureActivityFooter: View {
 // MARK: - Context conveniences
 
 private extension ActivityViewContext<DepartureActivityAttributes> {
-    var lineID: TubeLineID { attributes.lineID ?? .central }
 
     var condition: LineServiceCondition {
         LineServiceCondition(severityRank: state.conditionRank, headline: state.conditionHeadline)
@@ -414,7 +416,7 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
     }
 
     var deepLink: URL {
-        DeepLink.station(id: attributes.stationHubID, line: attributes.lineID).url
+        attributes.deepLink.url
     }
 }
 

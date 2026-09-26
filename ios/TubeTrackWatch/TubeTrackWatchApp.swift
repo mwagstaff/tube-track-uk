@@ -91,7 +91,7 @@ private struct WatchStatusScreen: View {
                 path = []
             case let .line(lineID):
                 path = [.line(lineID)]
-            case .station:
+            case .station, .pier:
                 break
             }
             Task { await refresh() }

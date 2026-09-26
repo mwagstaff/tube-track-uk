@@ -28,6 +28,11 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     /// on a Lock Screen all day.
     public let hardEndsAtEpoch: Int
 
+    public var isRiver: Bool { lineIDRaw.hasPrefix("rb") }
+    public var lineName: String { lineID?.displayName ?? lineIDRaw.uppercased() }
+    public var deepLink: DeepLink {
+        isRiver ? .pier(id: stationHubID, line: lineIDRaw) : .station(id: stationHubID, line: lineID)
+    }
     public var lineID: TubeLineID? { TubeLineID(rawValue: lineIDRaw) }
     public var directionFilter: DepartureDirectionFilter {
         DepartureDirectionFilter(rawValue: directionFilterRaw) ?? .any
@@ -45,10 +50,20 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         startedAt: Date,
         hardEndsAt: Date
     ) {
+        self.init(activityID: activityID, stationHubID: stationHubID, stationName: stationName,
+                  lineIDRaw: lineID.rawValue, direction: direction, directionFilter: directionFilter,
+                  startedAt: startedAt, hardEndsAt: hardEndsAt)
+    }
+
+    public init(
+        activityID: String, stationHubID: String, stationName: String,
+        lineIDRaw: String, direction: String, directionFilter: DepartureDirectionFilter,
+        startedAt: Date, hardEndsAt: Date
+    ) {
         self.activityID = activityID
         self.stationHubID = stationHubID
         self.stationName = String(stationName.prefix(40))
-        lineIDRaw = lineID.rawValue
+        self.lineIDRaw = lineIDRaw
         self.direction = direction
         directionFilterRaw = directionFilter.rawValue
         startedAtEpoch = startedAt.epochSeconds

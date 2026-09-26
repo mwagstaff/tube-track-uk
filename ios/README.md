@@ -54,6 +54,21 @@ xcodebuild test \
 Tests cover bundled graph integrity, disruption section resolution and safe
 fallback, API response decoding, train interpolation and works deduplication.
 
+### Game Center release signing
+
+Keep the Game Center capability and `com.apple.developer.game-center = true`
+entitlement on both `TubeTrackUK` and the `TubeTrackWatch` companion app.
+Build 1.2 (6) had the entitlement on the iPhone app but not the Watch app, and
+App Store Connect blocked review with a missing Game Center key error. Adding the
+Watch entitlement in build 7 cleared the error and allowed Add for Review to
+succeed. The Watch app does not authenticate players or use GameKit.
+
+After changing capabilities, allow Xcode to update provisioning profiles.
+Before uploading, inspect the exported IPA: both app signatures and their
+embedded App Store profiles should contain the Game Center entitlement. An
+archive alone is insufficient because export signs the apps again. Keep Game
+Center enabled in App Store Connect so the iPhone leaderboards remain available.
+
 ## Journey planning
 
 The Journeys tab replaces the former Works tab. Choose two rail stations, then
@@ -126,6 +141,15 @@ River Bus piers are shown by default on both maps. Profile → Preferences
 contains the remembered visibility switch, RB service filter and estimated-boat
 switch. Piers are independent selectable stops with departures and service
 status. Search includes stations, piers and shared favourites. A selected pier reveals the layer even if it was hidden.
+
+Pier cards share the station header's favourite, labelled Directions and close
+controls. Each RB service has a Track button for its next departures in both
+directions, using the same Lock Screen, Dynamic Island and Watch Live Activity
+as rail stations. Tapping the activity returns to the pier. Pier directions
+continue to use walking directions. Deploy the accompanying API changes before
+releasing the app so tracked piers receive background push updates; foreground
+updates use the existing pier polling. Stale and terminating predictions cannot
+start a new tracked board.
 
 “Show live trains and boats” enables both live layers (including the River Bus
 layer if it was hidden); switching it off clears both. The independent estimated-boat

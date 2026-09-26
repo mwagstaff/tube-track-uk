@@ -14,6 +14,37 @@ struct RiverBusTests {
             expiresAt: now.addingTimeInterval(arrival), terminatesHere: pier == destination)
     }
 
+    @Test func trackedPierBoardUsesOnlyCurrentNonTerminatingDeparturesForItsService() {
+        let board = RiverBoardSnapshot(predictions: [
+            prediction(pier: "B", arrival: 900), prediction(pier: "B", arrival: 60),
+            prediction(pier: "B", arrival: 300), prediction(pier: "B", arrival: 180),
+            prediction(pier: "B", arrival: 240), prediction(pier: "B", arrival: -1),
+            prediction(pier: "B", arrival: 200, observed: -91),
+            prediction(pier: "B", arrival: 210, observed: 31),
+            prediction(pier: "B", arrival: 30, destination: "B"),
+            prediction(pier: "A", arrival: 40)
+        ], updatedAt: now, stale: false)
+        let state = RiverDepartureBoard.contentState(board: board, pierID: "B", lineID: "rb99",
+                                                     statuses: [], sequence: 7, now: now)
+        #expect(state.departures.map(\.expectedAt) == [60, 180, 240, 300].map { now.addingTimeInterval($0) })
+        #expect(state.updatedAt == now && state.sequence == 7 && state.conditionRank == 3)
+        #expect(state.departures.allSatisfy { $0.platform == nil })
+        #expect(RiverDepartureBoard.departures(in: board, pierID: "B", lineID: "rb6", at: now).isEmpty)
+        #expect(RiverDepartureBoard.departures(in: board, pierID: "B", at: now.addingTimeInterval(91)).isEmpty)
+    }
+
+    @Test func riverTrackingKeepsTheOriginalSourceTimeAndServiceWarning() {
+        let board = RiverBoardSnapshot(predictions: [prediction(pier: "B", arrival: 300)], updatedAt: now, stale: false)
+        let statuses = [RiverLineStatus(id: "rb99", name: "RB99", entries: [
+            .init(description: "Minor delays", reason: nil, severity: 9)
+        ])]
+        let state = RiverDepartureBoard.contentState(board: board, pierID: "B", lineID: "rb99",
+                                                     statuses: statuses, sequence: 1, now: now.addingTimeInterval(30))
+        #expect(state.updatedAt == now)
+        #expect(state.conditionRank == 1 && state.conditionHeadline == "Minor delays")
+        #expect(state.departures.first?.id == "B:300.0")
+    }
+
     @Test func preparedBoatPathsInterpolateByDistanceAndReuseOnlyDirectedPierPairs() {
         let points = [CGPoint(x: 0, y: 0), CGPoint(x: 3, y: 0),
                       CGPoint(x: 3, y: 0), CGPoint(x: 3, y: 4)]

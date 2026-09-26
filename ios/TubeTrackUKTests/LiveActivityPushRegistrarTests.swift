@@ -90,6 +90,23 @@ struct LiveActivityPushRegistrarTests {
         #expect(json["frequentPushesEnabled"] as? Bool == false)
     }
 
+    @Test func riverRegistrationUsesThePierAndRawServiceID() async throws {
+        RegistrationURLProtocol.prepare(statusCode: 201)
+        let attributes = DepartureActivityAttributes(
+            activityID: "DEADBEEF-1234-5678", stationHubID: "930GCAD", stationName: "Cadogan Pier",
+            lineIDRaw: "rb6", direction: "All departures", directionFilter: .any,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400)
+        )
+        try await registrar().register(token: String(repeating: "ab", count: 32),
+                                       attributes: attributes, frequentPushesEnabled: true)
+        let body = try #require(RegistrationURLProtocol.lastBody)
+        let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        #expect(json["lineId"] as? String == "rb6")
+        #expect(json["hubId"] as? String == "930GCAD")
+        #expect(json["stopIds"] as? [String] == ["930GCAD"])
+        #expect(json["direction"] as? String == "any")
+    }
+
     @Test func aRefusedRegistrationSurfacesAsAnErrorRatherThanSilentSuccess() async {
         // 429 is the realistic refusal now that the server leans on rate limits.
         RegistrationURLProtocol.prepare(statusCode: 429)

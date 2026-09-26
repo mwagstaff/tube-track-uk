@@ -11,6 +11,7 @@ public enum DeepLink: Equatable, Sendable {
     case status
     case line(TubeLineID)
     case station(id: String, line: TubeLineID?)
+    case pier(id: String, line: String?)
 
     public init?(url: URL) {
         guard url.scheme?.lowercased() == Self.scheme,
@@ -27,6 +28,10 @@ public enum DeepLink: Equatable, Sendable {
                 return nil
             }
             self = .line(lineID)
+        case "pier":
+            guard segments.count == 1, !segments[0].isEmpty else { return nil }
+            let line = components.queryItems?.first(where: { $0.name == "line" })?.value
+            self = .pier(id: segments[0], line: line)
         case "station":
             guard segments.count == 1, !segments[0].isEmpty else { return nil }
             let lineID = components.queryItems?
@@ -48,6 +53,10 @@ public enum DeepLink: Equatable, Sendable {
         case let .line(lineID):
             components.host = "line"
             components.path = "/\(lineID.rawValue)"
+        case let .pier(id, line):
+            components.host = "pier"
+            components.path = "/\(id)"
+            if let line { components.queryItems = [URLQueryItem(name: "line", value: line)] }
         case let .station(id, lineID):
             components.host = "station"
             components.path = "/\(id)"

@@ -1,9 +1,10 @@
 # TubeTrack UK 1.2 — App Store release candidate
 
-Prepared 26 September 2026 for App Store app ID 6808680996. Builds 1.2 (1)
-and 1.2 (2) were uploaded to Apple; build 2 is selected in the 1.2 App Store
-Connect draft. The local IPA documented below is build 1. The version has not
-been submitted for review.
+Prepared 26 September 2026 for App Store app ID 6808680996. Build 1.2 (7)
+was uploaded at 8:35 PM BST with a Game Center signing fix for the Watch
+companion. Its verified App Store IPA is `export/build-7/TubeTrackUK.ipa`.
+The original build 1 export remains in `export/`. Build 7 is selected and version 1.2 is Ready for Review;
+the final submission to Apple has not been sent.
 
 ## Binary and validation
 
@@ -44,17 +45,26 @@ also retained here in `export/`.
 
 ## Before App Review
 
-App Store Connect currently blocks **Add for Review** with “You must add the
-com.apple.developer.game-center key in Xcode.” This conflicts with the build
-metadata Apple displays for both 1.2 (1) and 1.2 (2): the main iOS app has
-`com.apple.developer.game-center: true`. The local build 1 IPA's signed app and
-App Store provisioning profile also contain the entitlement, and the Xcode
-project enables the Game Center capability. Build 2, uploaded 26 September at
-5:33 PM BST, is validated and remains selected. Re-selecting either build,
-refreshing the Game Center checkbox, reloading, and retrying Add for Review did
-not clear the error. Game Center remains enabled. This is an App Store Connect
-validation inconsistency that should be raised with
-[Apple Developer Support](https://developer.apple.com/support/app-store/).
+Builds through 1.2 (6) were blocked at **Add for Review** with “You must add
+the com.apple.developer.game-center key in Xcode.” Apple's processed build 6
+metadata confirms that the iPhone app already had this entitlement, but the
+Watch companion did not. Re-selecting builds and toggling the Game Center
+checkbox did not resolve the error.
+
+Build 7 adds the Game Center capability and entitlement to `TubeTrackWatch`
+as a workaround for the reported companion-app validation issue, while
+preserving the iPhone Game Center functionality. Xcode automatic provisioning
+successfully updated the Watch App ID and generated matching profiles. Both
+the iPhone and Watch apps in the exported build 7 IPA have
+`com.apple.developer.game-center=true` in their signatures and distribution
+profiles, and `get-task-allow=false`. The IPA passes
+`codesign --verify --deep --strict`. The signed archive is retained at
+`/tmp/TubeTrackUK-1.2-game-center-fix.xcarchive`.
+
+App Store Connect finished processing build 7, and **Add for Review** succeeded
+with Game Center enabled. Version 1.2 now shows **Ready for Review**. This
+confirms that adding the Watch companion entitlement cleared the validation
+error. The final **Submit to App Review** action remains for the release owner.
 
 1. Review the App Privacy answers and privacy policy. Version 1.2 sends a
    random installation ID and app-open/feature-open events to the first-party

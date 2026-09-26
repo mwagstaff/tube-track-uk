@@ -494,32 +494,9 @@ private struct StationDepartureGroupView: View {
             lineID: group.lineID,
             direction: group.direction
         )
-        Button {
+        DepartureTrackButton(isTracking: isTracking, boardName: "\(group.lineID.displayName) \(group.direction)") {
             Task { await toggleTracking(tracking, controller: controller, isTracking: isTracking) }
-        } label: {
-            Label(
-                isTracking ? "Tracking" : "Track",
-                systemImage: isTracking ? "dot.radiowaves.left.and.right" : "pin"
-            )
-            .font(.appCaption(.semibold))
-            .labelStyle(.titleAndIcon)
-            .padding(.horizontal, 10)
-            .frame(minHeight: 30)
-            .contentShape(.rect)
         }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .capsule)
-        .foregroundStyle(isTracking ? Color.departureAccent : .secondary)
-        .accessibilityLabel(
-            isTracking
-                ? "Stop tracking \(group.lineID.displayName) \(group.direction) departures"
-                : "Track \(group.lineID.displayName) \(group.direction) departures"
-        )
-        .accessibilityHint(
-            isTracking
-                ? "Removes the departure board from the Lock Screen"
-                : "Shows this departure board on the Lock Screen"
-        )
     }
 
     private func toggleTracking(

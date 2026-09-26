@@ -2,9 +2,22 @@ import MapKit
 import SwiftUI
 
 struct StationDirectionsButton: View {
-    @Environment(TubeAppState.self) private var appState
     let station: TubeStation
     var iconOnly = false
+
+    var body: some View {
+        StopDirectionsButton(name: station.name, latitude: station.latitude,
+                             longitude: station.longitude, iconOnly: iconOnly)
+    }
+}
+
+struct StopDirectionsButton: View {
+    @Environment(TubeAppState.self) private var appState
+    let name: String
+    let latitude: Double
+    let longitude: Double
+    var iconOnly = false
+    var walking = false
 
     var body: some View {
         Button {
@@ -25,18 +38,18 @@ struct StationDirectionsButton: View {
         .foregroundStyle(.secondary)
         .frame(minWidth: 44, minHeight: 44)
         .contentShape(.rect)
-        .accessibilityLabel("Get directions to \(station.name)")
-        .requiresNetwork(appState.isOffline, onlineHint: "Opens transit directions in Maps")
+        .accessibilityLabel("Get directions to \(name)")
+        .requiresNetwork(appState.isOffline, onlineHint: walking ? "Opens walking directions in Maps" : "Opens transit directions in Maps")
     }
 
     private func openDirections() {
         let destination = MKMapItem(
-            location: CLLocation(latitude: station.latitude, longitude: station.longitude),
+            location: CLLocation(latitude: latitude, longitude: longitude),
             address: nil
         )
-        destination.name = station.name
+        destination.name = name
         destination.openInMaps(launchOptions: [
-            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeTransit
+            MKLaunchOptionsDirectionsModeKey: walking ? MKLaunchOptionsDirectionsModeWalking : MKLaunchOptionsDirectionsModeTransit
         ])
     }
 }

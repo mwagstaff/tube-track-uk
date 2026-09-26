@@ -275,3 +275,33 @@ test('widget registrations are stored separately from activities', async () => {
         assert.equal(store.size, 0);
     });
 });
+
+const riverPier = { id: '930GCAD', lineIds: ['rb6'], arrivalStopIds: ['930GCAD', '930BCAD'] };
+const riverRegistration = (overrides = {}) => registration({
+    lineId: 'rb6', hubId: '930GCAD', stopIds: ['930GCAD'], direction: 'any', ...overrides
+});
+
+test('river registration resolves a canonical pier and validates its service and stop scope', async () => {
+    await withRoutes(async ({ call, store }) => {
+        const good = await call('POST', '/api/v1/push/live-activities', { body: riverRegistration() });
+        assert.equal(good.status, 201);
+        const row = store.get((await good.json()).data.id);
+        assert.equal(row.lineId, 'rb6');
+        assert.deepEqual(row.stopIds, ['930GCAD']);
+        for (const fields of [
+            { lineId: 'rb999' }, { hubId: 'unknown' }, { direction: 'eastbound' },
+            { stopIds: ['930BCAD'] }, { stopIds: ['930GCAD', '940GZZLUOXC'] }
+        ]) {
+            const bad = await call('POST', '/api/v1/push/live-activities', { body: riverRegistration(fields) });
+            assert.equal(bad.status, 400);
+        }
+    }, { riverNetwork: async () => ({ piers: [riverPier] }) });
+});
+
+test('a river catalogue failure preserves the subscription and returns a retryable response', async () => {
+    await withRoutes(async ({ call, store }) => {
+        const response = await call('POST', '/api/v1/push/live-activities', { body: riverRegistration() });
+        assert.equal(response.status, 503);
+        assert.equal(store.size, 0);
+    }, { riverNetwork: async () => { throw new Error('offline'); } });
+});

@@ -38,14 +38,12 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         attributes: DepartureActivityAttributes,
         frequentPushesEnabled: Bool
     ) async throws {
-        guard let lineID = attributes.lineID else { return }
-
-        let stopIDs = StationIndex.bundled.hub(containing: attributes.stationHubID)?.stopIDs
-            ?? [attributes.stationHubID]
+        let stopIDs = attributes.isRiver ? [attributes.stationHubID]
+            : StationIndex.bundled.hub(containing: attributes.stationHubID)?.stopIDs ?? [attributes.stationHubID]
         let body = RegistrationBody(
             activityId: attributes.activityID,
             token: token,
-            lineId: lineID.rawValue,
+            lineId: attributes.lineIDRaw,
             direction: attributes.directionFilterRaw,
             hubId: attributes.stationHubID,
             stopIds: stopIDs,

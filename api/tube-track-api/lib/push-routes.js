@@ -1,5 +1,6 @@
 import express from 'express';
 import { DIRECTION_FILTERS } from './push/departure-projection.js';
+import { isRiverBusLine } from './river.js';
 import { LINE_COLOURS } from './line-colours.js';
 
 const LINE_IDS = new Set(LINE_COLOURS.map((line) => line.id));
@@ -103,6 +104,7 @@ function readStopIds(value, isKnownStop) {
 export function createPushRoutes({
     store,
     isKnownStop = () => true,
+    riverNetwork = async () => ({ piers: [] }),
     logger,
     metrics,
     clock = Date.now,
@@ -141,7 +143,7 @@ export function createPushRoutes({
         next();
     });
 
-    router.post('/live-activities', (req, res) => {
+    router.post('/live-activities', async (req, res) => {
         const body = req.body ?? {};
         const { activityId, token, lineId, direction, hubId } = body;
 
@@ -151,13 +153,30 @@ export function createPushRoutes({
         if (!TOKEN_PATTERN.test(String(token ?? ''))) {
             return badRequest(res, 'INVALID_TOKEN', 'token must be a hex APNs token');
         }
-        if (!LINE_IDS.has(String(lineId))) {
+        const isRiver = isRiverBusLine(lineId);
+        if (!LINE_IDS.has(String(lineId)) && !isRiver) {
             return badRequest(res, 'INVALID_LINE', 'lineId must be a line TubeTrack serves');
         }
         if (!DIRECTION_FILTERS.includes(String(direction ?? 'any'))) {
             return badRequest(res, 'INVALID_DIRECTION', 'direction must be a known filter');
         }
-        const stopIds = readStopIds(body.stopIds, isKnownStop);
+        let pier = null;
+        if (isRiver) {
+            let network;
+            try { network = await riverNetwork(); }
+            catch {
+                return res.status(503).json({ error: { code: 'RIVER_UNAVAILABLE', message: 'River Bus data is temporarily unavailable' } });
+            }
+            pier = network.piers.find((item) => item.id === hubId && item.lineIds.includes(lineId));
+            if (!pier || (direction ?? 'any') !== 'any') {
+                return badRequest(res, 'INVALID_PIER', 'River tracking requires a known pier and service');
+            }
+        }
+        // River subscriptions name exactly one canonical pier. Its berths are
+        // resolved server-side, so callers cannot subscribe to unrelated stops.
+        const stopIds = isRiver
+            ? (Array.isArray(body.stopIds) && body.stopIds.length === 1 && body.stopIds[0] === pier.id ? [pier.id] : null)
+            : readStopIds(body.stopIds, isKnownStop);
         if (!stopIds) {
             return badRequest(res, 'INVALID_STOP_IDS', 'stopIds must name stops TubeTrack knows');
         }

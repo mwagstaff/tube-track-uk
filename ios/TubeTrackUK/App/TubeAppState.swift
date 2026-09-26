@@ -810,6 +810,12 @@ final class TubeAppState {
                 setDisruptionHighlightScope(nil)
                 selectedLineID = lineID
             }
+        case let .pier(id, lineID):
+            guard let pier = river.network.pier(id) else { return }
+            selectedTab = .map
+            setDisruptionHighlightScope(nil)
+            river.selectedLineId = lineID.flatMap { pier.lineIds.contains($0) ? $0 : nil }
+            select(pier: pier)
         case let .station(id, lineID):
             selectedTab = .map
             guard let station = graph?.stationsByID[id]

@@ -40,26 +40,11 @@ struct StationDetailCard: View {
     var body: some View {
         GlassPanel {
             VStack(alignment: .leading, spacing: 10) {
-                HStack(alignment: .top, spacing: 4) {
-                    Text(station.name)
-                        .font(.appHeadline())
-                    Spacer()
-                    FavouriteStopButton(stop: .station(station))
+                StopDetailHeader(stop: .station(station), closeHint: "Closes station details") {
+                    if let onClose { onClose() }
+                    else { appState.clearStationSelection() }
+                } directions: {
                     StationDirectionsButton(station: station)
-                    Button("Close", systemImage: "xmark.circle.fill") {
-                        if let onClose {
-                            onClose()
-                        } else {
-                            appState.clearStationSelection()
-                        }
-                    }
-                    .labelStyle(.iconOnly)
-                    .foregroundStyle(.secondary)
-                    .font(.appTitle2())
-                    .frame(width: 44, height: 44)
-                    .contentShape(.rect)
-                    .buttonStyle(.plain)
-                    .accessibilityHint("Closes station details")
                 }
                 StationDeparturesSection(
                     lineIDs: lineIDs,

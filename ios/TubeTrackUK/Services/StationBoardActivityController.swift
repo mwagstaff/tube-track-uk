@@ -40,12 +40,13 @@ final class StationBoardActivityController {
     }
 
     func isTracking(hubID: String, lineID: TubeLineID, direction: String) -> Bool {
+        isTracking(hubID: hubID, lineIDRaw: lineID.rawValue, direction: direction)
+    }
+
+    func isTracking(hubID: String, lineIDRaw: String, direction: String) -> Bool {
         guard let trackedActivityID,
-              let attributes = DepartureActivityBridge.attributes(for: trackedActivityID) else {
-            return false
-        }
-        return attributes.stationHubID == hubID
-            && attributes.lineIDRaw == lineID.rawValue
+              let attributes = DepartureActivityBridge.attributes(for: trackedActivityID) else { return false }
+        return attributes.stationHubID == hubID && attributes.lineIDRaw == lineIDRaw
             && attributes.direction == direction
     }
 
@@ -61,12 +62,6 @@ final class StationBoardActivityController {
         statuses: [TfLLineStatus],
         updatedAt: Date
     ) async {
-        guard areActivitiesEnabled else {
-            Self.logger.notice("Live Activities are disabled for this app")
-            return
-        }
-        await endEverything(reason: .userEnded)
-
         let now = Date.now
         let attributes = DepartureActivityAttributes(
             activityID: UUID().uuidString,
@@ -78,22 +73,43 @@ final class StationBoardActivityController {
             startedAt: now,
             hardEndsAt: now.addingTimeInterval(DepartureActivityPolicy.maximumDuration)
         )
-        sequence = 1
         let state = DepartureActivityBoard.contentState(
             from: arrivals, lineID: lineID, direction: direction,
             condition: Self.condition(for: lineID, in: statuses),
-            updatedAt: updatedAt, sequence: sequence
+            updatedAt: updatedAt, sequence: 1
         )
 
+        await begin(attributes: attributes, state: state)
+    }
+
+    func start(pier: RiverPier, lineID: String, board: RiverBoardSnapshot,
+               statuses: [RiverLineStatus]) async {
+        let now = Date.now
+        let state = RiverDepartureBoard.contentState(board: board, pierID: pier.id, lineID: lineID,
+                                                     statuses: statuses, sequence: 1, now: now)
+        guard !state.departures.isEmpty, !board.stale else { return }
+        let attributes = DepartureActivityAttributes(
+            activityID: UUID().uuidString, stationHubID: pier.id, stationName: pier.name,
+            lineIDRaw: lineID, direction: "All departures", directionFilter: .any,
+            startedAt: now, hardEndsAt: now.addingTimeInterval(DepartureActivityPolicy.maximumDuration)
+        )
+        await begin(attributes: attributes, state: state)
+    }
+
+    private func begin(attributes: DepartureActivityAttributes,
+                       state: DepartureActivityAttributes.ContentState) async {
+        guard areActivitiesEnabled, !Task.isCancelled else { return }
+        await endEverything(reason: .userEnded)
+        guard !Task.isCancelled else { return }
+        sequence = state.sequence
         do {
             let isPushBacked = try DepartureActivityBridge.request(
                 attributes: attributes,
-                content: content(for: state, hardEndsAt: attributes.hardEndsAt)
+                content: content(for: state, attributes: attributes)
             )
             trackedActivityID = attributes.activityID
-            lastUpdatedAt = updatedAt
+            lastUpdatedAt = state.updatedAt
             AppGroup.recordTrackedActivity(id: attributes.activityID)
-            Self.logger.notice("Started tracking \(hubID, privacy: .public) \(lineID.rawValue, privacy: .public) \(directionLabel, privacy: .public), push-backed: \(isPushBacked, privacy: .public)")
             if isPushBacked {
                 observePushToken(activityID: attributes.activityID, attributes: attributes)
             }
@@ -124,6 +140,25 @@ final class StationBoardActivityController {
             condition: Self.condition(for: lineID, in: statuses),
             updatedAt: updatedAt, sequence: sequence
         )
+        await publish(state, attributes: attributes)
+    }
+
+    func update(pierID: String, board: RiverBoardSnapshot, statuses: [RiverLineStatus]) async {
+        guard let trackedActivityID,
+              let attributes = DepartureActivityBridge.attributes(for: trackedActivityID),
+              attributes.isRiver, attributes.stationHubID == pierID, !board.stale,
+              Date.now.timeIntervalSince(board.updatedAt) <= 90 else { return }
+        sequence += 1
+        let state = RiverDepartureBoard.contentState(board: board, pierID: pierID,
+            lineID: attributes.lineIDRaw, statuses: statuses, sequence: sequence)
+        await publish(state, attributes: attributes)
+    }
+
+    private func publish(_ state: DepartureActivityAttributes.ContentState,
+                         attributes: DepartureActivityAttributes) async {
+        let updatedAt = state.updatedAt
+        guard attributes.activityID == trackedActivityID,
+              updatedAt >= (lastUpdatedAt ?? .distantPast), !Task.isCancelled else { return }
         lastUpdatedAt = updatedAt
 
         if let reason = DepartureActivityPolicy.endReason(
@@ -137,8 +172,8 @@ final class StationBoardActivityController {
         }
 
         await DepartureActivityBridge.update(
-            activityID: trackedActivityID,
-            content: content(for: state, hardEndsAt: attributes.hardEndsAt),
+            activityID: attributes.activityID,
+            content: content(for: state, attributes: attributes),
             timestamp: updatedAt
         )
     }
@@ -179,14 +214,16 @@ final class StationBoardActivityController {
 
     private func content(
         for state: DepartureActivityAttributes.ContentState,
-        hardEndsAt: Date
+        attributes: DepartureActivityAttributes
     ) -> ActivityContent<DepartureActivityAttributes.ContentState> {
         ActivityContent(
             state: state,
-            staleDate: DepartureActivityPolicy.staleDate(
+            staleDate: attributes.isRiver
+                ? min(state.updatedAt.addingTimeInterval(90), attributes.hardEndsAt)
+                : DepartureActivityPolicy.staleDate(
                 updatedAt: state.updatedAt,
                 frequentPushesEnabled: isFrequentPushesEnabled,
-                hardEndsAt: hardEndsAt
+                hardEndsAt: attributes.hardEndsAt
             ),
             relevanceScore: DepartureActivityPolicy.relevanceScore(state: state, now: .now)
         )

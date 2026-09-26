@@ -8,6 +8,7 @@ import { PlannedTrackClosuresSource } from './lib/planned-works.js';
 import { ApnsClient, ApnsTokenSigner } from './lib/push/apns.js';
 import { LiveActivityNotifier } from './lib/push/notifier.js';
 import { PushTokenStore } from './lib/push/token-store.js';
+import { createRiverDataSource } from './lib/river.js';
 import { ResourceCache } from './lib/resource-cache.js';
 import { TfLClient } from './lib/tfl-client.js';
 import { UsageStore } from './lib/usage-store.js';
@@ -57,6 +58,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client 
             store,
             client: apns,
             topic: config.push.liveActivityTopic,
+            river: createRiverDataSource({ client, resourceCache }),
             logger,
             metrics,
             // Reuses the cache behind /api/v1/status, so a tracked board's

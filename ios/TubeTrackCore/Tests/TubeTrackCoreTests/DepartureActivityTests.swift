@@ -31,6 +31,19 @@ struct DepartureActivityTests {
         )
     }
 
+    @Test func riverActivityRoundTripsWithItsServiceAndPierLink() throws {
+        let attributes = DepartureActivityAttributes(
+            activityID: "river", stationHubID: "930GCAD", stationName: "Cadogan Pier",
+            lineIDRaw: "rb6", direction: "All departures", directionFilter: .any,
+            startedAt: updatedAt, hardEndsAt: updatedAt.addingTimeInterval(5400)
+        )
+        let decoded = try JSONDecoder().decode(DepartureActivityAttributes.self, from: JSONEncoder().encode(attributes))
+        #expect(decoded == attributes && decoded.isRiver && decoded.lineID == nil)
+        #expect(decoded.lineName == "RB6")
+        #expect(DeepLink(url: decoded.deepLink.url) == .pier(id: "930GCAD", line: "rb6"))
+        #expect(DeepLink(url: DeepLink.pier(id: "930GCAD", line: nil).url) == .pier(id: "930GCAD", line: nil))
+    }
+
     // MARK: - Wire format
 
     @Test func timesCrossTheWireAsEpochSecondsNotSwiftDates() throws {

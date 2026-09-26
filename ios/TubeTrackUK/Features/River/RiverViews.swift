@@ -10,7 +10,7 @@ struct FavouriteStopButton: View {
             appState.favourites.toggle(stop)
         }
         .labelStyle(.iconOnly)
-        .frame(width: 44, height: 44)
+        .frame(minWidth: 44, minHeight: 44)
         .accessibilityLabel("\(saved ? "Remove" : "Save") \(stop.name)\(saved ? " from favourites" : " to favourites")")
         .accessibilityValue(saved ? "Saved" : "Not saved")
     }
@@ -63,33 +63,27 @@ struct RiverStatusRows: View {
 
 struct RiverPierCard: View {
     @Environment(TubeAppState.self) private var appState
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @State private var departuresHeight: CGFloat = 160
     let pier: RiverPier
     var body: some View {
         GlassPanel {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(pier.name).font(.appHeadline()).fixedSize(horizontal: false, vertical: true)
-                HStack(spacing: 2) {
-                    Text(pier.lineIds.map { appState.river.network.lineName($0) }.joined(separator: " · "))
-                        .font(.appCaption(.semibold)).foregroundStyle(.secondary)
-                    Spacer(minLength: 0)
-                    FavouriteStopButton(stop: .pier(pier))
-                    Button("Directions", systemImage: "arrow.triangle.turn.up.right.diamond") {
-                        let item = MKMapItem(location: CLLocation(latitude: pier.latitude, longitude: pier.longitude), address: nil)
-                        item.name = pier.name
-                        item.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeWalking])
-                    }.labelStyle(.iconOnly).frame(width: 44, height: 44).disabled(appState.isOffline)
-                    Button("Close pier", systemImage: "xmark.circle.fill") { appState.river.clearSelection() }
-                        .labelStyle(.iconOnly).frame(width: 44, height: 44)
+            VStack(alignment: .leading, spacing: 10) {
+                StopDetailHeader(stop: .pier(pier), closeHint: "Closes pier details") {
+                    appState.river.clearSelection()
+                } directions: {
+                    StopDirectionsButton(name: pier.name, latitude: pier.latitude,
+                                         longitude: pier.longitude, walking: true)
                 }
+                Text(pier.lineIds.map { appState.river.network.lineName($0) }.joined(separator: " · "))
+                    .font(.appCaption(.semibold)).foregroundStyle(.secondary)
+                Divider()
                 TimelineView(.periodic(from: .now, by: 1)) { timeline in
                     VStack(alignment: .leading, spacing: 8) {
                         let board = appState.river.selectedBoard
-                        let departures = (board?.predictions ?? []).filter {
-                            !$0.terminatesHere && $0.isCurrent(at: timeline.date)
-                                && (appState.river.selectedLineId == nil || $0.lineId == appState.river.selectedLineId)
-                                && timeline.date.timeIntervalSince(board?.updatedAt ?? .distantPast) <= 90
-                        }.sorted { $0.expectedArrival < $1.expectedArrival }
+                        let departures = board.map {
+                            RiverDepartureBoard.departures(in: $0, pierID: pier.id,
+                                lineID: appState.river.selectedLineId, at: timeline.date)
+                        } ?? []
                         if departures.isEmpty {
                             if board == nil && appState.river.error == nil && !appState.isOffline {
                                 ProgressView("Loading departures…")
@@ -102,7 +96,22 @@ struct RiverPierCard: View {
                                     .font(.appSubheadline()).foregroundStyle(.secondary)
                             }
                         } else {
-                            boardRows(departures.prefix(dynamicTypeSize.isAccessibilitySize ? 2 : 4), at: timeline.date)
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: 14) {
+                                    ForEach(Array(Set(departures.map(\.lineId))).sorted(), id: \.self) { lineID in
+                                        RiverDepartureGroupView(
+                                            pier: pier, lineID: lineID,
+                                            departures: departures.filter { $0.lineId == lineID },
+                                            date: timeline.date
+                                        )
+                                    }
+                                }
+                                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
+                                    departuresHeight = $0
+                                }
+                            }
+                            .scrollBounceBehavior(.basedOnSize)
+                            .frame(height: min(departuresHeight, 280))
                         }
 
                     }
@@ -123,18 +132,60 @@ struct RiverPierCard: View {
         }
     }
 
-    private func boardRows(_ departures: ArraySlice<RiverPrediction>, at date: Date) -> some View {
-        VStack(spacing: 8) {
-            ForEach(departures) { departure in
+}
+
+private struct RiverDepartureGroupView: View {
+    @Environment(TubeAppState.self) private var appState
+    @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
+    @State private var isExpanded = false
+    let pier: RiverPier
+    let lineID: String
+    let departures: [RiverPrediction]
+    let date: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 9) {
+            HStack(spacing: 7) {
+                Circle().fill(.blue).frame(width: 9, height: 9).accessibilityHidden(true)
+                Text(appState.river.network.lineName(lineID)).font(.appSubheadline(.bold))
+                    .accessibilityAddTraits(.isHeader)
+                Spacer(minLength: 6)
+                if let controller = boardActivity, controller.areActivitiesEnabled {
+                    let isTracking = controller.isTracking(hubID: pier.id, lineIDRaw: lineID, direction: "All departures")
+                    DepartureTrackButton(isTracking: isTracking,
+                                         boardName: "\(appState.river.network.lineName(lineID)) at \(pier.name)") {
+                        Task {
+                            if isTracking { await controller.end(reason: .userEnded) }
+                            else if !appState.isOffline, let board = appState.river.selectedBoard {
+                                await controller.start(pier: pier, lineID: lineID, board: board,
+                                                       statuses: appState.river.statuses)
+                            }
+                        }
+                    }
+                    .disabled(!isTracking && (appState.isOffline || appState.river.selectedBoard?.stale == true))
+                }
+            }
+            ForEach(isExpanded ? departures : Array(departures.prefix(3))) { departure in
                 HStack(alignment: .firstTextBaseline, spacing: 10) {
-                    Text(appState.river.network.lineName(departure.lineId)).font(.appSubheadline(.semibold)).foregroundStyle(.blue)
-                    Text(departure.destinationName ?? "Destination unavailable").font(.appSubheadline()).lineLimit(2)
+                    Text(departure.destinationName ?? "Destination unavailable")
+                        .font(.appSubheadline()).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 6)
                     let seconds = departure.expectedArrival.timeIntervalSince(date)
                     Text(seconds < 60 ? "Due" : "\(Int(ceil(seconds / 60))) min")
                         .font(.appSubheadline(.semibold)).monospacedDigit().fixedSize()
+                        .foregroundStyle(Color.departureAccent)
                 }
                 .accessibilityElement(children: .combine)
+            }
+            if departures.count > 3 {
+                Button(isExpanded ? "Show fewer departures" : "View all departures",
+                       systemImage: isExpanded ? "chevron.up" : "chevron.down") {
+                    isExpanded.toggle()
+                }
+                .font(.appCaption(.semibold))
+                .frame(minHeight: 44)
+                .buttonStyle(.plain)
+                .foregroundStyle(Color.departureAccent)
             }
         }
     }
