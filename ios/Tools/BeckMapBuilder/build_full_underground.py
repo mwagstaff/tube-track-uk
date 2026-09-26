@@ -2675,12 +2675,28 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
 
     # Bank is a three-node diagonal chain on the official map: Central and
     # Waterloo & City share the northwest roundel, Northern and DLR share the
-    # middle roundel, and Monument is the southeast roundel. Place all three on
-    # one 45-degree axis and draw exactly the two interchange bars between them.
+    # middle roundel, and Monument is the southeast roundel. Keep Circle and
+    # District on their separate horizontal lanes through Monument; moving both
+    # routes to the roundel centre makes District climb across Circle there.
     monument_marker = markers_by_id["940GZZLUMMT"]
     monument_roundel = primitive_points(monument_marker)[0]
     for line_id in ("circle", "district"):
-        move_line_port("940GZZLUMMT", line_id, monument_roundel)
+        tower_hill_port = line_port(selected_segments, "940GZZLUTWH", line_id)
+        set_line_port(
+            "940GZZLUMMT",
+            line_id,
+            (monument_roundel[0], tower_hill_port[1]),
+        )
+    district_row = line_port(selected_segments, "940GZZLUTWH", "district")[1]
+    district_west = selected_segments["district:940GZZLUCST:940GZZLUMMT"]
+    district_west_commands = selected_paths[district_west["pathID"]]["commands"]
+    district_west_commands[-2]["control2"]["y"] = district_row
+    district_west_commands[-2]["to"]["y"] = district_row
+    district_east = selected_segments["district:940GZZLUMMT:940GZZLUTWH"]
+    selected_paths[district_east["pathID"]]["commands"] = [
+        {"op": "move", "to": district_east["fromPort"]},
+        {"op": "line", "to": district_east["toPort"]},
+    ]
     replace_marker("940GZZLUMMT", monument_roundel, [circle(monument_roundel)])
 
     old_bank_central = line_port(selected_segments, "940GZZLUBNK", "central")
@@ -2691,6 +2707,108 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     )
     move_line_port("940GZZLUBNK", "central", bank_central)
     move_line_port("940GZZLUBNK", "waterloo-city", bank_central)
+
+    # The original endpoint moves leave a steep last leg on Central and a
+    # Waterloo & City control handle beyond Bank. Round each approach into a
+    # 45-degree tangent at the shared roundel instead of hooking back into it.
+    central_approach = selected_segments["central:940GZZLUBNK:940GZZLUSPU"]
+    central_start_port = central_approach["fromPort"]
+    central_start = (central_start_port["x"], central_start_port["y"])
+    central_radius = 30.0
+    diagonal = math.sqrt(0.5)
+    central_intersection_x = (
+        bank_central[0] - (central_start[1] - bank_central[1])
+    )
+    central_bend_start = (
+        central_intersection_x - central_radius * (math.sqrt(2) - 1),
+        central_start[1],
+    )
+    central_bend_end = (
+        central_bend_start[0] + central_radius * diagonal,
+        central_start[1] - central_radius * (1 - diagonal),
+    )
+    central_handle = 4 / 3 * central_radius * math.tan(math.pi / 16)
+    selected_paths[central_approach["pathID"]]["commands"] = [
+        {"op": "move", "to": vector.rounded(central_start)},
+        {"op": "line", "to": vector.rounded(central_bend_start)},
+        {
+            "op": "cubic",
+            "control1": vector.rounded(
+                (central_bend_start[0] + central_handle, central_bend_start[1])
+            ),
+            "control2": vector.rounded(
+                (
+                    central_bend_end[0] - central_handle * diagonal,
+                    central_bend_end[1] + central_handle * diagonal,
+                )
+            ),
+            "to": vector.rounded(central_bend_end),
+        },
+        {"op": "line", "to": vector.rounded(bank_central)},
+    ]
+
+    waterloo_approach = selected_segments[
+        "waterloo-city:940GZZLUBNK:940GZZLUWLO"
+    ]
+    waterloo_commands = selected_paths[waterloo_approach["pathID"]]["commands"]
+    waterloo_diagonal_end = waterloo_commands[-6]["to"]
+    waterloo_vertical_x = bank_central[0] - 13.0
+    waterloo_lower_radius = 18.0
+    waterloo_lower_bend_start = (
+        waterloo_vertical_x - waterloo_lower_radius * (1 - diagonal),
+        waterloo_diagonal_end["x"] + waterloo_diagonal_end["y"]
+        - waterloo_vertical_x + waterloo_lower_radius * (1 - diagonal),
+    )
+    waterloo_lower_bend_end = (
+        waterloo_vertical_x,
+        waterloo_lower_bend_start[1] - waterloo_lower_radius * diagonal,
+    )
+    waterloo_lower_handle = 4 / 3 * waterloo_lower_radius * math.tan(math.pi / 16)
+    waterloo_radius = 18.0
+    waterloo_intersection_y = (
+        bank_central[1] + bank_central[0] - waterloo_vertical_x
+    )
+    waterloo_bend_start = (
+        waterloo_vertical_x,
+        waterloo_intersection_y + waterloo_radius * (math.sqrt(2) - 1),
+    )
+    waterloo_bend_end = (
+        waterloo_vertical_x + waterloo_radius * (1 - diagonal),
+        waterloo_bend_start[1] - waterloo_radius * diagonal,
+    )
+    waterloo_handle = 4 / 3 * waterloo_radius * math.tan(math.pi / 16)
+    selected_paths[waterloo_approach["pathID"]]["commands"] = [
+        *waterloo_commands[:-5],
+        {"op": "line", "to": vector.rounded(waterloo_lower_bend_start)},
+        {
+            "op": "cubic",
+            "control1": vector.rounded(
+                (
+                    waterloo_lower_bend_start[0] + waterloo_lower_handle * diagonal,
+                    waterloo_lower_bend_start[1] - waterloo_lower_handle * diagonal,
+                )
+            ),
+            "control2": vector.rounded(
+                (waterloo_lower_bend_end[0], waterloo_lower_bend_end[1] + waterloo_lower_handle)
+            ),
+            "to": vector.rounded(waterloo_lower_bend_end),
+        },
+        {"op": "line", "to": vector.rounded(waterloo_bend_start)},
+        {
+            "op": "cubic",
+            "control1": vector.rounded(
+                (waterloo_bend_start[0], waterloo_bend_start[1] - waterloo_handle)
+            ),
+            "control2": vector.rounded(
+                (
+                    waterloo_bend_end[0] - waterloo_handle * diagonal,
+                    waterloo_bend_end[1] + waterloo_handle * diagonal,
+                )
+            ),
+            "to": vector.rounded(waterloo_bend_end),
+        },
+        {"op": "line", "to": vector.rounded(bank_central)},
+    ]
 
     old_bank_northern = line_port(
         selected_segments, "940GZZLUBNK", "northern"
