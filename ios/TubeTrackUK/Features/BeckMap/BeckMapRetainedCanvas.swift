@@ -34,6 +34,17 @@ final class BeckMapLayerCamera {
         let overscan: CGFloat
     }
     private var surfaces: [Surface] = []
+    private struct Anchor {
+        weak var layer: CALayer?
+        let point: CGPoint
+    }
+    private var anchors: [Anchor] = []
+
+    func attach(layer: CALayer, at point: CGPoint) {
+        anchors.removeAll { $0.layer == nil || $0.layer === layer }
+        anchors.append(Anchor(layer: layer, point: point))
+        update(scale: scale, offset: offset)
+    }
 
     func update(scale: CGFloat, offset: CGSize) {
         guard scale.isFinite, scale > 0,
@@ -44,6 +55,12 @@ final class BeckMapLayerCamera {
         CATransaction.setDisableActions(true)
         for surface in surfaces {
             apply(surface)
+        }
+        for anchor in anchors {
+            anchor.layer?.position = CGPoint(
+                x: anchor.point.x * scale + offset.width,
+                y: anchor.point.y * scale + offset.height
+            )
         }
         CATransaction.commit()
     }
@@ -59,6 +76,7 @@ final class BeckMapLayerCamera {
     }
 
     func detach(layer: CALayer) {
+        anchors.removeAll { $0.layer == nil || $0.layer === layer }
         surfaces.removeAll { $0.layer == nil || $0.layer === layer }
     }
 
@@ -105,6 +123,9 @@ struct BeckMapRetainedCanvas<Key: Equatable>: UIViewControllerRepresentable {
 final class BeckMapCanvasController<Key: Equatable>: UIViewController {
     private var hosting: UIHostingController<BeckMapCanvasDrawing>?
     private var renderedKey: Key?
+    private var renderedScale: CGFloat?
+    private var renderedOffset: CGSize?
+    private var renderedOverscan: CGFloat?
     private weak var camera: BeckMapLayerCamera?
     private let surface = UIView()
 
@@ -130,6 +151,8 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
             detachCamera()
             self.camera = camera
         }
+        let rebasesCamera = renderedScale != renderScale || renderedOffset != renderOffset
+            || renderedOverscan != overscan || surface.bounds.size != canvasSize
         if renderedKey != key {
             let content = BeckMapCanvasDrawing(colorScheme: colorScheme, renderer: renderer)
             if let hosting {
@@ -145,11 +168,17 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
             }
             surface.bounds = CGRect(origin: .zero, size: canvasSize)
             hosting?.view.frame = surface.bounds
-            // Commit layout and the new base transform together. Otherwise a
-            // fast pan can display an old canvas at the newly rebased position.
-            hosting?.view.setNeedsLayout()
-            hosting?.view.layoutIfNeeded()
+            // Commit camera rebases synchronously to keep pixels and transform
+            // aligned. Time-only vehicle updates can use the normal scheduled
+            // layout pass instead of blocking input with a forced subtree layout.
+            if rebasesCamera {
+                hosting?.view.setNeedsLayout()
+                hosting?.view.layoutIfNeeded()
+            }
             renderedKey = key
+            renderedScale = renderScale
+            renderedOffset = renderOffset
+            renderedOverscan = overscan
         }
         camera.attach(
             layer: surface.layer, renderScale: renderScale,

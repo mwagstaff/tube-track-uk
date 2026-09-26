@@ -23,6 +23,16 @@ struct TubeTrackAPIClientTests {
         #expect(components.host == "api.test")
     }
 
+    @Test func sendsInstallationAndClientSurfaceOnAPIRequests() async throws {
+        APIClientURLProtocol.prepare(body: Data(#"{"data":[]}"#.utf8))
+        let _: [Int] = try await makeClient(surface: .widget).get("/api/v1/status")
+
+        let request = try #require(APIClientURLProtocol.lastRequest)
+        #expect(request.value(forHTTPHeaderField: "X-TubeTrack-Install") == "install-12345678")
+        #expect(request.value(forHTTPHeaderField: "X-TubeTrack-Surface") == "widget")
+        #expect(request.value(forHTTPHeaderField: "X-TubeTrack-App-Version") == AppInstall.appVersion)
+    }
+
     @Test func rateLimitResponseUsesPassengerSafeCopy() async throws {
         APIClientURLProtocol.prepare(
             statusCode: 429,
@@ -100,7 +110,7 @@ struct TubeTrackAPIClientTests {
         }
     }
 
-    private func makeClient() -> TubeTrackAPIClient {
+    private func makeClient(surface: TubeTrackClientSurface = .iosApp) -> TubeTrackAPIClient {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [APIClientURLProtocol.self]
         configuration.urlCache = nil
@@ -108,13 +118,16 @@ struct TubeTrackAPIClientTests {
             configuration: TubeTrackAPIConfiguration(
                 baseURL: URL(string: "https://api.test")!
             ),
-            session: URLSession(configuration: configuration)
+            session: URLSession(configuration: configuration),
+            clientSurface: surface,
+            installationID: "install-12345678"
         )
     }
 }
 
 private final class APIClientURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) private static var capturedURL: URL?
+    nonisolated(unsafe) private static var capturedRequest: URLRequest?
     nonisolated(unsafe) private static var configuredStatusCode = 200
     nonisolated(unsafe) private static var configuredRetryAfter: String?
     nonisolated(unsafe) private static var configuredBody = Data()
@@ -126,6 +139,10 @@ private final class APIClientURLProtocol: URLProtocol, @unchecked Sendable {
         }
     }
 
+    static var lastRequest: URLRequest? {
+        lock.withLock { capturedRequest }
+    }
+
     static func prepare(
         statusCode: Int = 200,
         retryAfter: String? = nil,
@@ -133,6 +150,7 @@ private final class APIClientURLProtocol: URLProtocol, @unchecked Sendable {
     ) {
         lock.withLock {
             capturedURL = nil
+            capturedRequest = nil
             configuredStatusCode = statusCode
             configuredRetryAfter = retryAfter
             configuredBody = body
@@ -150,6 +168,7 @@ private final class APIClientURLProtocol: URLProtocol, @unchecked Sendable {
         }
         let values = Self.lock.withLock { () -> (Int, String?, Data) in
             Self.capturedURL = url
+            Self.capturedRequest = request
             return (Self.configuredStatusCode, Self.configuredRetryAfter, Self.configuredBody)
         }
         var headers = ["Content-Type": "application/json"]

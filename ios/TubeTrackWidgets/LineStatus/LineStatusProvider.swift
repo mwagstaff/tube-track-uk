@@ -51,12 +51,26 @@ struct LineStatusProvider: AppIntentTimelineProvider {
 
     func timeline(for configuration: LineStatusConfigurationIntent, in context: Context) async -> Timeline<LineStatusEntry> {
         let entry = await load(configuration)
-        guard !(entry.failed && entry.updatedAt == nil) else {
-            return Timeline(entries: [entry], policy: .after(entry.date.addingTimeInterval(Self.retryInterval)))
-        }
+        let nextReload = entry.failed && entry.updatedAt == nil
+            ? entry.date.addingTimeInterval(Self.retryInterval)
+            : WidgetRefreshPolicy.nextReload(after: entry.date)
         // Status changes are rare and mostly arrive by push; spend the reload
-        // budget where it earns its keep rather than on a fixed short interval.
-        return Timeline(entries: [entry], policy: .after(WidgetRefreshPolicy.nextReload(after: entry.date)))
+        // budget where it earns its keep. Entries between fetches only advance
+        // the displayed age of the same snapshot; they never imply new data.
+        return Timeline(entries: Self.ageEntries(from: entry, until: nextReload), policy: .after(nextReload))
+    }
+
+    private static func ageEntries(from entry: LineStatusEntry, until reload: Date) -> [LineStatusEntry] {
+        guard let updatedAt = entry.updatedAt else { return [entry] }
+        var entries = [entry]
+        let age = max(0, entry.date.timeIntervalSince(updatedAt))
+        var next = updatedAt.addingTimeInterval((floor(age / 60) + 1) * 60)
+        while next < reload {
+            entries.append(LineStatusEntry(date: next, rows: entry.rows, updatedAt: updatedAt,
+                isCached: entry.isCached, failed: entry.failed))
+            next.addTimeInterval(60)
+        }
+        return entries
     }
 
     private func load(_ configuration: LineStatusConfigurationIntent) async -> LineStatusEntry {
@@ -64,7 +78,7 @@ struct LineStatusProvider: AppIntentTimelineProvider {
         let lineIDs = configuration.selectedLineIDs
         Self.logger.notice("Loading status for \(lineIDs.count) lines (\(configuration.lines.count) configured)")
         do {
-            let response = try await TubeTrackAPIClient().getSnapshot(
+            let response = try await TubeTrackAPIClient(clientSurface: .widget).getSnapshot(
                 "/api/v1/status", as: [TfLLineStatus].self
             )
             return LineStatusEntry(
@@ -94,16 +108,8 @@ struct LineStatusProvider: AppIntentTimelineProvider {
         lineIDs: [TubeLineID],
         disruptionsFirst: Bool
     ) -> [LineStatusRow] {
-        let statusesByID = Dictionary(statuses.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
-        let rows = lineIDs.map { lineID -> LineStatusRow in
-            let status = statusesByID[lineID]
-            let condition = LineServiceCondition.condition(for: status)
-            let reason = status?.lineStatuses
-                .first(where: { $0.isActionableIssue || $0.isOvernightClosure })?
-                .reason
-                .map(Self.trimmedReason)
-            return LineStatusRow(lineID: lineID, condition: condition, reason: reason)
-        }
+        let rows = LineStatusProjection.rows(from: statuses, lineIDs: lineIDs)
+            .map { LineStatusRow(lineID: $0.lineID, condition: $0.condition, reason: $0.reason) }
         guard disruptionsFirst else { return rows }
         return rows.sorted { left, right in
             let leftIssue = left.condition.hasIssue, rightIssue = right.condition.hasIssue
@@ -120,14 +126,7 @@ extension LineStatusProvider {
     /// TfL prefixes every reason with the line ("Central Line: Minor delays…").
     /// The row already names the line, so drop it to make room for the detail.
     static func trimmedReason(_ reason: String) -> String {
-        var text = reason.trimmingCharacters(in: .whitespacesAndNewlines)
-        if let colon = text.firstIndex(of: ":") {
-            let prefix = text[..<colon]
-            if prefix.count <= 40, prefix.localizedCaseInsensitiveContains("line") {
-                text = text[text.index(after: colon)...].trimmingCharacters(in: .whitespaces)
-            }
-        }
-        return text
+        LineStatusProjection.trimmedReason(reason)
     }
 }
 

@@ -424,32 +424,37 @@ enum TrainMapFocusPolicy {
 }
 
 enum MapLocationFocusPolicy {
+    static let nearbyStationDistance: CLLocationDistance = 5_000
+    // Matches the local station spacing in the Elmers End reference.
+    static let schematicScale: CGFloat = 0.7
+
+    static func isUsable(_ location: CLLocation, now: Date = .now) -> Bool {
+        CLLocationCoordinate2DIsValid(location.coordinate)
+            && location.horizontalAccuracy >= 0
+            && location.horizontalAccuracy <= 1_000
+            && abs(location.timestamp.timeIntervalSince(now)) <= 120
+    }
+
+    static func isWithinMapArea(_ location: CLLocation, in graph: TubeGraph) -> Bool {
+        if SharedMapProjection.geographicBounds(for: graph)
+            .contains(MKMapPoint(location.coordinate)) { return true }
+        return NearbyStationFinder.nearestStations(to: location, in: graph.stations, limit: 1)
+            .first.map { $0.distance <= nearbyStationDistance } ?? false
+    }
+
     static func request(
         for location: CLLocation,
         in graph: TubeGraph,
-        id: Int
+        id: Int,
+        automatic: Bool = false
     ) -> MapLocationFocusRequest? {
-        let coordinate = location.coordinate
-        let networkBounds = SharedMapProjection.geographicBounds(for: graph)
-        if networkBounds.contains(MKMapPoint(coordinate)) {
-            return MapLocationFocusRequest(
-                id: id,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude,
-                snappedStationID: nil
-            )
-        }
-
-        guard let nearestStation = NearbyStationFinder.nearestStations(
-            to: location,
-            in: graph.stations,
-            limit: 1
-        ).first?.station else { return nil }
+        guard isUsable(location), !graph.stations.isEmpty else { return nil }
+        guard !automatic || isWithinMapArea(location, in: graph) else { return nil }
         return MapLocationFocusRequest(
             id: id,
-            latitude: nearestStation.latitude,
-            longitude: nearestStation.longitude,
-            snappedStationID: nearestStation.id
+            latitude: location.coordinate.latitude,
+            longitude: location.coordinate.longitude,
+            snappedStationID: nil
         )
     }
 }

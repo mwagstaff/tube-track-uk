@@ -1,11 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
-    BUDGET_WINDOW_MS,
     detectChange,
     HEARTBEAT_MS,
     LEAD_DEPARTURE_THRESHOLD_SECONDS,
-    MAX_PUSHES_PER_HOUR,
     RELAXED_HEARTBEAT_MS,
     REASONS,
     staleWindowMs
@@ -24,7 +22,7 @@ function decide(overrides = {}) {
         next: [row()],
         previousSeverityRank: 4,
         nextSeverityRank: 4,
-        lastPushedAtMs: NOW_MS - 30_000,
+        lastPushedAtMs: NOW_MS - 20_000,
         frequentPushesEnabled: true,
         nowMs: NOW_MS,
         ...overrides
@@ -121,12 +119,21 @@ test('an unknown severity on either side is not treated as a change', () => {
 });
 
 test('a silent board is refreshed before its stale window closes', () => {
-    const justBefore = decide({ lastPushedAtMs: NOW_MS - HEARTBEAT_MS + 1_000 });
+    const justBefore = decide({ lastPushedAtMs: NOW_MS - HEARTBEAT_MS + 3_000 });
     assert.equal(justBefore.shouldPush, false);
 
     const due = decide({ lastPushedAtMs: NOW_MS - HEARTBEAT_MS });
     assert.equal(due.reason, REASONS.heartbeat);
     assert.equal(due.priority, 5);
+});
+
+test('small differences in poll completion time do not skip a refresh', () => {
+    for (const frequentPushesEnabled of [true, false]) {
+        const interval = frequentPushesEnabled ? 30_000 : 60_000;
+        assert.equal(decide({
+            frequentPushesEnabled, lastPushedAtMs: NOW_MS - interval + 750
+        }).reason, REASONS.heartbeat);
+    }
 });
 
 test('the heartbeat widens when the passenger has turned frequent updates off', () => {
@@ -167,48 +174,47 @@ function simulateAnHour({ boardAt, frequentPushesEnabled = true }) {
     return recentPushMs.length - 1;
 }
 
-test('an hour of a quiet board stays inside the push budget', () => {
-    const board = [row()];
-    const pushes = simulateAnHour({ boardAt: () => board });
-
-    assert.ok(pushes <= MAX_PUSHES_PER_HOUR, `a quiet hour spent ${pushes} pushes`);
-    // But it must still heartbeat, or the board dims for no reason.
-    assert.ok(pushes >= 6, `a quiet hour must keep the activity fresh, got ${pushes}`);
+test('a quiet board gets a low-priority snapshot every thirty seconds for the full hour', () => {
+    assert.equal(simulateAnHour({ boardAt: () => [row()] }), 120);
 });
 
-test('an hour of a board that changes every poll is capped, not throttled by iOS', () => {
-    // The pathological case: predictions flapping on every single poll.
-    const pushes = simulateAnHour({
+test('a board that changes every poll still receives thirty-second updates', () => {
+    assert.equal(simulateAnHour({
         boardAt: (elapsed) => [row({ seconds: 300 + elapsed / 1_000 })]
-    });
-    assert.ok(
-        pushes <= MAX_PUSHES_PER_HOUR,
-        `a flapping board spent ${pushes} pushes, which iOS would have thrown away`
-    );
+    }), 120);
 });
 
-test('once the budget is spent, only what the passenger would act on gets through', () => {
-    const spent = Array.from({ length: MAX_PUSHES_PER_HOUR }, (_, index) => NOW_MS - index * 60_000);
-
-    // A heartbeat is dropped: the board dims, which is honest.
-    const heartbeat = decide({ recentPushMs: spent, lastPushedAtMs: NOW_MS - HEARTBEAT_MS });
-    assert.equal(heartbeat.shouldPush, false);
-    assert.equal(heartbeat.suppressed, REASONS.heartbeat);
-
-    // A cancellation is not: dropping it costs them the train.
-    const cancelled = decide({ recentPushMs: spent, next: [] });
-    assert.equal(cancelled.shouldPush, true);
-    assert.equal(cancelled.reason, REASONS.boardEmptied);
+test('a passenger disabling frequent updates gets the relaxed cadence', () => {
+    assert.equal(simulateAnHour({ boardAt: () => [row()], frequentPushesEnabled: false }), 60);
 });
 
-test('the budget window rolls, so an old burst stops counting', () => {
-    const longAgo = Array.from(
-        { length: MAX_PUSHES_PER_HOUR },
-        (_, index) => NOW_MS - BUDGET_WINDOW_MS - index * 1_000
-    );
-    const verdict = decide({ recentPushMs: longAgo, lastPushedAtMs: NOW_MS - HEARTBEAT_MS });
+test('low-priority heartbeats remain deliverable after many prior updates', () => {
+    const recentPushMs = Array.from({ length: 100 }, (_, index) => NOW_MS - index * 30_000);
+    const heartbeat = decide({ recentPushMs, lastPushedAtMs: NOW_MS - HEARTBEAT_MS });
+    assert.equal(heartbeat.shouldPush, true);
+    assert.equal(heartbeat.priority, 5);
+    assert.equal(heartbeat.reason, REASONS.heartbeat);
+    assert.equal(decide({ recentPushMs, next: [] }).priority, 10);
+});
+
+test('crossing into Due gets a new snapshot even when the arrival timestamp is unchanged', () => {
+    const board = [row({ seconds: 35 })];
+    const verdict = decide({ previous: board, next: board, lastPushedAtMs: NOW_MS - 30_000 });
     assert.equal(verdict.shouldPush, true);
+    assert.equal(verdict.priority, 5);
     assert.equal(verdict.reason, REASONS.heartbeat);
+});
+
+test('minute changes in following rows also refresh the board', () => {
+    const board = [row({ seconds: 300 }), row({ id: 'v2', seconds: 395 })];
+    assert.equal(decide({ previous: board, next: board, lastPushedAtMs: NOW_MS - 30_000 }).reason, REASONS.heartbeat);
+});
+
+test('routine countdown transitions are coalesced within thirty seconds', () => {
+    const board = [row({ seconds: 50 })];
+    assert.equal(decide({
+        previous: board, next: board, lastPushedAtMs: NOW_MS - 20_000
+    }).shouldPush, false);
 });
 
 test('the stale window is wider than the heartbeat that has to land inside it', () => {

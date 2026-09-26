@@ -4,6 +4,7 @@ import path from 'node:path';
 import test from 'node:test';
 import { LiveActivityNotifier } from '../lib/push/notifier.js';
 import { PushTokenStore } from '../lib/push/token-store.js';
+import { HEARTBEAT_MS } from '../lib/push/change-detector.js';
 
 const NOW_MS = 1_800_000_000_000;
 
@@ -83,6 +84,20 @@ test('nothing is sent when nobody is tracking a board', async () => {
     assert.equal(client.sends.length, 0);
 });
 
+test('does not push an old board for a stale mode while healthy modes update', async () => {
+    const { notifier, client, store } = await fixture({ rows: [
+        subscription(),
+        subscription({ id: 'activity-2', lineId: 'elizabeth', token: 'bb'.repeat(32) })
+    ] });
+    const elizabeth = { ...arrival({ id: 'eliz', vehicleId: 'eliz-v' }), lineId: 'elizabeth' };
+
+    await notifier.notify(snapshotWith([arrival(), elizabeth]), { staleModes: ['tube'] });
+
+    assert.equal(client.sends.length, 1);
+    assert.equal(store.get('activity-1').sequence, undefined);
+    assert.equal(store.get('activity-2').sequence, 1);
+});
+
 test('the first snapshot pushes the board the client would have built', async () => {
     const { notifier, client, store } = await fixture({ rows: [subscription()] });
     await notifier.notify(snapshotWith([arrival()]));
@@ -109,6 +124,24 @@ test('an unchanged board spends no push on the next poll', async () => {
     await notifier.notify(snapshotWith([arrival()]));
     await notifier.notify(snapshotWith([arrival()]));
     assert.equal(client.sends.length, 1);
+});
+
+test('a heartbeat advances Updated even when the departure predictions are unchanged', async () => {
+    let nowMs = NOW_MS;
+    const { notifier, client } = await fixture({
+        rows: [subscription()], clock: () => nowMs
+    });
+    const arrivals = [arrival({ seconds: 1_800 })];
+    await notifier.notify({ arrivals, updatedAtMs: nowMs });
+    nowMs += HEARTBEAT_MS;
+    await notifier.notify({ arrivals, updatedAtMs: nowMs });
+
+    assert.equal(client.sends.length, 2);
+    const first = client.sends[0].payload.aps['content-state'];
+    const second = client.sends[1].payload.aps['content-state'];
+    assert.deepEqual(second.departures, first.departures);
+    assert.equal(second.updatedAtEpoch, nowMs / 1_000);
+    assert.ok(second.updatedAtEpoch > first.updatedAtEpoch);
 });
 
 test('the sequence number advances so a late push can be discarded', async () => {
@@ -160,6 +193,7 @@ test('losing line status costs a headline, not the board', async () => {
     assert.equal(client.sends.length, 1);
     assert.deepEqual(warnings, ['push_statuses_unavailable']);
     assert.equal(store.get('activity-1').lastBoard.length, 1);
+    assert.equal(client.sends[0].payload.aps['content-state'].conditionRank, 3);
 });
 
 test('a retired token is removed rather than retried forever', async () => {
@@ -170,6 +204,70 @@ test('a retired token is removed rather than retried forever', async () => {
 
     await notifier.notify(snapshotWith([arrival()]));
     assert.equal(store.get('activity-1'), null);
+    assert.equal(client.sends.length, 1);
+});
+
+test('a development token rejected by production is routed to sandbox and remembered', async () => {
+    let nowMs = NOW_MS;
+    const client = fakeClient({ responses: [
+        { status: 400, ok: false, dead: true, reason: 'BadDeviceToken' }
+    ] });
+    const { notifier, store } = await fixture({
+        rows: [subscription()], client, clock: () => nowMs
+    });
+    await notifier.notify(snapshotWith([arrival()]));
+    assert.deepEqual(client.sends.map((request) => request.environment), ['production', 'sandbox']);
+    assert.equal(store.get('activity-1').apnsEnvironment, 'sandbox');
+    nowMs += 30_000;
+    await notifier.notify({ ...snapshotWith([arrival()]), updatedAtMs: nowMs });
+    assert.equal(client.sends.length, 3);
+    assert.equal(client.sends[2].environment, 'sandbox');
+    assert.equal(client.sends[2].payload.aps['content-state'].updatedAtEpoch, nowMs / 1_000);
+    assert.equal(client.sends[2].priority, 5);
+});
+
+test('production tokens also recover when the configured default is sandbox', async () => {
+    const client = fakeClient({ responses: [
+        { status: 400, ok: false, dead: true, reason: 'BadDeviceToken' }
+    ] });
+    client.environment = 'sandbox';
+    const { notifier, store } = await fixture({ rows: [subscription()], client });
+    await notifier.notify(snapshotWith([arrival()]));
+    assert.deepEqual(client.sends.map((request) => request.environment), ['sandbox', 'production']);
+    assert.equal(store.get('activity-1').apnsEnvironment, 'production');
+});
+
+test('a token invalid in both environments is retired after exactly two attempts', async () => {
+    const invalid = { status: 400, ok: false, dead: true, reason: 'BadDeviceToken' };
+    const client = fakeClient({ responses: [invalid, invalid] });
+    const { notifier, store } = await fixture({ rows: [subscription()], client });
+    await notifier.notify(snapshotWith([arrival()]));
+    assert.equal(client.sends.length, 2);
+    assert.equal(store.get('activity-1'), null);
+});
+
+test('an outage during environment discovery preserves the subscription for the next poll', async () => {
+    const client = fakeClient({ responses: [
+        { status: 400, ok: false, dead: true, reason: 'BadDeviceToken' },
+        { status: 503, ok: false, dead: false, retryable: true, reason: 'ServiceUnavailable' }
+    ] });
+    const { notifier, store } = await fixture({ rows: [subscription()], client });
+    await notifier.notify(snapshotWith([arrival()]));
+    assert.ok(store.get('activity-1'));
+    assert.equal(store.get('activity-1').lastPushedAtMs, undefined);
+});
+
+test('a board with frequent updates disabled still receives a fresh snapshot each minute', async () => {
+    let nowMs = NOW_MS;
+    const { notifier, client } = await fixture({
+        rows: [subscription({ frequentPushesEnabled: false })], clock: () => nowMs
+    });
+    for (let poll = 0; poll <= 4; poll += 1) {
+        nowMs = NOW_MS + poll * 30_000;
+        await notifier.notify({ ...snapshotWith([arrival()]), updatedAtMs: nowMs });
+    }
+    assert.deepEqual(client.sends.map((request) => request.payload.aps['content-state'].updatedAtEpoch),
+        [0, 60, 120].map((seconds) => NOW_MS / 1_000 + seconds));
 });
 
 test('a rejected push leaves the subscription alone to try again', async () => {

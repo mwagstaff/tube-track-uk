@@ -3,7 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "TubeTrackCore",
-    platforms: [.iOS("26.0")],
+    platforms: [.iOS("26.0"), .watchOS("26.0")],
     products: [
         .library(name: "TubeTrackCore", targets: ["TubeTrackCore"]),
     ],

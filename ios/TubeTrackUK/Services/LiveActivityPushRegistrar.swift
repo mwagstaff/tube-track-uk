@@ -8,9 +8,13 @@ import TubeTrackCore
 /// correct — it just stops updating once the app goes away, which is exactly
 /// what happens when a push is dropped anyway. So nothing here is allowed to
 /// surface an error to the passenger or block starting an activity.
+///
+/// There is no client credential. One baked into the app would be readable by
+/// anyone who unpacks it, so it would have bought obfuscation rather than
+/// authentication; the server bounds abuse with rate limits and an entry cap
+/// instead. App Attest is the real answer if this ever needs one.
 struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
     let baseURL: URL
-    let clientSecret: String
     let installID: String
     let session: URLSession
 
@@ -21,24 +25,20 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
 
     init(
         baseURL: URL = TubeTrackAPIConfiguration.app.baseURL,
-        clientSecret: String = AppSecrets.pushClientSecret,
         installID: String = AppInstall.identifier,
         session: URLSession = .shared
     ) {
         self.baseURL = baseURL
-        self.clientSecret = clientSecret
         self.installID = installID
         self.session = session
     }
-
-    var isConfigured: Bool { !clientSecret.isEmpty }
 
     func register(
         token: String,
         attributes: DepartureActivityAttributes,
         frequentPushesEnabled: Bool
     ) async throws {
-        guard isConfigured, let lineID = attributes.lineID else { return }
+        guard let lineID = attributes.lineID else { return }
 
         let stopIDs = StationIndex.bundled.hub(containing: attributes.stationHubID)?.stopIDs
             ?? [attributes.stationHubID]
@@ -66,7 +66,6 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
     }
 
     func unregister(activityID: String) async {
-        guard isConfigured else { return }
         let request = self.request(
             path: "/api/v1/push/live-activities/\(activityID)",
             method: "DELETE"
@@ -79,8 +78,9 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
     private func request(path: String, method: String) -> URLRequest {
         var request = URLRequest(url: baseURL.appending(path: path))
         request.httpMethod = method
-        request.setValue("Bearer \(clientSecret)", forHTTPHeaderField: "Authorization")
         request.setValue(installID, forHTTPHeaderField: "X-TubeTrack-Install")
+        request.setValue("ios_app", forHTTPHeaderField: "X-TubeTrack-Surface")
+        request.setValue(AppInstall.appVersion, forHTTPHeaderField: "X-TubeTrack-App-Version")
         request.timeoutInterval = 15
         return request
     }
@@ -93,41 +93,5 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         let hubId: String
         let stopIds: [String]
         let frequentPushesEnabled: Bool
-    }
-}
-
-/// A stable, anonymous id for this install.
-///
-/// Not the IDFV and not anything Apple hands out: it exists only so the server
-/// can rate-limit and namespace subscriptions, and it is never sent anywhere
-/// else. Stored in the App Group so the widget extension would see the same one.
-enum AppInstall {
-    private static let key = "pushInstallIdentifier"
-
-    static var identifier: String {
-        if let existing = AppGroup.defaults?.string(forKey: key) { return existing }
-        // The server accepts [0-9A-Za-z-]{8,64}, which a UUID satisfies.
-        let created = UUID().uuidString
-        AppGroup.defaults?.set(created, forKey: key)
-        return created
-    }
-}
-
-/// Build-time secrets, injected through `Configuration/Shared.xcconfig` so they
-/// are not literals in source.
-///
-/// This one is obfuscation rather than authentication — it ships inside the app,
-/// so anyone who unpacks the binary has it. It raises the cost of casual abuse
-/// of the registration endpoint and nothing more; what actually bounds the
-/// damage is the server's rate limiting and entry cap. App Attest is the real
-/// answer and is deliberately left for its own change.
-enum AppSecrets {
-    static var pushClientSecret: String {
-        guard let value = Bundle.main.object(forInfoDictionaryKey: "TubeTrackPushClientSecret")
-            as? String else {
-            return ""
-        }
-        // An unset xcconfig variable arrives as the literal placeholder.
-        return value.hasPrefix("$(") ? "" : value
     }
 }

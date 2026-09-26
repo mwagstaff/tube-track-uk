@@ -168,19 +168,19 @@
       "visibilityTier": "minor"
     },
     {
-      "alignment": "leading",
+      "alignment": "centre",
       "associatedStationIDs": [
         "940GZZLUBLG"
       ],
       "id": "label.910GBTHNLGR",
       "position": {
-        "x": 2740.905,
-        "y": 1361.344
+        "x": 2774.922,
+        "y": 1405.344
       },
       "priority": 10,
       "rotationDegrees": 0,
       "stationID": "910GBTHNLGR",
-      "text": "Bethnal Green",
+      "text": "Bethnal\nGreen",
       "visibilityTier": "network"
     },
     {
@@ -197,16 +197,16 @@
       "visibilityTier": "minor"
     },
     {
-      "alignment": "leading",
+      "alignment": "trailing",
       "id": "label.910GCAMHTH",
       "position": {
-        "x": 2805.872,
-        "y": 1361.344
+        "x": 2815.172,
+        "y": 1336.859
       },
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GCAMHTH",
-      "text": "Cambridge Heath (London)",
+      "text": "Cambridge\nHeath",
       "visibilityTier": "minor"
     },
     {
@@ -840,13 +840,13 @@
       "alignment": "trailing",
       "id": "label.910GLONFLDS",
       "position": {
-        "x": 2815.114,
-        "y": 1279.101
+        "x": 2815.172,
+        "y": 1297.101
       },
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GLONFLDS",
-      "text": "London Fields",
+      "text": "London\nFields",
       "visibilityTier": "minor"
     },
     {
@@ -3145,9 +3145,12 @@
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GCNDAW"
+      ],
       "id": "label.940GZZLUCWR",
       "position": {
-        "x": 2639.0,
+        "x": 2638.938,
         "y": 1933.0
       },
       "priority": 5,
@@ -9495,12 +9498,12 @@
     },
     {
       "commands": [
-      {
-        "op": "move",
-        "to": {
-          "x": 600.109,
-          "y": 1707.781
-        }
+        {
+          "op": "move",
+          "to": {
+            "x": 600.109,
+            "y": 1707.781
+          }
         },
         {
           "op": "line",
@@ -12710,24 +12713,24 @@
             "y": 1657.203
           }
         },
-      {
-        "op": "line",
-        "to": {
-          "x": 600.109,
-          "y": 1657.203
-        }
+        {
+          "op": "line",
+          "to": {
+            "x": 600.109,
+            "y": 1657.203
+          }
         }
       ],
       "id": "beck.v1.path.elizabeth.heathrow-paddington.official.v1.5"
     },
     {
       "commands": [
-      {
-        "op": "move",
-        "to": {
-          "x": 600.109,
-          "y": 1657.203
-        }
+        {
+          "op": "move",
+          "to": {
+            "x": 600.109,
+            "y": 1657.203
+          }
         },
         {
           "op": "line",
@@ -15368,8 +15371,8 @@
         {
           "op": "line",
           "to": {
-            "x": 2705.052,
-            "y": 1917.55
+            "x": 2704.938,
+            "y": 1918.0
           }
         }
       ],
@@ -15380,8 +15383,8 @@
         {
           "op": "move",
           "to": {
-            "x": 2705.052,
-            "y": 1917.55
+            "x": 2704.938,
+            "y": 1918.0
           }
         },
         {
@@ -24184,7 +24187,7 @@
         {
           "op": "line",
           "to": {
-            "x": 2724.905,
+            "x": 2774.922,
             "y": 1379.344
           }
         }
@@ -24196,15 +24199,59 @@
         {
           "op": "move",
           "to": {
-            "x": 2724.905,
+            "x": 2774.922,
             "y": 1379.344
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 2789.872,
+            "x": 2797.516,
             "y": 1379.344
+          }
+        },
+        {
+          "control1": {
+            "x": 2803.891,
+            "y": 1379.344
+          },
+          "control2": {
+            "x": 2812.797,
+            "y": 1375.656
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2817.313,
+            "y": 1371.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2822.969,
+            "y": 1365.485
+          }
+        },
+        {
+          "control1": {
+            "x": 2827.484,
+            "y": 1360.985
+          },
+          "control2": {
+            "x": 2831.172,
+            "y": 1352.079
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2831.172,
+            "y": 1345.704
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2831.172,
+            "y": 1336.859
           }
         }
       ],
@@ -24215,30 +24262,52 @@
         {
           "op": "move",
           "to": {
-            "x": 2724.905,
+            "x": 2774.922,
             "y": 1379.344
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 2744.905,
+            "x": 2797.516,
             "y": 1379.344
           }
         },
         {
           "control1": {
-            "x": 2806.905,
+            "x": 2803.891,
             "y": 1379.344
           },
           "control2": {
+            "x": 2812.797,
+            "y": 1375.656
+          },
+          "op": "cubic",
+          "to": {
+            "x": 2817.313,
+            "y": 1371.141
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 2848.969,
+            "y": 1339.485
+          }
+        },
+        {
+          "control1": {
+            "x": 2853.484,
+            "y": 1334.985
+          },
+          "control2": {
             "x": 2857.172,
-            "y": 1329.077
+            "y": 1326.079
           },
           "op": "cubic",
           "to": {
             "x": 2857.172,
-            "y": 1267.077
+            "y": 1319.704
           }
         },
         {
@@ -24256,36 +24325,14 @@
         {
           "op": "move",
           "to": {
-            "x": 2789.872,
-            "y": 1379.344
+            "x": 2831.172,
+            "y": 1336.859
           }
         },
         {
           "op": "line",
           "to": {
-            "x": 2805.114,
-            "y": 1379.344
-          }
-        },
-        {
-          "control1": {
-            "x": 2819.473,
-            "y": 1379.344
-          },
-          "control2": {
-            "x": 2831.114,
-            "y": 1367.703
-          },
-          "op": "cubic",
-          "to": {
-            "x": 2831.114,
-            "y": 1353.344
-          }
-        },
-        {
-          "op": "line",
-          "to": {
-            "x": 2831.114,
+            "x": 2831.172,
             "y": 1297.101
           }
         }
@@ -24297,7 +24344,7 @@
         {
           "op": "move",
           "to": {
-            "x": 2831.114,
+            "x": 2831.172,
             "y": 1297.101
           }
         },
@@ -24545,7 +24592,7 @@
           "op": "move",
           "to": {
             "x": 2704.938,
-            "y": 1942.197
+            "y": 1918.0
           }
         },
         {
@@ -24933,7 +24980,7 @@
           "op": "line",
           "to": {
             "x": 2704.938,
-            "y": 1942.197
+            "y": 1918.0
           }
         }
       ],
@@ -33842,8 +33889,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.jubilee.east-connector.v1.1",
       "toPort": {
-        "x": 2705.052,
-        "y": 1917.55
+        "x": 2704.938,
+        "y": 1918.0
       },
       "toStationID": "940GZZLUCWR",
       "translation": {
@@ -34013,8 +34060,8 @@
     },
     {
       "fromPort": {
-        "x": 2705.052,
-        "y": 1917.55
+        "x": 2704.938,
+        "y": 1918.0
       },
       "fromStationID": "940GZZLUCWR",
       "id": "jubilee:940GZZLUCWR:940GZZLUCYF",
@@ -39553,7 +39600,7 @@
     },
     {
       "fromPort": {
-        "x": 2724.905,
+        "x": 2774.922,
         "y": 1379.344
       },
       "fromStationID": "910GBTHNLGR",
@@ -39562,8 +39609,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.weaver.liverpool-chingford.official.v1.1",
       "toPort": {
-        "x": 2789.872,
-        "y": 1379.344
+        "x": 2831.172,
+        "y": 1336.859
       },
       "toStationID": "910GCAMHTH",
       "translation": {
@@ -39573,7 +39620,7 @@
     },
     {
       "fromPort": {
-        "x": 2724.905,
+        "x": 2774.922,
         "y": 1379.344
       },
       "fromStationID": "910GBTHNLGR",
@@ -39602,7 +39649,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.weaver.liverpool-chingford.official.v1.0",
       "toPort": {
-        "x": 2724.905,
+        "x": 2774.922,
         "y": 1379.344
       },
       "toStationID": "910GBTHNLGR",
@@ -39613,8 +39660,8 @@
     },
     {
       "fromPort": {
-        "x": 2789.872,
-        "y": 1379.344
+        "x": 2831.172,
+        "y": 1336.859
       },
       "fromStationID": "910GCAMHTH",
       "id": "weaver:910GCAMHTH:910GLONFLDS",
@@ -39622,7 +39669,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.weaver.liverpool-chingford.official.v1.2",
       "toPort": {
-        "x": 2831.114,
+        "x": 2831.172,
         "y": 1297.101
       },
       "toStationID": "910GLONFLDS",
@@ -39753,7 +39800,7 @@
     },
     {
       "fromPort": {
-        "x": 2831.114,
+        "x": 2831.172,
         "y": 1297.101
       },
       "fromStationID": "910GLONFLDS",
@@ -40123,7 +40170,7 @@
       "pathID": "beck.v1.path.windrush.highbury-west-croydon.official.v1.9",
       "toPort": {
         "x": 2704.938,
-        "y": 1942.197
+        "y": 1918.0
       },
       "toStationID": "910GCNDAW",
       "translation": {
@@ -40134,7 +40181,7 @@
     {
       "fromPort": {
         "x": 2704.938,
-        "y": 1942.197
+        "y": 1918.0
       },
       "fromStationID": "910GCNDAW",
       "id": "windrush:910GCNDAW:910GSURREYQ",
@@ -40991,7 +41038,7 @@
     },
     {
       "anchor": {
-        "x": 2724.905,
+        "x": 2774.922,
         "y": 1379.344
       },
       "hitRadius": 14,
@@ -41004,12 +41051,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2724.905,
+              "x": 2774.922,
               "y": 1386.344
             },
             "lineID": "weaver",
             "start": {
-              "x": 2724.905,
+              "x": 2774.922,
               "y": 1372.344
             },
             "width": 3.2
@@ -41049,8 +41096,8 @@
     },
     {
       "anchor": {
-        "x": 2789.872,
-        "y": 1379.344
+        "x": 2831.172,
+        "y": 1336.859
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -41062,13 +41109,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2789.872,
-              "y": 1386.344
+              "x": 2824.172,
+              "y": 1336.859
             },
             "lineID": "weaver",
             "start": {
-              "x": 2789.872,
-              "y": 1372.344
+              "x": 2838.172,
+              "y": 1336.859
             },
             "width": 3.2
           }
@@ -41392,7 +41439,7 @@
     {
       "anchor": {
         "x": 2704.938,
-        "y": 1942.197
+        "y": 1918.0
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -41401,24 +41448,10 @@
       "name": "Canada Water",
       "primitives": [
         {
-          "connector": {
-            "end": {
-              "x": 2704.938,
-              "y": 1942.197
-            },
-            "start": {
-              "x": 2705.0,
-              "y": 1918.0
-            },
-            "width": 7.5
-          },
-          "kind": "connector"
-        },
-        {
           "circle": {
             "centre": {
               "x": 2704.938,
-              "y": 1942.197
+              "y": 1918.0
             },
             "outlineWidth": 3.5,
             "radius": 8.5
@@ -43208,7 +43241,7 @@
     },
     {
       "anchor": {
-        "x": 2831.114,
+        "x": 2831.172,
         "y": 1297.101
       },
       "hitRadius": 14,
@@ -43221,12 +43254,12 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 2838.114,
+              "x": 2824.172,
               "y": 1297.101
             },
             "lineID": "weaver",
             "start": {
-              "x": 2824.114,
+              "x": 2838.172,
               "y": 1297.101
             },
             "width": 3.2
@@ -49534,7 +49567,7 @@
     },
     {
       "anchor": {
-        "x": 2705.0,
+        "x": 2704.938,
         "y": 1918.0
       },
       "hitRadius": 24,
@@ -49546,7 +49579,7 @@
         {
           "circle": {
             "centre": {
-              "x": 2705.0,
+              "x": 2704.938,
               "y": 1918.0
             },
             "outlineWidth": 3.5,

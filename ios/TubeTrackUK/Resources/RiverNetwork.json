@@ -1,0 +1,604 @@
+{
+  "lines": [
+    {
+      "id": "rb1",
+      "name": "RB1"
+    },
+    {
+      "id": "rb4",
+      "name": "RB4"
+    },
+    {
+      "id": "rb6",
+      "name": "RB6"
+    }
+  ],
+  "piers": [
+    {
+      "id": "930GBFR",
+      "name": "Blackfriars Pier",
+      "latitude": 51.510762,
+      "longitude": -0.101963,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GBFR",
+        "9300BFR1",
+        "9300BFR2"
+      ]
+    },
+    {
+      "id": "930GBRVS",
+      "name": "Barking Riverside Pier",
+      "latitude": 51.516182,
+      "longitude": 0.117661,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GBRVS",
+        "9300BRVS1",
+        "9300BRVS2"
+      ]
+    },
+    {
+      "id": "930GBSE",
+      "name": "Cadogan Pier",
+      "latitude": 51.483256,
+      "longitude": -0.16652,
+      "lineIds": [
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GBSE",
+        "9300BSE1",
+        "9300BSE2"
+      ]
+    },
+    {
+      "id": "930GBSP",
+      "name": "Battersea Power Station Pier",
+      "latitude": 51.483498,
+      "longitude": -0.144158,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GBSP",
+        "9300BSP1",
+        "9300BSP2"
+      ]
+    },
+    {
+      "id": "930GCAW",
+      "name": "Canary Wharf Pier",
+      "latitude": 51.505692,
+      "longitude": -0.028482,
+      "lineIds": [
+        "rb1",
+        "rb6",
+        "rb4"
+      ],
+      "arrivalStopIds": [
+        "930GCAW",
+        "9300CAW1",
+        "9300CAW2",
+        "9300CAW3"
+      ]
+    },
+    {
+      "id": "930GCHP",
+      "name": "Chelsea Harbour Pier",
+      "latitude": 51.474146,
+      "longitude": -0.180335,
+      "lineIds": [
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GCHP",
+        "9300CHP1",
+        "9300CHP2"
+      ]
+    },
+    {
+      "id": "930GEMB",
+      "name": "Embankment Pier",
+      "latitude": 51.507389,
+      "longitude": -0.121428,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GEMB",
+        "9300EMB1",
+        "9300EMB2"
+      ]
+    },
+    {
+      "id": "930GGLP",
+      "name": "Greenland Surrey Quays Pier",
+      "latitude": 51.494685,
+      "longitude": -0.03276,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GGLP",
+        "9300GLP0",
+        "9300GLP1"
+      ]
+    },
+    {
+      "id": "930GGNW",
+      "name": "Greenwich Pier",
+      "latitude": 51.483621,
+      "longitude": -0.009659,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GGNW",
+        "9300GNW1",
+        "9300GNW2"
+      ]
+    },
+    {
+      "id": "930GLBR",
+      "name": "London Bridge City Pier",
+      "latitude": 51.506598,
+      "longitude": -0.084758,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GLBR",
+        "9300LBR1",
+        "9300LBR2"
+      ]
+    },
+    {
+      "id": "930GMBK",
+      "name": "Millbank Pier",
+      "latitude": 51.492197,
+      "longitude": -0.12512,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GMBK",
+        "9300MBK1",
+        "9300MBK2"
+      ]
+    },
+    {
+      "id": "930GMHT",
+      "name": "Masthouse Terrace Pier",
+      "latitude": 51.487498,
+      "longitude": -0.021935,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GMHT",
+        "9300MHT1",
+        "9300MHT2"
+      ]
+    },
+    {
+      "id": "930GMIL",
+      "name": "North Greenwich Pier",
+      "latitude": 51.502093,
+      "longitude": 0.008768,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GMIL",
+        "9300MIL1"
+      ]
+    },
+    {
+      "id": "930GNEL",
+      "name": "Rotherhithe Pier",
+      "latitude": 51.504552,
+      "longitude": -0.031788,
+      "lineIds": [
+        "rb4"
+      ],
+      "arrivalStopIds": [
+        "930GNEL",
+        "9300NEL1"
+      ]
+    },
+    {
+      "id": "930GPLW",
+      "name": "St Mary\u2019s Wandsworth Pier",
+      "latitude": 51.466833,
+      "longitude": -0.181921,
+      "lineIds": [
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GPLW",
+        "9300PLW1"
+      ]
+    },
+    {
+      "id": "930GPUT",
+      "name": "Putney Pier",
+      "latitude": 51.467083,
+      "longitude": -0.215774,
+      "lineIds": [
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GPUT",
+        "9300PUT1"
+      ]
+    },
+    {
+      "id": "930GSGW",
+      "name": "Vauxhall St George Wharf Pier",
+      "latitude": 51.486461,
+      "longitude": -0.126883,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GSGW",
+        "9300SGW1",
+        "9300SGW2"
+      ]
+    },
+    {
+      "id": "930GSWK",
+      "name": "Bankside Pier",
+      "latitude": 51.508388,
+      "longitude": -0.096384,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GSWK",
+        "9300SWK1",
+        "9300SWK3"
+      ]
+    },
+    {
+      "id": "930GTMP",
+      "name": "Tower Pier",
+      "latitude": 51.507809,
+      "longitude": -0.079087,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GTMP",
+        "9300TMP1",
+        "9300TMP2",
+        "9300TMP3",
+        "9300TMP4"
+      ]
+    },
+    {
+      "id": "930GWAS",
+      "name": "Woolwich Arsenal Pier",
+      "latitude": 51.495163,
+      "longitude": 0.07057,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GWAS",
+        "9300WAS1"
+      ]
+    },
+    {
+      "id": "930GWMP",
+      "name": "London Eye Waterloo Pier",
+      "latitude": 51.503607,
+      "longitude": -0.119436,
+      "lineIds": [
+        "rb6",
+        "rb1"
+      ],
+      "arrivalStopIds": [
+        "930GWMP",
+        "9300WMP1"
+      ]
+    },
+    {
+      "id": "930GWMR",
+      "name": "Westminster Pier",
+      "latitude": 51.501563,
+      "longitude": -0.123742,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GWMR",
+        "9300WMR1"
+      ]
+    },
+    {
+      "id": "930GWRF",
+      "name": "Royal Wharf Pier",
+      "latitude": 51.49755,
+      "longitude": 0.0249,
+      "lineIds": [
+        "rb1",
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GWRF",
+        "9300WRF1"
+      ]
+    },
+    {
+      "id": "930GWRQ",
+      "name": "Wandsworth Riverside Quarter Pier",
+      "latitude": 51.462842,
+      "longitude": -0.198923,
+      "lineIds": [
+        "rb6"
+      ],
+      "arrivalStopIds": [
+        "930GWRQ",
+        "9300WRQ1"
+      ]
+    }
+  ],
+  "routes": [
+    {
+      "id": "rb4:inbound:0",
+      "lineId": "rb4",
+      "direction": "inbound",
+      "stopIds": [
+        "930GCAW",
+        "930GNEL"
+      ]
+    },
+    {
+      "id": "rb4:outbound:0",
+      "lineId": "rb4",
+      "direction": "outbound",
+      "stopIds": [
+        "930GNEL",
+        "930GCAW"
+      ]
+    },
+    {
+      "id": "rb1:outbound:0",
+      "lineId": "rb1",
+      "direction": "outbound",
+      "stopIds": [
+        "930GBSP",
+        "930GEMB",
+        "930GBFR",
+        "930GSWK",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ]
+    },
+    {
+      "id": "rb1:outbound:1",
+      "lineId": "rb1",
+      "direction": "outbound",
+      "stopIds": [
+        "930GBSP",
+        "930GSGW",
+        "930GMBK",
+        "930GWMR",
+        "930GWMP",
+        "930GEMB",
+        "930GBFR",
+        "930GSWK",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ]
+    },
+    {
+      "id": "rb6:outbound:0",
+      "lineId": "rb6",
+      "direction": "outbound",
+      "stopIds": [
+        "930GPUT",
+        "930GPLW",
+        "930GCHP",
+        "930GBSP",
+        "930GEMB",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ]
+    },
+    {
+      "id": "rb6:outbound:1",
+      "lineId": "rb6",
+      "direction": "outbound",
+      "stopIds": [
+        "930GPUT",
+        "930GWRQ",
+        "930GPLW",
+        "930GCHP",
+        "930GBSE",
+        "930GBSP",
+        "930GSGW",
+        "930GMBK",
+        "930GWMR",
+        "930GWMP",
+        "930GEMB",
+        "930GBFR",
+        "930GSWK",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ]
+    },
+    {
+      "id": "rb6:outbound:2",
+      "lineId": "rb6",
+      "direction": "outbound",
+      "stopIds": [
+        "930GPUT",
+        "930GWRQ",
+        "930GPLW",
+        "930GCHP",
+        "930GBSE",
+        "930GBSP",
+        "930GSGW",
+        "930GMBK",
+        "930GWMR",
+        "930GWMP",
+        "930GEMB",
+        "930GBFR",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ]
+    },
+    {
+      "id": "rb6:inbound:0",
+      "lineId": "rb6",
+      "direction": "inbound",
+      "stopIds": [
+        "930GBRVS",
+        "930GWAS",
+        "930GWRF",
+        "930GMIL",
+        "930GGNW",
+        "930GMHT",
+        "930GGLP",
+        "930GCAW",
+        "930GTMP",
+        "930GLBR",
+        "930GSWK",
+        "930GBFR",
+        "930GEMB",
+        "930GWMR",
+        "930GMBK",
+        "930GSGW",
+        "930GBSP",
+        "930GBSE",
+        "930GCHP",
+        "930GPLW",
+        "930GWRQ",
+        "930GPUT"
+      ]
+    },
+    {
+      "id": "rb6:inbound:1",
+      "lineId": "rb6",
+      "direction": "inbound",
+      "stopIds": [
+        "930GBRVS",
+        "930GWAS",
+        "930GWRF",
+        "930GMIL",
+        "930GGNW",
+        "930GMHT",
+        "930GGLP",
+        "930GCAW",
+        "930GTMP",
+        "930GLBR",
+        "930GBFR",
+        "930GEMB",
+        "930GWMR",
+        "930GMBK",
+        "930GSGW",
+        "930GBSP",
+        "930GBSE",
+        "930GCHP",
+        "930GPLW",
+        "930GWRQ",
+        "930GPUT"
+      ]
+    },
+    {
+      "id": "rb6:inbound:2",
+      "lineId": "rb6",
+      "direction": "inbound",
+      "stopIds": [
+        "930GBFR",
+        "930GBSP"
+      ]
+    },
+    {
+      "id": "rb1:inbound:0",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "stopIds": [
+        "930GBRVS",
+        "930GWAS",
+        "930GWRF",
+        "930GMIL",
+        "930GGNW",
+        "930GMHT",
+        "930GGLP",
+        "930GCAW",
+        "930GTMP",
+        "930GLBR",
+        "930GSWK",
+        "930GBFR",
+        "930GEMB",
+        "930GWMR",
+        "930GMBK",
+        "930GSGW",
+        "930GBSP"
+      ]
+    }
+  ]
+}

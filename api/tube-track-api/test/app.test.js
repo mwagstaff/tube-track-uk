@@ -130,6 +130,40 @@ test('filters the shared live snapshot for line and station requests', async () 
     });
 });
 
+test('reports freshness for the requested mode when another mode is stale', async () => {
+    await withServer(async ({ baseUrl, cache }) => {
+        const nowMs = Date.now();
+        const tube = normaliseArrival(prediction({ id: 'tube', modeName: 'tube' }), 'tube');
+        const elizabeth = normaliseArrival(prediction({
+            id: 'elizabeth', modeName: 'elizabeth-line', lineId: 'elizabeth',
+            naptanId: '910GELIZ'
+        }), 'elizabeth-line');
+        const modes = ['tube', 'elizabeth-line'];
+        cache.replaceModes(new Map([['tube', [tube]], ['elizabeth-line', [elizabeth]]]), {
+            modes, startedAt: nowMs - 120_000, completedAt: nowMs - 120_000
+        });
+        cache.replaceModes(new Map([['tube', [tube]]]), {
+            modes, startedAt: nowMs, completedAt: nowMs
+        });
+
+        const health = await (await fetch(`${baseUrl}/healthcheck`)).json();
+        assert.equal(health.status, 'degraded');
+        assert.deepEqual(health.liveCache.staleModes, ['elizabeth-line']);
+
+        const tubeResponse = await (await fetch(`${baseUrl}/api/v1/live?lineIds=victoria`)).json();
+        assert.equal(tubeResponse.meta.stale, false);
+        assert.equal(tubeResponse.meta.updatedAt, new Date(nowMs).toISOString());
+        assert.deepEqual(tubeResponse.data.map((row) => row.id), ['tube']);
+
+        const elizabethResponse = await (await fetch(`${baseUrl}/api/v1/live?lineIds=elizabeth`)).json();
+        assert.equal(elizabethResponse.meta.stale, true);
+        assert.deepEqual(elizabethResponse.data.map((row) => row.id), ['elizabeth']);
+
+        const tubeStop = await (await fetch(`${baseUrl}/api/v1/arrivals/${tube.stopId}`)).json();
+        assert.equal(tubeStop.meta.stale, false);
+    });
+});
+
 test('caches status requests and validates planned-work dates', async () => {
     await withServer(async ({ baseUrl, upstreamRequests }) => {
         const first = await fetch(`${baseUrl}/api/v1/status`);

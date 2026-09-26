@@ -583,9 +583,10 @@ struct BeckMapRepositoryTests {
 
         // The two Weaver joins previously retained overlapping source
         // fragments, briefly travelling east/south before doubling back.
-        for segmentID in [
-            "weaver:910GCAMHTH:910GLONFLDS",
-            "weaver:910GCLAPTON:910GHAKNYNM",
+        for (segmentID, expectedBends) in [
+            ("weaver:910GBTHNLGR:910GCAMHTH", 2),
+            ("weaver:910GBTHNLGR:910GHAKNYNM", 2),
+            ("weaver:910GCLAPTON:910GHAKNYNM", 1),
         ] {
             let (segment, path) = try segmentAndPath(segmentID)
             let from = try #require(segment.fromPort)
@@ -598,8 +599,27 @@ struct BeckMapRepositoryTests {
             #expect(path.commands.count {
                 if case .cubic = $0 { return true }
                 return false
-            } == 1)
+            } == expectedBends)
         }
+
+        // Cambridge Heath sits on the straight vertical lane below London
+        // Fields. Both southbound branches share the Bethnal Green approach.
+        let (cambridgeToFields, cambridgePath) = try segmentAndPath(
+            "weaver:910GCAMHTH:910GLONFLDS"
+        )
+        let cambridge = try #require(cambridgeToFields.fromPort)
+        let londonFields = try #require(cambridgeToFields.toPort)
+        #expect(cambridgePath.commands == [.move(to: cambridge), .line(to: londonFields)])
+        #expect(cambridge.x == londonFields.x)
+        #expect(cambridge.y > londonFields.y)
+        let (bethnalToCambridge, localPath) = try segmentAndPath(
+            "weaver:910GBTHNLGR:910GCAMHTH"
+        )
+        let (_, bypassPath) = try segmentAndPath("weaver:910GBTHNLGR:910GHAKNYNM")
+        let bethnal = try #require(bethnalToCambridge.fromPort)
+        #expect(bethnal.x < cambridge.x)
+        #expect(bethnal.y > cambridge.y)
+        #expect(Array(localPath.commands.prefix(3)) == Array(bypassPath.commands.prefix(3)))
 
         // Every rebuilt northeast Victoria slice is a single horizontal line,
         // ordered Seven Sisters → Tottenham Hale → Blackhorse → Walthamstow.
@@ -1525,8 +1545,8 @@ struct BeckMapRepositoryTests {
         let tierCounts = Dictionary(grouping: document.labels, by: \.effectiveVisibilityTier)
             .mapValues(\.count)
         #expect(tierCounts[.overview] == 17)
-        #expect(tierCounts[.network] == 66)
-        #expect(tierCounts[.local] == 192)
+        #expect(tierCounts[.network] == 67)
+        #expect(tierCounts[.local] == 191)
         #expect(tierCounts[.minor] == 183)
     }
 

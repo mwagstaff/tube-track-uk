@@ -2,37 +2,29 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
-    <key>TubeTrackPushClientSecret</key>
-    <string>$(TUBETRACK_PUSH_CLIENT_SECRET)</string>
-    <key>NSSupportsLiveActivities</key>
-    <true/>
-    <!-- Departure predictions change minute to minute; without frequent
-         updates a tracked board dims between the few pushes iOS allows. -->
-    <key>NSSupportsLiveActivitiesFrequentUpdates</key>
-    <true/>
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Viewer</string>
-            <key>CFBundleURLName</key>
-            <string>dev.skynolimit.TubeTrackUK</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>tubetrack</string>
-            </array>
-        </dict>
-    </array>
-    <key>UILaunchScreen</key>
-    <dict>
-        <key>UIColorName</key>
-        <string>LaunchBackground</string>
-        <key>UIImageName</key>
-        <string>LaunchMark</string>
-        <key>UIImageRespectsSafeAreaInsets</key>
-        <true/>
-    </dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>dev.skynolimit.TubeTrackUK</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>tubetrack</string>
+			</array>
+		</dict>
+	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIColorName</key>
+		<string>LaunchBackground</string>
+		<key>UIImageName</key>
+		<string>LaunchMark</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
+	</dict>
 </dict>
 </plist>

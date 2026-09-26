@@ -4,9 +4,13 @@ import { JourneyError, JourneyPlanner } from './journey-planner.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { plannedWorksV2Response, PlannedWorksSourceError } from './planned-works.js';
 import { createPushRoutes } from './push-routes.js';
+import { createRiverRoutes } from './river.js';
+import { createCableCarRoutes } from './cable-car.js';
+import { clientMetadata, USAGE_FEATURES } from './usage.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 const LINE_IDS = LINE_COLOURS.map((line) => line.id).join(',');
+const MODE_BY_LINE_ID = new Map(LINE_COLOURS.map((line) => [line.id, line.mode]));
 
 function commaSeparated(value, { maximum = 25 } = {}) {
     if (typeof value !== 'string') return [];
@@ -26,7 +30,9 @@ function isDate(value) {
     return !Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(value);
 }
 
-function sendLiveResponse(req, res, state, arrivals) {
+function sendLiveResponse(req, res, state, arrivals, relevantModes = new Set(
+    arrivals.map((arrival) => MODE_BY_LINE_ID.get(arrival.lineId)).filter(Boolean)
+)) {
     res.set({
         'Cache-Control': 'public, max-age=5, stale-while-revalidate=20, stale-if-error=120',
         ETag: state.snapshot.etag
@@ -37,19 +43,44 @@ function sendLiveResponse(req, res, state, arrivals) {
     }
     res.json({
         data: arrivals,
-        meta: { ...liveMetadata(state), count: arrivals.length }
+        meta: { ...liveMetadata(state, relevantModes), count: arrivals.length }
     });
 }
 
-function liveMetadata(state) {
+function liveMetadata(state, relevantModes = null) {
+    const modeTimes = relevantModes?.size
+        ? [...relevantModes].map((mode) => state.snapshot.modeUpdatedAt?.[mode]).filter(Boolean)
+        : [];
+    const updatedAtMs = modeTimes.length > 0
+        ? Math.min(...modeTimes.map((timestamp) => Date.parse(timestamp)))
+        : state.snapshot.updatedAtMs;
+    const stale = relevantModes?.size
+        ? state.staleModes.some((mode) => relevantModes.has(mode))
+        : state.stale;
     return {
         generation: state.snapshot.generation,
-        updatedAt: state.snapshot.updatedAt,
-        ageSeconds: state.ageSeconds,
-        stale: state.stale,
+        updatedAt: new Date(updatedAtMs).toISOString(),
+        ageSeconds: relevantModes?.size
+            ? Math.max(...[...relevantModes].map((mode) => state.modeAgeSeconds?.[mode] ?? 0))
+            : state.ageSeconds,
+        stale,
         count: state.snapshot.arrivals.length,
-        modeCounts: state.snapshot.modeCounts
+        modeCounts: state.snapshot.modeCounts,
+        modeUpdatedAt: state.snapshot.modeUpdatedAt,
+        staleModes: state.staleModes
     };
+}
+
+function modesForStops(stopIds, arrivals, journeyPlanner) {
+    const modes = new Set(arrivals.map((arrival) => MODE_BY_LINE_ID.get(arrival.lineId)).filter(Boolean));
+    for (const stopId of stopIds) {
+        const station = journeyPlanner.byId.get(stopId.toUpperCase());
+        for (const lineId of station?.lineIds ?? []) {
+            const mode = MODE_BY_LINE_ID.get(lineId);
+            if (mode) modes.add(mode);
+        }
+    }
+    return modes;
 }
 
 export function createApp({
@@ -61,7 +92,7 @@ export function createApp({
     resourceCache,
     plannedTrackClosuresSource,
     pushTokenStore = null,
-    pushClientSecret = null,
+    usageStore = null,
     journeyPlanner = new JourneyPlanner({ client })
 }) {
     const app = express();
@@ -73,6 +104,30 @@ export function createApp({
     });
     app.use(metrics.middleware());
     app.use(compression({ threshold: 1_024 }));
+    const usageBody = express.json({ limit: '512b', strict: true });
+    app.post('/api/v1/usage', (req, res, next) => {
+        usageBody(req, res, (error) => {
+            if (!error) return next();
+            res.status(error.status === 413 ? 413 : 400)
+                .json({ error: { code: 'INVALID_USAGE_EVENT' } });
+        });
+    }, (req, res) => {
+        res.set('Cache-Control', 'no-store');
+        const client = clientMetadata(req);
+        const event = req.body?.event;
+        const feature = req.body?.feature;
+        if (!usageStore || !client.installId || client.surface !== 'ios_app'
+            || !['app_open', 'feature_open'].includes(event)
+            || !USAGE_FEATURES.includes(feature)) {
+            res.status(400).json({ error: { code: 'INVALID_USAGE_EVENT' } });
+            return;
+        }
+        if (event === 'app_open') usageStore.record(client.installId, 'ios_app');
+        metrics.recordUsageEvent({ event, feature });
+        res.status(204).end();
+    });
+    app.use('/api/v1/river', createRiverRoutes({ client, resourceCache }));
+    app.use('/api/v1/cable-car', createCableCarRoutes({ client, resourceCache }));
 
     app.get('/api/v1/line-colours', (req, res) => {
         res.set('Cache-Control', 'public, max-age=86400');
@@ -142,7 +197,10 @@ export function createApp({
         const arrivals = lineIDs.size === 0
             ? state.snapshot.arrivals
             : state.snapshot.arrivals.filter((arrival) => lineIDs.has(arrival.lineId));
-        sendLiveResponse(req, res, state, arrivals);
+        const relevantModes = lineIDs.size === 0
+            ? new Set()
+            : new Set([...lineIDs].map((lineId) => MODE_BY_LINE_ID.get(lineId)).filter(Boolean));
+        sendLiveResponse(req, res, state, arrivals, relevantModes);
     });
 
     app.get('/api/v1/arrivals', (req, res) => {
@@ -164,7 +222,7 @@ export function createApp({
         const arrivals = stopIDs.flatMap((stopID) =>
             state.snapshot.arrivalsByStop.get(stopID.toUpperCase()) ?? []
         );
-        sendLiveResponse(req, res, state, arrivals);
+        sendLiveResponse(req, res, state, arrivals, modesForStops(stopIDs, arrivals, journeyPlanner));
     });
 
     app.get('/api/v1/arrivals/:stopId', (req, res) => {
@@ -185,7 +243,7 @@ export function createApp({
         const arrivals = state.snapshot.arrivalsByStop.get(
             req.params.stopId.toUpperCase()
         ) ?? [];
-        sendLiveResponse(req, res, state, arrivals);
+        sendLiveResponse(req, res, state, arrivals, modesForStops([req.params.stopId], arrivals, journeyPlanner));
     });
 
     app.get('/api/v1/status', async (req, res, next) => {
@@ -207,10 +265,9 @@ export function createApp({
     // Mounted only when push is configured, so an API without APNs credentials
     // answers 404 rather than pretending to accept registrations it will never
     // act on.
-    if (pushTokenStore && pushClientSecret) {
+    if (pushTokenStore) {
         app.use('/api/v1/push', createPushRoutes({
             store: pushTokenStore,
-            clientSecret: pushClientSecret,
             isKnownStop: (id) => journeyPlanner.byId.has(id),
             logger,
             metrics

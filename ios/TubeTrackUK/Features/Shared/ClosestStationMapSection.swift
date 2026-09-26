@@ -37,13 +37,6 @@ struct ClosestStationMapSection: View {
                 )
             }
         }
-        .task {
-            // Let the launch/foreground photograph complete its reveal before
-            // presenting a first-run system permission sheet above it.
-            try? await Task.sleep(for: .seconds(1.6))
-            guard !Task.isCancelled else { return }
-            locationProvider.requestLocation()
-        }
         .task(id: departuresTaskID) {
             guard !appState.isOffline, let station = closestStation?.station else { return }
             await appState.refreshNearbyArrivals(for: [station])
@@ -104,7 +97,13 @@ private struct ClosestStationMapPanel: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            header
+            Button(action: openNearMe) {
+                header
+                    .contentShape(.rect)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Closest station, \(station.name)")
+            .accessibilityHint("Opens this station in Near Me")
 
             if lineIDs.count > 1 {
                 linePicker
@@ -118,13 +117,14 @@ private struct ClosestStationMapPanel: View {
                 departures(now: context.date)
                     .padding(.top, 8)
             }
+            CardUpdateFooter(
+                updatedAt: appState.nearbyArrivalsSourceUpdatedAt[station.id] ?? appState.nearbyArrivalsUpdatedAtByStationID[station.id],
+                isOffline: appState.isOffline,
+                isStale: appState.nearbyArrivalsStaleIDs.contains(station.id) || appState.nearbyArrivalsErrorsByStationID[station.id] != nil)
+                .padding(.top, 4)
         }
         .padding(12)
         .glassEffect(.regular, in: .rect(cornerRadius: 20))
-        .contentShape(.rect(cornerRadius: 20))
-        .onTapGesture {
-            openNearMe()
-        }
         .accessibilityElement(children: .contain)
         .accessibilityAction(named: "Open in Near Me") {
             openNearMe()
@@ -327,7 +327,7 @@ private struct ClosestStationAvailabilityPanel: View {
                 Button("Open") { onOpenNearMe() }
                     .font(.appCaption(.semibold))
                     .buttonStyle(.bordered)
-            } else if errorMessage != nil {
+            } else if !isLoading {
                 Button("Retry") { onRetry() }
                     .font(.appCaption(.semibold))
                     .buttonStyle(.bordered)
@@ -345,6 +345,6 @@ private struct ClosestStationAvailabilityPanel: View {
         if let errorMessage {
             return errorMessage
         }
-        return "Finding your nearest station…"
+        return isLoading ? "Finding your nearest station…" : "Tap Current location to find your nearest station."
     }
 }

@@ -70,7 +70,6 @@ test('rejects invalid timing and port configuration', () => {
 test('push stays off, and harmless, when APNs is not configured', () => {
     const push = loadPushConfig({});
     assert.equal(push.enabled, false);
-    assert.equal(push.clientSecret, null);
     assert.equal(push.liveActivityTopic, 'dev.skynolimit.TubeTrackUK.push-type.liveactivity');
 });
 
@@ -85,8 +84,7 @@ test('push turns on once every credential is present', () => {
     const push = loadPushConfig({
         APNS_KEY_ID: 'KEY123456',
         APNS_TEAM_ID: 'SJ8X4DLAN9',
-        APNS_AUTH_KEY_PATH: '/home/someone/.certs/AuthKey.p8',
-        TUBETRACK_UK_PUSH_CLIENT_SECRET: 'secret'
+        APNS_AUTH_KEY_PATH: '/home/someone/.certs/AuthKey.p8'
     });
     assert.equal(push.enabled, true);
     assert.equal(push.environment, 'production');
@@ -97,8 +95,7 @@ test('the sandbox is opt-in and validated', () => {
     const credentials = {
         APNS_KEY_ID: 'KEY123456',
         APNS_TEAM_ID: 'SJ8X4DLAN9',
-        APNS_AUTH_KEY: '-----BEGIN PRIVATE KEY-----',
-        TUBETRACK_UK_PUSH_CLIENT_SECRET: 'secret'
+        APNS_AUTH_KEY: '-----BEGIN PRIVATE KEY-----'
     };
     assert.equal(loadPushConfig({ ...credentials, APNS_USE_SANDBOX: 'true' }).environment, 'sandbox');
     assert.equal(loadPushConfig({ ...credentials, APNS_ENVIRONMENT: 'sandbox' }).environment, 'sandbox');

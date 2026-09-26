@@ -30,7 +30,7 @@ final class TubeGameShareItem: NSObject, UIActivityItemSource {
     }
 }
 
-/// Present from the tapped button's actual hosting controller, including when
+/// Present from the visible controller in the button's window, including when
 /// the game itself is a full-screen presentation or its timeline has stopped.
 struct TubeGameShareButton: UIViewRepresentable {
     @Environment(\.colorScheme) private var colorScheme
@@ -75,17 +75,20 @@ struct TubeGameShareButton: UIViewRepresentable {
         init(parent: TubeGameShareButton) { self.parent = parent }
 
         func share(from button: UIButton) {
-            var responder: UIResponder? = button
-            while responder != nil, !(responder is UIViewController) {
-                responder = responder?.next
-            }
-            guard let presenter = responder as? UIViewController,
-                  button.window != nil else {
+            guard let window = button.window,
+                  var presenter = window.rootViewController else {
                 parent.onFailure()
                 return
             }
+            while let presented = presenter.presentedViewController {
+                presenter = presented
+            }
             // Ignore rapid repeat taps while the already-visible sheet is opening.
-            guard presenter.presentedViewController == nil else { return }
+            guard !(presenter is UIActivityViewController) else { return }
+            guard presenter.viewIfLoaded?.window === window else {
+                parent.onFailure()
+                return
+            }
             guard let item = parent.makeItem() else {
                 parent.onFailure()
                 return

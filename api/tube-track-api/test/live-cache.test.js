@@ -43,3 +43,20 @@ test('derives countdown seconds when the mode feed only supplies timestamps', ()
 
     assert.equal(arrival.timeToStation, 90);
 });
+
+test('marks a mode that has never loaded as stale without hiding healthy arrivals', () => {
+    let nowMs = 10_000;
+    const cache = new LiveCache({ staleAfterMs: 5_000, clock: () => nowMs });
+    const tube = normaliseArrival(prediction({ id: 'tube' }), 'tube');
+    const state = cache.replaceModes(new Map([['tube', [tube]]]), {
+        modes: ['tube', 'elizabeth-line'], startedAt: nowMs, completedAt: nowMs
+    });
+
+    assert.deepEqual(state.snapshot.arrivals.map((arrival) => arrival.id), ['tube']);
+    assert.equal(state.snapshot.modeUpdatedAt['elizabeth-line'], null);
+    assert.deepEqual(state.staleModes, ['elizabeth-line']);
+    assert.equal(state.stale, true);
+
+    nowMs += 5_001;
+    assert.deepEqual(cache.read().staleModes, ['tube', 'elizabeth-line']);
+});

@@ -1,13 +1,15 @@
 import {
-    BUDGET_WINDOW_MS,
+    PUSH_HISTORY_WINDOW_MS,
     detectChange,
     staleWindowMs
 } from './change-detector.js';
 import { conditionsByLine } from './line-condition.js';
 import { liveActivityPayload } from './apns.js';
 import { MAXIMUM_DEPARTURES, projectBoard } from './departure-projection.js';
+import { LINE_COLOURS } from '../line-colours.js';
 
 const ACTIVITY_MAX_DURATION_MS = 90 * 60 * 1_000;
+const MODE_BY_LINE_ID = new Map(LINE_COLOURS.map((line) => [line.id, line.mode]));
 
 /**
  * Turns each live snapshot into pushes for the boards people are tracking.
@@ -44,9 +46,9 @@ export class LiveActivityNotifier {
      * Called after every successful cache replace. Never throws, and never runs
      * two passes at once — a slow APNs round trip must not let polls pile up.
      */
-    async notify(snapshot) {
+    async notify(snapshot, { staleModes = [] } = {}) {
         if (this.#inFlight) return { skipped: true, reason: 'in_flight' };
-        this.#inFlight = this.#run(snapshot)
+        this.#inFlight = this.#run(snapshot, new Set(staleModes))
             .catch((error) => {
                 this.metrics?.recordPushFailure?.({ stage: 'notify' });
                 this.logger?.error('push_notify_failed', { error: error?.message ?? String(error) });
@@ -58,7 +60,7 @@ export class LiveActivityNotifier {
         return this.#inFlight;
     }
 
-    async #run(snapshot) {
+    async #run(snapshot, staleModes) {
         const rows = this.store.all({ type: 'liveActivity' });
         if (rows.length === 0) return { sent: 0, considered: 0 };
 
@@ -67,6 +69,7 @@ export class LiveActivityNotifier {
         let sent = 0;
 
         for (const row of rows) {
+            if (staleModes.has(MODE_BY_LINE_ID.get(row.lineId))) continue;
             // eslint-disable-next-line no-await-in-loop
             const outcome = await this.#considerRow({ row, snapshot, conditions, nowMs });
             if (outcome === 'sent') sent += 1;
@@ -110,7 +113,6 @@ export class LiveActivityNotifier {
             previousSeverityRank: row.lastSeverityRank ?? null,
             nextSeverityRank: condition?.rank ?? null,
             lastPushedAtMs: row.lastPushedAtMs ?? null,
-            recentPushMs: row.recentPushMs ?? [],
             frequentPushesEnabled: row.frequentPushesEnabled !== false,
             nowMs
         });
@@ -134,7 +136,7 @@ export class LiveActivityNotifier {
         const contentState = {
             departures: board,
             updatedAtEpoch: updatedAtSeconds,
-            conditionRank: condition?.rank ?? 4,
+            conditionRank: condition?.rank ?? 3,
             conditionHeadline: condition?.headline ?? null,
             sequence
         };
@@ -149,8 +151,9 @@ export class LiveActivityNotifier {
 
         const startedAt = new Date(nowMs);
         let result;
+        let environment = row.apnsEnvironment ?? this.client.environment ?? 'production';
         try {
-            result = await this.client.send({
+            const request = {
                 token: row.token,
                 topic: this.topic,
                 pushType: 'liveactivity',
@@ -158,7 +161,17 @@ export class LiveActivityNotifier {
                 // No point delivering a departure board after the train has gone.
                 expiration: updatedAtSeconds + 10 * 60,
                 payload
-            });
+            };
+            result = await this.client.send({ ...request, environment });
+            // Development and distributed builds mint tokens in different APNs
+            // environments. Older clients don't report which one they use.
+            // BadDeviceToken can mean the environment is wrong, not that the
+            // activity ended. Try the other Apple endpoint once, then remember
+            // the endpoint that accepted it. Never retry genuinely ended tokens.
+            if (result.status === 400 && result.reason === 'BadDeviceToken') {
+                environment = environment === 'production' ? 'sandbox' : 'production';
+                result = await this.client.send({ ...request, environment });
+            }
         } catch (error) {
             this.metrics?.recordPushSent?.({ type: 'liveActivity', result: 'error' });
             this.logger?.warn('push_send_failed', { id: row.id, error: error.message });
@@ -192,12 +205,13 @@ export class LiveActivityNotifier {
 
         this.metrics?.recordPushSent?.({ type: 'liveActivity', result: 'ok' });
         this.store.touch(row.id, {
+            apnsEnvironment: environment,
             lastBoard: board,
             lastSeverityRank: condition?.rank ?? null,
             lastPushedAtMs: nowMs,
             sequence,
             recentPushMs: [...(row.recentPushMs ?? []), nowMs]
-                .filter((at) => nowMs - at < BUDGET_WINDOW_MS)
+                .filter((at) => nowMs - at < PUSH_HISTORY_WINDOW_MS)
         });
         return 'sent';
     }

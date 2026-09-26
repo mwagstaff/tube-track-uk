@@ -1,10 +1,1 @@
 // Shared target build settings live here when needed.
-
-// The push registration key, injected at build time so it is never a literal in
-// source. Left empty by default: without it the app simply does not register
-// for push, and Live Activities fall back to app-driven updates only.
-//
-// Set it for real builds from the same Bitwarden item the API reads
-// (TUBETRACK_UK_PUSH_CLIENT_SECRET), e.g. in a local Secrets.xcconfig that is
-// not committed, or by exporting TUBETRACK_PUSH_CLIENT_SECRET in CI.
-TUBETRACK_PUSH_CLIENT_SECRET =

@@ -76,6 +76,30 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         }
     }
 
+    /// TfL's familiar ordering in compact status views.
+    public static let widgetDisplayOrder: [Self] = [
+        .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
+        .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity,
+        .dlr, .elizabeth,
+        .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush,
+        .tram,
+    ]
+
+    public var widgetDisplayRank: Int {
+        Self.widgetDisplayOrder.firstIndex(of: self) ?? Self.widgetDisplayOrder.count
+    }
+
+    /// A readable name for the three-row Watch widget.
+    public var watchShortName: String {
+        switch self {
+        case .hammersmithCity: "H&C"
+        case .waterlooCity: "W&C"
+        case .elizabeth: "Elizabeth"
+        case .tram: "Trams"
+        default: displayName.replacingOccurrences(of: " line", with: "")
+        }
+    }
+
     public static var undergroundCases: [Self] { allCases.filter(\.isUnderground) }
 
     public static var liveTrainFilterCases: [Self] {
@@ -156,4 +180,3 @@ extension Color {
         }
     }
 }
-

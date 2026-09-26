@@ -1,0 +1,86 @@
+[
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Line, Tfl.Api.Presentation.Entities",
+    "id": "rb1",
+    "name": "RB1",
+    "modeName": "river-bus",
+    "disruptions": [],
+    "created": "2026-09-15T13:26:22.117Z",
+    "modified": "2026-09-15T13:26:22.117Z",
+    "lineStatuses": [],
+    "routeSections": [],
+    "serviceTypes": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+        "name": "Regular",
+        "uri": "/Line/Route?ids=RB1&serviceTypes=Regular"
+      }
+    ],
+    "crowding": {
+      "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+    }
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Line, Tfl.Api.Presentation.Entities",
+    "id": "rb4",
+    "name": "RB4",
+    "modeName": "river-bus",
+    "disruptions": [],
+    "created": "2026-09-15T13:26:22.117Z",
+    "modified": "2026-09-15T13:26:22.117Z",
+    "lineStatuses": [],
+    "routeSections": [],
+    "serviceTypes": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+        "name": "Regular",
+        "uri": "/Line/Route?ids=RB4&serviceTypes=Regular"
+      }
+    ],
+    "crowding": {
+      "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+    }
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Line, Tfl.Api.Presentation.Entities",
+    "id": "rb6",
+    "name": "RB6",
+    "modeName": "river-bus",
+    "disruptions": [],
+    "created": "2026-09-15T13:26:22.117Z",
+    "modified": "2026-09-15T13:26:22.117Z",
+    "lineStatuses": [],
+    "routeSections": [],
+    "serviceTypes": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+        "name": "Regular",
+        "uri": "/Line/Route?ids=RB6&serviceTypes=Regular"
+      }
+    ],
+    "crowding": {
+      "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+    }
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.Line, Tfl.Api.Presentation.Entities",
+    "id": "woolwich-ferry",
+    "name": "Woolwich Ferry",
+    "modeName": "river-bus",
+    "disruptions": [],
+    "created": "2026-09-15T13:26:22.117Z",
+    "modified": "2026-09-15T13:26:22.117Z",
+    "lineStatuses": [],
+    "routeSections": [],
+    "serviceTypes": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineServiceTypeInfo, Tfl.Api.Presentation.Entities",
+        "name": "Regular",
+        "uri": "/Line/Route?ids=Woolwich Ferry&serviceTypes=Regular"
+      }
+    ],
+    "crowding": {
+      "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+    }
+  }
+]

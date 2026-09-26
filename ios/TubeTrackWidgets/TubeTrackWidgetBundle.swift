@@ -5,7 +5,6 @@ import WidgetKit
 struct TubeTrackWidgetBundle: WidgetBundle {
     var body: some Widget {
         LineStatusWidget()
-        StationDeparturesWidget()
         DepartureLiveActivity()
     }
 }

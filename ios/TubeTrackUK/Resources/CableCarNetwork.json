@@ -1,0 +1,28 @@
+{
+  "id": "london-cable-car",
+  "name": "London Cable Car",
+  "terminals": [
+    {
+      "id": "940GZZALGWP",
+      "name": "Greenwich Peninsula",
+      "latitude": 51.499573,
+      "longitude": 0.00834
+    },
+    {
+      "id": "940GZZALRDK",
+      "name": "Royal Docks",
+      "latitude": 51.507732,
+      "longitude": 0.017648
+    }
+  ],
+  "coordinates": [
+    {
+      "latitude": 51.499573,
+      "longitude": 0.00834
+    },
+    {
+      "latitude": 51.507732,
+      "longitude": 0.017648
+    }
+  ]
+}

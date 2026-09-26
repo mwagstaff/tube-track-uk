@@ -19,24 +19,46 @@ struct NearMeTests {
         #expect(request.longitude == location.coordinate.longitude)
     }
 
-    @Test func mapLocationFocusSnapsOutsideLocationsToTheNearestStation() throws {
+    @Test func distantLocationDoesNotAutomaticallyMoveTheMap() throws {
         let graph = try TubeGraph.bundled()
         let location = CLLocation(latitude: 55.9533, longitude: -3.1883)
-        let nearest = try #require(NearbyStationFinder.nearestStations(
-            to: location,
-            in: graph.stations,
-            limit: 1
-        ).first?.station)
+        #expect(MapLocationFocusPolicy.request(for: location, in: graph, id: 1, automatic: true) == nil)
 
+        let explicit = try #require(MapLocationFocusPolicy.request(for: location, in: graph, id: 2))
+        #expect(explicit.latitude == location.coordinate.latitude)
+        #expect(explicit.longitude == location.coordinate.longitude)
+        #expect(explicit.snappedStationID == nil)
+    }
+
+    @Test func firstMapOpeningCentersNearElmersEnd() throws {
+        let graph = try TubeGraph.bundled()
+        let location = CLLocation(latitude: 51.3985, longitude: -0.0495)
         let request = try #require(MapLocationFocusPolicy.request(
-            for: location,
-            in: graph,
-            id: 8
+            for: location, in: graph, id: 3, automatic: true
         ))
+        #expect(request.latitude == location.coordinate.latitude)
+        #expect(request.longitude == location.coordinate.longitude)
+    }
 
-        #expect(request.snappedStationID == nearest.id)
-        #expect(request.latitude == nearest.latitude)
-        #expect(request.longitude == nearest.longitude)
+    @Test func nearbyLocationsBeyondTheMapBoundaryAreEligibleButDistantOnesAreNot() throws {
+        let graph = try TubeGraph.bundled()
+        let northernmost = try #require(graph.stations.max { $0.latitude < $1.latitude })
+        let nearby = CLLocation(latitude: northernmost.latitude + 0.02, longitude: northernmost.longitude)
+        let distant = CLLocation(latitude: northernmost.latitude + 0.10, longitude: northernmost.longitude)
+        #expect(MapLocationFocusPolicy.request(for: nearby, in: graph, id: 4, automatic: true) != nil)
+        #expect(MapLocationFocusPolicy.request(for: distant, in: graph, id: 5, automatic: true) == nil)
+    }
+
+    @Test func staleOrInaccurateFixDoesNotMoveTheMap() throws {
+        let graph = try TubeGraph.bundled()
+        for (accuracy, age) in [(10.0, -300.0), (2_000.0, 0.0), (-1.0, 0.0)] {
+            let location = CLLocation(
+                coordinate: CLLocationCoordinate2D(latitude: 51.3985, longitude: -0.0495),
+                altitude: 0, horizontalAccuracy: accuracy, verticalAccuracy: -1,
+                timestamp: Date.now.addingTimeInterval(age)
+            )
+            #expect(MapLocationFocusPolicy.request(for: location, in: graph, id: 1) == nil)
+        }
     }
 
     @Test func departureWaitingCopyMatchesTheAutomaticRetryState() {

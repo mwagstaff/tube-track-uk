@@ -58,6 +58,31 @@ enum GameCenterSubmissionState: Equatable {
 }
 
 @MainActor
+protocol GameCenterAuthenticationClient {
+    var isAuthenticated: Bool { get }
+    var displayName: String { get }
+    func authenticate(handler: @escaping @MainActor (UIViewController?, (any Error)?) -> Void)
+    func loadLeaderboardIDs() async throws -> Set<String>
+}
+
+@MainActor
+private final class LiveGameCenterAuthenticationClient: GameCenterAuthenticationClient {
+    var isAuthenticated: Bool { GKLocalPlayer.local.isAuthenticated }
+    var displayName: String { GKLocalPlayer.local.displayName }
+
+    func authenticate(handler: @escaping @MainActor (UIViewController?, (any Error)?) -> Void) {
+        GKLocalPlayer.local.authenticateHandler = { controller, error in
+            Task { @MainActor in handler(controller, error) }
+        }
+    }
+
+    func loadLeaderboardIDs() async throws -> Set<String> {
+        let boards = try await GKLeaderboard.loadLeaderboards(IDs: GameCenterLeaderboard.allCases.map(\.id))
+        return Set(boards.map(\.baseLeaderboardID))
+    }
+}
+
+@MainActor
 @Observable
 final class GameCenterService {
     private(set) var authenticationState: GameCenterAuthenticationState = .notStarted
@@ -72,13 +97,16 @@ final class GameCenterService {
     @ObservationIgnored private var synchronizationRequested = false
     @ObservationIgnored private var synchronizeAfterCurrentSubmissions = false
     @ObservationIgnored private var submittingRecordIDs: Set<UUID> = []
+    @ObservationIgnored private let authenticationClient: any GameCenterAuthenticationClient
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let storageKey: String
 
     init(
         defaults: UserDefaults = .standard,
-        storageKey: String = "TubeTrackUK.StationChase.pendingGameCenterScores.v1"
+        storageKey: String = "TubeTrackUK.StationChase.pendingGameCenterScores.v1",
+        authenticationClient: (any GameCenterAuthenticationClient)? = nil
     ) {
+        self.authenticationClient = authenticationClient ?? LiveGameCenterAuthenticationClient()
         self.defaults = defaults
         self.storageKey = storageKey
         pendingScoreRecords = defaults.data(forKey: storageKey)
@@ -86,11 +114,30 @@ final class GameCenterService {
     }
 
     var isAuthenticated: Bool {
-        GKLocalPlayer.local.isAuthenticated
+        if case .authenticated = authenticationState { return true }
+        return false
     }
 
     var rankingsAvailable: Bool {
-        !isOffline && isAuthenticated && Self.requiredLeaderboardIDs.isSubset(of: availableLeaderboardIDs)
+        !isOffline && isAuthenticated
+    }
+
+    private var canSubmitScores: Bool {
+        rankingsAvailable && Self.requiredLeaderboardIDs.isSubset(of: availableLeaderboardIDs)
+    }
+
+    var rankingsButtonTitle: String {
+        if isOffline { return "Game Center requires a connection" }
+        switch authenticationState {
+        case .notStarted: return "Connect to Game Center"
+        case .authenticating: return "Connecting to Game Center…"
+        case .authenticated: return "Game Center rankings"
+        case .unavailable: return "Retry Game Center"
+        }
+    }
+
+    var canRequestRankings: Bool {
+        !isOffline && authenticationState != .authenticating
     }
 
     func setOffline(_ offline: Bool) {
@@ -113,30 +160,29 @@ final class GameCenterService {
         hasRequestedAuthentication = true
         guard !isOffline else { return }
         if hasStartedAuthentication {
-            guard isAuthenticated else { return }
+            guard authenticationClient.isAuthenticated else { return }
+            authenticationState = .authenticated(displayName: authenticationClient.displayName)
             requestSynchronization()
             return
         }
         hasStartedAuthentication = true
         authenticationState = .authenticating
 
-        GKLocalPlayer.local.authenticateHandler = { [weak self] viewController, error in
-            Task { @MainActor [weak self] in
-                guard let self, !self.isOffline else { return }
-
-                if let viewController {
-                    self.authenticationState = .authenticating
-                    self.presentAuthentication(viewController)
-                    return
-                }
-
-                if GKLocalPlayer.local.isAuthenticated {
-                    self.requestSynchronization()
-                } else {
-                    _ = error
-                    self.availableLeaderboardIDs = []
-                    self.authenticationState = .unavailable
-                }
+        authenticationClient.authenticate { [weak self] viewController, _ in
+            guard let self, !self.isOffline else { return }
+            if let viewController {
+                self.authenticationState = .authenticating
+                self.presentAuthentication(viewController)
+                return
+            }
+            if self.authenticationClient.isAuthenticated {
+                // Signing in succeeds independently of leaderboard setup/loading.
+                self.authenticationState = .authenticated(displayName: self.authenticationClient.displayName)
+                self.requestSynchronization()
+            } else {
+                self.hasStartedAuthentication = false
+                self.availableLeaderboardIDs = []
+                self.authenticationState = .unavailable
             }
         }
     }
@@ -168,7 +214,7 @@ final class GameCenterService {
                 }
             }
         }
-        guard rankingsAvailable else {
+        guard canSubmitScores else {
             if submissionState.recordID == record.id {
                 submissionState = .failed(recordID: record.id)
             }
@@ -271,16 +317,11 @@ final class GameCenterService {
     private func validateConfiguration() async {
         guard !isOffline, !Task.isCancelled else { return }
         do {
-            let leaderboards = try await GKLeaderboard.loadLeaderboards(
-                IDs: GameCenterLeaderboard.allCases.map(\.id)
-            )
+            let identifiers = try await authenticationClient.loadLeaderboardIDs()
             guard !isOffline, !Task.isCancelled else { return }
-            availableLeaderboardIDs = Set(leaderboards.map(\.baseLeaderboardID))
+            availableLeaderboardIDs = identifiers
 
-            if rankingsAvailable {
-                authenticationState = .authenticated(
-                    displayName: GKLocalPlayer.local.displayName
-                )
+            if canSubmitScores {
                 // Local records survive app termination, including runs that did
                 // not make the local top ten. Retry only after Game Center is ready.
                 for record in pendingScoreRecords {
@@ -296,13 +337,11 @@ final class GameCenterService {
                         break // Avoid repeating requests while Game Center is unavailable.
                     }
                 }
-            } else {
-                authenticationState = .unavailable
             }
         } catch {
             guard !isOffline, !Task.isCancelled else { return }
             availableLeaderboardIDs = []
-            authenticationState = .unavailable
+            // A leaderboard request failing must not undo a successful sign-in.
         }
     }
 
@@ -333,6 +372,7 @@ final class GameCenterService {
 
     private func presentAuthentication(_ viewController: UIViewController) {
         guard let presenter = Self.topViewController() else {
+            hasStartedAuthentication = false
             authenticationState = .unavailable
             return
         }

@@ -349,6 +349,23 @@ class MapFidelityAuditTests(unittest.TestCase):
                 self.assertAlmostEqual(tick_centres[line_id][0], port["x"], places=3)
                 self.assertAlmostEqual(tick_centres[line_id][1], port["y"], places=3)
 
+    def test_canada_water_has_one_physical_roundel_on_both_routes(self):
+        document = json.loads((IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json").read_text())
+        ids = {"940GZZLUCWR", "910GCNDAW"}
+        markers = [m for m in document["stationMarkers"] if m["stationID"] in ids]
+        self.assertEqual(len(markers), 2)  # Both departure feeds remain selectable.
+        centre = {"x": 2704.938, "y": 1918.0}
+        for marker in markers:
+            self.assertEqual(marker["anchor"], centre)
+            self.assertEqual(marker["primitives"], [circle(centre["x"], centre["y"])])
+        for segment in document["segments"]:
+            if segment["fromStationID"] in ids:
+                self.assertEqual(segment["fromPort"], centre)
+            if segment["toStationID"] in ids:
+                self.assertEqual(segment["toPort"], centre)
+        label = next(l for l in document["labels"] if l["stationID"] == "940GZZLUCWR")
+        self.assertIn("910GCNDAW", label["associatedStationIDs"])
+
     def test_bundled_official_geometry_normalization_is_idempotent(self):
         document = json.loads((
             IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json"

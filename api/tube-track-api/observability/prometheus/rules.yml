@@ -35,7 +35,7 @@ groups:
 
       - alert: TubeTrackLiveRefreshFailing
         expr: >-
-          sum(increase(tube_track_live_refreshes_total{job="tube-track-api",status=~"failure|timeout"}[15m]))
+          sum(increase(tube_track_live_refreshes_total{job="tube-track-api",status=~"failure|timeout|partial"}[15m]))
             /
           clamp_min(sum(increase(tube_track_live_refreshes_total{job="tube-track-api"}[15m])), 1)
             > 0.5
@@ -44,11 +44,11 @@ groups:
           severity: warning
           service_name: tube-track-api
         annotations:
-          summary: 'tube-track-api: over half of live refreshes failed in the last 15m'
+          summary: 'tube-track-api: over half of live refreshes were incomplete in the last 15m'
           description: >-
-            {{ $value | humanizePercentage }} of refresh attempts failed or
-            timed out. TfL is probably degraded (see tube_track_tfl_requests_total
-            by status); the cache keeps serving the last good snapshot meanwhile.
+            {{ $value | humanizePercentage }} of refresh attempts failed, timed
+            out, or updated only some modes. Check tube_track_tfl_requests_total
+            by source and status; healthy modes keep updating independently.
 
       - alert: TubeTrackPushSendFailing
         expr: >-
@@ -98,3 +98,20 @@ groups:
             passengers will see boards dim between updates. Check whether
             predictions are flapping (tube_track_push_changes_detected_total by
             reason) before raising the thresholds.
+
+      - alert: TubeTrackPushRegistrationFlood
+        expr: >-
+          sum(increase(tube_track_push_rate_limited_total{job="tube-track-api"}[15m])) > 100
+        for: 15m
+        labels:
+          severity: warning
+          service_name: tube-track-api
+        annotations:
+          summary: 'tube-track-api is rate-limiting push registrations heavily'
+          description: >-
+            {{ $value }} registration attempts were rejected in the last 15
+            minutes. These endpoints are deliberately unauthenticated, so the
+            rate limiter is the only thing bounding abuse — a sustained flood
+            here is the signal that it needs App Attest rather than a higher
+            limit. Check tube_track_push_tokens for eviction of real
+            subscriptions.

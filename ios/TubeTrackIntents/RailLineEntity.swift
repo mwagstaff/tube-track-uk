@@ -33,16 +33,6 @@ struct RailLineQuery: EntityQuery {
 }
 
 extension TubeLineID {
-    /// TfL's customary ordering: Underground lines alphabetically, then the
-    /// other modes.
-    static let widgetDisplayOrder: [TubeLineID] = [
-        .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
-        .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity,
-        .dlr, .elizabeth,
-        .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush,
-        .tram,
-    ]
-
     var widgetModeDescription: String {
         switch modeName {
         case "tube": "Underground"
@@ -54,8 +44,4 @@ extension TubeLineID {
         }
     }
 
-    /// Sort key matching `widgetDisplayOrder`.
-    var widgetDisplayRank: Int {
-        Self.widgetDisplayOrder.firstIndex(of: self) ?? Self.widgetDisplayOrder.count
-    }
 }

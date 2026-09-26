@@ -1,0 +1,538 @@
+[
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+    "naptanId": "940GZZALGWP",
+    "modes": [
+      "cable-car"
+    ],
+    "icsCode": "1020079",
+    "stopType": "NaptanMetroStation",
+    "stationNaptan": "940GZZALGWP",
+    "hubNaptanCode": "HUBNGW",
+    "lines": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+        "id": "london-cable-car",
+        "name": "London Cable Car",
+        "uri": "/Line/london-cable-car",
+        "type": "Line",
+        "crowding": {
+          "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+        },
+        "routeType": "Unknown",
+        "status": "Unknown"
+      }
+    ],
+    "lineGroup": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineGroup, Tfl.Api.Presentation.Entities",
+        "stationAtcoCode": "940GZZALGWP",
+        "lineIdentifier": [
+          "london-cable-car"
+        ]
+      }
+    ],
+    "lineModeGroups": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineModeGroup, Tfl.Api.Presentation.Entities",
+        "modeName": "cable-car",
+        "lineIdentifier": [
+          "london-cable-car"
+        ]
+      }
+    ],
+    "status": true,
+    "id": "940GZZALGWP",
+    "commonName": "Greenwich Peninsula",
+    "placeType": "StopPoint",
+    "additionalProperties": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "MonFriTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Car park",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Lifts",
+        "sourceSystemKey": "StaticObjects",
+        "value": "2"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "MonFriTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SatTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SunTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Escalators",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "MonFriFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "07:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Photo Booths",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Address",
+        "key": "Address",
+        "sourceSystemKey": "StaticObjects",
+        "value": "Greenwich Peninsula Terminal,Edmund Halley Way,London,SE10 0FR"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Gates",
+        "sourceSystemKey": "StaticObjects",
+        "value": "7"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SatTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Waiting Room",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Toilets",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "WiFi",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Bridge",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Euro Cash Machines",
+        "sourceSystemKey": "StaticObjects",
+        "value": "yes"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Other Facilities",
+        "sourceSystemKey": "StaticObjects",
+        "value": "none"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Payphones",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SatFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "08:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SunFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "09:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "MonFriFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "07:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Ticket Halls",
+        "sourceSystemKey": "StaticObjects",
+        "value": "1"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Cash Machines",
+        "sourceSystemKey": "StaticObjects",
+        "value": "1"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Help Points",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0 on platforms, 0 in ticket halls, 0 elsewhere"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SatFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "08:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SunFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "09:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SunTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "NearestPlaces",
+        "key": "SourceSystemPlaceId",
+        "sourceSystemKey": "StaticObjects",
+        "value": "TaxiRank_5930"
+      }
+    ],
+    "children": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+        "naptanId": "9400ZZALGWP1",
+        "modes": [],
+        "icsCode": "1020079",
+        "stationNaptan": "940GZZALGWP",
+        "hubNaptanCode": "HUBNGW",
+        "lines": [],
+        "lineGroup": [],
+        "lineModeGroups": [],
+        "status": true,
+        "id": "9400ZZALGWP1",
+        "commonName": "Greenwich Peninsula",
+        "placeType": "StopPoint",
+        "additionalProperties": [],
+        "children": [],
+        "lat": 0.0,
+        "lon": 0.0
+      }
+    ],
+    "lat": 51.499573,
+    "lon": 0.00834
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+    "naptanId": "940GZZALRDK",
+    "modes": [
+      "cable-car"
+    ],
+    "icsCode": "1020078",
+    "stopType": "NaptanMetroStation",
+    "stationNaptan": "940GZZALRDK",
+    "hubNaptanCode": "HUBRVC",
+    "lines": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+        "id": "london-cable-car",
+        "name": "London Cable Car",
+        "uri": "/Line/london-cable-car",
+        "type": "Line",
+        "crowding": {
+          "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+        },
+        "routeType": "Unknown",
+        "status": "Unknown"
+      }
+    ],
+    "lineGroup": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineGroup, Tfl.Api.Presentation.Entities",
+        "stationAtcoCode": "940GZZALRDK",
+        "lineIdentifier": [
+          "london-cable-car"
+        ]
+      }
+    ],
+    "lineModeGroups": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.LineModeGroup, Tfl.Api.Presentation.Entities",
+        "modeName": "cable-car",
+        "lineIdentifier": [
+          "london-cable-car"
+        ]
+      }
+    ],
+    "status": true,
+    "id": "940GZZALRDK",
+    "commonName": "Royal Docks",
+    "placeType": "StopPoint",
+    "additionalProperties": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "MonFriFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "07:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Payphones",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SatFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "08:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Photo Booths",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Waiting Room",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Car park",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SatTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SunTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Cash Machines",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Gates",
+        "sourceSystemKey": "StaticObjects",
+        "value": "7"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Other Facilities",
+        "sourceSystemKey": "StaticObjects",
+        "value": "none"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SatTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "MonFriFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "07:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Ticket Halls",
+        "sourceSystemKey": "StaticObjects",
+        "value": "1"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Escalators",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Help Points",
+        "sourceSystemKey": "StaticObjects",
+        "value": "0 on platforms, 0 in ticket halls, 0 elsewhere"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SatFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "08:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "SunFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "09:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SunTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Address",
+        "key": "Address",
+        "sourceSystemKey": "StaticObjects",
+        "value": "Royal Docks Terminal,27 Western Gateway,London,E16 1FA"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Bridge",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Lifts",
+        "sourceSystemKey": "StaticObjects",
+        "value": "2"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Summer",
+        "key": "MonFriTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "21:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "SunFrom",
+        "sourceSystemKey": "StaticObjects",
+        "value": "09:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "WiFi",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Opening Time - Winter",
+        "key": "MonFriTo",
+        "sourceSystemKey": "StaticObjects",
+        "value": "20:00"
+      },
+      {
+        "$type": "Tfl.Api.Presentation.Entities.AdditionalProperties, Tfl.Api.Presentation.Entities",
+        "category": "Facility",
+        "key": "Toilets",
+        "sourceSystemKey": "StaticObjects",
+        "value": "no"
+      }
+    ],
+    "children": [
+      {
+        "$type": "Tfl.Api.Presentation.Entities.StopPoint, Tfl.Api.Presentation.Entities",
+        "naptanId": "9400ZZALRDK1",
+        "modes": [],
+        "icsCode": "1020078",
+        "stationNaptan": "940GZZALRDK",
+        "hubNaptanCode": "HUBRVC",
+        "lines": [],
+        "lineGroup": [],
+        "lineModeGroups": [],
+        "status": true,
+        "id": "9400ZZALRDK1",
+        "commonName": "Royal Docks",
+        "placeType": "StopPoint",
+        "additionalProperties": [],
+        "children": [],
+        "lat": 51.507732,
+        "lon": 0.017648
+      }
+    ],
+    "lat": 51.507732,
+    "lon": 0.017648
+  }
+]

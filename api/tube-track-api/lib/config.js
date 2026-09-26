@@ -111,7 +111,6 @@ export function loadPushConfig(env = process.env) {
     const teamId = env.APNS_TEAM_ID?.trim();
     const keyPath = env.APNS_AUTH_KEY_PATH?.trim();
     const inlineKey = env.APNS_AUTH_KEY?.trim();
-    const clientSecret = env.TUBETRACK_UK_PUSH_CLIENT_SECRET?.trim();
     const bundleId = env.TUBETRACK_UK_APNS_BUNDLE_ID?.trim() || 'dev.skynolimit.TubeTrackUK';
 
     const environment = env.APNS_USE_SANDBOX === 'true'
@@ -129,21 +128,20 @@ export function loadPushConfig(env = process.env) {
 
     // A half-configured push setup is a configuration error, not a reason to
     // silently do nothing: someone meant to turn this on.
-    const supplied = [keyId, teamId, keyPath || inlineKey, clientSecret].filter(Boolean).length;
-    if (supplied > 0 && supplied < 4) {
+    const supplied = [keyId, teamId, keyPath || inlineKey].filter(Boolean).length;
+    if (supplied > 0 && supplied < 3) {
         throw new Error(
-            'Push needs all of APNS_KEY_ID, APNS_TEAM_ID, APNS_AUTH_KEY_PATH (or APNS_AUTH_KEY) '
-            + 'and TUBETRACK_UK_PUSH_CLIENT_SECRET, or none of them'
+            'Push needs all of APNS_KEY_ID, APNS_TEAM_ID and APNS_AUTH_KEY_PATH '
+            + '(or APNS_AUTH_KEY), or none of them'
         );
     }
 
     return Object.freeze({
-        enabled: supplied === 4,
+        enabled: supplied === 3,
         keyId: keyId ?? null,
         teamId: teamId ?? null,
         keyPath: keyPath ?? null,
         inlineKey: inlineKey ?? null,
-        clientSecret: clientSecret ?? null,
         bundleId,
         liveActivityTopic: env.APNS_LIVE_ACTIVITY_TOPIC?.trim()
             || `${bundleId}.push-type.liveactivity`,

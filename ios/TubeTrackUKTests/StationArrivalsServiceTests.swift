@@ -41,16 +41,18 @@ struct StationArrivalsServiceTests {
                 ),
             ]),
         ])
-        let first = try await service.fetch(stationIDs: ["940GZZLUVIC"])
+        let first = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
         StationArrivalsURLProtocol.prepare(responses: [:])
 
-        let fallback = try await service.fetch(
+        let fallback = try await service.fetchSnapshot(
             stationIDs: ["940GZZLUVIC"],
             forceRefresh: true
         )
 
-        #expect(first.map(\.id) == ["cached-victoria"])
-        #expect(fallback.map(\.id) == ["cached-victoria"])
+        #expect(first.arrivals.map(\.id) == ["cached-victoria"])
+        #expect(fallback.arrivals.map(\.id) == ["cached-victoria"])
+        #expect(fallback.isStale)
+        #expect(fallback.fetchedAt == first.fetchedAt && fallback.serverUpdatedAt == first.serverUpdatedAt)
         #expect(StationArrivalsURLProtocol.requestCount(for: path) == 1)
     }
 

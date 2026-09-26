@@ -1,4 +1,3 @@
-import crypto from 'node:crypto';
 import express from 'express';
 import { DIRECTION_FILTERS } from './push/departure-projection.js';
 import { LINE_COLOURS } from './line-colours.js';
@@ -14,45 +13,63 @@ const ID_PATTERN = /^[0-9A-Za-z-]{8,64}$/;
 
 // Per install, not per IP: every request arrives through the same Cloudflare
 // tunnel, so an IP bucket would either throttle everybody at once or nobody.
+//
+// These are the only thing standing between the token store and abuse, so they
+// are set tighter than a credentialed endpoint would need. A passenger starts
+// one activity at a time and re-registers only when a token rotates, so even
+// heavy real use sits far below these.
 const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX_REQUESTS = 30;
+const RATE_LIMIT_MAX_REQUESTS = 10;
 const RATE_LIMIT_MAX_KEYS = 10_000;
+
+// An install id is self-asserted, so anyone willing to rotate it can walk past
+// the per-install bucket. The global ceiling is what actually bounds that: real
+// traffic is a handful of registrations a minute across all users, so this
+// leaves orders of magnitude of headroom and still caps a flood.
+const GLOBAL_RATE_LIMIT_MAX_REQUESTS = 300;
 
 function badRequest(res, code, message) {
     res.status(400).json({ error: { code, message } });
 }
 
-/** Constant-time compare that cannot leak the secret's length either. */
-export function secretMatches(provided, expected) {
-    if (typeof provided !== 'string' || typeof expected !== 'string' || expected.length === 0) {
-        return false;
-    }
-    const providedHash = crypto.createHash('sha256').update(provided).digest();
-    const expectedHash = crypto.createHash('sha256').update(expected).digest();
-    return crypto.timingSafeEqual(providedHash, expectedHash);
-}
-
 export function createRateLimiter({
     windowMs = RATE_LIMIT_WINDOW_MS,
     maxRequests = RATE_LIMIT_MAX_REQUESTS,
+    globalMaxRequests = GLOBAL_RATE_LIMIT_MAX_REQUESTS,
     maxKeys = RATE_LIMIT_MAX_KEYS,
     clock = Date.now
 } = {}) {
     const buckets = new Map();
+    let global = { startedAtMs: 0, count: 0 };
 
-    return function allow(key) {
-        const now = clock();
-        const bucket = buckets.get(key);
-        if (!bucket || now - bucket.startedAtMs >= windowMs) {
-            buckets.delete(key);
-            buckets.set(key, { startedAtMs: now, count: 1 });
-            while (buckets.size > maxKeys) {
-                buckets.delete(buckets.keys().next().value);
-            }
+    function spend(bucket, now, limit) {
+        if (now - bucket.startedAtMs >= windowMs) {
+            bucket.startedAtMs = now;
+            bucket.count = 1;
             return true;
         }
         bucket.count += 1;
-        return bucket.count <= maxRequests;
+        return bucket.count <= limit;
+    }
+
+    return function allow(key) {
+        const now = clock();
+
+        if (!spend(global, now, globalMaxRequests)) return false;
+
+        let bucket = buckets.get(key);
+        if (!bucket) {
+            bucket = { startedAtMs: 0, count: 0 };
+        } else {
+            // Re-inserting keeps the map in least-recently-seen order, so the
+            // eviction below drops idle installs rather than busy ones.
+            buckets.delete(key);
+        }
+        buckets.set(key, bucket);
+        while (buckets.size > maxKeys) {
+            buckets.delete(buckets.keys().next().value);
+        }
+        return spend(bucket, now, maxRequests);
     };
 }
 
@@ -67,16 +84,24 @@ function readStopIds(value, isKnownStop) {
 /**
  * Registration endpoints for push subscriptions.
  *
- * The shared secret here is obfuscation, not authentication: it ships inside
- * the app, so anyone who unpacks the binary has it. It raises the cost of
- * casual abuse and nothing more — what actually bounds the damage is the rate
- * limiter, the entry cap in the token store, and the fact that a subscription
- * can only ever cause a push to a device token its owner supplied. App Attest
- * is the real fix and belongs in its own change.
+ * Deliberately unauthenticated, matching TrainTrack UK and Top Scores. A secret
+ * shipped inside the app is readable by anyone who unpacks it, so it would have
+ * been obfuscation rather than authentication, at the cost of a secret to
+ * manage in two places.
+ *
+ * What bounds the damage instead:
+ *   - the rate limiter above, per install and globally;
+ *   - the entry cap and TTL in the token store;
+ *   - the fact that a subscription can only ever cause a push to the device
+ *     token its registrant supplied, so this cannot be pointed at anyone else;
+ *   - APNs itself, which answers BadDeviceToken for a fabricated token, and the
+ *     notifier then retires the row — so junk does not accumulate.
+ *
+ * The residual risk is someone rotating install ids to fill the store and evict
+ * real subscriptions. App Attest is the fix if that ever happens.
  */
 export function createPushRoutes({
     store,
-    clientSecret,
     isKnownStop = () => true,
     logger,
     metrics,
@@ -100,25 +125,13 @@ export function createPushRoutes({
     });
 
     router.use((req, res, next) => {
-        const header = req.get('authorization') ?? '';
-        const provided = header.startsWith('Bearer ') ? header.slice(7) : req.get('x-tubetrack-key');
-        if (!secretMatches(provided, clientSecret)) {
-            metrics?.recordPushAuthFailure?.();
-            res.status(401).json({
-                error: { code: 'UNAUTHORIZED', message: 'A valid client key is required' }
-            });
-            return;
-        }
-        next();
-    });
-
-    router.use((req, res, next) => {
         const installId = req.get('x-tubetrack-install');
         if (!installId || !ID_PATTERN.test(installId)) {
             badRequest(res, 'INVALID_INSTALL_ID', 'x-tubetrack-install must identify the app install');
             return;
         }
         if (!rateLimiter(installId)) {
+            metrics?.recordPushRateLimited?.();
             res.status(429).json({
                 error: { code: 'RATE_LIMITED', message: 'Too many registration requests' }
             });

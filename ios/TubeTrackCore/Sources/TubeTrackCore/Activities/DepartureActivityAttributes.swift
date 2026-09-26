@@ -70,7 +70,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
 
     public struct ContentState: Codable, Hashable, Sendable {
         /// At most this many departures ride in a push payload.
-        public static let maximumDepartures = 3
+        public static let maximumDepartures = 4
 
         public struct Departure: Codable, Hashable, Sendable, Identifiable {
             public let id: String

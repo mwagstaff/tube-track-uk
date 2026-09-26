@@ -11,6 +11,10 @@
 		A10000000000000000000064 /* TubeTrackCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000063 /* TubeTrackCore */; };
 		A10000000000000000000066 /* TubeTrackCore in Frameworks */ = {isa = PBXBuildFile; productRef = A10000000000000000000065 /* TubeTrackCore */; };
 		A10000000000000000000073 /* TubeTrackWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000070 /* TubeTrackWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A100000000000000000000A8 /* TubeTrackWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = A10000000000000000000091 /* TubeTrackWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A100000000000000000000AD /* TubeTrackWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = A10000000000000000000090 /* TubeTrackWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		A100000000000000000000B0 /* TubeTrackCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000AE /* TubeTrackCore */; };
+		A100000000000000000000B1 /* TubeTrackCore in Frameworks */ = {isa = PBXBuildFile; productRef = A100000000000000000000AF /* TubeTrackCore */; };
 		E71A7624304B0DA800EA021F /* GameCenterResources.gamekit in Resources */ = {isa = PBXBuildFile; fileRef = E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +33,20 @@
 			remoteGlobalIDString = A10000000000000000000071;
 			remoteInfo = TubeTrackWidgets;
 		};
+		A100000000000000000000B4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000096;
+			remoteInfo = TubeTrackWatchWidgets;
+		};
+		A100000000000000000000B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A10000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A10000000000000000000095;
+			remoteInfo = TubeTrackWatch;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +61,28 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A100000000000000000000A7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				A100000000000000000000A8 /* TubeTrackWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100000000000000000000AC /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				A100000000000000000000AD /* TubeTrackWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +90,8 @@
 		A10000000000000000000003 /* TubeTrackUKTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TubeTrackUKTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000040 /* Shared.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Shared.xcconfig; sourceTree = "<group>"; };
 		A10000000000000000000070 /* TubeTrackWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TubeTrackWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000090 /* TubeTrackWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeTrackWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A10000000000000000000091 /* TubeTrackWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TubeTrackWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E71A7623304B0DA800EA021F /* GameCenterResources.gamekit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = GameCenterResources.gamekit; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -60,6 +102,20 @@
 				Info.plist,
 			);
 			target = A10000000000000000000071 /* TubeTrackWidgets */;
+		};
+		A100000000000000000000B6 /* Exceptions for "TubeTrackWatch" folder in "TubeTrackWatch" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A10000000000000000000095 /* TubeTrackWatch */;
+		};
+		A100000000000000000000B7 /* Exceptions for "TubeTrackWatchWidgets" folder in "TubeTrackWatchWidgets" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = A10000000000000000000096 /* TubeTrackWatchWidgets */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -85,6 +141,27 @@
 		A10000000000000000000080 /* TubeTrackIntents */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TubeTrackIntents;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000092 /* TubeTrackWatch */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A100000000000000000000B6 /* Exceptions for "TubeTrackWatch" folder in "TubeTrackWatch" target */,
+			);
+			path = TubeTrackWatch;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000093 /* TubeTrackWatchWidgets */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				A100000000000000000000B7 /* Exceptions for "TubeTrackWatchWidgets" folder in "TubeTrackWatchWidgets" target */,
+			);
+			path = TubeTrackWatchWidgets;
+			sourceTree = "<group>";
+		};
+		A10000000000000000000094 /* TubeTrackWatchShared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TubeTrackWatchShared;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -114,6 +191,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A100000000000000000000A5 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000000000000B0 /* TubeTrackCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100000000000000000000AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A100000000000000000000B1 /* TubeTrackCore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -125,6 +218,9 @@
 				A10000000000000000000005 /* TubeTrackUKTests */,
 				A10000000000000000000074 /* TubeTrackWidgets */,
 				A10000000000000000000080 /* TubeTrackIntents */,
+				A10000000000000000000092 /* TubeTrackWatch */,
+				A10000000000000000000093 /* TubeTrackWatchWidgets */,
+				A10000000000000000000094 /* TubeTrackWatchShared */,
 				A10000000000000000000041 /* Configuration */,
 				A10000000000000000000007 /* Products */,
 			);
@@ -136,6 +232,8 @@
 				A10000000000000000000002 /* TubeTrackUK.app */,
 				A10000000000000000000003 /* TubeTrackUKTests.xctest */,
 				A10000000000000000000070 /* TubeTrackWidgets.appex */,
+				A10000000000000000000090 /* TubeTrackWatch.app */,
+				A10000000000000000000091 /* TubeTrackWatchWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -160,11 +258,13 @@
 				A10000000000000000000013 /* Resources */,
 				A10000000000000000000050 /* Copy Background Images */,
 				A10000000000000000000072 /* Embed Foundation Extensions */,
+				A100000000000000000000AC /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				A10000000000000000000077 /* PBXTargetDependency */,
+				A100000000000000000000B3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				A10000000000000000000004 /* TubeTrackUK */,
@@ -226,6 +326,56 @@
 			productReference = A10000000000000000000070 /* TubeTrackWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		A10000000000000000000095 /* TubeTrackWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000097 /* Build configuration list for PBXNativeTarget "TubeTrackWatch" */;
+			buildPhases = (
+				A100000000000000000000A4 /* Sources */,
+				A100000000000000000000A5 /* Frameworks */,
+				A100000000000000000000A6 /* Resources */,
+				A100000000000000000000A7 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A100000000000000000000B2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000092 /* TubeTrackWatch */,
+				A10000000000000000000094 /* TubeTrackWatchShared */,
+			);
+			name = TubeTrackWatch;
+			packageProductDependencies = (
+				A100000000000000000000AE /* TubeTrackCore */,
+			);
+			productName = TubeTrackWatch;
+			productReference = A10000000000000000000090 /* TubeTrackWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A10000000000000000000096 /* TubeTrackWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A10000000000000000000098 /* Build configuration list for PBXNativeTarget "TubeTrackWatchWidgets" */;
+			buildPhases = (
+				A100000000000000000000A9 /* Sources */,
+				A100000000000000000000AA /* Frameworks */,
+				A100000000000000000000AB /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				A10000000000000000000093 /* TubeTrackWatchWidgets */,
+				A10000000000000000000094 /* TubeTrackWatchShared */,
+			);
+			name = TubeTrackWatchWidgets;
+			packageProductDependencies = (
+				A100000000000000000000AF /* TubeTrackCore */,
+			);
+			productName = TubeTrackWatchWidgets;
+			productReference = A10000000000000000000091 /* TubeTrackWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -251,6 +401,12 @@
 					A10000000000000000000071 = {
 						CreatedOnToolsVersion = 26.6;
 					};
+					A10000000000000000000095 = {
+						CreatedOnToolsVersion = 26.6;
+					};
+					A10000000000000000000096 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = A10000000000000000000008 /* Build configuration list for PBXProject "TubeTrackUK" */;
@@ -273,6 +429,8 @@
 				A10000000000000000000010 /* TubeTrackUK */,
 				A10000000000000000000020 /* TubeTrackUKTests */,
 				A10000000000000000000071 /* TubeTrackWidgets */,
+				A10000000000000000000095 /* TubeTrackWatch */,
+				A10000000000000000000096 /* TubeTrackWatchWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -294,6 +452,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		A1000000000000000000007D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100000000000000000000A6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100000000000000000000AB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -346,6 +518,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A100000000000000000000A4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A100000000000000000000A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -358,6 +544,16 @@
 			isa = PBXTargetDependency;
 			target = A10000000000000000000071 /* TubeTrackWidgets */;
 			targetProxy = A10000000000000000000075 /* PBXContainerItemProxy */;
+		};
+		A100000000000000000000B2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000096 /* TubeTrackWatchWidgets */;
+			targetProxy = A100000000000000000000B4 /* PBXContainerItemProxy */;
+		};
+		A100000000000000000000B3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A10000000000000000000095 /* TubeTrackWatch */;
+			targetProxy = A100000000000000000000B5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -410,8 +606,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -453,7 +651,10 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
-				MARKETING_VERSION = 1.1;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
+				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -515,7 +716,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -546,7 +747,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.Widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -556,6 +757,116 @@
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		A100000000000000000000A0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000040 /* Shared.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TubeTrackWatch/TubeTrackWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SJ8X4DLAN9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TubeTrackWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_KEY_WKApplication = YES;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		A100000000000000000000A1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000040 /* Shared.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = TubeTrackWatch/TubeTrackWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SJ8X4DLAN9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TubeTrackWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
+				INFOPLIST_KEY_CFBundleIconName = AppIcon;
+				INFOPLIST_KEY_WKApplication = YES;
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		A100000000000000000000A2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000040 /* Shared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TubeTrackWatchWidgets/TubeTrackWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SJ8X4DLAN9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TubeTrackWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.watchkitapp.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		A100000000000000000000A3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A10000000000000000000040 /* Shared.xcconfig */;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = TubeTrackWatchWidgets/TubeTrackWatchWidgets.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = SJ8X4DLAN9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TubeTrackWatchWidgets/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
+				MARKETING_VERSION = 1.2;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.skynolimit.TubeTrackUK.watchkitapp.Widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
 			};
 			name = Release;
 		};
@@ -598,6 +909,24 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A10000000000000000000097 /* Build configuration list for PBXNativeTarget "TubeTrackWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000A0 /* Debug */,
+				A100000000000000000000A1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A10000000000000000000098 /* Build configuration list for PBXNativeTarget "TubeTrackWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A100000000000000000000A2 /* Debug */,
+				A100000000000000000000A3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
@@ -617,6 +946,14 @@
 			productName = TubeTrackCore;
 		};
 		A10000000000000000000065 /* TubeTrackCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TubeTrackCore;
+		};
+		A100000000000000000000AE /* TubeTrackCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = TubeTrackCore;
+		};
+		A100000000000000000000AF /* TubeTrackCore */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = TubeTrackCore;
 		};

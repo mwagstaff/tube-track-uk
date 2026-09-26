@@ -1,9 +1,37 @@
 import assert from 'node:assert/strict';
+import { getEventListeners } from 'node:events';
 import test from 'node:test';
 
 import { LiveCache } from '../lib/live-cache.js';
 import { LivePoller } from '../lib/live-poller.js';
+import { normaliseArrival } from '../lib/normalise-arrival.js';
 import { prediction } from './helpers.js';
+
+for (const outcome of ['success', 'failure', 'cancelled']) {
+    test(`detaches refresh cancellation listeners after ${outcome}`, async () => {
+        const controller = new AbortController();
+        let attemptSignal;
+        const poller = new LivePoller({
+            modes: ['tube'],
+            cache: new LiveCache(),
+            client: {
+                async fetchArrivals(mode, { signal }) {
+                    attemptSignal = signal;
+                    if (outcome === 'cancelled') controller.abort(new Error('cancelled'));
+                    if (outcome !== 'success') throw new Error(outcome);
+                    return [prediction()];
+                }
+            }
+        });
+        const pending = poller.refreshOnce({ signal: controller.signal });
+        if (outcome === 'success') await pending;
+        else await assert.rejects(pending);
+
+        assert.equal(getEventListeners(controller.signal, 'abort').length, 0);
+        assert.equal(getEventListeners(attemptSignal, 'abort').length, 0);
+        assert.equal(poller.refreshing, false);
+    });
+}
 
 function testMetrics() {
     return {
@@ -19,7 +47,7 @@ function testMetrics() {
     };
 }
 
-test('replaces the cache only after every mode succeeds', async () => {
+test('publishes a full snapshot when every mode succeeds', async () => {
     const cache = new LiveCache();
     const metrics = testMetrics();
     const modes = ['tube', 'elizabeth-line'];
@@ -52,33 +80,97 @@ test('replaces the cache only after every mode succeeds', async () => {
     assert.equal(metrics.cache.itemCount, 2);
 });
 
-test('keeps the last successful generation when one mode fails', async () => {
-    const cache = new LiveCache();
-    cache.replace([], {
-        startedAt: 1,
-        completedAt: 2,
-        modeCounts: { tube: 0 }
-    });
+test('refreshes successful modes while retaining the last good failed mode', async () => {
+    let nowMs = 1_000;
+    const cache = new LiveCache({ staleAfterMs: 5_000, clock: () => nowMs });
+    const oldTube = normaliseArrival(prediction({ id: 'old-tube', modeName: 'tube' }), 'tube');
+    const oldElizabeth = normaliseArrival(prediction({
+        id: 'old-elizabeth', modeName: 'elizabeth-line', lineId: 'elizabeth'
+    }), 'elizabeth-line');
+    cache.replaceModes(new Map([
+        ['tube', [oldTube]],
+        ['elizabeth-line', [oldElizabeth]]
+    ]), { modes: ['tube', 'elizabeth-line'], startedAt: nowMs, completedAt: nowMs });
     const originalGeneration = cache.read().snapshot.generation;
+    nowMs = 8_000;
     const metrics = testMetrics();
+    let elizabethFails = true;
     const poller = new LivePoller({
         modes: ['tube', 'elizabeth-line'],
         client: {
             async fetchArrivals(mode) {
-                if (mode === 'elizabeth-line') {
+                if (mode === 'elizabeth-line' && elizabethFails) {
                     throw new Error('simulated failure');
                 }
-                return [prediction()];
+                return [prediction({ id: `new-${mode}`, modeName: mode,
+                    lineId: mode === 'elizabeth-line' ? 'elizabeth' : 'victoria' })];
             }
         },
+        cache,
+        metrics,
+        clock: () => nowMs,
+        requestStaggerMs: 0
+    });
+
+    const partial = await poller.refreshOnce();
+    assert.ok(partial.state.snapshot.generation > originalGeneration);
+    assert.deepEqual(partial.state.snapshot.arrivals.map((arrival) => arrival.id).sort(),
+        ['new-tube', 'old-elizabeth']);
+    assert.deepEqual(partial.state.staleModes, ['elizabeth-line']);
+    assert.equal(partial.state.stale, true);
+    assert.equal(partial.state.snapshot.modeUpdatedAt.tube, new Date(nowMs).toISOString());
+    assert.equal(partial.state.snapshot.modeUpdatedAt['elizabeth-line'], new Date(1_000).toISOString());
+    assert.equal(metrics.refreshes.at(-1).status, 'partial');
+    assert.deepEqual(poller.status().lastError.failedModes, ['elizabeth-line']);
+
+    elizabethFails = false;
+    nowMs += 1_000;
+    const recovered = await poller.refreshOnce();
+    assert.deepEqual(recovered.state.snapshot.arrivals.map((arrival) => arrival.id).sort(),
+        ['new-elizabeth-line', 'new-tube']);
+    assert.deepEqual(recovered.state.staleModes, []);
+    assert.equal(recovered.state.stale, false);
+    assert.equal(metrics.refreshes.at(-1).status, 'success');
+    assert.equal(poller.status().lastError, null);
+});
+
+test('keeps the current snapshot when every mode fails', async () => {
+    const cache = new LiveCache();
+    cache.replace([], { startedAt: 1, completedAt: 2, modeCounts: { tube: 0 } });
+    const originalGeneration = cache.read().snapshot.generation;
+    const metrics = testMetrics();
+    const poller = new LivePoller({
+        modes: ['tube', 'elizabeth-line'],
+        client: { fetchArrivals: async () => { throw new Error('all failed'); } },
         cache,
         metrics,
         requestStaggerMs: 0
     });
 
-    await assert.rejects(poller.refreshOnce(), /simulated failure/);
+    await assert.rejects(poller.refreshOnce(), /all failed/);
     assert.equal(cache.read().snapshot.generation, originalGeneration);
     assert.equal(metrics.refreshes.at(-1).status, 'failure');
+});
+
+test('continues to later modes after the first mode fails', async () => {
+    const calls = [];
+    const poller = new LivePoller({
+        modes: ['tube', 'elizabeth-line'],
+        client: {
+            async fetchArrivals(mode) {
+                calls.push(mode);
+                if (mode === 'tube') throw new Error('tube unavailable');
+                return [prediction({ id: 'elizabeth', modeName: mode, lineId: 'elizabeth' })];
+            }
+        },
+        cache: new LiveCache(),
+        requestStaggerMs: 0
+    });
+
+    const { state } = await poller.refreshOnce();
+    assert.deepEqual(calls, ['tube', 'elizabeth-line']);
+    assert.deepEqual(state.snapshot.arrivals.map((arrival) => arrival.id), ['elizabeth']);
+    assert.deepEqual(state.staleModes, ['tube']);
 });
 
 function testLogger() {
@@ -141,13 +233,14 @@ test('a refresh whose upstream request never settles times out and the loop keep
 
     poller.start();
     try {
-        await settled(() => metrics.refreshes.some((entry) => entry.status === 'timeout'));
+        await settled(() => metrics.refreshes.some((entry) => entry.status === 'partial'));
         assert.equal(poller.refreshing, false);
-        assert.equal(poller.status().lastError.code, 'LIVE_REFRESH_TIMEOUT');
+        assert.equal(poller.status().lastError.code, 'LIVE_REFRESH_PARTIAL');
         assert.equal(calls[1].signal.aborted, true, 'the stuck request is told to abort');
-        const failure = logger.entries.find((entry) => entry.event === 'live_cache_refresh_failed');
-        assert.equal(failure.details.error.code, 'LIVE_REFRESH_TIMEOUT');
-        assert.equal(cache.read(), null, 'a timed-out attempt publishes nothing');
+        const partial = logger.entries.find((entry) => entry.event === 'live_cache_refresh_partial');
+        assert.equal(partial.details.failedModes.overground, 'LIVE_REFRESH_TIMEOUT');
+        assert.equal(cache.read().snapshot.arrivals.length, 1, 'the completed mode is published');
+        assert.deepEqual(cache.read().staleModes, ['overground']);
 
         // The loop must carry on: the next cycle succeeds (pollInterval floor is 1s).
         await settled(() => metrics.refreshes.some((entry) => entry.status === 'success'), { timeoutMs: 3_000 });

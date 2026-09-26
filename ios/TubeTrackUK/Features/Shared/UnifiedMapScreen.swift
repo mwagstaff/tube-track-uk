@@ -3,6 +3,10 @@ import SwiftUI
 
 struct UnifiedMapScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(UserLocationProvider.self) private var locationProvider
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var initialLocationFocusFinished = false
+    @State private var mapInteractionGeneration = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Binding var closestStationPanelHidden: Bool
     @Binding var mapNavigationActive: Bool
@@ -28,10 +32,7 @@ struct UnifiedMapScreen: View {
                 resetToken: resetToken,
                 locationFocusRequest: locationFocusRequest,
                 contentVerticalBias: 36,
-                onUserZoomIn: {
-                    guard !closestStationPanelHidden else { return }
-                    setClosestStationPanel(hidden: true)
-                },
+                onUserZoomIn: handleMapInteraction,
                 onInteractionChange: setMapNavigation(active:),
                 onBackgroundTap: handleMapBackgroundTap
             )
@@ -44,7 +45,8 @@ struct UnifiedMapScreen: View {
                 onResetAvailabilityChange: { _ in },
                 onOverviewOpacityChange: { realWorldOverviewOpacity = $0 },
                 screenFurnitureOpacity: screenFurnitureOpacity,
-                onInteractionChange: setMapNavigation(active:)
+                onInteractionChange: setMapNavigation(active:),
+                onUserInteraction: handleMapInteraction
             )
                 .opacity(realWorldRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .realWorld)
@@ -90,7 +92,32 @@ struct UnifiedMapScreen: View {
                 .opacity(screenFurnitureOpacity)
                 .accessibilityHidden(mapNavigationActive)
         }
+        .task(id: "river:\(scenePhase == .active):\(appState.selectedTab == .map):\(appState.isOffline):\(appState.river.isEnabled):\(appState.river.showsBoats):\(appState.river.selectedPierId ?? "")") {
+            await appState.river.restore()
+            guard scenePhase == .active, appState.selectedTab == .map, !appState.isOffline,
+                  appState.river.isEnabled else { return }
+            await appState.river.poll()
+        }
+        .task(id: "cable-clock:\(scenePhase == .active):\(appState.selectedTab == .map):\(appState.cableCar.isEnabled)") {
+            guard scenePhase == .active, appState.selectedTab == .map, appState.cableCar.isEnabled else { return }
+            await appState.cableCar.restore()
+            while !Task.isCancelled {
+                appState.cableCar.updatePresentation()
+                do { try await Task.sleep(for: .seconds(1)) } catch { return }
+            }
+        }
+        .task(id: "cable:\(scenePhase == .active):\(appState.selectedTab == .map):\(appState.isOffline):\(appState.cableCar.isEnabled):\(appState.disruptionDateSelection):\(appState.selectedDisruptionTimeWindows)") {
+            appState.cableCar.setContext(date: appState.isViewingLiveStatus ? nil : appState.selectedDisruptionDate,
+                windows: appState.selectedDisruptionTimeWindows, offline: appState.isOffline)
+            guard scenePhase == .active, appState.selectedTab == .map, !appState.isOffline, appState.cableCar.isEnabled else { return }
+            await appState.cableCar.poll()
+        }
+        .onChange(of: appState.cableCar.selectionGeneration) { handleMapInteraction() }
+        .onChange(of: appState.river.selectionGeneration) { handleMapInteraction() }
+        .onChange(of: locationProvider.location) { focusOnInitialLocationIfNeeded() }
+        .onChange(of: appState.graph?.generatedAt) { focusOnInitialLocationIfNeeded() }
         .onAppear {
+            focusOnInitialLocationIfNeeded()
             layoutProgress = appState.mapPresentationMode == .realWorld ? 1 : 0
         }
         .onChange(of: appState.mapPresentationMode) { _, mode in
@@ -120,13 +147,17 @@ struct UnifiedMapScreen: View {
             mapResetTask?.cancel()
             toastDismissTask?.cancel()
         }
+        .onChange(of: appState.stationSelectionGeneration) { _, _ in
+            guard appState.selectedStationID != nil else { return }
+            handleMapInteraction()
+        }
         .onChange(of: appState.disruptionSelectionGeneration) { _, _ in
             guard appState.selectedDisruption != nil else { return }
-            setClosestStationPanel(hidden: true)
+            handleMapInteraction()
         }
         .onChange(of: appState.selectedTrainID) { _, trainID in
             guard trainID != nil else { return }
-            setClosestStationPanel(hidden: true)
+            handleMapInteraction()
         }
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
@@ -205,12 +236,12 @@ struct UnifiedMapScreen: View {
                 reduceMotion: reduceMotion
             )
         case .realWorld:
-            return realWorldOverviewOpacity
+            return (appState.river.hasSelection || appState.cableCar.hasSelection) ? 0 : realWorldOverviewOpacity
         }
     }
 
     private var compactOverviewForZoom: Bool {
-        appState.mapPresentationMode == .beck && overviewOpacity <= 0.5
+        appState.cableCar.hasSelection || appState.river.hasSelection || (appState.mapPresentationMode == .beck && overviewOpacity <= 0.5)
     }
 
     private var activeMapChromeOpacity: Double {
@@ -222,7 +253,7 @@ struct UnifiedMapScreen: View {
     }
 
     private var hasMapSelection: Bool {
-        appState.selectedStation != nil
+        appState.cableCar.hasSelection || appState.river.hasSelection || appState.selectedStation != nil
             || appState.selectedEngineeringWork != nil
             || appState.selectedDisruption != nil
             || appState.selectedTrain != nil
@@ -244,6 +275,7 @@ struct UnifiedMapScreen: View {
     }
 
     private func setMapNavigation(active: Bool) {
+        if active { handleMapInteraction() }
         guard mapNavigationActive != active else { return }
         // Give a network-map drag immediate visual feedback and keep glass
         // compositing work out of its first frame. Animate the furniture's return.
@@ -272,7 +304,7 @@ struct UnifiedMapScreen: View {
         MapResetDiagnostics.logger.notice(
             "view-action source=\(source.rawValue, privacy: .public) token=\(self.resetToken)"
         )
-        setClosestStationPanel(hidden: false)
+        handleMapInteraction()
         let generation = appState.resetMapState(source: source)
         mapResetTask?.cancel()
         mapResetTask = Task { @MainActor in
@@ -289,6 +321,7 @@ struct UnifiedMapScreen: View {
     }
 
     private func handleMapBackgroundTap() {
+        handleMapInteraction()
         guard appState.selectedDisruption != nil else {
             appState.clearMapSelection()
             return
@@ -344,7 +377,13 @@ struct UnifiedMapScreen: View {
                     .transition(.opacity)
             }
 
-            if let station = appState.selectedStation {
+            if appState.cableCar.hasSelection {
+                CableCarCard()
+            } else if let pier = appState.river.selectedPier {
+                RiverPierCard(pier: pier)
+            } else if let boat = appState.river.selectedBoat {
+                RiverBoatCard(boat: boat)
+            } else if let station = appState.selectedStation {
                 StationDetailCard(
                     station: station,
                     onShowDisruption: showDisruptionDetails(_:)
@@ -384,6 +423,7 @@ struct UnifiedMapScreen: View {
                     .transition(.opacity)
             }
 
+
             if appState.showLiveTrains {
                 TrainFilterBar()
                     .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -395,11 +435,12 @@ struct UnifiedMapScreen: View {
             }
 
             MapControlDock(
-                showsClosestStation: appState.selectedDisruption == nil
+                interactionGeneration: mapInteractionGeneration,
+                showsClosestStation: !appState.cableCar.hasSelection && !appState.river.hasSelection && appState.selectedDisruption == nil
                     && appState.selectedTrain == nil
-                    && !closestStationPanelHidden
-                    && supportingContentOpacity > 0.01,
-                closestStationOpacity: supportingContentOpacity,
+                    && appState.showsClosestStation
+                    && !closestStationPanelHidden,
+                closestStationOpacity: 1,
                 showsReset: true,
                 onReset: { resetMapView(source: .mapOptions) },
                 onFocusUserLocation: focusMap(on:),
@@ -444,10 +485,6 @@ struct UnifiedMapScreen: View {
         return 8
     }
 
-    private var supportingContentOpacity: Double {
-        appState.mapPresentationMode == .realWorld ? overviewOpacity : 1
-    }
-
     private func focusMap(on location: CLLocation) {
         guard let graph = appState.graph else { return }
         locationFocusGeneration += 1
@@ -456,8 +493,32 @@ struct UnifiedMapScreen: View {
             in: graph,
             id: locationFocusGeneration
         ) else { return }
+        initialLocationFocusFinished = true
+        appState.clearMapSelection()
         locationFocusRequest = request
+        setClosestStationPanel(hidden: false)
+    }
+
+    private func handleMapInteraction() {
+        locationFocusRequest = nil
+        mapInteractionGeneration &+= 1
+        initialLocationFocusFinished = true
         setClosestStationPanel(hidden: true)
+    }
+
+    private func focusOnInitialLocationIfNeeded() {
+        guard !initialLocationFocusFinished,
+              appState.selectedTab == .map,
+              !hasMapSelection,
+              let graph = appState.graph,
+              let location = locationProvider.location,
+              MapLocationFocusPolicy.isUsable(location) else { return }
+        initialLocationFocusFinished = true
+        guard let request = MapLocationFocusPolicy.request(
+            for: location, in: graph, id: locationFocusGeneration + 1, automatic: true
+        ) else { return }
+        locationFocusGeneration += 1
+        locationFocusRequest = request
     }
 
     @ViewBuilder

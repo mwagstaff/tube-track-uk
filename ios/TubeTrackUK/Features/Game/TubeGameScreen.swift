@@ -2,10 +2,11 @@ import SwiftUI
 import UIKit
 
 struct TubeGameScreen: View {
-    @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
 
     let graph: TubeGraph
+    let onClose: () -> Void
+    let onReturnToMap: () -> Void
 
     @State private var engine: TubeGameEngine?
     @State private var renderModel: TubeGameRenderModel?
@@ -17,16 +18,17 @@ struct TubeGameScreen: View {
                 TubeGameSessionView(
                     engine: engine,
                     renderModel: renderModel,
-                    onDismiss: { dismiss() }
+                    onDismiss: onClose,
+                    onReturnToMap: onReturnToMap
                 )
             } else if let loadError {
                 TubeGameLoadFailureView(
                     message: loadError,
-                    onDismiss: { dismiss() },
+                    onDismiss: onReturnToMap,
                     onRetry: loadGame
                 )
             } else {
-                TubeGameLoadingView(onDismiss: { dismiss() })
+                TubeGameLoadingView(onDismiss: onClose)
             }
         }
         .background(Color(.systemBackground))
@@ -73,6 +75,7 @@ private struct TubeGameSessionView: View {
     @Bindable var engine: TubeGameEngine
     let renderModel: TubeGameRenderModel
     let onDismiss: () -> Void
+    let onReturnToMap: () -> Void
 
     @State private var submittedRecord: TubeGameScoreRecord?
     @State private var achievements: [TubeGameAchievement] = []
@@ -376,7 +379,6 @@ private struct TubeGameSessionView: View {
         case .ready:
             TubeGameReadyView(
                 bestScore: highScores.bestScore,
-                gameCenterAvailable: gameCenter.rankingsAvailable && !appState.isOffline,
                 isOffline: appState.isOffline,
                 onStart: engine.start,
                 onShowRankings: showRankings,
@@ -406,12 +408,11 @@ private struct TubeGameSessionView: View {
                 record: submittedRecord,
                 achievements: achievements,
                 collisionLineID: engine.collisionLineID,
-                gameCenterAvailable: gameCenter.rankingsAvailable && !appState.isOffline,
                 isOffline: appState.isOffline,
                 gameCenterSubmissionState: gameCenter.submissionState,
                 onPlayAgain: playAgain,
                 onShowRankings: showRankings,
-                onDismiss: onDismiss
+                onDismiss: onReturnToMap
             )
             .transition(overlayTransition)
         }
@@ -449,8 +450,12 @@ private struct TubeGameSessionView: View {
     }
 
     private func showRankings() {
-        guard !appState.isOffline, gameCenter.rankingsAvailable else { return }
-        isChoosingLeaderboard = true
+        guard !appState.isOffline else { return }
+        if gameCenter.rankingsAvailable {
+            isChoosingLeaderboard = true
+        } else {
+            gameCenter.authenticate()
+        }
     }
 
     private func handlePhaseChange(_ phase: TubeGamePhase) {
@@ -681,7 +686,6 @@ private struct TubeGameIntentBadge: View {
 
 private struct TubeGameReadyView: View {
     let bestScore: Int
-    let gameCenterAvailable: Bool
     let isOffline: Bool
     let onStart: () -> Void
     let onShowRankings: () -> Void
@@ -761,25 +765,14 @@ private struct TubeGameReadyView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Button(action: onShowRankings) {
-                        Label(
-                            isOffline ? "Game Center requires a connection" :
-                                (gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable"),
-                            systemImage: "person.3.fill"
-                        )
-                        .font(.appHeadline(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                    }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 15))
-                    .disabled(!gameCenterAvailable)
-                    .opacity(gameCenterAvailable ? 1 : 0.45)
+                    TubeGameRankingsButton(action: onShowRankings)
                 }
                 .padding(24)
                 .frame(maxWidth: 560)
                 .glassEffect(.regular, in: .rect(cornerRadius: 28))
                 .padding(.horizontal, 16)
-                .padding(.vertical, 54)
+                .padding(.top, TubeGameWindowMetrics.safeAreaInsets.top + 64)
+                .padding(.bottom, max(24, TubeGameWindowMetrics.safeAreaInsets.bottom + 12))
             }
 
             VStack {
@@ -791,11 +784,14 @@ private struct TubeGameReadyView: View {
                     .buttonStyle(.plain)
                     .glassEffect(.regular.interactive(), in: .circle)
                     .accessibilityLabel("Close Track-Man")
+                    .contentShape(.circle)
                     Spacer()
                 }
                 Spacer()
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.top, max(12, TubeGameWindowMetrics.safeAreaInsets.top + 8))
+            .zIndex(1)
         }
     }
 
@@ -882,7 +878,6 @@ private struct TubeGameResultsView: View {
     let record: TubeGameScoreRecord?
     let achievements: [TubeGameAchievement]
     let collisionLineID: TubeLineID?
-    let gameCenterAvailable: Bool
     let isOffline: Bool
     let gameCenterSubmissionState: GameCenterSubmissionState
     let onPlayAgain: () -> Void
@@ -997,19 +992,7 @@ private struct TubeGameResultsView: View {
                     .foregroundStyle(.black)
                     .background(.yellow, in: .rect(cornerRadius: 15))
 
-                    Button(action: onShowRankings) {
-                        Label(
-                            isOffline ? "Game Center requires a connection" :
-                                (gameCenterAvailable ? "Game Center rankings" : "Game Center unavailable"),
-                            systemImage: "person.3.fill"
-                        )
-                        .font(.appHeadline(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 48)
-                    }
-                    .buttonStyle(.plain)
-                    .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 15))
-                    .disabled(!gameCenterAvailable)
-                    .opacity(gameCenterAvailable ? 1 : 0.45)
+                    TubeGameRankingsButton(action: onShowRankings)
 
                     if reason != .manualQuit, record != nil {
                         TubeGameShareButton(
@@ -1029,7 +1012,7 @@ private struct TubeGameResultsView: View {
                         .frame(minHeight: 44)
                     }
 
-                    Button("Back to map", action: onDismiss)
+                    Button("Back to Map screen", action: onDismiss)
                         .tint(achievements.isEmpty ? .tubeBlue : .white)
                         .font(.appHeadline(.semibold))
                         .frame(minHeight: 44)
@@ -1207,11 +1190,13 @@ private struct TubeGameLoadingView: View {
                     }
                     .buttonStyle(.plain)
                     .accessibilityLabel("Close Track-Man")
+                    .contentShape(.circle)
                     Spacer()
                 }
                 Spacer()
             }
-            .padding(12)
+            .padding(.horizontal, 12)
+            .padding(.top, max(12, TubeGameWindowMetrics.safeAreaInsets.top + 8))
         }
     }
 }
@@ -1229,7 +1214,7 @@ private struct TubeGameLoadFailureView: View {
         } actions: {
             Button("Try again", action: onRetry)
                 .buttonStyle(.borderedProminent)
-            Button("Back to map", action: onDismiss)
+            Button("Back to Map screen", action: onDismiss)
         }
     }
 }
@@ -1288,5 +1273,22 @@ private extension TubeGameScoreEndReason {
         case .networkCleared: "trophy.fill"
         case .manualQuit: "stop.fill"
         }
+    }
+}
+
+private struct TubeGameRankingsButton: View {
+    @Environment(GameCenterService.self) private var gameCenter
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(gameCenter.rankingsButtonTitle, systemImage: "person.3.fill")
+                .font(.appHeadline(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 48)
+        }
+        .buttonStyle(.plain)
+        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 15))
+        .disabled(!gameCenter.canRequestRankings)
+        .opacity(gameCenter.canRequestRankings ? 1 : 0.45)
     }
 }

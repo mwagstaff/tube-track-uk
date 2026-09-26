@@ -1,14 +1,15 @@
 import Foundation
 
-/// When a widget should ask WidgetKit for its next reload.
+/// When an iPhone widget should ask WidgetKit for its next reload.
 ///
 /// WidgetKit budgets a frequently-viewed widget to roughly 40–70 reloads a day.
 /// Asking for more does not buy fresher data — the system simply throttles the
-/// widget, and it ends up staler than one that asked for less. So the budget is
-/// spent where it is worth most: tightest around the commute, loosest overnight.
+/// widget, and it can end up staler than one that asked for less. The iPhone
+/// schedule spends the budget around commutes. Watch status widgets use a
+/// separate five-minute request schedule and rely on WidgetKit to defer it.
 ///
-/// Reloads the passenger triggers (tapping refresh, opening the app) and
-/// server-driven pushes are on top of this and are not billed the same way.
+/// The app can also request reloads after a passenger refreshes status, while
+/// WidgetKit still controls when background reloads run.
 public enum WidgetRefreshPolicy {
     public static let peakInterval: TimeInterval = 15 * 60
     public static let standardInterval: TimeInterval = 30 * 60

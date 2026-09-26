@@ -71,12 +71,13 @@ test('an unlabelled platform belongs to no specific direction', () => {
     assert.equal(matchesDirection(label, 'northbound'), false);
 });
 
-test('the board keeps the soonest three in the chosen direction', () => {
+test('the board keeps the soonest four in the chosen direction', () => {
     const arrivals = [
         arrival({ id: 'late', vehicleId: 'vlate', seconds: 900 }),
         arrival({ id: 'soon', vehicleId: 'vsoon', seconds: 60 }),
         arrival({ id: 'mid', vehicleId: 'vmid', seconds: 300 }),
         arrival({ id: 'extra', vehicleId: 'vextra', seconds: 1_200 }),
+        arrival({ id: 'overflow', vehicleId: 'voverflow', seconds: 1_500 }),
         arrival({
             id: 'other',
             vehicleId: 'vother',
@@ -90,7 +91,7 @@ test('the board keeps the soonest three in the chosen direction', () => {
         lineId: 'central',
         direction: 'eastbound'
     });
-    assert.deepEqual(board.map((row) => row.id), ['vsoon', 'vmid', 'vlate']);
+    assert.deepEqual(board.map((row) => row.id), ['vsoon', 'vmid', 'vlate', 'vextra']);
     assert.equal(board[0].expectedAtEpoch, Math.round(BASE_MS / 1_000) + 60);
 });
 

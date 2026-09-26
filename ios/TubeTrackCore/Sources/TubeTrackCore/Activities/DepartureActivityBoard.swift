@@ -1,6 +1,6 @@
 import Foundation
 
-/// Turns live predictions into the three rows a Live Activity carries.
+/// Turns live predictions into the four rows a Live Activity carries.
 ///
 /// The server computes the same projection when it pushes an update, so this
 /// is the reference implementation: grouping, direction matching and ordering
@@ -38,7 +38,7 @@ public enum DepartureActivityBoard {
         return DepartureActivityAttributes.ContentState(
             departures: Array(departures),
             updatedAt: updatedAt,
-            conditionRank: condition?.severityRank ?? LineServiceCondition.good("Good service").severityRank,
+            conditionRank: condition?.severityRank ?? LineServiceCondition.updating.severityRank,
             conditionHeadline: condition?.hasIssue == true ? condition?.headline : nil,
             sequence: sequence
         )

@@ -1,0 +1,202 @@
+{
+  "$type": "Tfl.Api.Presentation.Entities.RouteSequence, Tfl.Api.Presentation.Entities",
+  "lineId": "rb4",
+  "lineName": "RB4",
+  "direction": "inbound",
+  "isOutboundOnly": false,
+  "mode": "river-bus",
+  "lineStrings": [
+    "[[[-0.028482,51.505692],[-0.031788,51.504552]]]"
+  ],
+  "stations": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GCAW",
+      "icsId": "1002021",
+      "topMostParentId": "930GCAW",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb4",
+          "name": "RB4",
+          "uri": "/Line/rb4",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GCAW",
+      "name": "Canary Wharf Pier",
+      "lat": 51.505692,
+      "lon": -0.028482
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GNEL",
+      "icsId": "1002047",
+      "topMostParentId": "930GNEL",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb4",
+          "name": "RB4",
+          "uri": "/Line/rb4",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GNEL",
+      "name": "Rotherhithe Pier",
+      "lat": 51.504552,
+      "lon": -0.031788
+    }
+  ],
+  "stopPointSequences": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb4",
+      "lineName": "RB4",
+      "direction": "inbound",
+      "branchId": 0,
+      "nextBranchIds": [],
+      "prevBranchIds": [],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GCAW",
+          "icsId": "1002021",
+          "topMostParentId": "930GCAW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb4",
+              "name": "RB4",
+              "uri": "/Line/rb4",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GCAW",
+          "name": "Canary Wharf Pier",
+          "lat": 51.505692,
+          "lon": -0.028482
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GNEL",
+          "icsId": "1002047",
+          "topMostParentId": "930GNEL",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb4",
+              "name": "RB4",
+              "uri": "/Line/rb4",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GNEL",
+          "name": "Rotherhithe Pier",
+          "lat": 51.504552,
+          "lon": -0.031788
+        }
+      ],
+      "serviceType": "Regular"
+    }
+  ],
+  "orderedLineRoutes": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.OrderedRoute, Tfl.Api.Presentation.Entities",
+      "name": "Canary Wharf  &harr;  Rotherhithe ",
+      "naptanIds": [
+        "930GCAW",
+        "930GNEL"
+      ],
+      "serviceType": "Regular"
+    }
+  ]
+}

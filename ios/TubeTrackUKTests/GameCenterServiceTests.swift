@@ -1,8 +1,53 @@
 import Foundation
 import Testing
+import UIKit
 @testable import TubeTrackUK
 
 struct GameCenterServiceTests {
+    @Test @MainActor func successfulSignInSurvivesAnIncompleteLeaderboardConfiguration() async throws {
+        let client = TestGameCenterAuthenticationClient()
+        client.identifiers = [GameCenterLeaderboard.score.id]
+        let service = GameCenterService(authenticationClient: client)
+        service.authenticate()
+        #expect(service.rankingsButtonTitle == "Connecting to Game Center…")
+        client.isAuthenticated = true
+        client.completeAuthentication()
+        for _ in 0..<10 { await Task.yield() }
+        #expect(service.authenticationState == .authenticated(displayName: "Test Player"))
+        #expect(service.rankingsAvailable)
+        #expect(service.rankingsButtonTitle == "Game Center rankings")
+        #expect(service.availableLeaderboardIDs == [GameCenterLeaderboard.score.id])
+    }
+
+    @Test @MainActor func leaderboardNetworkFailureDoesNotUndoSuccessfulSignIn() async throws {
+        let client = TestGameCenterAuthenticationClient()
+        client.loadFails = true
+        let service = GameCenterService(authenticationClient: client)
+        service.authenticate()
+        client.isAuthenticated = true
+        client.completeAuthentication()
+        for _ in 0..<10 { await Task.yield() }
+        #expect(service.isAuthenticated)
+        #expect(service.rankingsAvailable)
+        #expect(service.canRequestRankings)
+        #expect(service.availableLeaderboardIDs.isEmpty)
+    }
+
+    @Test @MainActor func unsuccessfulAuthenticationCanBeRetried() {
+        let client = TestGameCenterAuthenticationClient()
+        let service = GameCenterService(authenticationClient: client)
+        service.authenticate()
+        client.completeAuthentication()
+        #expect(service.authenticationState == .unavailable)
+        #expect(service.rankingsButtonTitle == "Retry Game Center")
+        #expect(service.canRequestRankings)
+        service.authenticate()
+        #expect(client.authenticationAttempts == 2)
+        client.isAuthenticated = true
+        client.completeAuthentication()
+        #expect(service.rankingsAvailable)
+    }
+
     @Test @MainActor func offlineRunsRemainLocalAndPersistForLaterGameCenterSync() async throws {
         let suiteName = "GameCenterServiceTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
@@ -99,5 +144,27 @@ struct GameCenterServiceTests {
         #expect(GameCenterLeaderboard.terminusStationsReached.id == "stationchase.termini.v1")
         #expect(GameCenterLeaderboard.timeSurvived.id == "stationchase.time.v1")
         #expect(Set(GameCenterLeaderboard.allCases.map(\.id)).count == 5)
+    }
+}
+
+@MainActor
+private final class TestGameCenterAuthenticationClient: GameCenterAuthenticationClient {
+    var isAuthenticated = false
+    var displayName = "Test Player"
+    var identifiers: Set<String> = []
+    var loadFails = false
+    var authenticationAttempts = 0
+    private var handler: (@MainActor (UIViewController?, (any Error)?) -> Void)?
+
+    func authenticate(handler: @escaping @MainActor (UIViewController?, (any Error)?) -> Void) {
+        authenticationAttempts += 1
+        self.handler = handler
+    }
+
+    func completeAuthentication() { handler?(nil, nil) }
+
+    func loadLeaderboardIDs() async throws -> Set<String> {
+        if loadFails { throw URLError(.notConnectedToInternet) }
+        return identifiers
     }
 }

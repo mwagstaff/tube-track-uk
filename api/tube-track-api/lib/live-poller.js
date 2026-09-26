@@ -70,10 +70,10 @@ export class LivePoller {
         this.staleSince = null;
     }
 
-    #notify(snapshot) {
+    #notify(snapshot, staleModes = []) {
         if (!this.notifier) return;
         try {
-            Promise.resolve(this.notifier.notify(snapshot)).catch((error) => {
+            Promise.resolve(this.notifier.notify(snapshot, { staleModes })).catch((error) => {
                 this.logger?.error('push_notify_failed', { error: error?.message ?? String(error) });
             });
         } catch (error) {
@@ -135,13 +135,22 @@ export class LivePoller {
         // even if an upstream request never honours the abort; an attempt that
         // outlives its deadline can no longer publish into the cache.
         const attempt = new AbortController();
-        const attemptSignal = AbortSignal.any([signal, attempt.signal]);
+        // Node 20 can retain completed attempts through a composite signal
+        // linked to the service-lifetime signal. Forward cancellation explicitly
+        // so every listener can be detached when this attempt finishes.
+        const attemptSignal = attempt.signal;
+        const abortFromCaller = () => attempt.abort(signal.reason);
+        if (signal.aborted) abortFromCaller();
+        else signal.addEventListener('abort', abortFromCaller, { once: true });
+        let rejectDeadline;
+        const abortDeadline = () => rejectDeadline(attemptSignal.reason);
         const deadline = new Promise((_, reject) => {
+            rejectDeadline = reject;
             if (attemptSignal.aborted) {
                 reject(attemptSignal.reason);
                 return;
             }
-            attemptSignal.addEventListener('abort', () => reject(attemptSignal.reason), { once: true });
+            attemptSignal.addEventListener('abort', abortDeadline, { once: true });
         });
         deadline.catch(() => {});
         const deadlineTimer = setTimeout(
@@ -149,40 +158,69 @@ export class LivePoller {
             this.refreshTimeoutMs
         );
         deadlineTimer.unref?.();
+        const successfulModes = new Map();
+        const failedModes = new Map();
 
         try {
-            const { allArrivals, modeCounts } = await Promise.race([
-                this.#collect(attemptSignal),
-                deadline
-            ]);
-            if (attemptSignal.aborted) {
-                throw attemptSignal.reason;
+            let refreshTimedOut = false;
+            try {
+                await Promise.race([
+                    this.#collect(attemptSignal, successfulModes, failedModes),
+                    deadline
+                ]);
+            } catch (error) {
+                if (signal.aborted || successfulModes.size === 0
+                    || !(error instanceof LiveRefreshTimeoutError)) {
+                    throw error;
+                }
+                // A hung mode cannot prevent completed modes from being
+                // published. The abandoned collection never writes the cache.
+                refreshTimedOut = true;
             }
+            if (successfulModes.size === 0) {
+                throw failedModes.values().next().value ?? new Error('No live mode refreshed');
+            }
+            if (attemptSignal.aborted && !refreshTimedOut) throw attemptSignal.reason;
 
             const completedAtMs = this.clock();
-            const state = this.cache.replace(allArrivals, {
+            const state = this.cache.replaceModes(successfulModes, {
+                modes: this.modes,
                 startedAt: startedAtMs,
-                completedAt: completedAtMs,
-                modeCounts
+                completedAt: completedAtMs
             });
-            this.lastSuccessAt = state.snapshot.updatedAt;
-            this.lastError = null;
+            const failedModeNames = this.modes.filter((mode) => !successfulModes.has(mode));
+            const partial = failedModeNames.length > 0;
+            this.lastSuccessAt = new Date(completedAtMs).toISOString();
+            this.lastError = partial ? {
+                at: this.lastSuccessAt,
+                code: 'LIVE_REFRESH_PARTIAL',
+                message: `Live refresh failed for: ${failedModeNames.join(', ')}`,
+                failedModes: failedModeNames
+            } : null;
 
             const durationSeconds = Math.max(0, completedAtMs - startedAtMs) / 1_000;
-            this.metrics?.observeRefresh({ status: 'success', durationSeconds });
+            this.metrics?.observeRefresh({ status: partial ? 'partial' : 'success', durationSeconds });
             this.metrics?.setCache({
                 itemCount: state.snapshot.arrivals.length,
                 updatedAtMs: state.snapshot.updatedAtMs
             });
-            this.logger?.info('live_cache_refreshed', {
+            const logDetails = {
                 durationSeconds,
                 itemCount: state.snapshot.arrivals.length,
-                modeCounts
-            });
+                modeCounts: state.snapshot.modeCounts,
+                ...(partial ? {
+                    failedModes: Object.fromEntries(failedModeNames.map((mode) => [
+                        mode,
+                        failedModes.get(mode)?.code ?? (refreshTimedOut ? 'LIVE_REFRESH_TIMEOUT' : 'UNKNOWN')
+                    ]))
+                } : {})
+            };
+            if (partial) this.logger?.warn('live_cache_refresh_partial', logDetails);
+            else this.logger?.info('live_cache_refreshed', logDetails);
             // Push is a consumer of the snapshot, never a participant in
             // producing it: a notifier that hangs or throws must not delay or
             // fail a refresh that has already succeeded.
-            this.#notify(state.snapshot);
+            this.#notify(state.snapshot, [...new Set([...state.staleModes, ...failedModeNames])]);
             return { skipped: false, state };
         } catch (error) {
             const completedAtMs = this.clock();
@@ -203,30 +241,34 @@ export class LivePoller {
             if (!cancelled) {
                 this.logger?.warn('live_cache_refresh_failed', {
                     durationSeconds,
+                    failedModes: [...failedModes.keys()],
                     error
                 });
             }
             throw error;
         } finally {
             clearTimeout(deadlineTimer);
+            signal.removeEventListener('abort', abortFromCaller);
+            attemptSignal.removeEventListener('abort', abortDeadline);
             this.refreshing = false;
         }
     }
 
-    async #collect(signal) {
-        const allArrivals = [];
-        const modeCounts = {};
+    async #collect(signal, successfulModes, failedModes) {
         for (let index = 0; index < this.modes.length; index += 1) {
             if (index > 0) {
                 await wait(this.requestStaggerMs, signal);
             }
             const mode = this.modes[index];
-            const predictions = await this.client.fetchArrivals(mode, { signal });
-            const arrivals = normaliseArrivals(predictions, mode);
-            allArrivals.push(...arrivals);
-            modeCounts[mode] = arrivals.length;
+            try {
+                const predictions = await this.client.fetchArrivals(mode, { signal });
+                if (signal.aborted) throw signal.reason;
+                successfulModes.set(mode, normaliseArrivals(predictions, mode));
+            } catch (error) {
+                if (signal.aborted) throw error;
+                failedModes.set(mode, error);
+            }
         }
-        return { allArrivals, modeCounts };
     }
 
     // Watchdog: runs on its own timer, independent of the polling loop, so a
@@ -255,11 +297,17 @@ export class LivePoller {
             return { stale: false };
         }
 
-        this.staleSince ??= (state ? state.snapshot.updatedAtMs : startedAt) + this.cache.staleAfterMs;
+        const hasMissingMode = state?.staleModes.some(
+            (mode) => state.snapshot.modeUpdatedAt[mode] === null
+        );
+        this.staleSince ??= hasMissingMode
+            ? nowMs
+            : (state ? state.snapshot.updatedAtMs : startedAt) + this.cache.staleAfterMs;
         const details = {
             ageSeconds: state ? state.ageSeconds : null,
             staleForSeconds: Math.floor((nowMs - this.staleSince) / 1_000),
             staleAfterSeconds: Math.floor(this.cache.staleAfterMs / 1_000),
+            staleModes: state?.staleModes ?? [],
             refreshing: this.refreshing,
             lastAttemptAt: this.lastAttemptAt,
             lastSuccessAt: this.lastSuccessAt,

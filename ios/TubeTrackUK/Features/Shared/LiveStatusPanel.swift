@@ -7,6 +7,14 @@ struct LiveStatusDock: View {
     @Binding var expanded: Bool
 
     private var summary: (symbol: String, color: Color, title: String, detail: String?) {
+        if appState.isViewingLiveStatus, appState.cableCar.issueCount > 0 {
+            let count = appState.currentIssueCount + (appState.river.isEnabled ? appState.river.issueCount : 0) + appState.cableCar.issueCount
+            return ("exclamationmark.triangle.fill", .orange, "\(count) service issue\(count == 1 ? "" : "s")", "Includes Cable Car")
+        }
+        if appState.isViewingLiveStatus, appState.river.isEnabled, appState.river.issueCount > 0 {
+            let count = appState.currentIssueCount + appState.river.issueCount
+            return ("exclamationmark.triangle.fill", .orange, "\(count) service issue\(count == 1 ? "" : "s")", "Includes River Bus")
+        }
         if !appState.isViewingLiveStatus {
             let date = LondonRailDate.formatted(
                 appState.selectedDisruptionDate,
@@ -500,8 +508,17 @@ struct LiveStatusPanel: View {
                     }
                 }
 
+                if appState.cableCar.isEnabled {
+                    ScrollView { CableCarStatusRow() }.frame(maxHeight: 110)
+                }
                 if appState.isViewingLiveStatus {
                     liveDisruptionsContent
+                    if appState.river.isEnabled {
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 8) { RiverStatusRows(lineIds: nil) }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }.frame(maxHeight: 140)
+                    }
                 } else {
                     plannedWorksContent
                 }

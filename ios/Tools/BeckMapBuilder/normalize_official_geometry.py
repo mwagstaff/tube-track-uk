@@ -309,9 +309,89 @@ def _align_northwest_interchange(
     )
 
 
+def _align_weaver_bethnal_green_bend(document: dict) -> None:
+    """Restore the shared 45-degree fork south of Cambridge Heath.
+
+    The source ticks put Bethnal Green on the horizontal approach and
+    Cambridge Heath on the western vertical lane. The former synthetic
+    bypass swept across that lane instead of sharing the approach curve.
+    Keep the existing Hackney Downs ports, with matching rounded bends
+    separated by the same 26-unit lane spacing.
+    """
+    bethnal = (2774.922, 1379.344)
+    cambridge = (2831.172, 1336.859)
+    london_fields = (2831.172, 1297.101)
+    for station_id, port, tangent in (
+        ("910GBTHNLGR", bethnal, (1, 0)),
+        ("910GCAMHTH", cambridge, (0, 1)),
+        ("910GLONFLDS", london_fields, (0, 1)),
+    ):
+        _set_line_port(document, station_id, "weaver", port)
+        _replace_marker(document, station_id, port, [_tick("weaver", port, tangent)])
+
+    # These source-traced commands are deliberately identical on both
+    # semantic routes so the renderer draws one shared horizontal approach.
+    shared_approach = [
+        {"op": "move", "to": _rounded(bethnal)},
+        {"op": "line", "to": _rounded((2797.516, 1379.344))},
+        {
+            "op": "cubic",
+            "control1": _rounded((2803.891, 1379.344)),
+            "control2": _rounded((2812.797, 1375.656)),
+            "to": _rounded((2817.313, 1371.141)),
+        },
+    ]
+    for segment_id, offset, endpoint in (
+        ("weaver:910GBTHNLGR:910GCAMHTH", 0.0, cambridge),
+        ("weaver:910GBTHNLGR:910GHAKNYNM", 26.0, (2857.172, 1220.895)),
+    ):
+        _replace_segment_commands(document, segment_id, [
+            *copy.deepcopy(shared_approach),
+            {"op": "line", "to": _rounded((2822.969 + offset, 1365.485 - offset))},
+            {
+                "op": "cubic",
+                "control1": _rounded((2827.484 + offset, 1360.985 - offset)),
+                "control2": _rounded((2831.172 + offset, 1352.079 - offset)),
+                "to": _rounded((2831.172 + offset, 1345.704 - offset)),
+            },
+            {"op": "line", "to": _rounded(endpoint)},
+        ])
+
+    _replace_segment_commands(document, "weaver:910GCAMHTH:910GLONFLDS", [
+        {"op": "move", "to": _rounded(cambridge)},
+        {"op": "line", "to": _rounded(london_fields)},
+    ])
+
+    for station_id, text, position, alignment, priority, tier in (
+        ("910GBTHNLGR", "Bethnal\nGreen", (bethnal[0], 1405.344), "centre", 10, "network"),
+        ("910GCAMHTH", "Cambridge\nHeath", (2815.172, cambridge[1]), "trailing", 5, "minor"),
+        ("910GLONFLDS", "London\nFields", (2815.172, london_fields[1]), "trailing", 5, "minor"),
+    ):
+        _set_label_layout(document, station_id, {
+            "text": text,
+            "position": position,
+            "alignment": alignment,
+            "priority": priority,
+            "visibilityTier": tier,
+        })
+
+
 def apply(document: dict) -> int:
     """Apply deterministic corrections and return the changed target count."""
     before = copy.deepcopy(document)
+
+    _align_weaver_bethnal_green_bend(document)
+
+    # Canada Water uses one physical roundel at the Jubilee/Windrush crossing.
+    # Keep both NaPTAN records for departures, routing and selection, with the
+    # same geometry so neither mode acquires a separate interchange node.
+    canada_water = (2704.938, 1918.0)
+    for station_id, line_id in (("940GZZLUCWR", "jubilee"), ("910GCNDAW", "windrush")):
+        _set_line_port(document, station_id, line_id, canada_water)
+        _replace_marker(document, station_id, canada_water, [_circle(canada_water)])
+    for label in document["labels"]:
+        if label["stationID"] == "940GZZLUCWR":
+            label["associatedStationIDs"] = ["910GCNDAW"]
 
     # The official symbols at both stations use level interchange bars. Their
     # route centre-lines land a few units apart because paths and glyphs were

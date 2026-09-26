@@ -383,7 +383,7 @@ struct AppBackgroundImageViewer: View {
         VStack(spacing: 0) {
             HStack {
                 Spacer()
-                Button(action: dismissToMap) {
+                Button(action: dismissPhoto) {
                     Image(systemName: "xmark")
                         .font(.appCaption(.bold))
                         .foregroundStyle(.white)
@@ -394,7 +394,7 @@ struct AppBackgroundImageViewer: View {
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Close photo")
-                .accessibilityHint("Returns to the map")
+                .accessibilityHint("Returns to Profile")
             }
 
             Spacer(minLength: 24)
@@ -430,12 +430,11 @@ struct AppBackgroundImageViewer: View {
                     translation: value.translation,
                     predictedEndTranslation: value.predictedEndTranslation
                 ) else { return }
-                dismissToMap()
+                dismissPhoto()
             }
     }
 
-    private func dismissToMap() {
-        appState.selectedTab = .map
+    private func dismissPhoto() {
         dismiss()
     }
 }

@@ -1,6 +1,12 @@
 import Foundation
 import OSLog
 
+public enum TubeTrackClientSurface: String, Sendable {
+    case iosApp = "ios_app"
+    case widget
+    case watch
+}
+
 public struct TubeTrackAPIConfiguration: Sendable {
     public let baseURL: URL
 
@@ -92,13 +98,19 @@ public actor TubeTrackAPIClient {
 
     private let baseURL: URL
     private let session: URLSession
+    private let clientSurface: TubeTrackClientSurface
+    private let installationID: String
 
     public init(
         configuration: TubeTrackAPIConfiguration = .app,
-        session: URLSession? = nil
+        session: URLSession? = nil,
+        clientSurface: TubeTrackClientSurface = .iosApp,
+        installationID: String = AppInstall.identifier
     ) {
         baseURL = configuration.baseURL
         self.session = session ?? URLSession(configuration: Self.defaultSessionConfiguration())
+        self.clientSurface = clientSurface
+        self.installationID = installationID
     }
 
     public nonisolated static func defaultSessionConfiguration() -> URLSessionConfiguration {
@@ -146,7 +158,10 @@ public actor TubeTrackAPIClient {
             ? .reloadRevalidatingCacheData
             : .useProtocolCachePolicy
         request.setValue("application/json", forHTTPHeaderField: "Accept")
-        request.setValue("TubeTrackUK/1.0", forHTTPHeaderField: "User-Agent")
+        request.setValue("TubeTrackUK/\(AppInstall.appVersion)", forHTTPHeaderField: "User-Agent")
+        request.setValue(installationID, forHTTPHeaderField: "X-TubeTrack-Install")
+        request.setValue(clientSurface.rawValue, forHTTPHeaderField: "X-TubeTrack-Surface")
+        request.setValue(AppInstall.appVersion, forHTTPHeaderField: "X-TubeTrack-App-Version")
 
         let data: Data
         let response: URLResponse

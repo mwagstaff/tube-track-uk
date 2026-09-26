@@ -2,18 +2,15 @@ import SwiftUI
 import TubeTrackCore
 import WidgetKit
 
-/// How old the data is, in words, with an optional refresh button. Sits at the
-/// bottom of medium and large widgets.
+/// Source time and age, with a refresh button, at the bottom of home screen widgets.
 ///
-/// A widget cannot fetch on demand, so this is the passenger's only way to tell
-/// a live board from a remembered one. It is never decorative.
+/// The clock time distinguishes a fresh snapshot from a remembered one, and
+/// refresh asks WidgetKit to load another snapshot.
 struct WidgetFooter: View {
     let freshness: Freshness
     /// The moment this entry renders — the footer ages with the timeline.
     let now: Date
     let failed: Bool
-    var showsRefresh = false
-
     var body: some View {
         HStack(spacing: 6) {
             if failed && freshness.updatedAt == nil {
@@ -26,17 +23,18 @@ struct WidgetFooter: View {
                     Image(systemName: freshness.symbolName)
                 }
                 .foregroundStyle(freshness.tier == .stale ? AnyShapeStyle(.orange) : AnyShapeStyle(.secondary))
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
             }
             Spacer(minLength: 0)
-            if showsRefresh {
-                Button(intent: RefreshWidgetIntent()) {
-                    Image(systemName: "arrow.clockwise")
-                        .font(.caption.weight(.semibold))
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .accessibilityLabel("Refresh")
+            Button(intent: RefreshWidgetIntent()) {
+                Image(systemName: "arrow.clockwise")
+                    .font(.caption.weight(.semibold))
+                    .frame(width: 24, height: 24)
             }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .accessibilityLabel("Refresh")
         }
         .font(.caption2)
         .foregroundStyle(.secondary)

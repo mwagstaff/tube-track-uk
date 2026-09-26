@@ -1,0 +1,82 @@
+{
+  "": {
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/primary.swiftdeps"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/CompactStationDeparturePolicyTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/CompactStationDeparturePolicyTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/CompactStationDeparturePolicyTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/CompactStationDeparturePolicyTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/CompactStationDeparturePolicyTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/CompactStationDeparturePolicyTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/DeepLinkTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DeepLinkTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DeepLinkTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DeepLinkTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DeepLinkTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DeepLinkTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/DepartureActivityTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureActivityTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureActivityTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureActivityTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureActivityTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureActivityTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/DepartureCountdownFormatStyleTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureCountdownFormatStyleTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureCountdownFormatStyleTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureCountdownFormatStyleTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureCountdownFormatStyleTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureCountdownFormatStyleTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/DepartureDirectionFilterTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureDirectionFilterTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureDirectionFilterTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureDirectionFilterTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureDirectionFilterTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureDirectionFilterTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/DepartureTimelineTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureTimelineTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureTimelineTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureTimelineTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureTimelineTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/DepartureTimelineTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/FreshnessTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/FreshnessTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/FreshnessTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/FreshnessTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/FreshnessTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/FreshnessTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/LineStatusProjectionTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/LineStatusProjectionTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/LineStatusProjectionTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/LineStatusProjectionTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/LineStatusProjectionTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/LineStatusProjectionTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/StationDeparturesTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationDeparturesTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationDeparturesTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationDeparturesTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationDeparturesTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationDeparturesTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/StationIndexTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationIndexTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationIndexTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationIndexTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationIndexTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/StationIndexTests.dia"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests/WidgetRefreshPolicyTests.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/WidgetRefreshPolicyTests.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/WidgetRefreshPolicyTests.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/WidgetRefreshPolicyTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/WidgetRefreshPolicyTests.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCoreTests.build/WidgetRefreshPolicyTests.dia"
+  }
+}

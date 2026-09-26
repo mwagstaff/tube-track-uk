@@ -64,15 +64,21 @@ private struct LineStatusSmallView: View {
 
     let entry: LineStatusEntry
 
-    private static let maximumRows = 5
+    private static let maximumRows = 4
 
     var body: some View {
-        if entry.rows.isEmpty {
-            LineStatusEmptyView(entry: entry, compact: true)
-        } else if entry.rows.count == 1, let row = entry.rows.first {
-            hero(row)
-        } else {
-            list
+        VStack(alignment: .leading, spacing: 4) {
+            Group {
+                if entry.rows.isEmpty {
+                    LineStatusEmptyView(entry: entry, compact: true)
+                } else if entry.rows.count == 1, let row = entry.rows.first {
+                    hero(row)
+                } else {
+                    list
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            WidgetFooter(freshness: entry.freshness, now: entry.date, failed: entry.failed)
         }
     }
 
@@ -199,8 +205,7 @@ private struct LineStatusListView: View {
             WidgetFooter(
                 freshness: entry.freshness,
                 now: entry.date,
-                failed: entry.failed,
-                showsRefresh: true
+                failed: entry.failed
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)

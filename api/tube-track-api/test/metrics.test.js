@@ -72,7 +72,7 @@ test('push metrics cover sends, changes, suppressions and token counts', async (
     metrics.setPushTokens({ liveActivity: 3, widget: 2 });
     metrics.recordChangeDetected({ reason: 'lead_departure' });
     metrics.recordPushSuppressed({ reason: 'heartbeat' });
-    metrics.recordPushAuthFailure();
+    metrics.recordPushRateLimited();
     metrics.recordPushStoreWriteFailure();
 
     const rendered = await metrics.render();
@@ -82,7 +82,7 @@ test('push metrics cover sends, changes, suppressions and token counts', async (
     assert.match(rendered, /tube_track_push_tokens\{[^}]*type="widget"[^}]*\} 2/);
     assert.match(rendered, /tube_track_push_changes_detected_total\{[^}]*reason="lead_departure"[^}]*\} 1/);
     assert.match(rendered, /tube_track_push_suppressed_total\{[^}]*reason="heartbeat"[^}]*\} 1/);
-    assert.match(rendered, /tube_track_push_auth_failures_total\{[^}]*\} 1/);
+    assert.match(rendered, /tube_track_push_rate_limited_total\{[^}]*\} 1/);
     assert.match(rendered, /tube_track_push_store_write_failures_total\{[^}]*\} 1/);
 });
 

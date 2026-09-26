@@ -10,6 +10,7 @@ import { LiveActivityNotifier } from './lib/push/notifier.js';
 import { PushTokenStore } from './lib/push/token-store.js';
 import { ResourceCache } from './lib/resource-cache.js';
 import { TfLClient } from './lib/tfl-client.js';
+import { UsageStore } from './lib/usage-store.js';
 
 const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 
@@ -98,7 +99,8 @@ async function main() {
     }
 
     const cache = new LiveCache({ staleAfterMs: config.staleAfterMs });
-    const metrics = createMetrics({ cache });
+    const usageStore = await new UsageStore({ logger }).load();
+    const metrics = createMetrics({ cache, usageStore });
     const client = new TfLClient({
         apiKey: config.apiKey,
         timeoutMs: config.requestTimeoutMs,
@@ -128,7 +130,7 @@ async function main() {
         resourceCache,
         plannedTrackClosuresSource,
         pushTokenStore: push.store,
-        pushClientSecret: config.push.clientSecret
+        usageStore
     });
 
     const server = app.listen(config.port, config.host, () => {
@@ -163,6 +165,8 @@ async function main() {
         // lost, and a lost token is an activity that silently stops updating.
         push.store?.stop();
         push.store?.flushSync();
+        usageStore.stop();
+        await usageStore.flush();
         push.apns?.close();
         await new Promise((resolve) => server.close(resolve));
         clearTimeout(forcedExit);

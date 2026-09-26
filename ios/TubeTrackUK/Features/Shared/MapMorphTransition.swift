@@ -302,12 +302,15 @@ struct MapMorphTransitionLayer: View, @preconcurrency Animatable {
         }
 
         guard appState.showLiveTrains else { return }
+        let closedLineIDs = appState.currentlyClosedLineIDs
+        let stationBoard = appState.authoritativeStationBoardSnapshot
+        var markerRenderer = LiveTrainMarkerRenderer()
         for train in appState.liveTrains {
             guard let segment = geometry.segmentsByID[train.segmentID],
                   let routeProgress = LiveTrainMarkerPolicy.projectedProgress(
                       for: train,
                       at: date,
-                      stationBoard: appState.authoritativeStationBoardSnapshot
+                      stationBoard: stationBoard
                   ) else { continue }
             let pointIndex = min(
                 segment.beckPoints.index(before: segment.beckPoints.endIndex),
@@ -324,9 +327,9 @@ struct MapMorphTransitionLayer: View, @preconcurrency Animatable {
             let rect = CGRect(x: point.x - 11, y: point.y - 11, width: 22, height: 22)
             let servicePresentation = LiveTrainServicePresentation.resolve(
                 lineID: train.lineID,
-                closedLineIDs: appState.currentlyClosedLineIDs
+                closedLineIDs: closedLineIDs
             )
-            LiveTrainMarkerRenderer.draw(
+            markerRenderer.draw(
                 presentation: servicePresentation,
                 lineID: train.lineID,
                 context: &context,

@@ -402,6 +402,17 @@ private struct NearbyStationCard: View {
                     .padding(.horizontal, 15)
                     .padding(.vertical, 13)
             }
+            CardUpdateFooter(
+                updatedAt: appState.isViewingLiveStatus
+                    ? (appState.nearbyArrivalsSourceUpdatedAt[station.id] ?? appState.nearbyArrivalsUpdatedAtByStationID[station.id])
+                    : appState.worksUpdatedAt,
+                isOffline: appState.isOffline,
+                isStale: appState.isViewingLiveStatus
+                    ? (appState.nearbyArrivalsStaleIDs.contains(station.id) || appState.nearbyArrivalsErrorsByStationID[station.id] != nil)
+                    : appState.isUsingCachedWorks,
+                staleAfter: appState.isViewingLiveStatus ? 120 : 1800)
+                .padding(.horizontal, 15)
+                .padding(.bottom, 13)
         }
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 18))
         .overlay {

@@ -12,105 +12,18 @@ struct MapActionNotice: Equatable, Identifiable, Sendable {
     let symbol: String
 }
 
-struct MapHeaderControls: View {
-    @Environment(TubeAppState.self) private var appState
-    @Environment(AppBackgroundImageStore.self) private var backgroundImageStore
-    @Environment(TubeGameHighScoreStore.self) private var gameHighScoreStore
-    @State private var presentedDestination: MapHeaderDestination?
-
-    var body: some View {
-        @Bindable var state = appState
-
-        HStack(spacing: 8) {
-            Button {
-                presentedDestination = .backgroundPhoto
-            } label: {
-                Image(systemName: "photo")
-            }
-            .mapDockButtonStyle()
-            .disabled(backgroundImageStore.selectedImage == nil)
-            .accessibilityLabel("View background photo")
-            .accessibilityValue(backgroundImageAccessibilityValue)
-            .accessibilityHint("Opens the current photo full screen")
-
-            Button {
-                guard let graph = appState.graph else { return }
-                appState.setGameActive(true)
-                presentedDestination = .trackMan(graph)
-            } label: {
-                TrackManGlyph()
-            }
-            .mapDockButtonStyle()
-            .disabled(appState.graph == nil)
-            .accessibilityLabel("Play Track-Man")
-            .accessibilityValue(trackManAccessibilityValue)
-            .accessibilityHint("Opens a 60-second game on the Tube network")
-
-            Menu {
-                Picker("Appearance", selection: $state.appearanceMode) {
-                    ForEach(AppAppearanceMode.allCases) { mode in
-                        Label(mode.actionTitle, systemImage: mode.symbol)
-                            .tag(mode)
-                    }
-                }
-            } label: {
-                Image(systemName: appState.appearanceMode.symbol)
-            }
-            .mapDockButtonStyle()
-            .accessibilityLabel("Appearance")
-            .accessibilityValue(appState.appearanceMode.title)
-        }
-        .fullScreenCover(item: $presentedDestination, onDismiss: {
-            appState.setGameActive(false)
-        }) { destination in
-            switch destination {
-            case .backgroundPhoto:
-                AppBackgroundImageViewer()
-            case let .trackMan(graph):
-                TubeGameScreen(graph: graph)
-            }
-        }
-    }
-
-    private var trackManAccessibilityValue: String {
-        let score = gameHighScoreStore.bestScore
-        return "Local best, \(score) point\(score == 1 ? "" : "s")"
-    }
-
-    private var backgroundImageAccessibilityValue: String {
-        guard let attribution = backgroundImageStore.selectedImageAttribution else {
-            return backgroundImageStore.selectedImage == nil
-                ? "No photo available"
-                : "Current background photograph"
-        }
-        return "Image courtesy of \(attribution.artistName), \(attribution.sourceName)"
-    }
-}
-
-private enum MapHeaderDestination: Identifiable {
-    case backgroundPhoto
-    case trackMan(TubeGraph)
-
-    var id: Int {
-        switch self {
-        case .backgroundPhoto: 0
-        case .trackMan: 1
-        }
-    }
-}
-
 struct MapActionButtons: View {
     @Environment(TubeAppState.self) private var appState
-    @Environment(UserLocationProvider.self) private var locationProvider
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var stationSearchPresented = false
     @State private var pendingStationSelection: TubeStation?
-    @State private var locationErrorPresented = false
+    @State private var pendingCableCarSelection = false
+    @State private var pendingCableCarTerminal: CableCarTerminal?
+    @State private var pendingPierSelection: RiverPier?
     @State private var resetRingExpanded = false
     let showsLabels: Bool
     let showsReset: Bool
     let onReset: () -> Void
-    let onFocusUserLocation: (CLLocation) -> Void
     let onAction: (MapActionNotice) -> Void
     let onActionCompleted: () -> Void
 
@@ -118,14 +31,12 @@ struct MapActionButtons: View {
         showsLabels: Bool = false,
         showsReset: Bool = false,
         onReset: @escaping () -> Void = {},
-        onFocusUserLocation: @escaping (CLLocation) -> Void = { _ in },
         onAction: @escaping (MapActionNotice) -> Void = { _ in },
         onActionCompleted: @escaping () -> Void = {}
     ) {
         self.showsLabels = showsLabels
         self.showsReset = showsReset
         self.onReset = onReset
-        self.onFocusUserLocation = onFocusUserLocation
         self.onAction = onAction
         self.onActionCompleted = onActionCompleted
     }
@@ -257,39 +168,6 @@ struct MapActionButtons: View {
 
             Button {
                 onAction(MapActionNotice(
-                    message: "Zooming to current location",
-                    symbol: "location.fill"
-                ))
-                locationProvider.requestLocation()
-                if locationProvider.needsSettingsPermission
-                    || locationProvider.errorMessage != nil {
-                    locationErrorPresented = true
-                }
-            } label: {
-                mapActionLabel(
-                    locationProvider.isRequesting
-                        ? "Finding current location" : "Current location"
-                ) {
-                    if locationProvider.isRequesting {
-                        ProgressView()
-                            .controlSize(.small)
-                            .tint(Color.tubeBlue)
-                    } else {
-                        Image(systemName: "location.fill")
-                            .foregroundStyle(Color.tubeBlue)
-                    }
-                }
-            }
-            .mapActionButtonStyle(showsLabel: showsLabels)
-            .disabled(appState.graph == nil || locationProvider.isRequesting)
-            .accessibilityLabel(
-                locationProvider.isRequesting
-                    ? "Finding current location"
-                    : "Zoom to current location"
-            )
-
-            Button {
-                onAction(MapActionNotice(
                     message: destinationMode.toggleNoticeMessage,
                     symbol: destinationMode.symbol
                 ))
@@ -309,14 +187,14 @@ struct MapActionButtons: View {
             Button {
                 let showsLiveTrains = !appState.showLiveTrains
                 onAction(MapActionNotice(
-                    message: showsLiveTrains ? "Showing live trains" : "Hiding live trains",
+                    message: showsLiveTrains ? "Showing trains and estimated boats" : "Hiding trains and estimated boats",
                     symbol: showsLiveTrains ? "tram.fill" : "tram"
                 ))
                 appState.setLiveTrains(showsLiveTrains)
                 onActionCompleted()
             } label: {
                 mapActionLabel(
-                    appState.showLiveTrains ? "Hide live trains" : "Show live trains"
+                    appState.showLiveTrains ? "Hide live trains and boats" : "Show live trains and boats"
                 ) {
                     if appState.isLoadingLiveTrains && !appState.isOffline {
                         ProgressView()
@@ -336,24 +214,24 @@ struct MapActionButtons: View {
             .accessibilityLabel(
                 appState.isLoadingLiveTrains && !appState.isOffline
                     ? "Loading live trains"
-                    : appState.showLiveTrains ? "Hide live trains" : "Show live trains"
+                    : appState.showLiveTrains ? "Hide live trains and boats" : "Show live trains and boats"
             )
             .requiresNetwork(appState.isOffline)
 
             Button {
                 onAction(MapActionNotice(
-                    message: "Opening station search",
+                    message: "Opening stop search",
                     symbol: "magnifyingglass"
                 ))
                 stationSearchPresented = true
             } label: {
-                mapActionLabel("Search stations") {
+                mapActionLabel("Stops & favourites") {
                     Image(systemName: "magnifyingglass")
                 }
             }
             .mapActionButtonStyle(showsLabel: showsLabels)
             .disabled(appState.graph == nil)
-            .accessibilityLabel("Station search")
+            .accessibilityLabel("Stations, piers, cable car and favourites")
 
             if showsReset {
                 Button {
@@ -384,47 +262,34 @@ struct MapActionButtons: View {
                     }
                 }
                 .accessibilityLabel("Reset map view")
-                .accessibilityHint("Returns to the opening zoom and restores closest station")
+                .accessibilityHint("Returns to the opening zoom")
                 .transition(.scale(scale: 0.78).combined(with: .opacity))
                 .onAppear(perform: emphasizeResetButton)
             }
         }
         .animation(reduceMotion ? nil : .smooth(duration: 0.24), value: showsReset)
-        .onChange(of: locationProvider.location) { _, location in
-            guard let location else { return }
-            onFocusUserLocation(location)
-            onActionCompleted()
-        }
-        .onChange(of: locationProvider.authorizationStatus) { _, status in
-            if status == .denied || status == .restricted {
-                locationErrorPresented = true
-            }
-        }
-        .onChange(of: locationProvider.errorMessage) { _, errorMessage in
-            if errorMessage != nil {
-                locationErrorPresented = true
-            }
-        }
-        .alert("Location unavailable", isPresented: $locationErrorPresented) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(locationErrorMessage)
-        }
         .sheet(isPresented: $stationSearchPresented, onDismiss: {
             if let station = pendingStationSelection {
                 pendingStationSelection = nil
                 appState.select(station: station)
             }
+            if pendingCableCarSelection {
+                pendingCableCarSelection = false
+                appState.selectCableCar(terminal: pendingCableCarTerminal)
+                pendingCableCarTerminal = nil
+            }
+            if let pier = pendingPierSelection {
+                pendingPierSelection = nil
+                appState.select(pier: pier)
+            }
             onActionCompleted()
         }) {
             Group {
                 if let graph = appState.graph {
-                    StationSearchSheet(
-                        graph: graph,
-                        selectedStationID: appState.selectedStationID
-                    ) { station in
-                        pendingStationSelection = station
-                    }
+                    TransportStopSearchSheet(graph: graph,
+                        onStation: { pendingStationSelection = $0 },
+                        onPier: { pendingPierSelection = $0 },
+                        onTerminal: { pendingCableCarTerminal = $0; pendingCableCarSelection = true })
                 } else {
                     ContentUnavailableView(
                         "Network unavailable",
@@ -460,13 +325,7 @@ struct MapActionButtons: View {
         }
     }
 
-    private var locationErrorMessage: String {
-        if locationProvider.needsSettingsPermission {
-            return "Allow location access in Settings to zoom to your position."
-        }
-        return locationProvider.errorMessage
-            ?? "Your current location could not be determined. Please try again."
-    }
+
 
     private var mobileCoverageSelected: Bool {
         appState.mobileCoverageMode.isActive
@@ -524,6 +383,7 @@ struct MapControlDock: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showsActions = false
 
+    let interactionGeneration: Int
     let showsClosestStation: Bool
     let closestStationOpacity: Double
     let showsReset: Bool
@@ -542,23 +402,30 @@ struct MapControlDock: View {
                     )
             } else {
                 VStack(alignment: .trailing, spacing: 8) {
-                    Button {
-                        setActionsVisible(true)
-                    } label: {
-                        Image(systemName: "ellipsis")
-                            .font(.appHeadline(.bold))
-                            .frame(
-                                width: MapDockMetrics.controlSize,
-                                height: MapDockMetrics.controlSize
-                            )
-                            .glassEffect(.regular.interactive(), in: .circle)
-                            .frame(width: 60, height: 60)
-                            .contentShape(.rect)
+                    HStack(spacing: 0) {
+                        MapCurrentLocationButton(
+                            interactionGeneration: interactionGeneration,
+                            onFocus: onFocusUserLocation
+                        )
+
+                        Button {
+                            setActionsVisible(true)
+                        } label: {
+                            Image(systemName: "ellipsis")
+                                .font(.appHeadline(.bold))
+                                .frame(
+                                    width: MapDockMetrics.controlSize,
+                                    height: MapDockMetrics.controlSize
+                                )
+                                .glassEffect(.regular.interactive(), in: .circle)
+                                .frame(width: 60, height: 60)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Map options")
+                        .accessibilityHint("Shows labelled map controls")
+                        .zIndex(2)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Map options")
-                    .accessibilityHint("Shows labelled map controls")
-                    .zIndex(2)
 
                     if showsClosestStation {
                         ClosestStationMapSection()
@@ -607,7 +474,6 @@ struct MapControlDock: View {
                 showsLabels: true,
                 showsReset: showsReset,
                 onReset: onReset,
-                onFocusUserLocation: onFocusUserLocation,
                 onAction: onAction,
                 onActionCompleted: {
                     setActionsVisible(false)

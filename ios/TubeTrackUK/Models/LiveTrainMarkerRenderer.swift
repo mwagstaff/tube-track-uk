@@ -1,14 +1,24 @@
 import SwiftUI
 
-enum LiveTrainMarkerRenderer {
-    static func draw(
+struct LiveTrainMarkerRenderer {
+    // Resolved images belong to a GraphicsContext. Reuse within one draw only;
+    // never carry them across canvases or appearance changes.
+    private var images: [TubeLineID: GraphicsContext.ResolvedImage] = [:]
+
+    mutating func draw(
         presentation: LiveTrainServicePresentation,
         lineID: TubeLineID,
         context: inout GraphicsContext,
         in rect: CGRect
     ) {
         guard presentation == .lineClosed else {
-            let markerImage = context.resolve(Image(lineID.liveTrainMarkerAssetName))
+            let markerImage: GraphicsContext.ResolvedImage
+            if let cached = images[lineID] {
+                markerImage = cached
+            } else {
+                markerImage = context.resolve(Image(lineID.liveTrainMarkerAssetName))
+                images[lineID] = markerImage
+            }
             context.draw(markerImage, in: rect)
             return
         }
@@ -18,7 +28,7 @@ enum LiveTrainMarkerRenderer {
         context.stroke(badge, with: .color(.tubeBlue.opacity(0.72)), lineWidth: 1.25)
 
         let ghostRect = rect.insetBy(dx: rect.width * 0.22, dy: rect.height * 0.16)
-        context.fill(ghostPath(in: ghostRect), with: .color(.tubeBlue))
+        context.fill(Self.ghostPath(in: ghostRect), with: .color(.tubeBlue))
 
         let eyeDiameter = max(1.5, ghostRect.width * 0.16)
         for horizontalPosition in [0.34, 0.66] {

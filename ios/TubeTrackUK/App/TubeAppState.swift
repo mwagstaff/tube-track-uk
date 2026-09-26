@@ -108,6 +108,9 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
 @Observable
 final class TubeAppState {
     let journeyPlanner: JourneyPlannerModel
+    let cableCar: CableCarState
+    let river: RiverBusState
+    let favourites: FavouriteStopsStore
     var showsWorks = false
     private static let appearanceModeKey = "appearanceMode"
     private static let nearbyArrivalsStaleLifetime: TimeInterval = 5 * 60
@@ -165,6 +168,10 @@ final class TubeAppState {
         }
     }
 
+    var showsClosestStation: Bool {
+        didSet { defaults.set(showsClosestStation, forKey: "showsClosestStation") }
+    }
+
     var preferredColorScheme: ColorScheme? {
         appearanceMode.colorScheme
     }
@@ -187,10 +194,14 @@ final class TubeAppState {
     var activeTrainCounts = ActiveTrainCounts()
     var stationArrivals: [TfLArrivalPrediction] = []
     private(set) var stationArrivalsUpdatedAt: Date?
+    private(set) var stationArrivalsSourceUpdatedAt: Date?
+    private(set) var stationArrivalsStale = false
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
     var nearbyArrivalsByStationID: [String: [TfLArrivalPrediction]] = [:]
     var nearbyArrivalsUpdatedAtByStationID: [String: Date] = [:]
+    private(set) var nearbyArrivalsSourceUpdatedAt: [String: Date] = [:]
+    private(set) var nearbyArrivalsStaleIDs: Set<String> = []
     var nearbyArrivalsLoadingStationIDs: Set<String> = []
     var nearbyArrivalsErrorsByStationID: [String: String] = [:]
     var statusUpdatedAt: Date?
@@ -237,11 +248,15 @@ final class TubeAppState {
         self.trainService = trainService
         let sharedClient = apiClient ?? TubeTrackAPIClient()
         self.apiClient = sharedClient
+        self.cableCar = CableCarState(client: sharedClient, defaults: defaults, cache: snapshotCache)
+        self.river = RiverBusState(client: sharedClient, defaults: defaults, cache: snapshotCache)
+        self.favourites = FavouriteStopsStore(defaults: defaults)
         self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient))
         self.snapshotCache = snapshotCache
         self.connectivityMonitor = monitorsConnectivity
             && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
             ? NetworkConnectivityMonitor() : nil
+        showsClosestStation = defaults.object(forKey: "showsClosestStation") as? Bool ?? true
         appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
             .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
 
@@ -261,6 +276,12 @@ final class TubeAppState {
            let mode = MobileCoverageMode(rawValue: arguments[flag + 1]) {
             mobileCoverageMode = mode
         }
+        if arguments.contains("-DebugCableCar") { cableCar.select() }
+        if let flag = arguments.firstIndex(of: "-DebugCableTerminal"), arguments.indices.contains(flag + 1),
+           let terminal = cableCar.network.terminals.first(where: { $0.id == arguments[flag + 1] }) { cableCar.select(terminal) }
+        if arguments.contains("-DebugRiverBus") { river.isEnabled = true }
+        if let flag = arguments.firstIndex(of: "-DebugRiverPier"), arguments.indices.contains(flag + 1),
+           let pier = river.network.pier(arguments[flag + 1]) { river.select(pier) }
         if arguments.contains("-DebugLiveTrains") {
             showLiveTrains = true
             trainLineFilter = [.piccadilly]
@@ -601,6 +622,8 @@ final class TubeAppState {
     func setLiveTrains(_ enabled: Bool) {
         guard !enabled || !isOffline else { return }
         showLiveTrains = enabled
+        river.showsBoats = enabled
+        if enabled { river.isEnabled = true }
         if enabled {
             isLoadingLiveTrains = liveTrains.isEmpty
             updateLiveTrainPollingVisibility()
@@ -731,6 +754,8 @@ final class TubeAppState {
         station: TubeStation,
         preferredDepartureLineID: TubeLineID? = nil
     ) {
+        cableCar.clearSelection()
+        river.clearSelection()
         cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedTrainID = nil
@@ -751,6 +776,8 @@ final class TubeAppState {
         selectedEngineeringWorkID = nil
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
+        stationArrivalsSourceUpdatedAt = nil
+        stationArrivalsStale = false
         stationArrivalsError = nil
         AppGroup.recordRecentStation(id: station.hubID ?? station.id)
         if selectedTab == .map {
@@ -819,6 +846,8 @@ final class TubeAppState {
         selectedStationDepartureLineID = nil
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
+        stationArrivalsSourceUpdatedAt = nil
+        stationArrivalsStale = false
         stationArrivalsError = nil
     }
 
@@ -828,7 +857,27 @@ final class TubeAppState {
         await refreshTask?.value
     }
 
+    func selectCableCar(terminal: CableCarTerminal? = nil) {
+        clearMapSelection()
+        selectedTab = .map
+        cableCar.select(terminal)
+    }
+
+    func select(pier: RiverPier) {
+        clearMapSelection()
+        selectedTab = .map
+        river.select(pier)
+        if !river.anchors.contains(where: { $0.id == pier.id }), !isOffline { mapPresentationMode = .realWorld }
+    }
+
+    func select(boat: EstimatedRiverBoat) {
+        clearMapSelection()
+        river.select(boat)
+    }
+
     func select(train: LiveTubeTrain) {
+        cableCar.clearSelection()
+        river.clearSelection()
         clearStationSelection()
         selectedTrainID = train.id
         trainSelectionGeneration &+= 1
@@ -853,7 +902,6 @@ final class TubeAppState {
         let requests = stations.map { station -> NearbyArrivalsRequest in
             let generation = (nearbyArrivalsGenerationByStationID[station.id] ?? 0) &+ 1
             nearbyArrivalsGenerationByStationID[station.id] = generation
-            nearbyArrivalsErrorsByStationID[station.id] = nil
             return NearbyArrivalsRequest(
                 station: station,
                 stopIDs: graph.stations(inSamePlaceAs: station).map(\.id),
@@ -874,6 +922,8 @@ final class TubeAppState {
                             generation: request.generation,
                             arrivals: snapshot.arrivals,
                             fetchedAt: snapshot.fetchedAt,
+                            sourceUpdatedAt: snapshot.serverUpdatedAt ?? snapshot.fetchedAt,
+                            isStale: snapshot.isStale,
                             errorDescription: nil
                         )
                     } catch {
@@ -903,6 +953,9 @@ final class TubeAppState {
                 } else {
                     nearbyArrivalsByStationID[result.stationID] = result.arrivals
                     nearbyArrivalsUpdatedAtByStationID[result.stationID] = result.fetchedAt
+                    nearbyArrivalsSourceUpdatedAt[result.stationID] = result.sourceUpdatedAt
+                    if result.isStale { nearbyArrivalsStaleIDs.insert(result.stationID) }
+                    else { nearbyArrivalsStaleIDs.remove(result.stationID) }
                     nearbyArrivalsErrorsByStationID[result.stationID] = nil
                 }
             }
@@ -910,6 +963,8 @@ final class TubeAppState {
     }
 
     func select(disruption: ResolvedDisruption) {
+        cableCar.clearSelection()
+        river.clearSelection()
         let mapFocus = MapDisruptionFocus(disruption: disruption, graph: graph)
         mobileCoverageMode = .off
         selectedMapNetworkStat = nil
@@ -1001,6 +1056,8 @@ final class TubeAppState {
     }
 
     func clearMapSelection() {
+        cableCar.clearSelection()
+        river.clearSelection()
         clearStationSelection()
         selectedTrainID = nil
         selectedLineID = nil
@@ -1368,14 +1425,16 @@ final class TubeAppState {
 
         do {
             let stopIDs = graph?.stations(inSamePlaceAs: station).map(\.id) ?? [stationID]
-            let arrivals = try await stationArrivalsService.fetch(stationIDs: stopIDs)
+            let snapshot = try await stationArrivalsService.fetchSnapshot(stationIDs: stopIDs)
             guard !Task.isCancelled,
                   generation == stationArrivalsGeneration,
                   selectedStationID == stationID else {
                 return
             }
-            stationArrivals = arrivals
+            stationArrivals = snapshot.arrivals
             stationArrivalsUpdatedAt = .now
+            stationArrivalsSourceUpdatedAt = snapshot.serverUpdatedAt ?? snapshot.fetchedAt
+            stationArrivalsStale = snapshot.isStale
             stationArrivalsError = nil
         } catch {
             guard !Task.isCancelled,
@@ -1471,6 +1530,8 @@ private struct NearbyArrivalsResult: Sendable {
     let generation: UInt
     let arrivals: [TfLArrivalPrediction]
     let fetchedAt: Date?
+    var sourceUpdatedAt: Date? = nil
+    var isStale: Bool = false
     let errorDescription: String?
 }
 

@@ -1,0 +1,218 @@
+[
+  {
+    "id": "930GPUT",
+    "x": 1200,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GWRQ",
+    "x": 1340,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GPLW",
+    "x": 1450,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GCHP",
+    "x": 1490,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GBSE",
+    "x": 1580,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GBSP",
+    "x": 1670,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GSGW",
+    "x": 1760,
+    "y": 2100,
+    "offsetX": 27,
+    "offsetY": 0,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GMBK",
+    "x": 1760,
+    "y": 2005,
+    "offsetX": -27,
+    "offsetY": 0,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GWMR",
+    "x": 1830,
+    "y": 1950,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": true
+  },
+  {
+    "id": "930GWMP",
+    "x": 1940,
+    "y": 1950,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GEMB",
+    "x": 2050,
+    "y": 1950,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": true
+  },
+  {
+    "id": "930GBFR",
+    "x": 2185,
+    "y": 1865,
+    "offsetX": -20,
+    "offsetY": -20,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GSWK",
+    "x": 2280,
+    "y": 1790,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GLBR",
+    "x": 2390,
+    "y": 1790,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GTMP",
+    "x": 2510,
+    "y": 1790,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": true
+  },
+  {
+    "id": "930GNEL",
+    "x": 2840,
+    "y": 1950,
+    "offsetX": -27,
+    "offsetY": 0,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GCAW",
+    "x": 2840,
+    "y": 1950,
+    "offsetX": 27,
+    "offsetY": 0,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GGLP",
+    "x": 2840,
+    "y": 2090,
+    "offsetX": -27,
+    "offsetY": 0,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GMHT",
+    "x": 2940,
+    "y": 2200,
+    "offsetX": 0,
+    "offsetY": -27,
+    "labelSide": -1,
+    "major": false
+  },
+  {
+    "id": "930GGNW",
+    "x": 3060,
+    "y": 2200,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GMIL",
+    "x": 3100,
+    "y": 1925,
+    "offsetX": 27,
+    "offsetY": 0,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GWRF",
+    "x": 3320,
+    "y": 2020,
+    "offsetX": 27,
+    "offsetY": 0,
+    "labelSide": 1,
+    "major": false
+  },
+  {
+    "id": "930GWAS",
+    "x": 3500,
+    "y": 2200,
+    "offsetX": 0,
+    "offsetY": 27,
+    "labelSide": 1,
+    "major": true
+  },
+  {
+    "id": "930GBRVS",
+    "x": 3825,
+    "y": 1675,
+    "offsetX": 20,
+    "offsetY": 20,
+    "labelSide": 1,
+    "major": true
+  }
+]

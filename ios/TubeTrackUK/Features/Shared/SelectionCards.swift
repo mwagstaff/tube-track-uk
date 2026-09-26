@@ -44,6 +44,7 @@ struct StationDetailCard: View {
                     Text(station.name)
                         .font(.appHeadline())
                     Spacer()
+                    FavouriteStopButton(stop: .station(station))
                     StationDirectionsButton(station: station)
                     Button("Close", systemImage: "xmark.circle.fill") {
                         if let onClose {
@@ -80,6 +81,9 @@ struct StationDetailCard: View {
                     onSelectLine: appState.selectDepartureLine
                 )
                 .id("\(station.id):\(appState.stationSelectionGeneration)")
+                CardUpdateFooter(updatedAt: appState.stationArrivalsSourceUpdatedAt ?? appState.stationArrivalsUpdatedAt,
+                    isOffline: appState.isOffline,
+                    isStale: appState.stationArrivalsStale || appState.stationArrivalsError != nil)
             }
         }
         .accessibilityElement(children: .contain)

@@ -27,7 +27,7 @@ export const DIRECTION_FILTERS = Object.freeze([
     'outbound'
 ]);
 
-export const MAXIMUM_DEPARTURES = 3;
+export const MAXIMUM_DEPARTURES = 4;
 
 // Mirrors the truncation in ContentState.Departure so a board built here cannot
 // encode larger than the one the app built.

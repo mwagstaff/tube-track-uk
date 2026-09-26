@@ -127,7 +127,11 @@ test('per-request deadline releases the shared concurrency gate without changing
     }
 });
 
-test('deadline settles a request whose fetch ignores the abort signal and frees its slot', async () => {
+test('deadline settles a request whose fetch ignores the abort signal and frees its slot', async (t) => {
+    // The production server keeps the loop alive; this fake fetch has no socket
+    // and the client's deadline is intentionally unref'd.
+    const keepAlive = setTimeout(() => {}, 1_000);
+    t.after(() => clearTimeout(keepAlive));
     // Regression for the 2026-09-21 production stall: Node's fetch left a body
     // read pending forever after abort, so the abort alone cannot be relied on.
     const observations = [];
@@ -154,7 +158,9 @@ test('deadline settles a request whose fetch ignores the abort signal and frees 
     assert.deepEqual(await client.fetchJSON('/next'), []);
 });
 
-test('deadline also settles a body read that never completes', async () => {
+test('deadline also settles a body read that never completes', async (t) => {
+    const keepAlive = setTimeout(() => {}, 1_000);
+    t.after(() => clearTimeout(keepAlive));
     const client = new TfLClient({
         apiKey: 'test-key',
         fetchImpl: async () => new Response(new ReadableStream({ pull() { return new Promise(() => {}); } }), {

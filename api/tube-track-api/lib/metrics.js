@@ -5,6 +5,7 @@ import {
     Registry,
     collectDefaultMetrics
 } from 'prom-client';
+import { clientMetadata, USAGE_SURFACES } from './usage.js';
 
 const TFL_RECENT_WINDOW_MS = 6 * 60 * 60 * 1_000;
 const TFL_RECENT_REQUEST_LIMIT = 100_000;
@@ -123,6 +124,14 @@ function rollingGauge({ register, name, help, labelNames, rows }) {
 }
 
 function requestRoute(req) {
+    if (req.path === '/api/v1/usage') return '/api/v1/usage';
+    if (req.path.startsWith('/api/v1/river/arrivals/')) return '/api/v1/river/arrivals/:pierId';
+    if (['network', 'status', 'live', 'boats'].some((name) => req.path === `/api/v1/river/${name}`)) {
+        return req.path;
+    }
+    if (['network', 'status', 'hours', 'planned-works'].some((name) => req.path === `/api/v1/cable-car/${name}`)) {
+        return req.path;
+    }
     if (req.path === '/api/v1/line-colours') return '/api/v1/line-colours';
     if (req.path === '/api/v1/journeys') return '/api/v1/journeys';
     if (req.path === '/api/v1/stations') return '/api/v1/stations';
@@ -145,11 +154,13 @@ function requestRoute(req) {
     if (req.path === '/api/v1/push/widgets') return '/api/v1/push/widgets';
     if (req.path === '/healthcheck') return '/healthcheck';
     if (req.path === '/metrics') return '/metrics';
+    if (req.path.startsWith('/api/')) return '/api/other';
     return 'unmatched';
 }
 
 export function createMetrics({
     cache,
+    usageStore,
     collectProcessMetrics = true,
     clock = Date.now
 } = {}) {
@@ -173,6 +184,44 @@ export function createMetrics({
         help: 'Inbound HTTP request duration',
         labelNames: ['method', 'route', 'status'],
         buckets: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+        registers: [register]
+    });
+    const clientRequests = new Counter({
+        name: 'tube_track_client_requests_total',
+        help: 'App API requests by bounded route, client surface and identification',
+        labelNames: ['route', 'surface', 'identified'],
+        registers: [register]
+    });
+    const clientVersions = new Counter({
+        name: 'tube_track_client_versions_total',
+        help: 'App API requests by bounded client version and surface',
+        labelNames: ['version', 'surface'],
+        registers: [register]
+    });
+    const usageEvents = new Counter({
+        name: 'tube_track_usage_events_total',
+        help: 'Accepted app-open and feature-open events',
+        labelNames: ['event', 'feature'],
+        registers: [register]
+    });
+    const activeInstalls = new Gauge({
+        name: 'tube_track_active_installs',
+        help: 'Distinct install hashes seen in the current London day or trailing calendar days',
+        labelNames: ['surface', 'window'],
+        collect() {
+            const counts = usageStore?.counts() ?? {};
+            for (const surface of USAGE_SURFACES) {
+                for (const window of ['1d', '7d', '30d']) {
+                    this.set({ surface, window }, counts[surface]?.[window] ?? 0);
+                }
+            }
+        },
+        registers: [register]
+    });
+    new Gauge({
+        name: 'tube_track_usage_store_write_ok',
+        help: '1 when the durable usage store is readable and its last write succeeded',
+        collect() { this.set(usageStore?.writeOk === false ? 0 : 1); },
         registers: [register]
     });
     const tflRequests = new Counter({
@@ -377,9 +426,11 @@ export function createMetrics({
         labelNames: ['reason'],
         registers: [register]
     });
-    const pushAuthFailures = new Counter({
-        name: 'tube_track_push_auth_failures_total',
-        help: 'Registration attempts rejected for a bad client key',
+    // The registration endpoints are unauthenticated, so this is the signal
+    // that someone is hammering them.
+    const pushRateLimited = new Counter({
+        name: 'tube_track_push_rate_limited_total',
+        help: 'Registration attempts rejected by the rate limiter',
         registers: [register]
     });
     const pushStoreWriteFailures = new Counter({
@@ -397,6 +448,9 @@ export function createMetrics({
         collect() {
             const state = cache?.read();
             this.set({ check: 'live_cache_fresh' }, state && !state.stale ? 1 : 0);
+            if (usageStore) {
+                this.set({ check: 'usage_store_write' }, usageStore.writeOk ? 1 : 0);
+            }
         },
         registers: [register]
     });
@@ -410,6 +464,7 @@ export function createMetrics({
                 // the response finishes the original path is gone and every
                 // routed request would be labelled 'unmatched'.
                 const route = requestRoute(req);
+                const client = clientMetadata(req);
                 res.on('finish', () => {
                     const labels = {
                         method: req.method,
@@ -418,9 +473,24 @@ export function createMetrics({
                     };
                     inboundRequests.inc(labels);
                     inboundDuration.observe(labels, (performance.now() - startedAt) / 1_000);
+                    if (route.startsWith('/api/') && route !== '/api/v1/usage') {
+                        clientRequests.inc({
+                            route,
+                            surface: client.surface,
+                            identified: client.installId ? 'yes' : 'no'
+                        });
+                        clientVersions.inc({ version: client.version, surface: client.surface });
+                        if (client.installId && ['widget', 'watch'].includes(client.surface)
+                            && res.statusCode >= 200 && res.statusCode < 400) {
+                            usageStore?.record(client.installId, client.surface);
+                        }
+                    }
                 });
                 next();
             };
+        },
+        recordUsageEvent({ event, feature }) {
+            usageEvents.inc({ event, feature });
         },
         observeTflRequest({ source, mode, status, durationSeconds, responseBytes, url }) {
             const normalizedSource = String(source ?? mode ?? 'other');
@@ -477,8 +547,8 @@ export function createMetrics({
         recordPushSuppressed({ reason }) {
             pushSuppressed.inc({ reason: String(reason) });
         },
-        recordPushAuthFailure() {
-            pushAuthFailures.inc();
+        recordPushRateLimited() {
+            pushRateLimited.inc();
         },
         recordPushStoreWriteFailure() {
             pushStoreWriteFailures.inc();

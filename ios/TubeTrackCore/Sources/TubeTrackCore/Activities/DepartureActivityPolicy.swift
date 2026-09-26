@@ -17,27 +17,18 @@ public enum DepartureActivityPolicy {
     /// cost no budget at all, so while the app is feeding the activity we can
     /// promise data this fresh. Once the app goes away the server takes over
     /// and sets a wider window on each push — see `pushStaleWindow`.
-    public static let staleWindow: TimeInterval = 5 * 60
+    public static let staleWindow: TimeInterval = 3 * 60
 
     /// Without frequent updates the server pushes far less often, so the
     /// activity has to tolerate longer gaps before dimming.
-    public static let relaxedStaleWindow: TimeInterval = 15 * 60
+    public static let relaxedStaleWindow: TimeInterval = 7 * 60
 
-    /// What the server sets while it owns the activity, mirroring
-    /// `PUSH_STALE_WINDOW_MS` in the API's `lib/push/change-detector.js`.
-    ///
-    /// iOS budgets roughly eight Live Activity pushes an hour while the device
-    /// is locked. A heartbeat every seven minutes is about as often as that
-    /// allows once real changes have taken their share, and nine minutes lets
-    /// one heartbeat go missing without dimming a board that is still correct.
-    /// Anything tighter looks fresher on paper and is throttled in practice.
-    public static let pushStaleWindow: TimeInterval = 9 * 60
-    public static let relaxedPushStaleWindow: TimeInterval = 25 * 60
-
-    /// The cadence the server aims for while an activity is live. Kept here so
-    /// the two halves of the contract sit next to each other.
-    public static let heartbeat: TimeInterval = 7 * 60
-    public static let relaxedHeartbeat: TimeInterval = 20 * 60
+    /// Priority-5 snapshots refresh exact minute labels without consuming the
+    /// APNs high-priority budget. Stale dates allow for delayed delivery.
+    public static let pushStaleWindow: TimeInterval = 3 * 60
+    public static let relaxedPushStaleWindow: TimeInterval = 7 * 60
+    public static let heartbeat: TimeInterval = 30
+    public static let relaxedHeartbeat: TimeInterval = 60
 
     /// Give up when nothing has arrived for this long — a frozen board is
     /// worse than none.

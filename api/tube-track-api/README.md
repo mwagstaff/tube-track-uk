@@ -20,14 +20,22 @@ Optional polling settings:
 
 ### Live cache staleness
 
-Live routes always serve the last complete snapshot; `meta.stale` is `true`
-once it is older than `TUBETRACK_UK_LIVE_STALE_AFTER_MS`, and clients should
-degrade rather than trust `expectedArrival` values that are already in the
-past. Each poll attempt is bounded by `TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS`
+Each transport mode keeps its last successful arrivals. A failed or timed-out
+mode retains its previous data while successful modes publish a new snapshot.
+`meta.modeUpdatedAt` gives each mode's last update time and `meta.staleModes`
+lists modes older than `TUBETRACK_UK_LIVE_STALE_AFTER_MS` (including modes
+that have never loaded). On a line or stop request, `meta.stale` and
+`meta.updatedAt` describe the modes in that response; unfiltered requests and
+`/healthcheck` describe the whole cache. Clients should degrade stale boards
+rather than trust `expectedArrival` values that are already in the past.
+Live Activity pushes pause for modes that failed the current refresh or are
+stale, while healthy modes continue updating. Each poll attempt is bounded by
+`TUBETRACK_UK_LIVE_REFRESH_TIMEOUT_MS`
 and each TfL request by `TUBETRACK_UK_TFL_TIMEOUT_MS`; both deadlines settle
 the call themselves rather than relying on `fetch` honouring its abort signal
 (a stalled response body was observed ignoring abort for hours on
-2026-09-21). A timed-out or failed attempt never stops the next one.
+2026-09-21). A timed-out or failed attempt never stops the next one. When all
+modes fail, the existing snapshot remains unchanged.
 
 A watchdog independent of the polling loop logs `live_cache_stale` (warn) every
 poll interval while the cache is stale, with the age, the current attempt and
@@ -36,6 +44,19 @@ the last error, and `live_cache_recovered` (info) when it refreshes again.
 while stale, and `/metrics` exposes `tube_track_live_cache_stale` (0/1) and
 `app_check_ok{check="live_cache_fresh"}` alongside
 `tube_track_live_cache_age_seconds` for alerting.
+
+Completed refreshes explicitly detach cancellation listeners. Keep this cleanup:
+on the production Node 20 runtime, combining every attempt with the long-lived
+shutdown signal retained old arrival generations and exhausted the 192 MiB heap.
+The regression test runs as part of `npm test`. To inspect its memory samples:
+
+```sh
+node --expose-gc --max-old-space-size=192 scripts/check-live-memory.js
+```
+
+Run it with the deployed Node version too; newer runtimes can mask the leak.
+See [the memory investigation](docs/memory-investigation-2026-09-25.md) for
+before/after measurements and rollout checks.
 
 Alert rules live in `observability/prometheus/rules.yml` and are installed on
 the monitoring host by a full deployment (`rules/tube-track-api.yml`, reloaded
@@ -87,6 +108,30 @@ falls back to v1 if v2 is unavailable; older installed apps continue to call
 v1 and are unaffected.
 
 ## Development
+
+### Live Activity refreshes
+
+Each successful live-data poll considers active departure boards for a push.
+Routine snapshots target 30 seconds, or 60 seconds if the user disables frequent
+updates, even when the predictions are unchanged. A two-second scheduling
+allowance avoids missing a poll because its upstream requests finished slightly
+earlier. Keep `TUBETRACK_UK_LIVE_POLL_INTERVAL_MS` at its 30-second default to
+support this cadence. Failed TfL polls do not re-label old data as fresh.
+
+Routine snapshots use APNs priority 5; urgent board changes use priority 10.
+Apple controls delivery timing, so the send cadence is a target, not a guarantee
+that the Lock Screen refreshes within that time.
+
+Development and distributed apps use different APNs environments. The notifier
+starts with the configured environment and, only on `BadDeviceToken`, tries the
+other Apple endpoint once before retiring the token. Successful routing is saved
+per subscription, allowing both builds to coexist. Ended tokens (`Unregistered`)
+are removed immediately. Activities whose tokens were already removed must be
+stopped and started again after deploying the fix.
+
+See [Apple's Live Activity push guidance](https://sosumi.ai/documentation/activitykit/starting-and-updating-live-activities-with-activitykit-push-notifications).
+
+### Running locally
 
 ```sh
 npm install
@@ -271,3 +316,50 @@ automatically imported into **Dashboards → tube-track-api → TfL Upstream API
 calls** by a full deployment with
 `/Users/mwagstaff/dev/server-tooling/deploy/node_project.zsh`. Quick deployments
 intentionally skip Prometheus and Grafana configuration.
+
+The **App audience and usage** dashboard is provisioned from
+`observability/grafana/dashboards/app-audience-usage-dashboard.json` by the same
+full deployment. Its headline is distinct iOS app installations that reported
+an `app_open` event during the current Europe/London calendar day. The 7- and
+30-day values count distinct installations over those calendar-day windows; they
+must not be calculated by adding daily values. Widget and watch installations
+are counted separately when they make a successful API request. An installation
+is not a person, and an offline app open cannot be counted until it is reported.
+
+New clients send `X-TubeTrack-Install` (an app-generated UUID),
+`X-TubeTrack-Surface` (`ios_app`, `widget`, or `watch`) and
+`X-TubeTrack-App-Version` on first-party API requests. The iOS app sends a
+small `POST /api/v1/usage` body (`app_open` or `feature_open`, with a fixed
+feature name) on foreground entry or a tab/game visit. This event is best effort
+and never blocks app use. Older app versions remain supported; their requests
+appear as `unknown` and cannot contribute to distinct-install counts. The
+installation ID is accepted only as an observation key, not authentication.
+
+The API keeps only salted hashes of installation IDs, deduplicated by London
+day and client surface. The store is written with mode 0600 under
+`TUBETRACK_UK_DATA_DIR` or the same default durable directory as push tokens,
+outside the deployed project tree. It retains 45 calendar days and supports a
+single API instance; use a shared store before scaling the service horizontally.
+Prometheus receives only aggregate counts and bounded route/surface/version
+labels, never installation IDs. Review the privacy notice and App Store privacy
+answers before releasing a build that sends usage events.
+
+## London Cable Car
+
+Independent `/api/v1/cable-car/network`, `/status`, `/hours` and `/planned-works`
+resources reuse the TfL client and resource cache without changing rail or River
+Bus contracts. See [Cable Car integration](docs/cable-car.md) for recorded API
+findings, cache/freshness semantics and the reviewed opening-hours policy. Deploy
+these routes before releasing the cable-car client. Renew the schedule review
+before 25 October 2026; repeated fetches never extend its validity.
+
+## Estimated River Bus positions
+
+`GET /api/v1/river/boats` shares the existing 30-second river prediction cache and
+returns estimated boat positions, learned from pier arrival times. In-process
+history is shared across clients; first-load estimates use unambiguous preceding
+legs and learned travel durations. Brief feed gaps retain positions only within
+their original 90-second observation window and next-pier ETA. Deploy this endpoint
+to enable immediate shared estimates in the updated iOS app; older APIs retain
+the transition-only fallback. See [River Bus integration](docs/river-bus.md) for
+the contract, assumptions, recorded replay and regression coverage.

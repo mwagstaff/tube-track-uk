@@ -1,0 +1,2020 @@
+{
+  "$type": "Tfl.Api.Presentation.Entities.RouteSequence, Tfl.Api.Presentation.Entities",
+  "lineId": "rb1",
+  "lineName": "RB1",
+  "direction": "outbound",
+  "isOutboundOnly": false,
+  "mode": "river-bus",
+  "lineStrings": [
+    "[[[-0.144158,51.483498],[-0.126883,51.486461],[-0.12512,51.492197],[-0.123742,51.501563],[-0.119436,51.503607],[-0.121428,51.507389],[-0.101963,51.510762],[-0.096384,51.508388],[-0.084758,51.506598],[-0.079087,51.507809],[-0.028482,51.505692],[-0.03276,51.494685],[-0.021935,51.487498],[-0.009659,51.483621],[0.008768,51.502093],[0.0249,51.49755],[0.07057,51.495163],[0.117661,51.516182]]]",
+    "[[[-0.144158,51.483498],[-0.121428,51.507389],[-0.101963,51.510762],[-0.096384,51.508388],[-0.084758,51.506598],[-0.079087,51.507809],[-0.028482,51.505692],[-0.03276,51.494685],[-0.021935,51.487498],[-0.009659,51.483621],[0.008768,51.502093],[0.0249,51.49755],[0.07057,51.495163],[0.117661,51.516182]]]"
+  ],
+  "stations": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GBFR",
+      "icsId": "1002016",
+      "topMostParentId": "930GBFR",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GBFR",
+      "name": "Blackfriars Pier",
+      "lat": 51.510762,
+      "lon": -0.101963
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GBRVS",
+      "icsId": "1002271",
+      "topMostParentId": "930GBRVS",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GBRVS",
+      "name": "Barking Riverside Pier",
+      "lat": 51.516182,
+      "lon": 0.117661
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GBSP",
+      "icsId": "1002015",
+      "topMostParentId": "930GBSP",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GBSP",
+      "name": "Battersea Power Station Pier",
+      "lat": 51.483498,
+      "lon": -0.144158
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GCAW",
+      "icsId": "1002021",
+      "topMostParentId": "930GCAW",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb4",
+          "name": "RB4",
+          "uri": "/Line/rb4",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GCAW",
+      "name": "Canary Wharf Pier",
+      "lat": 51.505692,
+      "lon": -0.028482
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GEMB",
+      "icsId": "1002036",
+      "topMostParentId": "930GEMB",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GEMB",
+      "name": "Embankment Pier",
+      "lat": 51.507389,
+      "lon": -0.121428
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GGLP",
+      "icsId": "1002089",
+      "topMostParentId": "930GGLP",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GGLP",
+      "name": "Greenland Surrey Quays Pier",
+      "lat": 51.494685,
+      "lon": -0.03276
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GGNW",
+      "icsId": "1002088",
+      "topMostParentId": "930GGNW",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GGNW",
+      "name": "Greenwich Pier",
+      "lat": 51.483621,
+      "lon": -0.009659
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GLBR",
+      "icsId": "1002056",
+      "topMostParentId": "930GLBR",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GLBR",
+      "name": "London Bridge City Pier",
+      "lat": 51.506598,
+      "lon": -0.084758
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GMBK",
+      "icsId": "1016418",
+      "topMostParentId": "930GMBK",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GMBK",
+      "name": "Millbank Pier",
+      "lat": 51.492197,
+      "lon": -0.12512
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GMHT",
+      "icsId": "1002097",
+      "topMostParentId": "930GMHT",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GMHT",
+      "name": "Masthouse Terrace Pier",
+      "lat": 51.487498,
+      "lon": -0.021935
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GMIL",
+      "icsId": "1002067",
+      "topMostParentId": "930GMIL",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GMIL",
+      "name": "North Greenwich Pier",
+      "lat": 51.502093,
+      "lon": 0.008768
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GSGW",
+      "icsId": "1002100",
+      "topMostParentId": "930GSGW",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GSGW",
+      "name": "Vauxhall St George Wharf Pier",
+      "lat": 51.486461,
+      "lon": -0.126883
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GSWK",
+      "icsId": "1002007",
+      "topMostParentId": "930GSWK",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GSWK",
+      "name": "Bankside Pier",
+      "lat": 51.508388,
+      "lon": -0.096384
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GTMP",
+      "icsId": "1002077",
+      "topMostParentId": "930GTMP",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GTMP",
+      "name": "Tower Pier",
+      "lat": 51.507809,
+      "lon": -0.079087
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GWAS",
+      "icsId": "1016784",
+      "topMostParentId": "930GWAS",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GWAS",
+      "name": "Woolwich Arsenal Pier",
+      "lat": 51.495163,
+      "lon": 0.07057
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GWMP",
+      "icsId": "1002080",
+      "topMostParentId": "930GWMP",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GWMP",
+      "name": "London Eye Waterloo Pier",
+      "lat": 51.503607,
+      "lon": -0.119436
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GWMR",
+      "icsId": "1002085",
+      "topMostParentId": "930GWMR",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GWMR",
+      "name": "Westminster Pier",
+      "lat": 51.501563,
+      "lon": -0.123742
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+      "stationId": "930GWRF",
+      "icsId": "1002135",
+      "topMostParentId": "930GWRF",
+      "modes": [
+        "river-bus"
+      ],
+      "stopType": "NaptanFerryPort",
+      "lines": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb1",
+          "name": "RB1",
+          "uri": "/Line/rb1",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+          "id": "rb6",
+          "name": "RB6",
+          "uri": "/Line/rb6",
+          "type": "Line",
+          "crowding": {
+            "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+          },
+          "routeType": "Unknown",
+          "status": "Unknown"
+        }
+      ],
+      "status": true,
+      "id": "930GWRF",
+      "name": "Royal Wharf Pier",
+      "lat": 51.49755,
+      "lon": 0.0249
+    }
+  ],
+  "stopPointSequences": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 8,
+      "nextBranchIds": [
+        12,
+        13
+      ],
+      "prevBranchIds": [],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GBSP",
+          "icsId": "1002015",
+          "topMostParentId": "930GBSP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GBSP",
+          "name": "Battersea Power Station Pier",
+          "lat": 51.483498,
+          "lon": -0.144158
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GSGW",
+          "icsId": "1002100",
+          "topMostParentId": "930GSGW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GSGW",
+          "name": "Vauxhall St George Wharf Pier",
+          "lat": 51.486461,
+          "lon": -0.126883
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 12,
+      "nextBranchIds": [
+        14
+      ],
+      "prevBranchIds": [
+        8
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GSGW",
+          "icsId": "1002100",
+          "topMostParentId": "930GSGW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GSGW",
+          "name": "Vauxhall St George Wharf Pier",
+          "lat": 51.486461,
+          "lon": -0.126883
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GMBK",
+          "icsId": "1016418",
+          "topMostParentId": "930GMBK",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GMBK",
+          "name": "Millbank Pier",
+          "lat": 51.492197,
+          "lon": -0.12512
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GWMR",
+          "icsId": "1002085",
+          "topMostParentId": "930GWMR",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GWMR",
+          "name": "Westminster Pier",
+          "lat": 51.501563,
+          "lon": -0.123742
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 14,
+      "nextBranchIds": [
+        16,
+        17
+      ],
+      "prevBranchIds": [
+        12,
+        13
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GWMR",
+          "icsId": "1002085",
+          "topMostParentId": "930GWMR",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GWMR",
+          "name": "Westminster Pier",
+          "lat": 51.501563,
+          "lon": -0.123742
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GWMP",
+          "icsId": "1002080",
+          "topMostParentId": "930GWMP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GWMP",
+          "name": "London Eye Waterloo Pier",
+          "lat": 51.503607,
+          "lon": -0.119436
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GEMB",
+          "icsId": "1002036",
+          "topMostParentId": "930GEMB",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GEMB",
+          "name": "Embankment Pier",
+          "lat": 51.507389,
+          "lon": -0.121428
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 19,
+      "nextBranchIds": [
+        10,
+        11
+      ],
+      "prevBranchIds": [
+        16,
+        17
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GSWK",
+          "icsId": "1002007",
+          "topMostParentId": "930GSWK",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GSWK",
+          "name": "Bankside Pier",
+          "lat": 51.508388,
+          "lon": -0.096384
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GLBR",
+          "icsId": "1002056",
+          "topMostParentId": "930GLBR",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GLBR",
+          "name": "London Bridge City Pier",
+          "lat": 51.506598,
+          "lon": -0.084758
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GTMP",
+          "icsId": "1002077",
+          "topMostParentId": "930GTMP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GTMP",
+          "name": "Tower Pier",
+          "lat": 51.507809,
+          "lon": -0.079087
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GCAW",
+          "icsId": "1002021",
+          "topMostParentId": "930GCAW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb4",
+              "name": "RB4",
+              "uri": "/Line/rb4",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GCAW",
+          "name": "Canary Wharf Pier",
+          "lat": 51.505692,
+          "lon": -0.028482
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GGLP",
+          "icsId": "1002089",
+          "topMostParentId": "930GGLP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GGLP",
+          "name": "Greenland Surrey Quays Pier",
+          "lat": 51.494685,
+          "lon": -0.03276
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 10,
+      "nextBranchIds": [
+        18
+      ],
+      "prevBranchIds": [
+        19
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GGLP",
+          "icsId": "1002089",
+          "topMostParentId": "930GGLP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GGLP",
+          "name": "Greenland Surrey Quays Pier",
+          "lat": 51.494685,
+          "lon": -0.03276
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GMHT",
+          "icsId": "1002097",
+          "topMostParentId": "930GMHT",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GMHT",
+          "name": "Masthouse Terrace Pier",
+          "lat": 51.487498,
+          "lon": -0.021935
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GGNW",
+          "icsId": "1002088",
+          "topMostParentId": "930GGNW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GGNW",
+          "name": "Greenwich Pier",
+          "lat": 51.483621,
+          "lon": -0.009659
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 18,
+      "nextBranchIds": [],
+      "prevBranchIds": [
+        10
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GGNW",
+          "icsId": "1002088",
+          "topMostParentId": "930GGNW",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GGNW",
+          "name": "Greenwich Pier",
+          "lat": 51.483621,
+          "lon": -0.009659
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GMIL",
+          "icsId": "1002067",
+          "topMostParentId": "930GMIL",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GMIL",
+          "name": "North Greenwich Pier",
+          "lat": 51.502093,
+          "lon": 0.008768
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GWRF",
+          "icsId": "1002135",
+          "topMostParentId": "930GWRF",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GWRF",
+          "name": "Royal Wharf Pier",
+          "lat": 51.49755,
+          "lon": 0.0249
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GWAS",
+          "icsId": "1016784",
+          "topMostParentId": "930GWAS",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GWAS",
+          "name": "Woolwich Arsenal Pier",
+          "lat": 51.495163,
+          "lon": 0.07057
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GBRVS",
+          "icsId": "1002271",
+          "topMostParentId": "930GBRVS",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GBRVS",
+          "name": "Barking Riverside Pier",
+          "lat": 51.516182,
+          "lon": 0.117661
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 17,
+      "nextBranchIds": [
+        19
+      ],
+      "prevBranchIds": [
+        14,
+        9
+      ],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GEMB",
+          "icsId": "1002036",
+          "topMostParentId": "930GEMB",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GEMB",
+          "name": "Embankment Pier",
+          "lat": 51.507389,
+          "lon": -0.121428
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GBFR",
+          "icsId": "1002016",
+          "topMostParentId": "930GBFR",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GBFR",
+          "name": "Blackfriars Pier",
+          "lat": 51.510762,
+          "lon": -0.101963
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GSWK",
+          "icsId": "1002007",
+          "topMostParentId": "930GSWK",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GSWK",
+          "name": "Bankside Pier",
+          "lat": 51.508388,
+          "lon": -0.096384
+        }
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.StopPointSequence, Tfl.Api.Presentation.Entities",
+      "lineId": "rb1",
+      "lineName": "RB1",
+      "direction": "outbound",
+      "branchId": 9,
+      "nextBranchIds": [
+        17
+      ],
+      "prevBranchIds": [],
+      "stopPoint": [
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GBSP",
+          "icsId": "1002015",
+          "topMostParentId": "930GBSP",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GBSP",
+          "name": "Battersea Power Station Pier",
+          "lat": 51.483498,
+          "lon": -0.144158
+        },
+        {
+          "$type": "Tfl.Api.Presentation.Entities.MatchedStop, Tfl.Api.Presentation.Entities",
+          "stationId": "930GEMB",
+          "icsId": "1002036",
+          "topMostParentId": "930GEMB",
+          "modes": [
+            "river-bus"
+          ],
+          "stopType": "NaptanFerryPort",
+          "lines": [
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb1",
+              "name": "RB1",
+              "uri": "/Line/rb1",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            },
+            {
+              "$type": "Tfl.Api.Presentation.Entities.Identifier, Tfl.Api.Presentation.Entities",
+              "id": "rb6",
+              "name": "RB6",
+              "uri": "/Line/rb6",
+              "type": "Line",
+              "crowding": {
+                "$type": "Tfl.Api.Presentation.Entities.Crowding, Tfl.Api.Presentation.Entities"
+              },
+              "routeType": "Unknown",
+              "status": "Unknown"
+            }
+          ],
+          "status": true,
+          "id": "930GEMB",
+          "name": "Embankment Pier",
+          "lat": 51.507389,
+          "lon": -0.121428
+        }
+      ],
+      "serviceType": "Regular"
+    }
+  ],
+  "orderedLineRoutes": [
+    {
+      "$type": "Tfl.Api.Presentation.Entities.OrderedRoute, Tfl.Api.Presentation.Entities",
+      "name": "Battersea Power Station  &harr;  Barking Riverside  via Blackfriars ",
+      "naptanIds": [
+        "930GBSP",
+        "930GEMB",
+        "930GBFR",
+        "930GSWK",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ],
+      "serviceType": "Regular"
+    },
+    {
+      "$type": "Tfl.Api.Presentation.Entities.OrderedRoute, Tfl.Api.Presentation.Entities",
+      "name": "Battersea Power Station  &harr;  Barking Riverside  via Bankside ",
+      "naptanIds": [
+        "930GBSP",
+        "930GSGW",
+        "930GMBK",
+        "930GWMR",
+        "930GWMP",
+        "930GEMB",
+        "930GBFR",
+        "930GSWK",
+        "930GLBR",
+        "930GTMP",
+        "930GCAW",
+        "930GGLP",
+        "930GMHT",
+        "930GGNW",
+        "930GMIL",
+        "930GWRF",
+        "930GWAS",
+        "930GBRVS"
+      ],
+      "serviceType": "Regular"
+    }
+  ]
+}

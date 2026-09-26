@@ -8,44 +8,20 @@ struct MapOverviewHeader: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            if usesCompactTopRow {
-                HStack(spacing: 8) {
-                    MapDisruptionOverviewCard(
-                        headlineOnly: true,
-                        compactHeadline: true,
-                        onExpand: onShowDisruptions
-                    )
-                    .layoutPriority(1)
-
-                    MapHeaderControls()
-                }
-            } else {
-                HStack(spacing: 8) {
-                    if !compactForZoom {
-                        Text("TubeTrack UK")
-                            .font(.appLargeTitle(.bold))
-                            .tracking(-0.7)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                            .layoutPriority(1)
-                            .opacity(overviewOpacity)
-                            .accessibilityElement(children: .ignore)
-                            .accessibilityAddTraits(.isHeader)
-                            .accessibilityLabel("TubeTrack UK")
-                    }
-
-                    Spacer(minLength: 4)
-
-                    MapHeaderControls()
-                }
-                .frame(minHeight: MapDockMetrics.controlSize)
-
-                MapDisruptionOverviewCard(
-                    headlineOnly: compactForZoom,
-                    compactHeadline: false,
-                    onExpand: onShowDisruptions
-                )
+            if !compactForZoom {
+                Text("TubeTrack UK")
+                    .font(.appLargeTitle(.bold))
+                    .tracking(-0.7)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+                    .opacity(overviewOpacity)
+                    .accessibilityAddTraits(.isHeader)
             }
+            MapDisruptionOverviewCard(
+                headlineOnly: compactForZoom,
+                compactHeadline: usesCompactTopRow,
+                onExpand: onShowDisruptions
+            )
         }
         .padding(.horizontal, 14)
         .padding(.top, 6)
@@ -71,6 +47,8 @@ struct MapDisruptionOverviewCard: View {
     private var lineEntries: [ResolvedDisruption] {
         lineGroups.all
     }
+
+    private var disruptionCount: Int { lineEntries.count + appState.cableCar.overviewIssueCount }
 
     private var isLoadingTfLDisruptions: Bool {
         appState.isViewingLiveStatus && appState.isLoadingInitialStatus && !appState.isOffline
@@ -212,6 +190,14 @@ struct MapDisruptionOverviewCard: View {
                 .accessibilityElement(children: .ignore)
                 .accessibilityLabel(affectedLinesAccessibilityLabel)
             }
+            if appState.cableCar.isEnabled, appState.cableCar.presentation.kind != .open {
+                Label("Cable Car · \(appState.cableCar.presentation.headline)", image: "CableCarIcon")
+                    .font(.appCaption(.semibold))
+                    .foregroundStyle(appState.cableCar.presentation.isIssue ? .red : .secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 10)
+            }
         }
     }
 
@@ -277,21 +263,23 @@ struct MapDisruptionOverviewCard: View {
     }
 
     private var headline: String {
-        let count = lineEntries.count
-        if hasNoSavedDisruptionData { return "No saved disruptions" }
-        if isLoadingTfLDisruptions {
+        let count = disruptionCount
+        if count == 0, appState.cableCar.isOverviewUnconfirmed { return "Cable Car status unconfirmed" }
+        if count == 0, hasNoSavedDisruptionData { return "No saved disruptions" }
+        if count == 0, isLoadingTfLDisruptions {
             return "Loading disruptions from TfL"
         }
         if !appState.isViewingLiveStatus,
            !appState.isOffline,
            appState.isRefreshingDisruptionData,
-           appState.visibleDisruptions.isEmpty {
+           disruptionCount == 0 {
             return "Loading planned disruptions"
         }
         if appState.isViewingLiveStatus {
             return MapDisruptionSummaryText.liveHeadline(
                 disruptionCount: count,
-                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count,
+                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count
+                    + (appState.cableCar.isEnabled && appState.cableCar.presentation.kind == .scheduledClosed ? 1 : 0),
                 isOffline: appState.isOffline
             )
         }
@@ -317,22 +305,24 @@ struct MapDisruptionOverviewCard: View {
             if isLoadingTfLDisruptions {
                 return "Loading disruption data from TfL..."
             }
-            return "All lines are reporting normally... For now."
+            return appState.cableCar.isEnabled ? "No rail disruptions reported." : "All lines are reporting normally... For now."
         }
         return "No planned work matches the selected date and times."
     }
 
     private var headlineSymbol: String {
-        if hasNoSavedDisruptionData { return "wifi.slash" }
-        return lineEntries.isEmpty
+        if disruptionCount == 0, hasNoSavedDisruptionData { return "wifi.slash" }
+        if disruptionCount == 0, appState.cableCar.isOverviewUnconfirmed { return "questionmark.circle" }
+        return disruptionCount == 0
             ? "checkmark.circle.fill"
             : "exclamationmark.triangle.fill"
     }
 
     private var headlineColor: Color {
-        if hasNoSavedDisruptionData { return .secondary }
+        if disruptionCount == 0, hasNoSavedDisruptionData { return .secondary }
         if isLoadingTfLDisruptions { return .blue }
-        return lineEntries.isEmpty ? .green : .red
+        if disruptionCount == 0, appState.cableCar.isOverviewUnconfirmed { return .secondary }
+        return disruptionCount == 0 ? .green : .red
     }
 }
 
@@ -348,6 +338,8 @@ struct MapDisruptionsScreen: View {
     private var lineEntries: [ResolvedDisruption] {
         lineGroups.all
     }
+
+    private var disruptionCount: Int { lineEntries.count + appState.cableCar.overviewIssueCount }
 
     private var isLoadingTfLDisruptions: Bool {
         appState.isViewingLiveStatus && appState.isLoadingInitialStatus && !appState.isOffline
@@ -386,6 +378,12 @@ struct MapDisruptionsScreen: View {
                 Divider()
 
                 disruptionContent
+
+                if appState.cableCar.isEnabled {
+                    CableCarStatusRow(onSelect: { dismiss() })
+                        .padding(12)
+                        .background(.primary.opacity(0.055), in: .rect(cornerRadius: 14))
+                }
 
                 actions
             }
@@ -497,7 +495,9 @@ struct MapDisruptionsScreen: View {
             .frame(maxWidth: .infinity, minHeight: 180)
         } else if lineEntries.isEmpty {
             ContentUnavailableView(
-                appState.isOffline ? "No saved disruptions" : "No disruptions",
+                appState.cableCar.isEnabled
+                    ? (appState.isOffline ? "No saved rail disruptions" : "No rail disruptions")
+                    : (appState.isOffline ? "No saved disruptions" : "No disruptions"),
                 systemImage: hasNoSavedDisruptionData ? "wifi.slash" : "checkmark.circle",
                 description: Text(emptyMessage)
             )
@@ -522,7 +522,11 @@ struct MapDisruptionsScreen: View {
         VStack(spacing: 8) {
             Button {
                 withAnimation(.smooth(duration: 0.26)) {
-                    appState.toggleAllDisruptionsOnMap()
+                    if lineEntries.isEmpty, appState.cableCar.overviewIssueCount > 0 {
+                        appState.selectCableCar()
+                    } else {
+                        appState.toggleAllDisruptionsOnMap()
+                    }
                 }
                 dismiss()
             } label: {
@@ -546,8 +550,8 @@ struct MapDisruptionsScreen: View {
                     .interactive(),
                 in: .capsule
             )
-            .disabled(lineEntries.isEmpty && !appState.isViewingDisruptedLines)
-            .opacity(lineEntries.isEmpty && !appState.isViewingDisruptedLines ? 0.5 : 1)
+            .disabled(disruptionCount == 0 && !appState.isViewingDisruptedLines)
+            .opacity(disruptionCount == 0 && !appState.isViewingDisruptedLines ? 0.5 : 1)
             .accessibilityHint(
                 appState.isViewingDisruptedLines
                     ? "Returns to the map and shows every line"
@@ -628,19 +632,21 @@ struct MapDisruptionsScreen: View {
     }
 
     private var headline: String {
-        let count = lineEntries.count
-        if hasNoSavedDisruptionData { return "No saved disruptions" }
-        if isLoadingTfLDisruptions { return "Loading disruptions from TfL" }
+        let count = disruptionCount
+        if count == 0, appState.cableCar.isOverviewUnconfirmed { return "Cable Car status unconfirmed" }
+        if count == 0, hasNoSavedDisruptionData { return "No saved disruptions" }
+        if count == 0, isLoadingTfLDisruptions { return "Loading disruptions from TfL" }
         if !appState.isViewingLiveStatus,
            !appState.isOffline,
            appState.isRefreshingDisruptionData,
-           appState.visibleDisruptions.isEmpty {
+           disruptionCount == 0 {
             return "Loading planned disruptions"
         }
         if appState.isViewingLiveStatus {
             return MapDisruptionSummaryText.liveHeadline(
                 disruptionCount: count,
-                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count,
+                closedLineCount: appState.mapNetworkStatusSummary.closedLineIDs.count
+                    + (appState.cableCar.isEnabled && appState.cableCar.presentation.kind == .scheduledClosed ? 1 : 0),
                 isOffline: appState.isOffline
             )
         }
@@ -666,22 +672,24 @@ struct MapDisruptionsScreen: View {
             if isLoadingTfLDisruptions {
                 return "Loading disruption data from TfL..."
             }
-            return "All lines are reporting normally... For now."
+            return appState.cableCar.isEnabled ? "No rail disruptions reported." : "All lines are reporting normally... For now."
         }
         return "No planned work matches the selected date and times."
     }
 
     private var headlineSymbol: String {
-        if hasNoSavedDisruptionData { return "wifi.slash" }
-        return lineEntries.isEmpty
+        if disruptionCount == 0, hasNoSavedDisruptionData { return "wifi.slash" }
+        if disruptionCount == 0, appState.cableCar.isOverviewUnconfirmed { return "questionmark.circle" }
+        return disruptionCount == 0
             ? "checkmark.circle.fill"
             : "exclamationmark.triangle.fill"
     }
 
     private var headlineColor: Color {
-        if hasNoSavedDisruptionData { return .secondary }
+        if disruptionCount == 0, hasNoSavedDisruptionData { return .secondary }
         if isLoadingTfLDisruptions { return .blue }
-        return lineEntries.isEmpty ? .green : .red
+        if disruptionCount == 0, appState.cableCar.isOverviewUnconfirmed { return .secondary }
+        return disruptionCount == 0 ? .green : .red
     }
 }
 

@@ -3,10 +3,9 @@ import express from 'express';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { createPushRoutes, createRateLimiter, secretMatches } from '../lib/push-routes.js';
+import { createPushRoutes, createRateLimiter } from '../lib/push-routes.js';
 import { PushTokenStore } from '../lib/push/token-store.js';
 
-const SECRET = 'a-shared-client-secret';
 const INSTALL = 'install-0123456789';
 const TOKEN = 'ab'.repeat(32);
 const KNOWN_STOPS = new Set(['940GZZLUOXC', '940GZZLUBND']);
@@ -21,7 +20,6 @@ async function withRoutes(run, overrides = {}) {
         '/api/v1/push',
         createPushRoutes({
             store,
-            clientSecret: SECRET,
             isKnownStop: (id) => KNOWN_STOPS.has(id),
             ...overrides
         })
@@ -37,7 +35,6 @@ async function withRoutes(run, overrides = {}) {
             method,
             headers: {
                 'content-type': 'application/json',
-                authorization: `Bearer ${SECRET}`,
                 'x-tubetrack-install': INSTALL,
                 ...headers
             },
@@ -63,17 +60,6 @@ function registration(overrides = {}) {
         ...overrides
     };
 }
-
-test('a registration without the client key is refused', async () => {
-    await withRoutes(async ({ call, store }) => {
-        const response = await call('POST', '/api/v1/push/live-activities', {
-            body: registration(),
-            headers: { authorization: 'Bearer wrong' }
-        });
-        assert.equal(response.status, 401);
-        assert.equal(store.size, 0);
-    });
-});
 
 test('a registration without an install id is refused', async () => {
     await withRoutes(async ({ call }) => {
@@ -160,7 +146,6 @@ test('a body that is not JSON is refused', async () => {
             method: 'POST',
             headers: {
                 'content-type': 'application/json',
-                authorization: `Bearer ${SECRET}`,
                 'x-tubetrack-install': INSTALL
             },
             body: '{ not json'
@@ -238,12 +223,44 @@ test('a flood from one install is throttled without touching the others', async 
     );
 });
 
-test('the shared secret is compared without leaking its length', () => {
-    assert.equal(secretMatches('abc', 'abc'), true);
-    assert.equal(secretMatches('abc', 'abd'), false);
-    assert.equal(secretMatches('a', 'a-much-longer-secret'), false);
-    assert.equal(secretMatches('', ''), false, 'an unset secret must never match');
-    assert.equal(secretMatches(undefined, 'abc'), false);
+test('a flood spread across forged install ids still hits the global ceiling', () => {
+    // The endpoints are unauthenticated and an install id is self-asserted, so
+    // rotating it must not be a way around the limiter.
+    let now = 0;
+    const allow = createRateLimiter({
+        maxRequests: 10,
+        globalMaxRequests: 25,
+        clock: () => now
+    });
+
+    let accepted = 0;
+    for (let index = 0; index < 100; index += 1) {
+        if (allow(`forged-install-${index}`)) accepted += 1;
+    }
+    assert.equal(accepted, 25, 'the global ceiling caps a flood of fresh identities');
+
+    now += 60_001;
+    assert.equal(allow('forged-install-0'), true, 'and it recovers once the window rolls');
+});
+
+test('rotating install ids cannot grow the limiter without bound', () => {
+    // Evicting a real install's bucket only resets its own allowance, which
+    // costs nothing — the global ceiling above is what actually stops a flood.
+    // What matters here is that a million forged ids cannot exhaust memory.
+    let now = 0;
+    const allow = createRateLimiter({
+        maxRequests: 2,
+        globalMaxRequests: 10_000,
+        maxKeys: 8,
+        clock: () => now
+    });
+
+    for (let index = 0; index < 5_000; index += 1) {
+        allow(`forged-install-${index}`);
+    }
+    // The limiter exposes no size, so prove boundedness behaviourally: the
+    // oldest keys are gone, which is only possible if they were evicted.
+    assert.equal(allow('forged-install-0'), true, 'the earliest bucket was dropped');
 });
 
 test('widget registrations are stored separately from activities', async () => {

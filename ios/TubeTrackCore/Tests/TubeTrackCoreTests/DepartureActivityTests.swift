@@ -46,7 +46,7 @@ struct DepartureActivityTests {
     }
 
     @Test func contentStateRoundTripsAndStaysWellUnderThePushLimit() throws {
-        let state = sampleState()
+        let state = sampleState(departures: 4)
         let encoded = try JSONEncoder().encode(state)
         let decoded = try JSONDecoder().decode(DepartureActivityAttributes.ContentState.self, from: encoded)
         #expect(decoded == state)
@@ -79,18 +79,20 @@ struct DepartureActivityTests {
 
     // MARK: - Board projection
 
-    @Test func boardKeepsTheSoonestThreeInTheChosenDirection() {
+    @Test func boardKeepsTheSoonestFourInTheChosenDirection() {
         let arrivals = [
             arrival(id: "late", seconds: 900),
             arrival(id: "soon", seconds: 60),
             arrival(id: "mid", seconds: 300),
+            arrival(id: "fourth", seconds: 1_200),
+            arrival(id: "overflow", seconds: 1_500),
             arrival(id: "other", platform: "Northbound - Platform 7", destination: "Edgware", seconds: 30),
         ]
         let state = DepartureActivityBoard.contentState(
             from: arrivals, lineID: .northern, direction: .southbound,
             condition: nil, updatedAt: updatedAt, sequence: 0
         )
-        #expect(state.departures.map(\.id) == ["vsoon", "vmid", "vlate"])
+        #expect(state.departures.map(\.id) == ["vsoon", "vmid", "vlate", "vfourth"])
         #expect(state.departures.allSatisfy { $0.destination == "Morden" })
     }
 
@@ -101,6 +103,14 @@ struct DepartureActivityTests {
         )
         #expect(state.conditionHeadline == nil)
         #expect(state.conditionRank == LineServiceCondition.good("Good service").severityRank)
+    }
+
+    @Test func missingServiceStatusMustNotClaimGoodService() {
+        let state = DepartureActivityBoard.contentState(
+            from: [arrival(id: "1", seconds: 120)], lineID: .northern, direction: .any,
+            condition: nil, updatedAt: updatedAt, sequence: 0
+        )
+        #expect(state.conditionRank == LineServiceCondition.updating.severityRank)
     }
 
     @Test func departedTrainsDropOffTheBoardAsTimePasses() {

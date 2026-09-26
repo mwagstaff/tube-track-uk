@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "updatedAt": "2026-09-25T11:44:34.451Z",
+    "cached": true,
+    "stale": false
+  },
+  "data": [
+    {
+      "id": "[\"rb1\",\"9015450000108617\",\"930GBRVS\",\"930GBSP\",\"inbound\",1790338200000]",
+      "vehicleId": "9015450000108617",
+      "tripId": "9015450000108617",
+      "pierId": "930GBRVS",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "destinationId": "930GBSP",
+      "destinationName": "Battersea Power Station Pier",
+      "expectedArrival": "2026-09-25T12:10:00.000Z",
+      "observedAt": "2026-09-25T11:44:01.804Z",
+      "expiresAt": "2026-09-25T11:45:01.773Z",
+      "terminatesHere": false
+    },
+    {
+      "id": "[\"rb1\",\"9015450000108617\",\"930GWAS\",\"930GBSP\",\"inbound\",1790338740000]",
+      "vehicleId": "9015450000108617",
+      "tripId": "9015450000108617",
+      "pierId": "930GWAS",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "destinationId": "930GBSP",
+      "destinationName": "Battersea Power Station Pier",
+      "expectedArrival": "2026-09-25T12:19:00.000Z",
+      "observedAt": "2026-09-25T11:44:01.927Z",
+      "expiresAt": "2026-09-25T11:45:01.773Z",
+      "terminatesHere": false
+    },
+    {
+      "id": "[\"rb1\",\"9015450000108617\",\"930GWRF\",\"930GBSP\",\"inbound\",1790339160000]",
+      "vehicleId": "9015450000108617",
+      "tripId": "9015450000108617",
+      "pierId": "930GWRF",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "destinationId": "930GBSP",
+      "destinationName": "Battersea Power Station Pier",
+      "expectedArrival": "2026-09-25T12:26:00.000Z",
+      "observedAt": "2026-09-25T11:44:01.864Z",
+      "expiresAt": "2026-09-25T11:45:01.773Z",
+      "terminatesHere": false
+    },
+    {
+      "id": "[\"rb1\",\"9015450000108617\",\"930GMIL\",\"930GBSP\",\"inbound\",1790339400000]",
+      "vehicleId": "9015450000108617",
+      "tripId": "9015450000108617",
+      "pierId": "930GMIL",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "destinationId": "930GBSP",
+      "destinationName": "Battersea Power Station Pier",
+      "expectedArrival": "2026-09-25T12:30:00.000Z",
+      "observedAt": "2026-09-25T11:44:01.864Z",
+      "expiresAt": "2026-09-25T11:45:01.773Z",
+      "terminatesHere": false
+    },
+    {
+      "id": "[\"rb1\",\"9015450000108617\",\"930GGNW\",\"930GBSP\",\"inbound\",1790340000000]",
+      "vehicleId": "9015450000108617",
+      "tripId": "9015450000108617",
+      "pierId": "930GGNW",
+      "lineId": "rb1",
+      "direction": "inbound",
+      "destinationId": "930GBSP",
+      "destinationName": "Battersea Power Station Pier",
+      "expectedArrival": "2026-09-25T12:40:00.000Z",
+      "observedAt": "2026-09-25T11:44:01.864Z",
+      "expiresAt": "2026-09-25T11:45:01.773Z",
+      "terminatesHere": false
+    }
+  ]
+}

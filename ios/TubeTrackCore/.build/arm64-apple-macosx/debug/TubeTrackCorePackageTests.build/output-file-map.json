@@ -1,0 +1,12 @@
+{
+  "": {
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/primary.swiftdeps"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.derived/runner.swift": {
+    "dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/runner.d",
+    "object": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/runner.swift.o",
+    "swiftmodule": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/runner~partial.swiftmodule",
+    "swift-dependencies": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/runner.swiftdeps",
+    "diagnostics": "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/arm64-apple-macosx/debug/TubeTrackCorePackageTests.build/runner.dia"
+  }
+}

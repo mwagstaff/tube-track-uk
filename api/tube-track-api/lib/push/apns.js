@@ -123,25 +123,27 @@ export class ApnsClient {
         return HOSTS[this.environment] ?? HOSTS.production;
     }
 
-    #session() {
-        const existing = this.#sessions.get(this.host);
+    #session(environment) {
+        const host = HOSTS[environment];
+        if (!host) throw new Error('Unknown APNs environment');
+        const existing = this.#sessions.get(host);
         if (existing && !existing.closed && !existing.destroyed) {
             return existing;
         }
 
-        const session = this.connect(this.host);
+        const session = this.connect(host);
         session.setTimeout?.(5 * 60 * 1_000, () => session.close());
         session.on('error', (error) => {
-            this.logger?.warn('apns_session_error', { error: error.message, host: this.host });
-            this.#sessions.delete(this.host);
+            this.logger?.warn('apns_session_error', { error: error.message, host });
+            if (this.#sessions.get(host) === session) this.#sessions.delete(host);
         });
         session.on('close', () => {
-            if (this.#sessions.get(this.host) === session) {
-                this.#sessions.delete(this.host);
+            if (this.#sessions.get(host) === session) {
+                this.#sessions.delete(host);
             }
         });
         session.unref?.();
-        this.#sessions.set(this.host, session);
+        this.#sessions.set(host, session);
         return session;
     }
 
@@ -149,7 +151,7 @@ export class ApnsClient {
      * Sends one notification. Resolves `{ status, reason, apnsId, dead }` for
      * anything APNs answered, and rejects only when the request never completed.
      */
-    send({ token, topic, pushType, priority = 5, expiration, payload, collapseId }) {
+    send({ token, topic, pushType, priority = 5, expiration, payload, collapseId, environment = this.environment }) {
         if (!token) throw new Error('A device token is required');
         if (!topic) throw new Error('An APNs topic is required');
 
@@ -169,7 +171,7 @@ export class ApnsClient {
         return new Promise((resolve, reject) => {
             let request;
             try {
-                request = this.#session().request(headers);
+                request = this.#session(environment).request(headers);
             } catch (error) {
                 reject(new ApnsError(error.message, { retryable: true }));
                 return;

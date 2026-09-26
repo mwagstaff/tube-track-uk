@@ -29,12 +29,11 @@ struct LiveActivityPushRegistrarTests {
         )
     }
 
-    private func registrar(secret: String = "a-shared-client-secret") -> LiveActivityPushRegistrar {
+    private func registrar() -> LiveActivityPushRegistrar {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [RegistrationURLProtocol.self]
         return LiveActivityPushRegistrar(
             baseURL: URL(string: "https://api.example.test/tube-track")!,
-            clientSecret: secret,
             installID: "install-0123456789",
             session: URLSession(configuration: configuration)
         )
@@ -51,8 +50,10 @@ struct LiveActivityPushRegistrarTests {
         let request = try #require(RegistrationURLProtocol.lastRequest)
         #expect(request.httpMethod == "POST")
         #expect(request.url?.path == "/tube-track/api/v1/push/live-activities")
-        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer a-shared-client-secret")
         #expect(request.value(forHTTPHeaderField: "X-TubeTrack-Install") == "install-0123456789")
+        // The endpoint is unauthenticated by design; the install id identifies
+        // the caller for rate limiting, it does not authorise them.
+        #expect(request.value(forHTTPHeaderField: "Authorization") == nil)
 
         let body = try #require(RegistrationURLProtocol.lastBody)
         let json = try #require(
@@ -89,22 +90,9 @@ struct LiveActivityPushRegistrarTests {
         #expect(json["frequentPushesEnabled"] as? Bool == false)
     }
 
-    @Test("A build with no secret never registers rather than sending an empty key")
-    func anUnconfiguredBuildStaysQuiet() async throws {
-        RegistrationURLProtocol.prepare(statusCode: 201)
-        let subject = registrar(secret: "")
-        #expect(subject.isConfigured == false)
-
-        try await subject.register(
-            token: String(repeating: "ab", count: 32),
-            attributes: attributes(),
-            frequentPushesEnabled: true
-        )
-        #expect(RegistrationURLProtocol.lastRequest == nil)
-    }
-
     @Test func aRefusedRegistrationSurfacesAsAnErrorRatherThanSilentSuccess() async {
-        RegistrationURLProtocol.prepare(statusCode: 401)
+        // 429 is the realistic refusal now that the server leans on rate limits.
+        RegistrationURLProtocol.prepare(statusCode: 429)
         await #expect(throws: (any Error).self) {
             try await registrar().register(
                 token: String(repeating: "ab", count: 32),

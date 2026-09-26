@@ -19,6 +19,7 @@ enum AppStartupPresentation {
 }
 
 struct RootTabView: View {
+    @Environment(UserLocationProvider.self) private var locationProvider
     @Environment(GameCenterService.self) private var gameCenter
     @Environment(TubeAppState.self) private var appState
     @Environment(AppBackgroundImageStore.self) private var backgroundImageStore
@@ -56,26 +57,22 @@ struct RootTabView: View {
                 }
 
                 TabView(selection: $state.selectedTab) {
-                    Group {
-                        if appState.selectedTab == .map {
-                            NavigationStack {
-                                UnifiedMapScreen(
-                                    closestStationPanelHidden: $closestStationPanelHidden,
-                                    mapNavigationActive: $mapNavigationActive,
-                                    onShowDisruptions: {
-                                        mapNavigation.showDisruptions()
-                                    }
-                                )
-                                .toolbar(.hidden, for: .navigationBar)
-                                .navigationDestination(
-                                    isPresented: $mapNavigation.showsDisruptions
-                                ) {
-                                    MapDisruptionsScreen()
-                                        .toolbar(.visible, for: .navigationBar)
-                                }
+                    // Keep the map's identity across tab switches so its camera
+                    // and gesture surfaces return together at the same viewport.
+                    NavigationStack {
+                        UnifiedMapScreen(
+                            closestStationPanelHidden: $closestStationPanelHidden,
+                            mapNavigationActive: $mapNavigationActive,
+                            onShowDisruptions: {
+                                mapNavigation.showDisruptions()
                             }
-                        } else {
-                            Color.clear
+                        )
+                        .toolbar(.hidden, for: .navigationBar)
+                        .navigationDestination(
+                            isPresented: $mapNavigation.showsDisruptions
+                        ) {
+                            MapDisruptionsScreen()
+                                .toolbar(.visible, for: .navigationBar)
                         }
                     }
                     .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
@@ -137,6 +134,17 @@ struct RootTabView: View {
             scheduleStartupDeadline()
             await appState.start()
         }
+        .task(id: shouldTrackMapLocation) {
+            guard shouldTrackMapLocation else {
+                locationProvider.setMapTracking(false)
+                return
+            }
+            // The stable tab owner starts tracking after the launch photo fades.
+            do { try await Task.sleep(for: .seconds(AppStartupTiming.interstitialFadeDuration)) }
+            catch { return }
+            guard !Task.isCancelled else { return }
+            locationProvider.setMapTracking(true)
+        }
         .onOpenURL { url in
             guard let link = DeepLink(url: url) else { return }
             appState.handle(link)
@@ -147,7 +155,7 @@ struct RootTabView: View {
             // was away should not be waiting on the next refresh to notice.
             Task { await boardActivity.endIfExpired() }
             if phase == .active {
-                if backgroundImageStore.appDidBecomeActive() {
+                if backgroundImageStore.appDidBecomeActive(), !appState.isGameActive {
                     appState.selectedTab = .map
                     appState.mapPresentationMode = .beck
                 }
@@ -155,6 +163,21 @@ struct RootTabView: View {
             } else if phase == .background {
                 backgroundImageStore.appDidBecomeInactive()
             }
+        }
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active {
+                AppUsageReporter.becameActive(feature: appState.selectedTab.usageFeature)
+            } else if phase == .background {
+                AppUsageReporter.enteredBackground()
+            }
+        }
+        .onChange(of: appState.selectedTab) { _, tab in
+            guard scenePhase == .active else { return }
+            AppUsageReporter.openedFeature(tab.usageFeature)
+        }
+        .onChange(of: appState.isGameActive) { _, active in
+            guard active, scenePhase == .active else { return }
+            AppUsageReporter.openedFeature("game")
         }
         .onChange(of: appState.isOffline, initial: true) { _, offline in
             gameCenter.setOffline(offline)
@@ -201,6 +224,7 @@ struct RootTabView: View {
             }
         }
         .onDisappear {
+            locationProvider.setMapTracking(false)
             backgroundRevealTask?.cancel()
             startupDeadlineTask?.cancel()
         }
@@ -209,6 +233,12 @@ struct RootTabView: View {
         )) { _ in
             appState.handleMemoryWarning()
         }
+    }
+
+    private var shouldTrackMapLocation: Bool {
+        appStartupCompleted && scenePhase == .active
+            && appState.selectedTab == .map && !mapNavigation.showsDisruptions
+            && !appState.isGameActive
     }
 
     private var offlineBannerShowsWorks: Bool {
@@ -303,6 +333,17 @@ struct RootTabView: View {
         startupDeadlineTask?.cancel()
         startupDeadlineTask = nil
         dismissBackgroundReveal()
+    }
+}
+
+private extension AppTab {
+    var usageFeature: String {
+        switch self {
+        case .map: "map"
+        case .nearMe: "near_me"
+        case .journeys: "journeys"
+        case .profile: "profile"
+        }
     }
 }
 

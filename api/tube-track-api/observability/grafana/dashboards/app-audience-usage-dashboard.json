@@ -1,0 +1,106 @@
+{
+  "uid": "tube-track-api-app-audience-usage",
+  "title": "App audience and usage",
+  "tags": ["tube-track-api", "audience", "usage"],
+  "timezone": "Europe/London",
+  "schemaVersion": 38,
+  "version": 1,
+  "refresh": "1m",
+  "time": { "from": "now-30d", "to": "now" },
+  "panels": [
+    {
+      "id": 1, "type": "stat", "title": "Active app installations today",
+      "description": "Distinct installations that reported an app open during the current Europe/London calendar day. An installation is not necessarily a person.",
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 4 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=\"ios_app\",window=\"1d\"}", "instant": true }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 2, "type": "stat", "title": "Active app installations, 7 days",
+      "description": "Distinct installations with an app open today or in the previous six London calendar days.",
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 4 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=\"ios_app\",window=\"7d\"}", "instant": true }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 3, "type": "stat", "title": "Active app installations, 30 days",
+      "description": "Distinct installations with an app open today or in the previous 29 London calendar days.",
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 4 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=\"ios_app\",window=\"30d\"}", "instant": true }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 4, "type": "timeseries", "title": "Daily active app installations",
+      "description": "Distinct installations opening the iOS app each London calendar day. Current day is still accumulating.",
+      "gridPos": { "x": 0, "y": 4, "w": 16, "h": 8 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=\"ios_app\",window=\"1d\"}", "legendFormat": "Daily active" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "hidden" }, "tooltip": { "mode": "single" } }
+    },
+    {
+      "id": 5, "type": "timeseries", "title": "7 and 30 day active installations",
+      "gridPos": { "x": 16, "y": 4, "w": 8, "h": 8 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=\"ios_app\",window=~\"7d|30d\"}", "legendFormat": "{{window}}" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "id": 6, "type": "timeseries", "title": "App opens per hour",
+      "description": "Foreground sessions reported by the iOS app; multiple opens by one installation are counted separately.",
+      "gridPos": { "x": 0, "y": 12, "w": 16, "h": 8 },
+      "targets": [{ "expr": "sum(increase(tube_track_usage_events_total{job=\"tube-track-api\",event=\"app_open\"}[1h]))", "legendFormat": "Opens/hour", "interval": "1h" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "hidden" }, "tooltip": { "mode": "single" } }
+    },
+    {
+      "id": 7, "type": "barchart", "title": "Features opened",
+      "description": "Tab visits and game entries, including the initially selected tab on app open. Counts are visits, not distinct installations.",
+      "gridPos": { "x": 16, "y": 12, "w": 8, "h": 8 },
+      "targets": [{ "expr": "sum(increase(tube_track_usage_events_total{job=\"tube-track-api\"}[$__range])) by (feature)", "instant": true, "format": "table" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 8, "type": "timeseries", "title": "Widget and watch active installations",
+      "description": "Distinct widget/watch installations making a successful API request each London day. These are separate from iOS app opens.",
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 },
+      "targets": [{ "expr": "tube_track_active_installs{job=\"tube-track-api\",surface=~\"widget|watch\",window=\"1d\"}", "legendFormat": "{{surface}}" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom" }, "tooltip": { "mode": "multi" } }
+    },
+    {
+      "id": 9, "type": "stat", "title": "Requests with installation ID",
+      "description": "Share of app API requests carrying a valid installation ID; older versions are expected to lower this during rollout.",
+      "gridPos": { "x": 12, "y": 20, "w": 6, "h": 8 },
+      "targets": [{ "expr": "sum(increase(tube_track_client_requests_total{job=\"tube-track-api\",identified=\"yes\"}[$__range])) / clamp_min(sum(increase(tube_track_client_requests_total{job=\"tube-track-api\"}[$__range])), 1)", "instant": true }],
+      "fieldConfig": { "defaults": { "unit": "percentunit", "min": 0, "max": 1 }, "overrides": [] }
+    },
+    {
+      "id": 10, "type": "barchart", "title": "Requests by client surface",
+      "gridPos": { "x": 18, "y": 20, "w": 6, "h": 8 },
+      "targets": [{ "expr": "sum(increase(tube_track_client_requests_total{job=\"tube-track-api\"}[$__range])) by (surface)", "instant": true, "format": "table" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 11, "type": "barchart", "title": "Most requested API routes",
+      "description": "Bounded route names omit station and journey parameters.",
+      "gridPos": { "x": 0, "y": 28, "w": 12, "h": 9 },
+      "targets": [{ "expr": "topk(12, sum(increase(tube_track_client_requests_total{job=\"tube-track-api\"}[$__range])) by (route))", "instant": true, "format": "table" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 12, "type": "barchart", "title": "iOS app versions by request volume",
+      "description": "Request volume by major.minor app version; unknown includes released clients without the new header.",
+      "gridPos": { "x": 12, "y": 28, "w": 12, "h": 9 },
+      "targets": [{ "expr": "sum(increase(tube_track_client_versions_total{job=\"tube-track-api\",surface=\"ios_app\"}[$__range])) by (version)", "instant": true, "format": "table" }],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0 }, "overrides": [] }
+    },
+    {
+      "id": 13, "type": "timeseries", "title": "API errors by route",
+      "description": "Server errors by bounded route; the existing upstream dashboard gives more TfL detail.",
+      "gridPos": { "x": 0, "y": 37, "w": 24, "h": 8 },
+      "targets": [{ "expr": "sum(rate(tube_track_http_requests_total{job=\"tube-track-api\",status=~\"5..\",route=~\"/api/.*\"}[$__rate_interval])) by (route)", "legendFormat": "{{route}}" }],
+      "fieldConfig": { "defaults": { "unit": "reqps", "min": 0 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "calcs": ["lastNotNull"] }, "tooltip": { "mode": "multi" } }
+    }
+  ]
+}

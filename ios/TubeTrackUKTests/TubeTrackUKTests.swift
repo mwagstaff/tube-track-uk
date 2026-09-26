@@ -38,6 +38,18 @@ struct TubeTrackUKTests {
         #expect(restoredLightState.preferredColorScheme == .light)
     }
 
+    @Test @MainActor func closestStationPreferenceDefaultsOnAndPersists() throws {
+        let suiteName = "TubeTrackUKTests.ClosestStation.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suiteName))
+        defer { defaults.removePersistentDomain(forName: suiteName) }
+        let state = TubeAppState(defaults: defaults)
+        #expect(state.showsClosestStation)
+        state.showsClosestStation = false
+        #expect(!TubeAppState(defaults: defaults).showsClosestStation)
+        state.showsClosestStation = true
+        #expect(TubeAppState(defaults: defaults).showsClosestStation)
+    }
+
     @Test func allTubeLinesHaveDisplayNames() {
         #expect(TubeLineID.allCases.count == 20)
         #expect(TubeLineID.undergroundCases.count == 11)

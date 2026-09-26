@@ -1,0 +1,122 @@
+[
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 0,
+    "description": "Special Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 1,
+    "description": "Closed"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 2,
+    "description": "No Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 3,
+    "description": "No Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 4,
+    "description": "Planned Closure"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 5,
+    "description": "Part Closure"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 6,
+    "description": "Severe Delays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 7,
+    "description": "Reduced Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 8,
+    "description": "Bus Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 9,
+    "description": "Minor Delays"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 10,
+    "description": "Good Service"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 11,
+    "description": "Part Closed"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 12,
+    "description": "Exit Only"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 13,
+    "description": "No Step Free Access"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 14,
+    "description": "Change of frequency"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 15,
+    "description": "Diverted"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 16,
+    "description": "Not Running"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 17,
+    "description": "Issues Reported"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 18,
+    "description": "No Issues"
+  },
+  {
+    "$type": "Tfl.Api.Presentation.Entities.StatusSeverity, Tfl.Api.Presentation.Entities",
+    "modeName": "cable-car",
+    "severityLevel": 19,
+    "description": "Information"
+  }
+]

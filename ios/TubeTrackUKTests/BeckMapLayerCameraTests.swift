@@ -6,6 +6,22 @@ import UIKit
 @testable import TubeTrackUK
 
 struct BeckMapLayerCameraTests {
+    @Test @MainActor func locationMarkerFollowsCameraWithoutScalingAndDetaches() {
+        let camera = BeckMapLayerCamera()
+        let dot = CALayer()
+        dot.bounds = CGRect(x: -7, y: -7, width: 14, height: 14)
+        camera.attach(layer: dot, at: CGPoint(x: 100, y: 200))
+        camera.update(scale: 2, offset: CGSize(width: -30, height: 40))
+        #expect(dot.position == CGPoint(x: 170, y: 440))
+        #expect(dot.bounds.width == 14)
+        #expect(dot.affineTransform() == .identity)
+        camera.attach(layer: dot, at: CGPoint(x: 110, y: 205))
+        #expect(dot.position == CGPoint(x: 190, y: 450))
+        camera.detach(layer: dot)
+        camera.update(scale: 3, offset: .zero)
+        #expect(dot.position == CGPoint(x: 190, y: 450))
+    }
+
     @Test func cachedArtworkStaysAlignedWithTheLiveCameraDuringPanAndPinch() {
         let renderScale: CGFloat = 0.35
         let renderOffset = CGSize(width: -470, height: 125)

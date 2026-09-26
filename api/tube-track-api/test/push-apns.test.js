@@ -195,6 +195,31 @@ test('a dead token is reported as dead rather than retryable', async () => {
     assert.equal(result.reason, 'Unregistered');
 });
 
+test('mixed development and production tokens use separate reusable sessions', async () => {
+    const sessions = new Map();
+    const client = new ApnsClient({
+        signer: signer(() => 1_800_000_000_000),
+        environment: 'production',
+        connect: (host) => {
+            assert.equal(sessions.has(host), false, 'each host should connect only once');
+            const session = fakeSession();
+            sessions.set(host, session);
+            return session;
+        }
+    });
+    for (const environment of ['production', 'sandbox', 'production', 'sandbox']) {
+        const pending = client.send({ token: 'a', topic: 't', pushType: 'liveactivity', payload: {}, environment });
+        const host = environment === 'sandbox'
+            ? 'https://api.sandbox.push.apple.com:443' : 'https://api.push.apple.com:443';
+        respond(sessions.get(host).requests.at(-1), { status: 200 });
+        assert.equal((await pending).ok, true);
+    }
+    assert.equal(sessions.size, 2);
+    assert.equal(client.environment, 'production');
+    client.close();
+    assert.ok([...sessions.values()].every((session) => session.closed));
+});
+
 test('throttling and outages are retryable, a rejected payload is not', async () => {
     const session = fakeSession();
     const { client } = clientWith(session);

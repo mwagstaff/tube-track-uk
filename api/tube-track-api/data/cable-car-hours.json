@@ -1,0 +1,17 @@
+{
+  "sourceURL": "https://tfl.gov.uk/modes/london-cable-car/opening-hours-frequency",
+  "reviewedOn": "2026-09-25",
+  "validFrom": "2026-09-25",
+  "validThrough": "2026-10-24",
+  "weekly": {
+    "1": { "opens": 540, "closes": 1260 },
+    "2": { "opens": 480, "closes": 1260 },
+    "3": { "opens": 480, "closes": 1260 },
+    "4": { "opens": 480, "closes": 1260 },
+    "5": { "opens": 480, "closes": 1260 },
+    "6": { "opens": 540, "closes": 1320 },
+    "7": { "opens": 540, "closes": 1380 }
+  },
+  "bankHolidays": [],
+  "exceptions": {}
+}

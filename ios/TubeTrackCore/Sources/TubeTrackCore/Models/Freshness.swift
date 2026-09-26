@@ -74,22 +74,30 @@ public struct Freshness: Equatable, Sendable {
         }
     }
 
-    /// Footer wording. Deliberately plain: the passenger is deciding whether to
-    /// run for a train, so vagueness costs them.
+    /// Include the source clock time as well as its age, so a remembered
+    /// snapshot cannot look like a fresh update after the widget has aged.
     public func summary(at now: Date = .now) -> String {
         guard let updatedAt else { return "No live data" }
-        let minutes = Int(max(0, now.timeIntervalSince(updatedAt)) / 60)
-        switch tier {
-        case .fresh:
-            return isCached ? "Cached just now" : "Updated now"
-        case .ageing:
-            let age = minutes <= 1 ? "1 min ago" : "\(minutes) min ago"
-            return isCached ? "Cached \(age)" : "Updated \(age)"
-        case .stale:
-            return "Data may be out of date"
-        case .unavailable:
-            return "No live data"
+        let age = Int(max(0, now.timeIntervalSince(updatedAt)))
+        let relative: String
+        switch age {
+        case ..<60:
+            relative = "just now"
+        case ..<3600:
+            let minutes = age / 60
+            relative = "\(minutes) minute\(minutes == 1 ? "" : "s") ago"
+        case ..<86400:
+            let hours = age / 3600
+            relative = "\(hours) hour\(hours == 1 ? "" : "s") ago"
+        default:
+            let days = age / 86400
+            relative = "\(days) day\(days == 1 ? "" : "s") ago"
         }
+        let clock = DateFormatter()
+        clock.locale = Locale(identifier: "en_GB")
+        clock.timeZone = TimeZone(identifier: "Europe/London")!
+        clock.dateFormat = "HH:mm"
+        return "Updated at \(clock.string(from: updatedAt)), \(relative)"
     }
 
     /// What to say instead of a departure board once the snapshot is stale.

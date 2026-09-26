@@ -29,11 +29,16 @@ server; the app does not store or send a TfL API key.
 - chronological planned works with date/line filters, detail and map links;
 - system light/dark mode, Dynamic Type, VoiceOver representations and Reduce
   Motion support;
-- no account, analytics or location permission.
+- no account; location permission is optional for Near Me and map centering.
 
 Train markers are prediction-based estimates rather than GPS positions. The app
 labels cached/stale status explicitly and keeps the static network available if
 TfL is temporarily unreachable.
+
+The app sends first-party app-open and feature-open usage events with a random
+installation ID. The API retains salted daily installation hashes for 45 days.
+Review the privacy notice and App Store privacy answers before shipping this
+version; see `../api/tube-track-api/README.md` for the event and retention details.
 
 ## Verification
 
@@ -80,23 +85,22 @@ with `-DebugJourneyFrom <station ID>` and `-DebugJourneyTo <station ID>`.
 `-DebugJourneyDestination details` or `map` opens that screen after the search.
 These options are Debug-only. No TfL credential belongs in the app.
 
-## Home and Lock Screen widgets
+## Widgets and Live Activity
 
-The `TubeTrackWidgets` extension ships two configurable widgets:
+The `TubeTrackWidgets` extension ships one configurable widget and the
+departures board Live Activity:
 
 - **Line Status** — the lines you choose (Edit Widget → Lines), disrupted
   lines first. Small, medium and large Home Screen sizes plus the three Lock
   Screen families. Refreshes every 15 minutes and falls back to the app's
   last `status.json` snapshot from the App Group when offline.
-- **Station Departures** — next trains in each direction from a chosen station,
-  optionally filtered to one of its lines. One fetch produces ten one-minute
-  timeline entries so the countdowns tick without extra reloads; the widget
-  reloads roughly every 10 minutes and keeps a 15-minute cache per station.
+- **Departures board Live Activity** — shows departures for a station on the
+  Lock Screen and in the Dynamic Island while tracking is active.
 
-Both widgets have a refresh button (medium and large), open the app in context
-via `tubetrack://` links (`status`, `line/<id>`, `station/<naptan>?line=<id>`),
-and drop line colours for short codes in tinted and Lock Screen rendering so
-status is never colour-only.
+The Line Status widget has a refresh button (medium and large), opens the app
+in context via `tubetrack://` links (`status`, `line/<id>`), and drops line
+colours for short codes in tinted and Lock Screen rendering so status is never
+colour-only.
 
 Shared code lives in the local `TubeTrackCore` package (API client, TfL
 models, departure grouping, the slim `StationIndex.json`). Regenerate the
@@ -113,10 +117,64 @@ them in the app process.
 
 Simulator note: on the iOS 26.5 simulator runtime, `linkd` cannot identify
 ad-hoc-signed processes ("Unable to get teamId"), so widget configuration
-entities never resolve and every widget renders its defaults. Use the iOS 26.3
-or 26.4 runtime, or a device, to test configuration.
+entities never resolve and the Line Status widget renders its defaults. Use
+the iOS 26.3 or 26.4 runtime, or a device, to test configuration.
 
-## Offline use
+## River Bus
+
+River Bus piers are shown by default on both maps. Profile → Preferences
+contains the remembered visibility switch, RB service filter and estimated-boat
+switch. Piers are independent selectable stops with departures and service
+status. Search includes stations, piers and shared favourites. A selected pier reveals the layer even if it was hidden.
+
+“Show live trains and boats” enables both live layers (including the River Bus
+layer if it was hidden); switching it off clears both. The independent estimated-boat
+preference remains available. Boat markers are estimates from pier predictions,
+not GPS. The shared `/api/v1/river/boats` endpoint learns travel times between
+calling piers and can position boats on first load when the preceding leg is
+unambiguous and the inferred departure is in the past. Observed pier transitions
+refine those estimates. Brief empty responses or failures retain valid boats until
+their next ETA or 90 seconds after their original observation; their update footer
+shows delayed/offline warnings. Future origin departures and ambiguous routes stay
+hidden. An older API without `/boats` uses the legacy client estimator, which still
+needs a witnessed transition; the app retries the new endpoint after five minutes.
+The initial bundled catalogue includes 24 piers; future unanchored piers open on
+the geographic map until their schematic positions have been reviewed.
+
+Deploy the API's `/api/v1/river/*` endpoints before releasing this client.
+See `../api/tube-track-api/docs/river-bus.md` for captured API quirks, geometry
+provenance, endpoint contracts and the remaining active-service verification.
+Bundled metadata and favourites work offline. Departure predictions expire;
+an empty board does not mean that there is no service.
+
+## London Cable Car
+
+Cable Car and River Bus piers are shown by default on both maps. Their remembered
+visibility switches live in Profile → Preferences, along with River Bus service
+and estimated-boat controls. Existing explicit hide choices are preserved.
+Both layers use small Tube-sized circles at overview zoom and larger mode icons
+when zoomed in or selected. Layer cards are only shown after selection, and the
+cable-car route has no badge during good service. The
+route and two independent terminals are selectable, with shared search and
+terminal favourites. Walking connections appear only for the selected terminal.
+Closed routes remain visible and muted, with an explicit badge and explanation.
+
+Published opening hours, fresh TfL status and dated planned closures are resolved
+separately. Routine closing time is not counted as a disruption. Missing or stale
+status cannot become Good Service; expired hours cannot assert scheduled opening.
+The future-date AM/PM/Overnight controls apply to cable-car works independently
+of the rail PDF's coverage. Details include TfL reasons, hours, source freshness,
+planned changes and walking directions. There are no cabin countdowns or moving
+cabin estimates.
+
+Deploy `/api/v1/cable-car/*` before shipping this client. The reviewed hours policy
+needs renewal before **25 October 2026**. See
+`../api/tube-track-api/docs/cable-car.md` for fixtures, API findings, policy
+maintenance and release checks. Debug builds support `-DebugCableCar` and
+`-DebugCableTerminal <terminal ID>` for visual QA with the existing loopback API
+override. Both maps use the same gondola glyph, with a matching template asset for controls.
+
+## Offline behaviour
 
 The network map, station search, mobile coverage overlay and Track-Man use
 bundled data and work on a first launch without internet access. Losing the
@@ -249,3 +307,16 @@ to generate the artist credit and link to the photograph automatically.
 Data provided by Transport for London. The real-world view uses Apple MapKit
 and leaves Apple's attribution visible. TubeTrack UK is an independent app by
 SkyNoLimit and is not affiliated with or endorsed by Transport for London.
+
+## Card update freshness
+
+Station cards (including Near Me and Closest station), pier cards and Cable Car
+cards share a bottom-aligned update footer: “Last updated just now, at 11:01”.
+It uses the original source timestamp, London clock time, and an offline or
+delayed-update warning. Cached arrivals never reset that timestamp.
+
+A single empty pier response retains recent predictions with a warning; another
+distinct source update confirms an empty board. Cached repeats do not count as
+confirmation. Expired predictions stay hidden and show “Waiting for fresh
+departures…” while the next update is pending. Retention never extends prediction
+expiry or the 90-second freshness window.

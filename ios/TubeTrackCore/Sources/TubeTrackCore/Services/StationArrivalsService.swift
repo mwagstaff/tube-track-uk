@@ -128,7 +128,7 @@ public actor StationArrivalsService {
                     fetchedAt: cached.fetchedAt,
                     cached: true,
                     serverUpdatedAt: cached.serverUpdatedAt,
-                    isStale: cached.isStale
+                    isStale: true
                 )
             }
             throw error
