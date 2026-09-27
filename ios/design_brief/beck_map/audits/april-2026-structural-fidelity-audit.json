@@ -13,1582 +13,6 @@
   },
   "findings": [
     {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 28.178 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 28.178,
-        "deviationDegrees": 16.822,
-        "end": [
-          3587.523,
-          1525.187
-        ],
-        "kind": "connector",
-        "length": 51.653,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          3541.992,
-          1549.578
-        ],
-        "stationID": "910GBARKING",
-        "stationName": "Barking"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GBARKING primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 42.099 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 42.099,
-        "deviationDegrees": 2.901,
-        "end": [
-          1477.407,
-          2266.062
-        ],
-        "kind": "connector",
-        "length": 43.653,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1509.797,
-          2295.328
-        ],
-        "stationID": "910GCLPHMJC",
-        "stationName": "Clapham Junction"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GCLPHMJC primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 38.005 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 38.005,
-        "deviationDegrees": 6.995,
-        "end": [
-          1962.828,
-          1345.609
-        ],
-        "kind": "connector",
-        "length": 41.591,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1995.6,
-          1320.0
-        ],
-        "stationID": "910GEUSTON",
-        "stationName": "London Euston"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GEUSTON primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 47.380 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 47.38,
-        "deviationDegrees": 2.38,
-        "end": [
-          2444.88,
-          1426.488
-        ],
-        "kind": "connector",
-        "length": 81.002,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2390.031,
-          1486.094
-        ],
-        "stationID": "910GLIVST",
-        "stationName": "London Liverpool Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GLIVST primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 43.386 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 43.386,
-        "deviationDegrees": 1.614,
-        "end": [
-          2708.25,
-          935.207
-        ],
-        "kind": "connector",
-        "length": 35.776,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2734.25,
-          959.782
-        ],
-        "stationID": "910GSEVNSIS",
-        "stationName": "Seven Sisters"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GSEVNSIS primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 42.976 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 42.976,
-        "deviationDegrees": 2.024,
-        "end": [
-          2704.938,
-          1718.422
-        ],
-        "kind": "connector",
-        "length": 58.356,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2747.634,
-          1758.203
-        ],
-        "stationID": "910GSHADWEL",
-        "stationName": "Shadwell"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GSHADWEL primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 85.626 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 85.626,
-        "deviationDegrees": 4.374,
-        "end": [
-          3940.062,
-          1171.437
-        ],
-        "kind": "connector",
-        "length": 30.357,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          3937.747,
-          1201.706
-        ],
-        "stationID": "910GUPMNSTR",
-        "stationName": "Upminster"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GUPMNSTR primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 12.915 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 12.915,
-        "deviationDegrees": 12.915,
-        "end": [
-          2986.293,
-          954.805
-        ],
-        "kind": "connector",
-        "length": 22.268,
-        "nearestCanonicalAngle": 0.0,
-        "start": [
-          3007.998,
-          959.782
-        ],
-        "stationID": "910GWLTWCEN",
-        "stationName": "Walthamstow Central"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GWLTWCEN primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 52.756 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 52.756,
-        "deviationDegrees": 7.756,
-        "end": [
-          2670.517,
-          2669.516
-        ],
-        "kind": "connector",
-        "length": 56.875,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2704.938,
-          2624.24
-        ],
-        "stationID": "940GZZCRWCR",
-        "stationName": "West Croydon"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZCRWCR primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 49.587 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 49.587,
-        "deviationDegrees": 4.587,
-        "end": [
-          1387.281,
-          2406.609
-        ],
-        "kind": "connector",
-        "length": 79.439,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1335.781,
-          2346.125
-        ],
-        "stationID": "940GZZCRWMB",
-        "stationName": "Wimbledon"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZCRWMB primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 28.024 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 28.024,
-        "deviationDegrees": 16.976,
-        "end": [
-          3289.016,
-          1726.297
-        ],
-        "kind": "connector",
-        "length": 67.908,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          3229.07,
-          1758.203
-        ],
-        "stationID": "940GZZDLCGT",
-        "stationName": "Canning Town DLR Station"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZDLCGT primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 2.887 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 2.887,
-        "deviationDegrees": 2.887,
-        "end": [
-          3252.75,
-          1271.032
-        ],
-        "kind": "connector",
-        "length": 23.749,
-        "nearestCanonicalAngle": 0.0,
-        "start": [
-          3229.031,
-          1269.836
-        ],
-        "stationID": "940GZZDLSTD",
-        "stationName": "Stratford DLR Station"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZDLSTD primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 72.938 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 72.938,
-        "deviationDegrees": 17.062,
-        "end": [
-          2178.679,
-          1810.696
-        ],
-        "kind": "connector",
-        "length": 4.502,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2180.0,
-          1815.0
-        ],
-        "stationID": "940GZZLUBKF",
-        "stationName": "Blackfriars"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBKF primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 63.175 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 63.175,
-        "deviationDegrees": 18.175,
-        "end": [
-          2182.043,
-          1819.04
-        ],
-        "kind": "connector",
-        "length": 4.527,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2180.0,
-          1815.0
-        ],
-        "stationID": "940GZZLUBKF",
-        "stationName": "Blackfriars"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBKF primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 31.015 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 31.015,
-        "deviationDegrees": 13.985,
-        "end": [
-          1682.0,
-          1620.0
-        ],
-        "kind": "connector",
-        "length": 53.674,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1728.0,
-          1592.344
-        ],
-        "stationID": "940GZZLUBND",
-        "stationName": "Bond Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBND primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 37.369 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 37.369,
-        "deviationDegrees": 7.631,
-        "end": [
-          1767.999,
-          1561.797
-        ],
-        "kind": "connector",
-        "length": 50.329,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1728.0,
-          1592.344
-        ],
-        "stationID": "940GZZLUBND",
-        "stationName": "Bond Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBND primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 57.189 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 57.189,
-        "deviationDegrees": 12.189,
-        "end": [
-          1710.489,
-          1385.796
-        ],
-        "kind": "connector",
-        "length": 52.614,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1681.979,
-          1430.016
-        ],
-        "stationID": "940GZZLUBST",
-        "stationName": "Baker Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBST primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 70.257 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 70.257,
-        "deviationDegrees": 19.743,
-        "end": [
-          2263.25,
-          1726.124
-        ],
-        "kind": "connector",
-        "length": 5.181,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2265.0,
-          1731.0
-        ],
-        "stationID": "940GZZLUCST",
-        "stationName": "Cannon Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUCST primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 74.163 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 74.163,
-        "deviationDegrees": 15.837,
-        "end": [
-          2266.125,
-          1734.966
-        ],
-        "kind": "connector",
-        "length": 4.122,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2265.0,
-          1731.0
-        ],
-        "stationID": "940GZZLUCST",
-        "stationName": "Cannon Street"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUCST primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 29.370 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 29.37,
-        "deviationDegrees": 15.63,
-        "end": [
-          3027.29,
-          1903.547
-        ],
-        "kind": "connector",
-        "length": 70.421,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2965.92,
-          1938.085
-        ],
-        "stationID": "940GZZLUCYF",
-        "stationName": "Canary Wharf"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUCYF primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 46.128 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 46.128,
-        "deviationDegrees": 1.128,
-        "end": [
-          1990.353,
-          1868.606
-        ],
-        "kind": "connector",
-        "length": 34.305,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1966.578,
-          1843.876
-        ],
-        "stationID": "940GZZLUEMB",
-        "stationName": "Embankment"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUEMB primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 31.368 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 31.368,
-        "deviationDegrees": 13.632,
-        "end": [
-          2028.407,
-          1300.0
-        ],
-        "kind": "connector",
-        "length": 38.423,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1995.6,
-          1320.0
-        ],
-        "stationID": "940GZZLUEUS",
-        "stationName": "Euston"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUEUS primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 53.625 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 53.625,
-        "deviationDegrees": 8.625,
-        "end": [
-          2027.754,
-          1363.652
-        ],
-        "kind": "connector",
-        "length": 54.216,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1995.6,
-          1320.0
-        ],
-        "stationID": "940GZZLUEUS",
-        "stationName": "Euston"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUEUS primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 49.685 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 49.685,
-        "deviationDegrees": 4.685,
-        "end": [
-          2354.687,
-          1521.438
-        ],
-        "kind": "connector",
-        "length": 36.721,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2330.929,
-          1549.438
-        ],
-        "stationID": "940GZZLUMGT",
-        "stationName": "Moorgate"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUMGT primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 14.800 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 14.8,
-        "deviationDegrees": 14.8,
-        "end": [
-          1410.266,
-          1683.976
-        ],
-        "kind": "connector",
-        "length": 6.205,
-        "nearestCanonicalAngle": 0.0,
-        "start": [
-          1416.265,
-          1682.391
-        ],
-        "stationID": "940GZZLUNHG",
-        "stationName": "Notting Hill Gate"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUNHG primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 55.232 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 55.232,
-        "deviationDegrees": 10.232,
-        "end": [
-          3229.031,
-          1269.836
-        ],
-        "kind": "connector",
-        "length": 30.83,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          3211.45,
-          1244.51
-        ],
-        "stationID": "940GZZLUSTD",
-        "stationName": "Stratford"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUSTD primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 51.943 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 51.943,
-        "deviationDegrees": 6.943,
-        "end": [
-          1966.983,
-          1561.804
-        ],
-        "kind": "connector",
-        "length": 38.786,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1943.074,
-          1592.344
-        ],
-        "stationID": "940GZZLUTCR",
-        "stationName": "Tottenham Court Road"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUTCR primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 77.253 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 77.253,
-        "deviationDegrees": 12.747,
-        "end": [
-          2528.968,
-          1687.438
-        ],
-        "kind": "connector",
-        "length": 4.677,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2530.0,
-          1692.0
-        ],
-        "stationID": "940GZZLUTWH",
-        "stationName": "Tower Hill"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUTWH primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 61.766 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 61.766,
-        "deviationDegrees": 16.766,
-        "end": [
-          2532.005,
-          1695.734
-        ],
-        "kind": "connector",
-        "length": 4.238,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2530.0,
-          1692.0
-        ],
-        "stationID": "940GZZLUTWH",
-        "stationName": "Tower Hill"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUTWH primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 52.056 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 52.056,
-        "deviationDegrees": 7.056,
-        "end": [
-          1729.02,
-          1844.839
-        ],
-        "kind": "connector",
-        "length": 30.492,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1710.271,
-          1868.885
-        ],
-        "stationID": "940GZZLUVIC",
-        "stationName": "Victoria"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUVIC primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 48.813 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 48.813,
-        "deviationDegrees": 3.813,
-        "end": [
-          1172.758,
-          1644.957
-        ],
-        "kind": "walkingConnector",
-        "length": 49.742,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1140.002,
-          1682.391
-        ],
-        "stationID": "940GZZLUWCY",
-        "stationName": "White City"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUWCY primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 28.137 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 28.137,
-        "deviationDegrees": 16.863,
-        "end": [
-          3280.781,
-          1545.945
-        ],
-        "kind": "connector",
-        "length": 58.66,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          3229.053,
-          1518.282
-        ],
-        "stationID": "940GZZLUWHM",
-        "stationName": "West Ham"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUWHM primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 43.644 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 43.644,
-        "deviationDegrees": 1.356,
-        "end": [
-          2735.05,
-          1516.281
-        ],
-        "kind": "connector",
-        "length": 41.611,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2704.938,
-          1545.0
-        ],
-        "stationID": "940GZZLUWPL",
-        "stationName": "Whitechapel"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUWPL primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 86.949 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 86.949,
-        "deviationDegrees": 3.051,
-        "end": [
-          1873.785,
-          1873.034
-        ],
-        "kind": "connector",
-        "length": 4.04,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          1874.0,
-          1869.0
-        ],
-        "stationID": "940GZZLUWSM",
-        "stationName": "Westminster"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUWSM primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 47.343 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 47.343,
-        "deviationDegrees": 2.343,
-        "end": [
-          1885.992,
-          1855.985
-        ],
-        "kind": "connector",
-        "length": 17.697,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1874.0,
-          1869.0
-        ],
-        "stationID": "940GZZLUWSM",
-        "stationName": "Westminster"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUWSM primitive 2",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "roundels",
-      "code": "roundel-not-on-route-port",
-      "description": "A roundel centre is not attached to its authored route or an interchange connector.",
-      "evidence": {
-        "centre": [
-          1172.907,
-          1276.111
-        ],
-        "nearestConnector": {
-          "endpoint": "start",
-          "kind": "connector",
-          "primitiveIndex": 0,
-          "stationID": "940GZZLUPAC"
-        },
-        "nearestDistance": 13.078,
-        "nearestPath": {
-          "lineID": "lioness",
-          "pathID": "beck.v1.path.lioness.euston-watford.official.v1.3",
-          "segmentID": "lioness:910GKENSLG:910GQPRK",
-          "side": "from"
-        },
-        "stationID": "910GQPRK"
-      },
-      "impact": "The symbol can appear visually detached or imply the wrong interchange relationship.",
-      "location": "910GQPRK primitive 0",
-      "recommendation": "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "duplicate-connector",
-      "description": "The same connector geometry is authored 2 times.",
-      "evidence": {
-        "count": 2,
-        "end": [
-          2390.031,
-          1549.447
-        ],
-        "kind": "connector",
-        "start": [
-          2390.031,
-          1486.094
-        ]
-      },
-      "impact": "Duplicate strokes can darken antialiasing and create unclear ownership across semantic markers.",
-      "location": "(2390.031, 1486.094) to (2390.031, 1549.447)",
-      "recommendation": "Retain one visual primitive and associate the relevant semantic station records with it.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector start does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          3541.992,
-          1549.578
-        ],
-        "endpoint": "start",
-        "kind": "connector",
-        "nearestDistance": 4.194,
-        "nearestRoundel": {
-          "primitiveIndex": 0,
-          "stationID": "940GZZLUBKG"
-        },
-        "stationID": "910GBARKING"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "910GBARKING primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.602 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.602,
-        "deviationDegrees": 0.398,
-        "end": [
-          2534.278,
-          1205.469
-        ],
-        "kind": "connector",
-        "length": 30.497,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2534.49,
-          1174.973
-        ],
-        "stationID": "910GCNNB",
-        "stationName": "Canonbury"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GCNNB primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 0.759 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 0.759,
-        "deviationDegrees": 0.759,
-        "end": [
-          3229.031,
-          1269.836
-        ],
-        "kind": "connector",
-        "length": 39.456,
-        "nearestCanonicalAngle": 0.0,
-        "start": [
-          3189.578,
-          1269.313
-        ],
-        "stationID": "910GSTFD",
-        "stationName": "Stratford (London)"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "910GSTFD primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2178.679,
-          1810.696
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.502,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUBKF"
-        },
-        "stationID": "940GZZLUBKF"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUBKF primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2182.043,
-          1819.04
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.527,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUBKF"
-        },
-        "stationID": "940GZZLUBKF"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUBKF primitive 1",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.008 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.008,
-        "deviationDegrees": 0.992,
-        "end": [
-          1240.516,
-          1873.042
-        ],
-        "kind": "connector",
-        "length": 29.858,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          1239.999,
-          1843.188
-        ],
-        "stationID": "940GZZLUBSC",
-        "stationName": "Barons Court"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUBSC primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2263.25,
-          1726.124
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 5.181,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUCST"
-        },
-        "stationID": "940GZZLUCST"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUCST primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2266.125,
-          1734.966
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.122,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUCST"
-        },
-        "stationID": "940GZZLUCST"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUCST primitive 1",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.351 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.351,
-        "deviationDegrees": 0.649,
-        "end": [
-          1376.479,
-          1873.041
-        ],
-        "kind": "connector",
-        "length": 29.855,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          1376.141,
-          1843.188
-        ],
-        "stationID": "940GZZLUECT",
-        "stationName": "Earl's Court"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUECT primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 44.508 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 44.508,
-        "deviationDegrees": 0.492,
-        "end": [
-          2406.13,
-          1058.002
-        ],
-        "kind": "connector",
-        "length": 18.777,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          2392.739,
-          1044.839
-        ],
-        "stationID": "940GZZLUFPK",
-        "stationName": "Finsbury Park"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUFPK primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.566 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.566,
-        "deviationDegrees": 0.434,
-        "end": [
-          2909.95,
-          1549.594
-        ],
-        "kind": "connector",
-        "length": 6.594,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          2910.0,
-          1543.0
-        ],
-        "stationID": "940GZZLUMED",
-        "stationName": "Mile End"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUMED primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2909.95,
-          1549.594
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 6.594,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUMED"
-        },
-        "stationID": "940GZZLUMED"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUMED primitive 1",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          1410.266,
-          1683.976
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 6.205,
-        "nearestRoundel": {
-          "primitiveIndex": 1,
-          "stationID": "940GZZLUNHG"
-        },
-        "stationID": "940GZZLUNHG"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUNHG primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.240 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.24,
-        "deviationDegrees": 0.76,
-        "end": [
-          1523.672,
-          1868.887
-        ],
-        "kind": "connector",
-        "length": 25.725,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          1524.013,
-          1843.164
-        ],
-        "stationID": "940GZZLUSKS",
-        "stationName": "South Kensington"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUSKS primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 89.526 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 89.526,
-        "deviationDegrees": 0.474,
-        "end": [
-          919.595,
-          1873.046
-        ],
-        "kind": "connector",
-        "length": 29.859,
-        "nearestCanonicalAngle": 90.0,
-        "start": [
-          919.842,
-          1843.188
-        ],
-        "stationID": "940GZZLUTNG",
-        "stationName": "Turnham Green"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUTNG primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2528.968,
-          1687.438
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.677,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUTWH"
-        },
-        "stationID": "940GZZLUTWH"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUTWH primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          2532.005,
-          1695.734
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.238,
-        "nearestRoundel": {
-          "primitiveIndex": 2,
-          "stationID": "940GZZLUTWH"
-        },
-        "stationID": "940GZZLUTWH"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUTWH primitive 1",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          1874.002,
-          1864.734
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.266,
-        "nearestRoundel": {
-          "primitiveIndex": 3,
-          "stationID": "940GZZLUWSM"
-        },
-        "stationID": "940GZZLUWSM"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUWSM primitive 0",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-endpoint-without-roundel",
-      "description": "The connector end does not meet a roundel centre.",
-      "evidence": {
-        "coordinate": [
-          1873.785,
-          1873.034
-        ],
-        "endpoint": "end",
-        "kind": "connector",
-        "nearestDistance": 4.04,
-        "nearestRoundel": {
-          "primitiveIndex": 3,
-          "stationID": "940GZZLUWSM"
-        },
-        "stationID": "940GZZLUWSM"
-      },
-      "impact": "The bar may visibly miss its interchange node or terminate without a station symbol.",
-      "location": "940GZZLUWSM primitive 1",
-      "recommendation": "Move the endpoint and corresponding roundel together using the official source coordinate.",
-      "severity": "medium"
-    },
-    {
-      "category": "roundels",
-      "code": "roundel-not-on-route-port",
-      "description": "A roundel centre is not attached to its authored route or an interchange connector.",
-      "evidence": {
-        "centre": [
-          3541.488,
-          1545.414
-        ],
-        "nearestConnector": {
-          "endpoint": "start",
-          "kind": "connector",
-          "primitiveIndex": 0,
-          "stationID": "910GBARKING"
-        },
-        "nearestDistance": 4.194,
-        "nearestPath": {
-          "lineID": "hammersmith-city",
-          "pathID": "beck.v1.path.hammersmith-city.eastern-fan.v1.6",
-          "segmentID": "hammersmith-city:940GZZLUBKG:940GZZLUEHM",
-          "side": "to"
-        },
-        "stationID": "940GZZLUBKG"
-      },
-      "impact": "The symbol can appear visually detached or imply the wrong interchange relationship.",
-      "location": "940GZZLUBKG primitive 0",
-      "recommendation": "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
-      "severity": "medium"
-    },
-    {
-      "category": "roundels",
-      "code": "roundel-not-on-route-port",
-      "description": "A roundel centre is not attached to its authored route or an interchange connector.",
-      "evidence": {
-        "centre": [
-          1800.0,
-          1594.0
-        ],
-        "nearestConnector": {
-          "endpoint": "end",
-          "kind": "connector",
-          "primitiveIndex": 1,
-          "stationID": "940GZZLUBND"
-        },
-        "nearestDistance": 1.375,
-        "nearestPath": {
-          "lineID": "bakerloo",
-          "pathID": "beck.v1.path.bakerloo.central-completion.v1.1",
-          "segmentID": "bakerloo:940GZZLUOXC:940GZZLURGP",
-          "side": "to"
-        },
-        "stationID": "940GZZLUOXC"
-      },
-      "impact": "The symbol can appear visually detached or imply the wrong interchange relationship.",
-      "location": "940GZZLUOXC primitive 0",
-      "recommendation": "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
-      "severity": "medium"
-    },
-    {
-      "category": "roundels",
-      "code": "roundel-not-on-route-port",
-      "description": "A roundel centre is not attached to its authored route or an interchange connector.",
-      "evidence": {
-        "centre": [
-          660.125,
-          862.149
-        ],
-        "nearestConnector": {
-          "endpoint": "start",
-          "kind": "walkingConnector",
-          "primitiveIndex": 0,
-          "stationID": "940GZZLUNKP"
-        },
-        "nearestDistance": 4.55,
-        "nearestPath": {
-          "lineID": "piccadilly",
-          "pathID": "beck.v1.path.piccadilly.uxbridge.western-fan.v1.5",
-          "segmentID": "piccadilly:940GZZLUEAE:940GZZLURYL",
-          "side": "to"
-        },
-        "stationID": "940GZZLURYL"
-      },
-      "impact": "The symbol can appear visually detached or imply the wrong interchange relationship.",
-      "location": "940GZZLURYL primitive 0",
-      "recommendation": "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 47.857,
-            "commandIndex": 1,
-            "deviationDegrees": 2.857,
-            "length": 67.741,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.central.east-connector.v1.4",
-            "segmentID": "central:940GZZLUBLG:940GZZLULVT"
-          },
-          {
-            "angleDegrees": 30.018,
-            "commandIndex": 1,
-            "deviationDegrees": 14.982,
-            "length": 100.71,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.central.east-connector.v1.3",
-            "segmentID": "central:940GZZLUBNK:940GZZLULVT"
-          }
-        ],
-        "count": 2,
-        "lineID": "central",
-        "maximumDeviationDegrees": 14.982
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "central",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 36.777,
-            "commandIndex": 1,
-            "deviationDegrees": 8.223,
-            "length": 116.884,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.circle.shared-central.full.v1.6",
-            "segmentID": "circle:940GZZLUBBN:940GZZLUFCN"
-          },
-          {
-            "angleDegrees": 36.777,
-            "commandIndex": 1,
-            "deviationDegrees": 8.223,
-            "length": 112.713,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.circle.shared-central.full.v1.5",
-            "segmentID": "circle:940GZZLUFCN:940GZZLUKSX"
-          }
-        ],
-        "count": 2,
-        "lineID": "circle",
-        "maximumDeviationDegrees": 8.223
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "circle",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
       "category": "routes",
       "code": "non-canonical-straight-runs",
       "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
@@ -1598,7 +22,7 @@
             "angleDegrees": 44.6,
             "commandIndex": 1,
             "deviationDegrees": 0.4,
-            "length": 132.724,
+            "length": 132.541,
             "nearestCanonicalAngle": 45.0,
             "pathID": "beck.v1.path.dlr.stratford-lewisham.official.v1.1",
             "segmentID": "dlr:940GZZDLBOW:940GZZDLPUD"
@@ -1619,160 +43,6 @@
       },
       "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
       "location": "dlr",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "3 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 42.021,
-            "commandIndex": 1,
-            "deviationDegrees": 2.979,
-            "length": 120.011,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.elizabeth.stratford-liverpool-mainline.official.v1.0",
-            "segmentID": "elizabeth:910GLIVST:910GSTFD"
-          },
-          {
-            "angleDegrees": 49.05,
-            "commandIndex": 1,
-            "deviationDegrees": 4.05,
-            "length": 88.554,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.elizabeth.shenfield-stratford.official.v1.11",
-            "segmentID": "elizabeth:910GMRYLAND:910GSTFD"
-          },
-          {
-            "angleDegrees": 42.021,
-            "commandIndex": 1,
-            "deviationDegrees": 2.979,
-            "length": 120.011,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.elizabeth.stratford-whitechapel.official.v1.0",
-            "segmentID": "elizabeth:910GSTFD:910GWCHAPXR"
-          }
-        ],
-        "count": 3,
-        "lineID": "elizabeth",
-        "maximumDeviationDegrees": 4.05
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "elizabeth",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 36.775,
-            "commandIndex": 1,
-            "deviationDegrees": 8.225,
-            "length": 116.892,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.hammersmith-city.shared-central.full.v1.6",
-            "segmentID": "hammersmith-city:940GZZLUBBN:940GZZLUFCN"
-          },
-          {
-            "angleDegrees": 36.775,
-            "commandIndex": 1,
-            "deviationDegrees": 8.225,
-            "length": 112.717,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.hammersmith-city.shared-central.full.v1.5",
-            "segmentID": "hammersmith-city:940GZZLUFCN:940GZZLUKSX"
-          }
-        ],
-        "count": 2,
-        "lineID": "hammersmith-city",
-        "maximumDeviationDegrees": 8.225
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "hammersmith-city",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 0.298,
-            "commandIndex": 1,
-            "deviationDegrees": 0.298,
-            "length": 102.234,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.jubilee.east-connector.v1.2",
-            "segmentID": "jubilee:940GZZLUCWR:940GZZLUCYF"
-          }
-        ],
-        "count": 1,
-        "lineID": "jubilee",
-        "maximumDeviationDegrees": 0.298
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "jubilee",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "4 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 36.789,
-            "commandIndex": 1,
-            "deviationDegrees": 8.211,
-            "length": 117.062,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.metropolitan.shared-central.full.v1.4",
-            "segmentID": "metropolitan:940GZZLUBBN:940GZZLUFCN"
-          },
-          {
-            "angleDegrees": 53.462,
-            "commandIndex": 2,
-            "deviationDegrees": 8.462,
-            "length": 42.291,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.12",
-            "segmentID": "metropolitan:940GZZLUBST:940GZZLUFYR"
-          },
-          {
-            "angleDegrees": 41.465,
-            "commandIndex": 1,
-            "deviationDegrees": 3.535,
-            "length": 73.79,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.5",
-            "segmentID": "metropolitan:940GZZLUEAE:940GZZLURYL"
-          },
-          {
-            "angleDegrees": 36.789,
-            "commandIndex": 1,
-            "deviationDegrees": 8.211,
-            "length": 112.644,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.metropolitan.shared-central.full.v1.3",
-            "segmentID": "metropolitan:940GZZLUFCN:940GZZLUKSX"
-          }
-        ],
-        "count": 4,
-        "lineID": "metropolitan",
-        "maximumDeviationDegrees": 8.462
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "metropolitan",
       "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
       "severity": "medium"
     },
@@ -1813,49 +83,31 @@
     {
       "category": "routes",
       "code": "non-canonical-straight-runs",
-      "description": "4 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
+      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
       "evidence": {
         "candidates": [
           {
-            "angleDegrees": 46.939,
-            "commandIndex": 1,
-            "deviationDegrees": 1.939,
-            "length": 16.844,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.northern.bank.east-connector.v1.0",
-            "segmentID": "northern:940GZZLUAGL:940GZZLUKSX"
+            "angleDegrees": 89.721,
+            "commandIndex": 3,
+            "deviationDegrees": 0.279,
+            "length": 12.75,
+            "nearestCanonicalAngle": 90.0,
+            "pathID": "beck.v1.path.northern.edgware.north-connector.v1.8",
+            "segmentID": "northern:940GZZLUCFM:940GZZLUCTN"
           },
           {
             "angleDegrees": 89.727,
-            "commandIndex": 1,
+            "commandIndex": 6,
             "deviationDegrees": 0.273,
             "length": 12.597,
             "nearestCanonicalAngle": 90.0,
-            "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.10",
-            "segmentID": "northern:940GZZLUCTN:940GZZLUMTC"
-          },
-          {
-            "angleDegrees": 43.177,
-            "commandIndex": 8,
-            "deviationDegrees": 1.823,
-            "length": 17.912,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.northern.bank-join.north-connector.v1.1",
-            "segmentID": "northern:940GZZLUEUS:940GZZLUKSX"
-          },
-          {
-            "angleDegrees": 89.436,
-            "commandIndex": 1,
-            "deviationDegrees": 0.564,
-            "length": 41.155,
-            "nearestCanonicalAngle": 90.0,
-            "pathID": "beck.v1.path.northern.charing-cross.central-core-join.v1.2",
-            "segmentID": "northern:940GZZLUGDG:940GZZLUTCR"
+            "pathID": "beck.v1.path.northern.high-barnet.north-connector.v1.9",
+            "segmentID": "northern:940GZZLUCTN:940GZZLUKSH"
           }
         ],
-        "count": 4,
+        "count": 2,
         "lineID": "northern",
-        "maximumDeviationDegrees": 1.939
+        "maximumDeviationDegrees": 0.279
       },
       "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
       "location": "northern",
@@ -1865,77 +117,9 @@
     {
       "category": "routes",
       "code": "non-canonical-straight-runs",
-      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
+      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
       "evidence": {
         "candidates": [
-          {
-            "angleDegrees": 41.465,
-            "commandIndex": 1,
-            "deviationDegrees": 3.535,
-            "length": 73.788,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.piccadilly.uxbridge.western-fan.v1.5",
-            "segmentID": "piccadilly:940GZZLUEAE:940GZZLURYL"
-          }
-        ],
-        "count": 1,
-        "lineID": "piccadilly",
-        "maximumDeviationDegrees": 3.535
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "piccadilly",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 48.633,
-            "commandIndex": 1,
-            "deviationDegrees": 3.633,
-            "length": 90.233,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.suffragette.gospel-barking-riverside.official.v1.11",
-            "segmentID": "suffragette:910GBARKING:910GBARKRIV"
-          }
-        ],
-        "count": 1,
-        "lineID": "suffragette",
-        "maximumDeviationDegrees": 3.633
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "suffragette",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "4 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 0.936,
-            "commandIndex": 2,
-            "deviationDegrees": 0.936,
-            "length": 92.48,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.victoria.north-connector.v1.0",
-            "segmentID": "victoria:940GZZLUEUS:940GZZLUKSX"
-          },
-          {
-            "angleDegrees": 3.414,
-            "commandIndex": 1,
-            "deviationDegrees": 3.414,
-            "length": 25.358,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.victoria.north-connector.v1.1",
-            "segmentID": "victoria:940GZZLUHAI:940GZZLUKSX"
-          },
           {
             "angleDegrees": 44.203,
             "commandIndex": 5,
@@ -1955,62 +139,12 @@
             "segmentID": "victoria:940GZZLUHAI:940GZZLUKSX"
           }
         ],
-        "count": 4,
+        "count": 2,
         "lineID": "victoria",
-        "maximumDeviationDegrees": 3.414
+        "maximumDeviationDegrees": 0.797
       },
       "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
       "location": "victoria",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 47.077,
-            "commandIndex": 3,
-            "deviationDegrees": 2.077,
-            "length": 40.104,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.weaver.liverpool-chingford.official.v1.4",
-            "segmentID": "weaver:910GCLAPTON:910GHAKNYNM"
-          }
-        ],
-        "count": 1,
-        "lineID": "weaver",
-        "maximumDeviationDegrees": 2.077
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "weaver",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 26.508,
-            "commandIndex": 2,
-            "deviationDegrees": 18.492,
-            "length": 60.536,
-            "nearestCanonicalAngle": 45.0,
-            "pathID": "beck.v1.path.windrush.surrey-clapham.official.v1.0",
-            "segmentID": "windrush:910GPCKHMQD:910GSURREYQ"
-          }
-        ],
-        "count": 1,
-        "lineID": "windrush",
-        "maximumDeviationDegrees": 18.492
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "windrush",
       "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
       "severity": "medium"
     },
@@ -2030,56 +164,56 @@
   "metrics": {
     "connectors": {
       "byKind": {
-        "connector": 80,
-        "walkingConnector": 5
+        "connector": 63,
+        "walkingConnector": 29
       },
-      "count": 85,
+      "count": 92,
       "nearestAxis": {
-        "0 degrees": 10,
-        "45 degrees": 52,
-        "90 degrees": 23
+        "0 degrees": 11,
+        "45 degrees": 64,
+        "90 degrees": 17
       },
       "records": [
         {
-          "angleDegrees": 28.178,
-          "deviationDegrees": 16.822,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3587.523,
-            1525.187
+            3550.203,
+            1545.476
           ],
           "kind": "connector",
-          "length": 51.653,
+          "length": 34.713,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            4.194,
-            0.0
+            0.011,
+            0.011
           ],
           "start": [
-            3541.992,
-            1549.578
+            3574.749,
+            1520.93
           ],
           "stationID": "910GBARKING",
           "stationName": "Barking"
         },
         {
-          "angleDegrees": 44.998,
-          "deviationDegrees": 0.002,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2883.798,
-            943.985
+            2860.08,
+            959.736
           ],
           "kind": "connector",
-          "length": 22.341,
+          "length": 28.355,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.317,
+            0.318
           ],
           "start": [
-            2868.0,
-            959.782
+            2880.13,
+            939.686
           ],
           "stationID": "910GBLCHSRD",
           "stationName": "Blackhorse Road"
@@ -2088,253 +222,517 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2333.953,
-            1174.982
+            1737.248,
+            1592.49
           ],
           "kind": "connector",
-          "length": 50.458,
+          "length": 43.603,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.107,
+            0.107
           ],
           "start": [
-            2298.274,
-            1139.303
+            1768.08,
+            1561.658
+          ],
+          "stationID": "910GBONDST",
+          "stationName": "Bond Street"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1798.705,
+            1592.288
+          ],
+          "kind": "walkingConnector",
+          "length": 43.207,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.004,
+            0.002
+          ],
+          "start": [
+            1768.153,
+            1561.736
+          ],
+          "stationID": "910GBONDST",
+          "stationName": "Bond Street"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3062.829,
+            1867.38
+          ],
+          "kind": "walkingConnector",
+          "length": 50.937,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.025,
+            0.025
+          ],
+          "start": [
+            3026.811,
+            1831.362
+          ],
+          "stationID": "910GCANWHRF",
+          "stationName": "Canary Wharf"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3027.328,
+            1902.882
+          ],
+          "kind": "walkingConnector",
+          "length": 50.182,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.0,
+            0.001
+          ],
+          "start": [
+            3062.812,
+            1867.398
+          ],
+          "stationID": "910GCANWHRF",
+          "stationName": "Canary Wharf"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2332.53,
+            1174.775
+          ],
+          "kind": "walkingConnector",
+          "length": 49.359,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.373,
+            0.373
+          ],
+          "start": [
+            2297.628,
+            1139.873
           ],
           "stationID": "910GCLDNNRB",
           "stationName": "Caledonian Road & Barnsbury"
         },
         {
-          "angleDegrees": 42.099,
-          "deviationDegrees": 2.901,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1477.407,
-            2266.062
+            1812.164,
+            2393.899
+          ],
+          "kind": "walkingConnector",
+          "length": 44.876,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.016,
+            0.016
+          ],
+          "start": [
+            1812.164,
+            2349.023
+          ],
+          "stationID": "910GCLPHHS",
+          "stationName": "Clapham High Street"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1503.471,
+            2294.264
           ],
           "kind": "connector",
-          "length": 43.653,
+          "length": 37.151,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.235,
+            0.235
           ],
           "start": [
-            1509.797,
-            2295.328
+            1477.201,
+            2267.994
           ],
-          "stationID": "910GCLPHMJC",
+          "stationID": "910GCLPHMJ1",
           "stationName": "Clapham Junction"
         },
         {
-          "angleDegrees": 89.602,
-          "deviationDegrees": 0.398,
-          "end": [
-            2534.278,
-            1205.469
-          ],
-          "kind": "connector",
-          "length": 30.497,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2534.49,
-            1174.973
-          ],
-          "stationID": "910GCNNB",
-          "stationName": "Canonbury"
-        },
-        {
-          "angleDegrees": 38.005,
-          "deviationDegrees": 6.995,
-          "end": [
-            1962.828,
-            1345.609
-          ],
-          "kind": "connector",
-          "length": 41.591,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1995.6,
-            1320.0
-          ],
-          "stationID": "910GEUSTON",
-          "stationName": "London Euston"
-        },
-        {
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1633.1,
-            1174.9
+            2012.052,
+            1212.686
           ],
           "kind": "walkingConnector",
-          "length": 89.237,
+          "length": 66.397,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.013,
+            0.013
           ],
           "start": [
-            1570.0,
-            1238.0
+            2059.002,
+            1165.736
           ],
-          "stationID": "910GFNCHLYR",
-          "stationName": "Finchley Road & Frognal"
-        },
-        {
-          "angleDegrees": 45.002,
-          "deviationDegrees": 0.002,
-          "end": [
-            784.276,
-            1972.162
-          ],
-          "kind": "connector",
-          "length": 25.367,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            766.339,
-            1954.224
-          ],
-          "stationID": "910GGNRSBRY",
-          "stationName": "Gunnersbury"
-        },
-        {
-          "angleDegrees": 89.938,
-          "deviationDegrees": 0.062,
-          "end": [
-            1958.668,
-            1048.813
-          ],
-          "kind": "connector",
-          "length": 41.595,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1958.713,
-            1090.408
-          ],
-          "stationID": "910GGOSPLOK",
-          "stationName": "Gospel Oak"
-        },
-        {
-          "angleDegrees": 0.0,
-          "deviationDegrees": 0.0,
-          "end": [
-            2857.172,
-            1220.895
-          ],
-          "kind": "connector",
-          "length": 26.0,
-          "nearestCanonicalAngle": 0.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2831.172,
-            1220.895
-          ],
-          "stationID": "910GHAKNYNM",
-          "stationName": "Hackney Downs"
-        },
-        {
-          "angleDegrees": 45.0,
-          "deviationDegrees": 0.0,
-          "end": [
-            2905.59,
-            1269.313
-          ],
-          "kind": "connector",
-          "length": 68.473,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2857.172,
-            1220.895
-          ],
-          "stationID": "910GHAKNYNM",
-          "stationName": "Hackney Downs"
-        },
-        {
-          "angleDegrees": 45.211,
-          "deviationDegrees": 0.211,
-          "end": [
-            2424.0,
-            1174.976
-          ],
-          "kind": "connector",
-          "length": 25.363,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2406.132,
-            1156.976
-          ],
-          "stationID": "910GHGHI",
-          "stationName": "Highbury & Islington"
+          "stationID": "910GCMDNRD",
+          "stationName": "Camden Road"
         },
         {
           "angleDegrees": 90.0,
           "deviationDegrees": 0.0,
           "end": [
-            2424.0,
-            1205.469
+            2535.527,
+            1205.266
           ],
           "kind": "connector",
-          "length": 30.493,
+          "length": 30.172,
           "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 1,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.004,
+            0.004
+          ],
+          "start": [
+            2535.527,
+            1175.094
+          ],
+          "stationID": "910GCNNB",
+          "stationName": "Canonbury"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3543.743,
+            1887.203
+          ],
+          "kind": "connector",
+          "length": 66.799,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.001
+          ],
+          "start": [
+            3590.977,
+            1839.969
+          ],
+          "stationID": "910GCUSTMHS",
+          "stationName": "Custom House"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            598.906,
+            1682.32
+          ],
+          "kind": "connector",
+          "length": 25.359,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
           "roundelEndpointDistances": [
             0.0,
             0.0
           ],
           "start": [
-            2424.0,
-            1174.976
+            598.906,
+            1656.961
           ],
-          "stationID": "910GHGHI",
-          "stationName": "Highbury & Islington"
+          "stationID": "910GEALINGB",
+          "stationName": "Ealing Broadway"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1569.455,
+            1236.955
+          ],
+          "kind": "walkingConnector",
+          "length": 87.888,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.003,
+            0.003
+          ],
+          "start": [
+            1631.601,
+            1174.809
+          ],
+          "stationID": "910GFNCHLYR",
+          "stationName": "Finchley Road & Frognal"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2169.301,
+            1486.168
+          ],
+          "kind": "connector",
+          "length": 46.171,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.182,
+            0.182
+          ],
+          "start": [
+            2201.949,
+            1453.52
+          ],
+          "stationID": "910GFRNDXR",
+          "stationName": "Farringdon"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3376.84,
+            1190.772
+          ],
+          "kind": "walkingConnector",
+          "length": 37.842,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.004,
+            0.004
+          ],
+          "start": [
+            3376.84,
+            1152.93
+          ],
+          "stationID": "910GFRSTGT",
+          "stationName": "Forest Gate"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            764.012,
+            1992.862
+          ],
+          "kind": "connector",
+          "length": 25.51,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.006,
+            0.005
+          ],
+          "start": [
+            745.974,
+            1974.824
+          ],
+          "stationID": "910GGNRSBRY",
+          "stationName": "Gunnersbury"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1959.086,
+            1089.68
+          ],
+          "kind": "connector",
+          "length": 40.766,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            1959.086,
+            1048.914
+          ],
+          "stationID": "910GGOSPLOK",
+          "stationName": "Gospel Oak"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2903.701,
+            1268.963
+          ],
+          "kind": "connector",
+          "length": 68.983,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.329,
+            0.328
+          ],
+          "start": [
+            2854.923,
+            1220.185
+          ],
+          "stationID": "910GHACKNYC",
+          "stationName": "Hackney Central"
         },
         {
           "angleDegrees": 0.0,
           "deviationDegrees": 0.0,
           "end": [
-            1306.969,
-            1765.223
+            2855.156,
+            1219.949
           ],
           "kind": "connector",
-          "length": 28.875,
+          "length": 24.148,
+          "nearestCanonicalAngle": 0.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.004,
+            0.004
+          ],
+          "start": [
+            2831.008,
+            1219.949
+          ],
+          "stationID": "910GHAKNYNM",
+          "stationName": "Hackney Downs"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2424.121,
+            1175.379
+          ],
+          "kind": "connector",
+          "length": 27.026,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.006,
+            0.006
+          ],
+          "start": [
+            2405.011,
+            1156.269
+          ],
+          "stationID": "910GHGHI",
+          "stationName": "Highbury & Islington"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2453.928,
+            1205.174
+          ],
+          "kind": "connector",
+          "length": 42.144,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.003,
+            0.003
+          ],
+          "start": [
+            2424.128,
+            1175.374
+          ],
+          "stationID": "910GHGHI",
+          "stationName": "Highbury & Islington"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2486.48,
+            925.684
+          ],
+          "kind": "walkingConnector",
+          "length": 55.355,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.006,
+            0.006
+          ],
+          "start": [
+            2525.622,
+            886.542
+          ],
+          "stationID": "910GHRGYGL",
+          "stationName": "Harringay Green Lanes"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            320.25,
+            2116.594
+          ],
+          "kind": "connector",
+          "length": 39.908,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            292.031,
+            2088.375
+          ],
+          "stationID": "910GHTRWAPT",
+          "stationName": "Heathrow Terminals 2 & 3"
+        },
+        {
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            202.422,
+            2286.976
+          ],
+          "kind": "connector",
+          "length": 26.546,
+          "nearestCanonicalAngle": 0.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.179,
+            0.18
+          ],
+          "start": [
+            175.876,
+            2286.976
+          ],
+          "stationID": "910GHTRWTM5",
+          "stationName": "Heathrow Terminal 5"
+        },
+        {
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1336.016,
+            1764.102
+          ],
+          "kind": "connector",
+          "length": 29.493,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2342,8 +740,8 @@
             0.0
           ],
           "start": [
-            1335.844,
-            1765.223
+            1306.523,
+            1764.102
           ],
           "stationID": "910GKENOLYM",
           "stationName": "Kensington (Olympia)"
@@ -2352,42 +750,86 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            670.199,
-            2086.239
+            663.859,
+            2093.11
           ],
           "kind": "connector",
-          "length": 25.368,
+          "length": 27.444,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.1,
+            0.099
           ],
           "start": [
-            652.261,
-            2068.301
+            644.453,
+            2073.704
           ],
           "stationID": "910GKEWGRDN",
           "stationName": "Kew Gardens"
         },
         {
-          "angleDegrees": 47.38,
-          "deviationDegrees": 2.38,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2444.88,
-            1426.488
+            1086.459,
+            935.748
           ],
-          "kind": "connector",
-          "length": 81.002,
+          "kind": "walkingConnector",
+          "length": 88.261,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.003,
+            0.003
           ],
           "start": [
-            2390.031,
-            1486.094
+            1148.869,
+            873.338
+          ],
+          "stationID": "910GKTON",
+          "stationName": "Kenton"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2385.119,
+            1486.018
+          ],
+          "kind": "connector",
+          "length": 53.293,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.025,
+            0.025
+          ],
+          "start": [
+            2422.803,
+            1448.334
+          ],
+          "stationID": "910GLIVST",
+          "stationName": "London Liverpool Street"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2354.344,
+            1517.023
+          ],
+          "kind": "connector",
+          "length": 43.685,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.187,
+            0.188
+          ],
+          "start": [
+            2385.234,
+            1486.133
           ],
           "stationID": "910GLIVST",
           "stationName": "London Liverpool Street"
@@ -2396,86 +838,152 @@
           "angleDegrees": 90.0,
           "deviationDegrees": 0.0,
           "end": [
-            2390.031,
-            1549.447
+            2385.215,
+            1548.944
           ],
           "kind": "connector",
-          "length": 63.353,
+          "length": 62.944,
           "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
+          "primitiveIndex": 2,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.113,
+            0.113
           ],
           "start": [
-            2390.031,
-            1486.094
+            2385.215,
+            1486.0
           ],
-          "stationID": "910GLIVSTLL",
-          "stationName": "Liverpool Street"
+          "stationID": "910GLIVST",
+          "stationName": "London Liverpool Street"
         },
         {
-          "angleDegrees": 45.002,
-          "deviationDegrees": 0.002,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            598.908,
-            2157.53
+            3276.658,
+            1112.361
           ],
-          "kind": "connector",
-          "length": 25.367,
+          "kind": "walkingConnector",
+          "length": 62.064,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.004,
+            0.003
           ],
           "start": [
-            580.971,
-            2139.592
+            3320.544,
+            1068.475
+          ],
+          "stationID": "910GLYTNSHR",
+          "stationName": "Leytonstone High Road"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2705.041,
+            2223.229
+          ],
+          "kind": "walkingConnector",
+          "length": 52.21,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.19,
+            0.191
+          ],
+          "start": [
+            2741.959,
+            2186.311
+          ],
+          "stationID": "910GNEWXGTE",
+          "stationName": "New Cross Gate"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1459.668,
+            1474.956
+          ],
+          "kind": "connector",
+          "length": 64.081,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.006,
+            0.005
+          ],
+          "start": [
+            1414.356,
+            1429.644
+          ],
+          "stationID": "910GPADTLL",
+          "stationName": "Paddington"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            591.877,
+            2164.623
+          ],
+          "kind": "connector",
+          "length": 27.108,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.035,
+            0.035
+          ],
+          "start": [
+            572.709,
+            2145.455
           ],
           "stationID": "910GRICHMND",
           "stationName": "Richmond (London)"
         },
         {
-          "angleDegrees": 43.386,
-          "deviationDegrees": 1.614,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2708.25,
-            935.207
+            2708.094,
+            959.89
           ],
-          "kind": "connector",
-          "length": 35.776,
+          "kind": "walkingConnector",
+          "length": 101.348,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.022,
+            0.022
           ],
           "start": [
-            2734.25,
-            959.782
+            2779.758,
+            888.226
           ],
           "stationID": "910GSEVNSIS",
           "stationName": "Seven Sisters"
         },
         {
-          "angleDegrees": 42.976,
-          "deviationDegrees": 2.024,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2704.938,
-            1718.422
+            2745.018,
+            1758.155
           ],
-          "kind": "connector",
-          "length": 58.356,
+          "kind": "walkingConnector",
+          "length": 56.266,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.058,
+            0.057
           ],
           "start": [
-            2747.634,
-            1758.203
+            2705.232,
+            1718.369
           ],
           "stationID": "910GSHADWEL",
           "stationName": "Shadwell"
@@ -2484,11 +992,11 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1290.079,
-            1716.082
+            1622.195,
+            1289.789
           ],
           "kind": "walkingConnector",
-          "length": 47.646,
+          "length": 49.729,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2496,21 +1004,43 @@
             0.0
           ],
           "start": [
-            1323.77,
-            1682.391
+            1657.359,
+            1254.625
+          ],
+          "stationID": "910GSHMPSTD",
+          "stationName": "South Hampstead"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1290.09,
+            1716.823
+          ],
+          "kind": "walkingConnector",
+          "length": 48.722,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.238,
+            0.237
+          ],
+          "start": [
+            1324.542,
+            1682.371
           ],
           "stationID": "910GSHPDSB",
           "stationName": "Shepherds Bush"
         },
         {
-          "angleDegrees": 0.759,
-          "deviationDegrees": 0.759,
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3229.031,
-            1269.836
+            3220.773,
+            1268.992
           ],
           "kind": "connector",
-          "length": 39.456,
+          "length": 33.804,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2518,52 +1048,118 @@
             0.0
           ],
           "start": [
-            3189.578,
-            1269.313
+            3186.969,
+            1268.992
           ],
           "stationID": "910GSTFD",
           "stationName": "Stratford (London)"
         },
         {
-          "angleDegrees": 85.626,
-          "deviationDegrees": 4.374,
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3940.062,
-            1171.437
+            3253.195,
+            1269.012
           ],
           "kind": "connector",
-          "length": 30.357,
+          "length": 32.422,
+          "nearestCanonicalAngle": 0.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.02,
+            0.019
+          ],
+          "start": [
+            3220.773,
+            1269.012
+          ],
+          "stationID": "910GSTFD",
+          "stationName": "Stratford (London)"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1936.017,
+            1592.433
+          ],
+          "kind": "connector",
+          "length": 43.207,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.009,
+            0.008
+          ],
+          "start": [
+            1966.569,
+            1561.881
+          ],
+          "stationID": "910GTOTCTRD",
+          "stationName": "Tottenham Court Road"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3940.137,
+            1199.344
+          ],
+          "kind": "connector",
+          "length": 28.226,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.09,
+            0.09
           ],
           "start": [
-            3937.747,
-            1201.706
+            3940.137,
+            1171.118
           ],
           "stationID": "910GUPMNSTR",
           "stationName": "Upminster"
         },
         {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2141.065,
+            944.272
+          ],
+          "kind": "walkingConnector",
+          "length": 39.703,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.45,
+            0.45
+          ],
+          "start": [
+            2112.991,
+            916.198
+          ],
+          "stationID": "910GUPRHLWY",
+          "stationName": "Upper Holloway"
+        },
+        {
           "angleDegrees": 0.0,
           "deviationDegrees": 0.0,
           "end": [
-            1306.969,
-            1948.626
+            1335.539,
+            1948.406
           ],
           "kind": "connector",
-          "length": 28.812,
+          "length": 28.578,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.133,
+            0.133
           ],
           "start": [
-            1335.781,
-            1948.626
+            1306.961,
+            1948.406
           ],
           "stationID": "910GWBRMPTN",
           "stationName": "West Brompton"
@@ -2572,33 +1168,99 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1580.9,
-            1174.9
+            2705.085,
+            1545.85
           ],
-          "kind": "walkingConnector",
-          "length": 52.326,
+          "kind": "connector",
+          "length": 42.178,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.328,
+            0.33
           ],
           "start": [
-            1543.9,
-            1211.9
+            2734.909,
+            1516.026
+          ],
+          "stationID": "910GWCHAPEL",
+          "stationName": "Whitechapel"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1543.362,
+            1211.51
+          ],
+          "kind": "walkingConnector",
+          "length": 51.834,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.031,
+            0.03
+          ],
+          "start": [
+            1580.014,
+            1174.858
           ],
           "stationID": "910GWHMDSTD",
           "stationName": "West Hampstead"
         },
         {
-          "angleDegrees": 12.915,
-          "deviationDegrees": 12.915,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2986.293,
-            954.805
+            2956.385,
+            1017.291
+          ],
+          "kind": "walkingConnector",
+          "length": 42.432,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.135,
+            0.136
+          ],
+          "start": [
+            2986.389,
+            987.287
+          ],
+          "stationID": "910GWLTHQRD",
+          "stationName": "Walthamstow Queens Road"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2986.35,
+            987.248
           ],
           "kind": "connector",
-          "length": 22.268,
+          "length": 38.399,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.191,
+            0.19
+          ],
+          "start": [
+            3013.502,
+            960.096
+          ],
+          "stationID": "910GWLTWCEN",
+          "stationName": "Walthamstow Central"
+        },
+        {
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3564.422,
+            2245.094
+          ],
+          "kind": "walkingConnector",
+          "length": 70.156,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2606,52 +1268,74 @@
             0.0
           ],
           "start": [
-            3007.998,
-            959.782
+            3494.266,
+            2245.094
           ],
-          "stationID": "910GWLTWCEN",
-          "stationName": "Walthamstow Central"
+          "stationID": "910GWOLWXR",
+          "stationName": "Woolwich"
         },
         {
-          "angleDegrees": 52.756,
-          "deviationDegrees": 7.756,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2670.517,
-            2669.516
+            1604.029,
+            2758.236
           ],
-          "kind": "connector",
-          "length": 56.875,
+          "kind": "walkingConnector",
+          "length": 109.22,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            1.307,
+            1.307
           ],
           "start": [
-            2704.938,
-            2624.24
+            1526.799,
+            2681.006
+          ],
+          "stationID": "940GZZCRMDN",
+          "stationName": "Morden Road"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2670.548,
+            2669.831
+          ],
+          "kind": "walkingConnector",
+          "length": 48.742,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.334,
+            0.334
+          ],
+          "start": [
+            2705.014,
+            2635.365
           ],
           "stationID": "940GZZCRWCR",
           "stationName": "West Croydon"
         },
         {
-          "angleDegrees": 49.587,
-          "deviationDegrees": 4.587,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1387.281,
-            2406.609
+            1387.352,
+            2399.898
           ],
           "kind": "connector",
-          "length": 79.439,
+          "length": 72.908,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
+            0.001,
             0.0
           ],
           "start": [
-            1335.781,
-            2346.125
+            1335.798,
+            2348.344
           ],
           "stationID": "940GZZCRWMB",
           "stationName": "Wimbledon"
@@ -2660,77 +1344,99 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2395.0,
-            1692.0
+            2997.617,
+            1545.805
           ],
-          "kind": "connector",
-          "length": 57.011,
+          "kind": "walkingConnector",
+          "length": 41.487,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.508,
+            0.508
           ],
           "start": [
-            2354.687,
-            1651.687
+            3026.953,
+            1516.469
           ],
-          "stationID": "940GZZDLBNK",
-          "stationName": "Bank DLR Station"
+          "stationID": "940GZZDLBOW",
+          "stationName": "Bow Church DLR Station"
         },
         {
-          "angleDegrees": 28.024,
-          "deviationDegrees": 16.976,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3289.016,
-            1726.297
+            2991.218,
+            1938.997
           ],
-          "kind": "connector",
-          "length": 67.908,
+          "kind": "walkingConnector",
+          "length": 51.07,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.003,
+            0.003
           ],
           "start": [
-            3229.07,
-            1758.203
+            3027.33,
+            1902.885
+          ],
+          "stationID": "940GZZDLCAN",
+          "stationName": "Canary Wharf DLR Station"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            3253.483,
+            1758.357
+          ],
+          "kind": "connector",
+          "length": 48.519,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.284,
+            0.285
+          ],
+          "start": [
+            3287.791,
+            1724.049
           ],
           "stationID": "940GZZDLCGT",
           "stationName": "Canning Town DLR Station"
         },
         {
-          "angleDegrees": 2.887,
-          "deviationDegrees": 2.887,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3252.75,
-            1271.032
+            3280.791,
+            1545.529
           ],
           "kind": "connector",
-          "length": 23.749,
-          "nearestCanonicalAngle": 0.0,
+          "length": 39.216,
+          "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.002,
+            0.003
           ],
           "start": [
-            3229.031,
-            1269.836
+            3253.061,
+            1517.799
           ],
-          "stationID": "940GZZDLSTD",
-          "stationName": "Stratford DLR Station"
+          "stationID": "940GZZDLWHM",
+          "stationName": "West Ham DLR Station"
         },
         {
-          "angleDegrees": 89.925,
-          "deviationDegrees": 0.075,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            708.035,
-            1873.047
+            707.508,
+            1872.953
           ],
           "kind": "connector",
-          "length": 29.828,
+          "length": 30.336,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2738,96 +1444,30 @@
             0.0
           ],
           "start": [
-            707.996,
-            1843.219
+            707.508,
+            1842.617
           ],
           "stationID": "940GZZLUACT",
           "stationName": "Acton Town"
         },
         {
-          "angleDegrees": 72.938,
-          "deviationDegrees": 17.062,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2178.679,
-            1810.696
+            1681.897,
+            1647.834
           ],
           "kind": "connector",
-          "length": 4.502,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            4.502
-          ],
-          "start": [
-            2180.0,
-            1815.0
-          ],
-          "stationID": "940GZZLUBKF",
-          "stationName": "Blackfriars"
-        },
-        {
-          "angleDegrees": 63.175,
-          "deviationDegrees": 18.175,
-          "end": [
-            2182.043,
-            1819.04
-          ],
-          "kind": "connector",
-          "length": 4.527,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            4.527
-          ],
-          "start": [
-            2180.0,
-            1815.0
-          ],
-          "stationID": "940GZZLUBKF",
-          "stationName": "Blackfriars"
-        },
-        {
-          "angleDegrees": 31.015,
-          "deviationDegrees": 13.985,
-          "end": [
-            1682.0,
-            1620.0
-          ],
-          "kind": "connector",
-          "length": 53.674,
+          "length": 78.274,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.103,
+            0.102
           ],
           "start": [
-            1728.0,
-            1592.344
-          ],
-          "stationID": "940GZZLUBND",
-          "stationName": "Bond Street"
-        },
-        {
-          "angleDegrees": 37.369,
-          "deviationDegrees": 7.631,
-          "end": [
-            1767.999,
-            1561.797
-          ],
-          "kind": "connector",
-          "length": 50.329,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1728.0,
-            1592.344
+            1737.245,
+            1592.486
           ],
           "stationID": "940GZZLUBND",
           "stationName": "Bond Street"
@@ -2836,33 +1476,55 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2354.687,
-            1651.687
+            2354.08,
+            1652.249
           ],
           "kind": "connector",
-          "length": 73.338,
+          "length": 45.439,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.07,
+            0.069
           ],
           "start": [
-            2302.829,
-            1599.829
+            2321.95,
+            1620.119
           ],
           "stationID": "940GZZLUBNK",
           "stationName": "Bank"
         },
         {
-          "angleDegrees": 89.008,
-          "deviationDegrees": 0.992,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1240.516,
-            1873.042
+            2393.204,
+            1691.568
           ],
           "kind": "connector",
-          "length": 29.858,
+          "length": 55.468,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 1,
+          "roundelEndpointDistances": [
+            0.069,
+            0.069
+          ],
+          "start": [
+            2353.982,
+            1652.346
+          ],
+          "stationID": "940GZZLUBNK",
+          "stationName": "Bank"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1239.141,
+            1872.891
+          ],
+          "kind": "connector",
+          "length": 30.133,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2870,21 +1532,21 @@
             0.0
           ],
           "start": [
-            1239.999,
-            1843.188
+            1239.141,
+            1842.758
           ],
           "stationID": "940GZZLUBSC",
           "stationName": "Barons Court"
         },
         {
-          "angleDegrees": 57.189,
-          "deviationDegrees": 12.189,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1710.489,
-            1385.796
+            1681.602,
+            1429.617
           ],
           "kind": "connector",
-          "length": 52.614,
+          "length": 61.783,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -2892,131 +1554,21 @@
             0.0
           ],
           "start": [
-            1681.979,
-            1430.016
+            1725.289,
+            1385.93
           ],
           "stationID": "940GZZLUBST",
           "stationName": "Baker Street"
         },
         {
-          "angleDegrees": 70.257,
-          "deviationDegrees": 19.743,
-          "end": [
-            2263.25,
-            1726.124
-          ],
-          "kind": "connector",
-          "length": 5.181,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            5.181
-          ],
-          "start": [
-            2265.0,
-            1731.0
-          ],
-          "stationID": "940GZZLUCST",
-          "stationName": "Cannon Street"
-        },
-        {
-          "angleDegrees": 74.163,
-          "deviationDegrees": 15.837,
-          "end": [
-            2266.125,
-            1734.966
-          ],
-          "kind": "connector",
-          "length": 4.122,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            4.122
-          ],
-          "start": [
-            2265.0,
-            1731.0
-          ],
-          "stationID": "940GZZLUCST",
-          "stationName": "Cannon Street"
-        },
-        {
-          "angleDegrees": 29.37,
-          "deviationDegrees": 15.63,
-          "end": [
-            3027.29,
-            1903.547
-          ],
-          "kind": "connector",
-          "length": 70.421,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2965.92,
-            1938.085
-          ],
-          "stationID": "940GZZLUCYF",
-          "stationName": "Canary Wharf"
-        },
-        {
-          "angleDegrees": 44.843,
-          "deviationDegrees": 0.157,
-          "end": [
-            3063.096,
-            1867.937
-          ],
-          "kind": "connector",
-          "length": 50.499,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            3027.29,
-            1903.547
-          ],
-          "stationID": "940GZZLUCYF",
-          "stationName": "Canary Wharf"
-        },
-        {
-          "angleDegrees": 44.92,
-          "deviationDegrees": 0.08,
-          "end": [
-            3063.096,
-            1867.937
-          ],
-          "kind": "connector",
-          "length": 50.564,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 2,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            3027.292,
-            1832.233
-          ],
-          "stationID": "940GZZLUCYF",
-          "stationName": "Canary Wharf"
-        },
-        {
           "angleDegrees": 90.0,
           "deviationDegrees": 0.0,
           "end": [
-            600.109,
-            1682.391
+            598.906,
+            1707.766
           ],
           "kind": "connector",
-          "length": 25.188,
+          "length": 25.446,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3024,65 +1576,43 @@
             0.0
           ],
           "start": [
-            600.109,
-            1657.203
+            598.906,
+            1682.32
           ],
           "stationID": "940GZZLUEBY",
           "stationName": "Ealing Broadway"
         },
         {
-          "angleDegrees": 90.0,
+          "angleDegrees": 0.0,
           "deviationDegrees": 0.0,
           "end": [
-            600.109,
-            1707.781
-          ],
-          "kind": "connector",
-          "length": 25.39,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            600.109,
-            1682.391
-          ],
-          "stationID": "940GZZLUEBY",
-          "stationName": "Ealing Broadway"
-        },
-        {
-          "angleDegrees": 0.136,
-          "deviationDegrees": 0.136,
-          "end": [
-            640.686,
-            1774.029
+            640.616,
+            1772.972
           ],
           "kind": "connector",
           "length": 26.892,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.089,
+            0.09
           ],
           "start": [
-            667.578,
-            1773.965
+            667.508,
+            1772.972
           ],
           "stationID": "940GZZLUECM",
           "stationName": "Ealing Common"
         },
         {
-          "angleDegrees": 89.351,
-          "deviationDegrees": 0.649,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1376.479,
-            1873.041
+            1374.688,
+            1868.734
           ],
           "kind": "connector",
-          "length": 29.855,
+          "length": 25.757,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3090,30 +1620,30 @@
             0.0
           ],
           "start": [
-            1376.141,
-            1843.188
+            1374.688,
+            1842.977
           ],
           "stationID": "940GZZLUECT",
           "stationName": "Earl's Court"
         },
         {
-          "angleDegrees": 46.128,
-          "deviationDegrees": 1.128,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1990.353,
-            1868.606
+            1992.395,
+            1869.902
           ],
           "kind": "connector",
-          "length": 34.305,
+          "length": 38.283,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.006,
+            0.005
           ],
           "start": [
-            1966.578,
-            1843.876
+            1965.325,
+            1842.832
           ],
           "stationID": "940GZZLUEMB",
           "stationName": "Embankment"
@@ -3122,11 +1652,11 @@
           "angleDegrees": 90.0,
           "deviationDegrees": 0.0,
           "end": [
-            1522.017,
-            1406.664
+            1491.867,
+            1405.851
           ],
           "kind": "connector",
-          "length": 25.036,
+          "length": 23.14,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3134,52 +1664,74 @@
             0.0
           ],
           "start": [
-            1522.017,
-            1381.628
+            1491.867,
+            1382.711
           ],
           "stationID": "940GZZLUERC",
           "stationName": "Edgware Road (Circle Line)"
         },
         {
-          "angleDegrees": 31.368,
-          "deviationDegrees": 13.632,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2028.407,
-            1300.0
+            1926.71,
+            1385.727
           ],
-          "kind": "connector",
-          "length": 38.423,
+          "kind": "walkingConnector",
+          "length": 56.758,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.045,
+            0.045
           ],
           "start": [
-            1995.6,
-            1320.0
+            1966.844,
+            1345.593
+          ],
+          "stationID": "940GZZLUESQ",
+          "stationName": "Euston Square"
+        },
+        {
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            2028.195,
+            1318.57
+          ],
+          "kind": "connector",
+          "length": 33.022,
+          "nearestCanonicalAngle": 0.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.203,
+            0.203
+          ],
+          "start": [
+            1995.173,
+            1318.57
           ],
           "stationID": "940GZZLUEUS",
           "stationName": "Euston"
         },
         {
-          "angleDegrees": 53.625,
-          "deviationDegrees": 8.625,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2027.754,
-            1363.652
+            1967.103,
+            1345.854
           ],
           "kind": "connector",
-          "length": 54.216,
+          "length": 39.284,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 1,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.412,
+            0.412
           ],
           "start": [
-            1995.6,
-            1320.0
+            1994.881,
+            1318.076
           ],
           "stationID": "940GZZLUEUS",
           "stationName": "Euston"
@@ -3188,55 +1740,33 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2165.191,
-            1486.141
+            2034.067,
+            1357.352
           ],
           "kind": "connector",
-          "length": 32.681,
+          "length": 55.069,
           "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
+          "primitiveIndex": 2,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.064,
+            0.064
           ],
           "start": [
-            2188.3,
-            1463.032
+            1995.127,
+            1318.412
           ],
-          "stationID": "940GZZLUFCN",
-          "stationName": "Farringdon"
-        },
-        {
-          "angleDegrees": 44.508,
-          "deviationDegrees": 0.492,
-          "end": [
-            2406.13,
-            1058.002
-          ],
-          "kind": "connector",
-          "length": 18.777,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2392.739,
-            1044.839
-          ],
-          "stationID": "940GZZLUFPK",
-          "stationName": "Finsbury Park"
+          "stationID": "940GZZLUEUS",
+          "stationName": "Euston"
         },
         {
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1551.0,
-            1257.0
+            1550.172,
+            1256.234
           ],
           "kind": "connector",
-          "length": 26.87,
+          "length": 27.267,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3244,21 +1774,65 @@
             0.0
           ],
           "start": [
-            1570.0,
-            1238.0
+            1569.453,
+            1236.953
           ],
           "stationID": "940GZZLUFYR",
           "stationName": "Finchley Road"
         },
         {
-          "angleDegrees": 89.988,
-          "deviationDegrees": 0.012,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1171.923,
-            1873.043
+            667.322,
+            1470.416
+          ],
+          "kind": "walkingConnector",
+          "length": 54.354,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.003,
+            0.003
+          ],
+          "start": [
+            705.756,
+            1431.982
+          ],
+          "stationID": "940GZZLUHGR",
+          "stationName": "Hanger Lane"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            319.281,
+            2286.828
           ],
           "kind": "connector",
-          "length": 29.855,
+          "length": 38.537,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            292.031,
+            2259.578
+          ],
+          "stationID": "940GZZLUHR4",
+          "stationName": "Heathrow Terminal 4"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1172.891,
+            1843.141
+          ],
+          "kind": "walkingConnector",
+          "length": 38.188,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3266,8 +1840,30 @@
             0.0
           ],
           "start": [
-            1171.929,
-            1843.188
+            1172.891,
+            1804.953
+          ],
+          "stationID": "940GZZLUHSC",
+          "stationName": "Hammersmith (H&C Line)"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1172.891,
+            1873.203
+          ],
+          "kind": "connector",
+          "length": 30.062,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            1172.891,
+            1843.141
           ],
           "stationID": "940GZZLUHSD",
           "stationName": "Hammersmith (Dist&Picc Line)"
@@ -3276,20 +1872,20 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1976.0,
-            2257.0
+            1973.338,
+            2257.178
           ],
           "kind": "connector",
-          "length": 34.365,
+          "length": 32.578,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.025,
+            0.025
           ],
           "start": [
-            1951.7,
-            2232.7
+            1950.302,
+            2234.142
           ],
           "stationID": "940GZZLUKNG",
           "stationName": "Kennington"
@@ -3298,196 +1894,86 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2098.041,
-            1395.558
+            2107.477,
+            1386.257
           ],
           "kind": "connector",
-          "length": 55.935,
+          "length": 42.271,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.409,
+            0.408
           ],
           "start": [
-            2137.593,
-            1356.006
+            2137.367,
+            1356.367
           ],
           "stationID": "940GZZLUKSX",
           "stationName": "King's Cross St. Pancras"
         },
         {
-          "angleDegrees": 90.0,
+          "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2390.031,
-            1549.447
+            2940.365,
+            1545.447
           ],
           "kind": "connector",
-          "length": 63.353,
-          "nearestCanonicalAngle": 90.0,
+          "length": 42.596,
+          "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.003,
+            0.003
           ],
           "start": [
-            2390.031,
-            1486.094
+            2910.245,
+            1515.327
           ],
-          "stationID": "940GZZLULVT",
-          "stationName": "Liverpool Street"
+          "stationID": "940GZZLUMED",
+          "stationName": "Mile End"
         },
         {
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            2354.687,
-            1521.438
+            2322.004,
+            1549.48
           ],
           "kind": "connector",
-          "length": 49.984,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2390.031,
-            1486.094
-          ],
-          "stationID": "940GZZLULVT",
-          "stationName": "Liverpool Street"
-        },
-        {
-          "angleDegrees": 89.998,
-          "deviationDegrees": 0.002,
-          "end": [
-            2909.999,
-            1515.328
-          ],
-          "kind": "connector",
-          "length": 27.672,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2910.0,
-            1543.0
-          ],
-          "stationID": "940GZZLUMED",
-          "stationName": "Mile End"
-        },
-        {
-          "angleDegrees": 89.566,
-          "deviationDegrees": 0.434,
-          "end": [
-            2909.95,
-            1549.594
-          ],
-          "kind": "connector",
-          "length": 6.594,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            6.594
-          ],
-          "start": [
-            2910.0,
-            1543.0
-          ],
-          "stationID": "940GZZLUMED",
-          "stationName": "Mile End"
-        },
-        {
-          "angleDegrees": 49.685,
-          "deviationDegrees": 4.685,
-          "end": [
-            2354.687,
-            1521.438
-          ],
-          "kind": "connector",
-          "length": 36.721,
+          "length": 45.818,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.105,
+            0.105
           ],
           "start": [
-            2330.929,
-            1549.438
+            2354.402,
+            1517.082
           ],
           "stationID": "940GZZLUMGT",
           "stationName": "Moorgate"
         },
         {
-          "angleDegrees": 14.8,
-          "deviationDegrees": 14.8,
-          "end": [
-            1410.266,
-            1683.976
-          ],
-          "kind": "connector",
-          "length": 6.205,
-          "nearestCanonicalAngle": 0.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            6.205
-          ],
-          "start": [
-            1416.265,
-            1682.391
-          ],
-          "stationID": "940GZZLUNHG",
-          "stationName": "Notting Hill Gate"
-        },
-        {
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1149.008,
-            874.14
-          ],
-          "kind": "walkingConnector",
-          "length": 86.909,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1087.554,
-            935.594
-          ],
-          "stationID": "940GZZLUNKP",
-          "stationName": "Northwick Park"
-        },
-        {
-          "angleDegrees": 45.0,
-          "deviationDegrees": 0.0,
-          "end": [
-            1377.05,
-            1393.254
+            1377.693,
+            1392.713
           ],
           "kind": "connector",
-          "length": 58.076,
+          "length": 57.547,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.03,
+            0.03
           ],
           "start": [
-            1335.984,
-            1352.188
+            1337.001,
+            1352.021
           ],
           "stationID": "940GZZLUPAC",
           "stationName": "Paddington"
@@ -3496,55 +1982,33 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1414.422,
-            1430.626
+            1414.411,
+            1429.59
           ],
           "kind": "connector",
-          "length": 52.852,
+          "length": 52.04,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 1,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.083,
+            0.083
           ],
           "start": [
-            1377.05,
-            1393.254
+            1377.613,
+            1392.792
           ],
           "stationID": "940GZZLUPAC",
           "stationName": "Paddington"
         },
         {
-          "angleDegrees": 45.0,
+          "angleDegrees": 90.0,
           "deviationDegrees": 0.0,
           "end": [
-            1458.781,
-            1474.985
+            1523.375,
+            1868.711
           ],
           "kind": "connector",
-          "length": 62.733,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 2,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1414.422,
-            1430.626
-          ],
-          "stationID": "940GZZLUPAC",
-          "stationName": "Paddington"
-        },
-        {
-          "angleDegrees": 89.24,
-          "deviationDegrees": 0.76,
-          "end": [
-            1523.672,
-            1868.887
-          ],
-          "kind": "connector",
-          "length": 25.725,
+          "length": 25.938,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3552,65 +2016,21 @@
             0.0
           ],
           "start": [
-            1524.013,
-            1843.164
+            1523.375,
+            1842.773
           ],
           "stationID": "940GZZLUSKS",
           "stationName": "South Kensington"
         },
         {
-          "angleDegrees": 55.232,
-          "deviationDegrees": 10.232,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            3229.031,
-            1269.836
+            920.719,
+            1872.766
           ],
           "kind": "connector",
-          "length": 30.83,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            3211.45,
-            1244.51
-          ],
-          "stationID": "940GZZLUSTD",
-          "stationName": "Stratford"
-        },
-        {
-          "angleDegrees": 51.943,
-          "deviationDegrees": 6.943,
-          "end": [
-            1966.983,
-            1561.804
-          ],
-          "kind": "connector",
-          "length": 38.786,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1943.074,
-            1592.344
-          ],
-          "stationID": "940GZZLUTCR",
-          "stationName": "Tottenham Court Road"
-        },
-        {
-          "angleDegrees": 89.526,
-          "deviationDegrees": 0.474,
-          "end": [
-            919.595,
-            1873.046
-          ],
-          "kind": "connector",
-          "length": 29.859,
+          "length": 30.0,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3618,153 +2038,87 @@
             0.0
           ],
           "start": [
-            919.842,
-            1843.188
+            920.719,
+            1842.766
           ],
           "stationID": "940GZZLUTNG",
           "stationName": "Turnham Green"
         },
         {
-          "angleDegrees": 77.253,
-          "deviationDegrees": 12.747,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2528.968,
-            1687.438
+            2566.877,
+            1727.78
           ],
-          "kind": "connector",
-          "length": 4.677,
-          "nearestCanonicalAngle": 90.0,
+          "kind": "walkingConnector",
+          "length": 51.271,
+          "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            4.677
+            0.196,
+            0.197
           ],
           "start": [
-            2530.0,
-            1692.0
+            2530.623,
+            1691.526
           ],
           "stationID": "940GZZLUTWH",
           "stationName": "Tower Hill"
         },
         {
-          "angleDegrees": 61.766,
-          "deviationDegrees": 16.766,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2532.005,
-            1695.734
+            1703.206,
+            1868.66
           ],
           "kind": "connector",
-          "length": 4.238,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            4.238
-          ],
-          "start": [
-            2530.0,
-            1692.0
-          ],
-          "stationID": "940GZZLUTWH",
-          "stationName": "Tower Hill"
-        },
-        {
-          "angleDegrees": 52.056,
-          "deviationDegrees": 7.056,
-          "end": [
-            1729.02,
-            1844.839
-          ],
-          "kind": "connector",
-          "length": 30.492,
+          "length": 36.594,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.579,
+            0.581
           ],
           "start": [
-            1710.271,
-            1868.885
+            1729.082,
+            1842.784
           ],
           "stationID": "940GZZLUVIC",
           "stationName": "Victoria"
         },
         {
-          "angleDegrees": 48.813,
-          "deviationDegrees": 3.813,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1172.758,
-            1644.957
+            1172.641,
+            1714.914
           ],
           "kind": "walkingConnector",
-          "length": 49.742,
+          "length": 46.414,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.067,
+            0.066
           ],
           "start": [
-            1140.002,
-            1682.391
+            1139.821,
+            1682.094
           ],
           "stationID": "940GZZLUWCY",
           "stationName": "White City"
         },
         {
-          "angleDegrees": 28.137,
-          "deviationDegrees": 16.863,
-          "end": [
-            3280.781,
-            1545.945
-          ],
-          "kind": "connector",
-          "length": 58.66,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            3229.053,
-            1518.282
-          ],
-          "stationID": "940GZZLUWHM",
-          "stationName": "West Ham"
-        },
-        {
-          "angleDegrees": 45.0,
+          "angleDegrees": 0.0,
           "deviationDegrees": 0.0,
           "end": [
-            1387.96,
-            1093.846
+            1991.062,
+            1968.898
           ],
           "kind": "connector",
-          "length": 26.87,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1406.96,
-            1074.846
-          ],
-          "stationID": "940GZZLUWIG",
-          "stationName": "Willesden Green"
-        },
-        {
-          "angleDegrees": 0.05,
-          "deviationDegrees": 0.05,
-          "end": [
-            1991.094,
-            1970.021
-          ],
-          "kind": "connector",
-          "length": 24.094,
+          "length": 24.554,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3772,118 +2126,52 @@
             0.0
           ],
           "start": [
-            1967.0,
-            1970.0
+            1966.508,
+            1968.898
           ],
           "stationID": "940GZZLUWLO",
           "stationName": "Waterloo"
         },
         {
-          "angleDegrees": 0.044,
-          "deviationDegrees": 0.044,
+          "angleDegrees": 0.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1942.469,
-            1970.019
+            1941.953,
+            1968.902
           ],
           "kind": "connector",
-          "length": 24.531,
+          "length": 24.556,
           "nearestCanonicalAngle": 0.0,
           "primitiveIndex": 1,
           "roundelEndpointDistances": [
-            0.0,
-            0.0
+            0.004,
+            0.004
           ],
           "start": [
-            1967.0,
-            1970.0
+            1966.509,
+            1968.902
           ],
           "stationID": "940GZZLUWLO",
           "stationName": "Waterloo"
         },
         {
-          "angleDegrees": 43.644,
-          "deviationDegrees": 1.356,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            2735.05,
-            1516.281
+            1872.465,
+            1869.086
           ],
           "kind": "connector",
-          "length": 41.611,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2704.938,
-            1545.0
-          ],
-          "stationID": "940GZZLUWPL",
-          "stationName": "Whitechapel"
-        },
-        {
-          "angleDegrees": 89.973,
-          "deviationDegrees": 0.027,
-          "end": [
-            1874.002,
-            1864.734
-          ],
-          "kind": "connector",
-          "length": 4.266,
+          "length": 26.688,
           "nearestCanonicalAngle": 90.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
-            4.266
+            0.168,
+            0.168
           ],
           "start": [
-            1874.0,
-            1869.0
-          ],
-          "stationID": "940GZZLUWSM",
-          "stationName": "Westminster"
-        },
-        {
-          "angleDegrees": 86.949,
-          "deviationDegrees": 3.051,
-          "end": [
-            1873.785,
-            1873.034
-          ],
-          "kind": "connector",
-          "length": 4.04,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 1,
-          "roundelEndpointDistances": [
-            0.0,
-            4.04
-          ],
-          "start": [
-            1874.0,
-            1869.0
-          ],
-          "stationID": "940GZZLUWSM",
-          "stationName": "Westminster"
-        },
-        {
-          "angleDegrees": 47.343,
-          "deviationDegrees": 2.343,
-          "end": [
-            1885.992,
-            1855.985
-          ],
-          "kind": "connector",
-          "length": 17.697,
-          "nearestCanonicalAngle": 45.0,
-          "primitiveIndex": 2,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            1874.0,
-            1869.0
+            1872.465,
+            1842.398
           ],
           "stationID": "940GZZLUWSM",
           "stationName": "Westminster"
@@ -3892,20 +2180,20 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
-            1263.067,
-            968.875
+            1262.891,
+            968.844
           ],
           "kind": "connector",
-          "length": 26.87,
+          "length": 27.178,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
-            0.0,
+            0.001,
             0.0
           ],
           "start": [
-            1282.067,
-            949.875
+            1282.109,
+            949.626
           ],
           "stationID": "940GZZLUWYP",
           "stationName": "Wembley Park"
@@ -3916,10 +2204,10 @@
       "labels": 458,
       "paths": 620,
       "primitives": {
-        "circle": 178,
-        "connector": 80,
-        "tick": 407,
-        "walkingConnector": 5
+        "circle": 216,
+        "connector": 63,
+        "tick": 360,
+        "walkingConnector": 29
       },
       "routes": 93,
       "segments": 619,
@@ -3948,45 +2236,35 @@
       ]
     },
     "roundels": {
-      "count": 178,
+      "count": 216,
       "styles": [
         {
-          "count": 178,
-          "outlineWidth": 3.5,
-          "radius": 8.5
+          "count": 216,
+          "outlineWidth": 4.14,
+          "radius": 10.36
         }
       ],
-      "unmatchedRoutePorts": 4
+      "unmatchedRoutePorts": 0
     },
     "routeAngleCandidatesByLine": {
-      "central": 2,
-      "circle": 2,
       "dlr": 2,
-      "elizabeth": 3,
-      "hammersmith-city": 2,
-      "jubilee": 1,
-      "metropolitan": 4,
       "mildmay": 2,
-      "northern": 4,
-      "piccadilly": 1,
-      "suffragette": 1,
-      "victoria": 4,
-      "weaver": 1,
-      "windrush": 1
+      "northern": 2,
+      "victoria": 2
     },
     "routeCommands": {
-      "cubic": 333,
-      "line": 980,
+      "cubic": 390,
+      "line": 1499,
       "move": 619
     },
     "sourceVerifiedGeometry": {
-      "connectorExpectationsChecked": 8,
+      "connectorExpectationsChecked": 7,
       "sharedStationRowsChecked": 3
     },
     "ticks": {
-      "count": 407,
-      "maximumLength": 14.001,
-      "minimumLength": 13.999,
+      "count": 360,
+      "maximumLength": 19.54,
+      "minimumLength": 9.769,
       "nonPerpendicular": 0
     }
   },
@@ -4025,15 +2303,12 @@
   "schemaVersion": 1,
   "summary": {
     "byCategory": {
-      "connectors": 55,
-      "roundels": 4,
-      "routes": 14,
+      "routes": 4,
       "styles": 1
     },
     "bySeverity": {
-      "high": 36,
-      "medium": 38
+      "medium": 5
     },
-    "findingCount": 74
+    "findingCount": 5
   }
 }

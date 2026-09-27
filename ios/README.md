@@ -180,7 +180,8 @@ Both layers use small Tube-sized circles at overview zoom and larger mode icons
 when zoomed in or selected. Layer cards are only shown after selection, and the
 cable-car route has no badge during good service. The
 route and two independent terminals are selectable, with shared search and
-terminal favourites. Walking connections appear only for the selected terminal.
+terminal favourites. As on the TfL map, dotted walking links join each terminal
+to North Greenwich and Royal Victoria; the selected terminal's link is labelled.
 Closed routes remain visible and muted, with an explicit badge and explanation.
 
 Published opening hours, fresh TfL status and dated planned closures are resolved
@@ -305,13 +306,36 @@ because those paths are extracted directly from the official vector artwork.
 Move the gate to `--fail-on high` once the remaining connector and symbol
 findings have been source-adjudicated.
 
-The final map compiler first runs `normalize_official_geometry.py` to apply
-station-specific, source-verified connector and shared-corridor corrections,
-then runs `normalize_station_markers.py` after every rail mode has been
-composed. The latter promotes connector-linked ordinary ticks to interchange
-roundels and derives visibly skewed ticks from their closest local route
-tangent. Both passes are idempotent, so rerunning them must not change a current
-bundled asset.
+The final map compiler first runs `normalize_official_geometry.py`, which
+aligns the composed map with the September 2026 TfL standard map through
+`reference_alignment.py`. That pass pairs every route station with its TfL
+tick, roundel or step-free disc (in route order, guided by each station's TfL
+label), moves stations along their existing paths to those symbols and
+re-traces the few runs that had been drawn away from TfL's strokes. It then
+rebuilds station markers in the TfL grammar: ticks run one tick length from the
+line centre towards the station name, termini have a bar centred across the
+line end, interchange bars are 12.4 units wide with a white core a third as
+wide, and walking interchanges are rows of 5.3-unit square dots. Labels of moved
+stations are placed on TfL's label boxes. `normalize_station_markers.py` runs
+after every rail mode has been composed and only corrects markers that still
+break that grammar. Both passes are idempotent, so rerunning them must not
+change a current bundled asset.
+
+The TfL reference is a checked-in extract of page 1 (the map) of the official
+PDF. Regenerate it after a new map edition, from the `ios` directory:
+
+```sh
+pdftocairo -svg -f 1 -l 1 standard-tube-map.pdf /tmp/tfl.svg
+pdftotext -f 1 -l 1 -bbox-layout standard-tube-map.pdf /tmp/tfl-words.html
+python3 Tools/BeckMapBuilder/extract_tfl_reference.py --svg /tmp/tfl.svg \
+  --words /tmp/tfl-words.html --revision "September 2026" \
+  --output design_brief/beck_map/tfl-standard-map-2026-09-reference.json
+```
+
+River Bus piers and cable-car terminals are drawn by their own layers.
+`RiverSchematic.json` places the 13 piers that the TfL map shows at TfL's
+positions and lists the stations each one joins with a walking link; the
+cable-car layer uses TfL's terminal positions and route.
 
 ## Background images
 

@@ -284,12 +284,14 @@ struct BeckMapRepositoryTests {
         }
 
         // Shared rail records normally resolve to one physical roundel. TfL
-        // gives Hackney Downs two Weaver branch ports plus Hackney Central's
-        // connected roundel.
+        // gives Hackney Downs two Weaver branch roundels joined by a bar, and
+        // a second bar to Hackney Central's roundel.
         #expect(circles(try marker("910GROMFORD")).count == 1)
         let hackneyDowns = try marker("910GHAKNYNM")
-        #expect(circles(hackneyDowns).count == 3)
-        #expect(connectors(hackneyDowns).count == 2)
+        let hackneyCentral = try marker("910GHACKNYC")
+        #expect(circles(hackneyDowns).count == 2)
+        #expect(circles(hackneyCentral).count == 1)
+        #expect(connectors(hackneyDowns).count + connectors(hackneyCentral).count == 2)
 
         // These Underground interchanges use roundels, not ordinary ticks.
         for stationID in [
@@ -302,10 +304,9 @@ struct BeckMapRepositoryTests {
         }
 
         let compactInterchanges: [(String, Double)] = [
-            ("910GSEVNSIS", 40),
             ("910GBLCHSRD", 30),
-            ("910GWLTWCEN", 25),
-            ("910GHGHI", 32),
+            ("910GWLTWCEN", 40),
+            ("910GHGHI", 45),
             ("910GCLDNNRB", 55),
             ("910GWHMDSTD", 55),
             ("910GFNCHLYR", 90),
@@ -329,24 +330,46 @@ struct BeckMapRepositoryTests {
             abs(caledonianLink.end.x - caledonianLink.start.x)
                 - abs(caledonianLink.end.y - caledonianLink.start.y)
         ) < 0.01)
+        // Blackhorse Road's bar runs at 45 degrees between the Suffragette
+        // roundel and the Victoria line roundel to its south-west.
         let blackhorseLink = try #require(
             connectors(try marker("910GBLCHSRD")).first
         )
-        #expect(blackhorseLink.end.x > blackhorseLink.start.x)
-        #expect(blackhorseLink.end.y < blackhorseLink.start.y)
+        let blackhorseEnds = [blackhorseLink.start, blackhorseLink.end].sorted { $0.x < $1.x }
+        let blackhorseRoundels = (circles(try marker("940GZZLUBLR")) + circles(try marker("910GBLCHSRD")))
+            .sorted { $0.x < $1.x }
+        #expect(blackhorseRoundels.count == 2)
+        for (end, roundel) in zip(blackhorseEnds, blackhorseRoundels) {
+            #expect(hypot(end.x - roundel.x, end.y - roundel.y) < 0.5)
+        }
+        #expect(blackhorseEnds[0].y > blackhorseEnds[1].y)
         #expect(abs(
             abs(blackhorseLink.end.x - blackhorseLink.start.x)
                 - abs(blackhorseLink.end.y - blackhorseLink.start.y)
         ) < 0.01)
 
+        // TfL draws Seven Sisters as one roundel for the Victoria and Weaver
+        // lines, with a walking link to South Tottenham.
+        #expect(circles(try marker("910GSEVNSIS")) == circles(try marker("940GZZLUSVS")))
+        let sevenSistersWalk = try #require(try marker("910GSEVNSIS").primitives.compactMap { primitive in
+            if case let .walkingConnector(connector) = primitive { return connector }
+            return nil
+        }.first)
+        let southTottenham = try #require(circles(try marker("910GSTOTNHM")).first)
+        #expect([sevenSistersWalk.start, sevenSistersWalk.end].contains {
+            hypot($0.x - southTottenham.x, $0.y - southTottenham.y) < 0.5
+        })
+
         // Queen's Park keeps the official small separation between the
-        // Bakerloo and Lioness traces while retaining one shared roundel.
+        // Bakerloo and Lioness traces, across the diagonal, while retaining
+        // one shared roundel.
         let queensBakerloo = try port("940GZZLUQPS", .bakerloo)
         let queensLioness = try port("910GQPRK", .lioness)
         #expect(abs(hypot(
             queensBakerloo.x - queensLioness.x,
             queensBakerloo.y - queensLioness.y
-        ) - 13.078) < 0.001)
+        ) - 9.248) < 0.001)
+        #expect(abs((queensLioness.x - queensBakerloo.x) + (queensLioness.y - queensBakerloo.y)) < 0.01)
         #expect(circles(try marker("940GZZLUQPS")).count == 1)
         #expect(circles(try marker("910GQPRK")).count == 1)
         #expect(circles(try marker("940GZZLUQPS")) == circles(try marker("910GQPRK")))
@@ -371,11 +394,15 @@ struct BeckMapRepositoryTests {
         })
         let kensalPort = try #require(kensalToWillesden.fromPort)
         let willesdenPort = try #require(kensalToWillesden.toPort)
-        #expect(kensalToWillesdenPath.commands == [
-            .move(to: kensalPort),
-            .line(to: willesdenPort),
-        ])
-        #expect(abs(kensalPort.x - willesdenPort.x) < 0.001)
+        // A straight vertical run from Kensal Green to Willesden Junction.
+        #expect(kensalToWillesdenPath.commands.first == .move(to: kensalPort))
+        #expect(kensalToWillesdenPath.commands.last == .line(to: willesdenPort))
+        #expect(kensalToWillesdenPath.commands.allSatisfy { command in
+            switch command {
+            case let .move(to), let .line(to): abs(to.x - kensalPort.x) < 0.001
+            default: false
+            }
+        })
 
         // The parallel Bakerloo/Lioness corridor uses short horizontal links.
         for (overgroundID, undergroundID) in [
@@ -394,11 +421,11 @@ struct BeckMapRepositoryTests {
             #expect(abs(lioness.x - bakerloo.x) < 15)
         }
 
-        // Stratford's four displayed nodes are distinct, with no duplicated
-        // Jubilee/Elizabeth ring at the shared centre.
-        let stratfordCentres = try ["940GZZLUSTD", "910GSTFD", "940GZZDLSTD"]
-            .flatMap { circles(try marker($0)) }
-        #expect(stratfordCentres.count == 4)
+        // TfL shows Stratford as three distinct discs in a row; station
+        // records that share a disc each draw it.
+        let stratfordCentres = Array(Set(try ["940GZZLUSTD", "910GSTFD", "940GZZDLSTD"]
+            .flatMap { circles(try marker($0)) }))
+        #expect(stratfordCentres.count == 3)
         for (index, centre) in stratfordCentres.enumerated() {
             for other in stratfordCentres.dropFirst(index + 1) {
                 #expect(hypot(centre.x - other.x, centre.y - other.y) > 10)

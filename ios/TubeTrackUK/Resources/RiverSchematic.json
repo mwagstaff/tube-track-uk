@@ -10,7 +10,7 @@
   },
   {
     "id": "930GWRQ",
-    "x": 1340,
+    "x": 1270,
     "y": 2145,
     "offsetX": 0,
     "offsetY": 27,
@@ -19,7 +19,7 @@
   },
   {
     "id": "930GPLW",
-    "x": 1450,
+    "x": 1340,
     "y": 2145,
     "offsetX": 0,
     "offsetY": 27,
@@ -28,16 +28,19 @@
   },
   {
     "id": "930GCHP",
-    "x": 1490,
+    "x": 1410.4,
     "y": 2145,
     "offsetX": 0,
-    "offsetY": -27,
+    "offsetY": -2,
     "labelSide": -1,
-    "major": false
+    "major": false,
+    "walkingLinkStationIDs": [
+      "910GCSEAH"
+    ]
   },
   {
     "id": "930GBSE",
-    "x": 1580,
+    "x": 1495,
     "y": 2145,
     "offsetX": 0,
     "offsetY": -27,
@@ -46,21 +49,27 @@
   },
   {
     "id": "930GBSP",
-    "x": 1670,
+    "x": 1577.6,
     "y": 2145,
     "offsetX": 0,
-    "offsetY": 27,
+    "offsetY": 17.5,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZBPSUST"
+    ]
   },
   {
     "id": "930GSGW",
-    "x": 1760,
-    "y": 2100,
-    "offsetX": 27,
-    "offsetY": 0,
+    "x": 1750,
+    "y": 2145,
+    "offsetX": 0,
+    "offsetY": 17.4,
     "labelSide": 1,
-    "major": false
+    "major": false,
+    "walkingLinkStationIDs": [
+      "940GZZLUVXL"
+    ]
   },
   {
     "id": "930GMBK",
@@ -73,39 +82,51 @@
   },
   {
     "id": "930GWMR",
-    "x": 1830,
+    "x": 1872.5,
     "y": 1950,
     "offsetX": 0,
-    "offsetY": -27,
+    "offsetY": -29.3,
     "labelSide": -1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZLUWSM"
+    ]
   },
   {
     "id": "930GWMP",
-    "x": 1940,
+    "x": 1917.5,
     "y": 1950,
-    "offsetX": -20,
-    "offsetY": 18,
+    "offsetX": 0,
+    "offsetY": -5.6,
     "labelSide": -1,
-    "major": false
+    "major": false,
+    "walkingLinkStationIDs": [
+      "940GZZLUWLO"
+    ]
   },
   {
     "id": "930GEMB",
-    "x": 2050,
+    "x": 2043.7,
     "y": 1950,
     "offsetX": 0,
-    "offsetY": -27,
+    "offsetY": -28.8,
     "labelSide": -1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZLUEMB"
+    ]
   },
   {
     "id": "930GBFR",
-    "x": 2185,
-    "y": 1865,
-    "offsetX": -20,
-    "offsetY": -20,
+    "x": 2187.7,
+    "y": 1862.3,
+    "offsetX": -10.1,
+    "offsetY": -10.1,
     "labelSide": -1,
-    "major": false
+    "major": false,
+    "walkingLinkStationIDs": [
+      "940GZZLUBKF"
+    ]
   },
   {
     "id": "930GSWK",
@@ -118,21 +139,28 @@
   },
   {
     "id": "930GLBR",
-    "x": 2390,
+    "x": 2402.5,
     "y": 1790,
     "offsetX": 0,
-    "offsetY": 27,
+    "offsetY": -2.2,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZLULNB"
+    ]
   },
   {
     "id": "930GTMP",
-    "x": 2510,
+    "x": 2530.1,
     "y": 1790,
     "offsetX": 0,
-    "offsetY": -27,
+    "offsetY": -25.3,
     "labelSide": -1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZDLTWG",
+      "940GZZLUTWH"
+    ]
   },
   {
     "id": "930GNEL",
@@ -172,21 +200,27 @@
   },
   {
     "id": "930GGNW",
-    "x": 3060,
+    "x": 3003.2,
     "y": 2200,
     "offsetX": 0,
-    "offsetY": 27,
+    "offsetY": 16.4,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZDLCUT"
+    ]
   },
   {
     "id": "930GMIL",
-    "x": 3100,
-    "y": 1925,
-    "offsetX": 27,
-    "offsetY": 0,
+    "x": 3168.4,
+    "y": 1900,
+    "offsetX": 0,
+    "offsetY": 10.3,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZLUNGW"
+    ]
   },
   {
     "id": "930GWRF",
@@ -199,20 +233,26 @@
   },
   {
     "id": "930GWAS",
-    "x": 3500,
+    "x": 3463.8,
     "y": 2200,
     "offsetX": 0,
-    "offsetY": 27,
+    "offsetY": 15.3,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "940GZZDLWLA"
+    ]
   },
   {
     "id": "930GBRVS",
-    "x": 3825,
-    "y": 1675,
-    "offsetX": 20,
-    "offsetY": 20,
+    "x": 3833.6,
+    "y": 1666.4,
+    "offsetX": -18.8,
+    "offsetY": -18.9,
     "labelSide": 1,
-    "major": true
+    "major": true,
+    "walkingLinkStationIDs": [
+      "910GBARKRIV"
+    ]
   }
 ]

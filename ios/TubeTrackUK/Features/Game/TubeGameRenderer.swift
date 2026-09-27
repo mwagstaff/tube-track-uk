@@ -519,25 +519,27 @@ struct TubeGamePlayfield: View {
             let width = max(1.2, CGFloat(connector.width) * camera.scale)
             let outline = palette.stationOutline.opacity(consumed ? 0.48 : 1)
             if isWalking {
+                // TfL walking links: square dots separated by half a dot.
                 context.stroke(
                     path,
                     with: .color(outline),
                     style: StrokeStyle(
                         lineWidth: width,
                         lineCap: .butt,
-                        dash: [max(3, width), max(2, width * 0.65)]
+                        dash: [max(3, width), max(1.5, width / 2)]
                     )
                 )
             } else {
+                // TfL interchange bars: a white core a third of the bar's width.
                 context.stroke(
                     path,
                     with: .color(outline),
-                    style: StrokeStyle(lineWidth: width + 1.8, lineCap: .round)
+                    style: StrokeStyle(lineWidth: max(3, width), lineCap: .round)
                 )
                 context.stroke(
                     path,
                     with: .color(palette.paper.opacity(consumed ? 0.62 : 1)),
-                    style: StrokeStyle(lineWidth: max(1, width - 2.2), lineCap: .round)
+                    style: StrokeStyle(lineWidth: max(1, width / 3), lineCap: .round)
                 )
             }
         }

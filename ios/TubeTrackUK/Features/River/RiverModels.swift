@@ -117,6 +117,8 @@ struct RiverSchematicAnchor: Codable, Identifiable, Sendable {
     let offsetY: Double
     let labelSide: Double
     let major: Bool
+    /// Stations the TfL map joins to this pier with a dotted walking link.
+    var walkingLinkStationIDs: [String]? = nil
     var riverPoint: CGPoint { CGPoint(x: x, y: y) }
     var markerPoint: CGPoint { CGPoint(x: x + offsetX, y: y + offsetY) }
 }

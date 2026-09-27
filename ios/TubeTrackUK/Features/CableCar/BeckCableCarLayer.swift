@@ -1,14 +1,17 @@
 import SwiftUI
 import UIKit
 
+/// The cable car as drawn on the September 2026 TfL map: terminal symbols
+/// east of North Greenwich and south-east of Royal Victoria, joined by a
+/// horizontal, diagonal, horizontal route.
 enum CableCarSchematic {
     static let anchors: [String: CGPoint] = [
-        "940GZZALGWP": CGPoint(x: 3210, y: 1967),
-        "940GZZALRDK": CGPoint(x: 3455, y: 1822)
+        "940GZZALGWP": CGPoint(x: 3243.3, y: 1948.73),
+        "940GZZALRDK": CGPoint(x: 3490.34, y: 1793.45)
     ]
-    static let points = [CGPoint(x: 3210, y: 1967), CGPoint(x: 3260, y: 1967),
-                         CGPoint(x: 3405, y: 1822), CGPoint(x: 3455, y: 1822)]
-    static let midpoint = CGPoint(x: 3332.5, y: 1894.5)
+    static let points = [CGPoint(x: 3243.3, y: 1949.2), CGPoint(x: 3267.1, y: 1949.2),
+                         CGPoint(x: 3431.2, y: 1792.0), CGPoint(x: 3490.3, y: 1792.0)]
+    static let midpoint = CGPoint(x: 3349.2, y: 1870.6)
 
     static func path(scale: CGFloat, offset: CGSize) -> Path {
         func screen(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * scale + offset.width, y: p.y * scale + offset.height) }
@@ -49,19 +52,27 @@ struct BeckCableCarLayer: View {
             context.stroke(path, with: .color(Color(.systemBackground)), style: StrokeStyle(lineWidth: 10 * strokeScale, lineCap: .round, lineJoin: .round))
             context.stroke(path, with: .color(tint), style: StrokeStyle(lineWidth: (cable.hasSelection ? 7 : 6) * strokeScale, lineCap: .round, lineJoin: .round))
             context.stroke(path, with: .color(Color(.systemBackground)), style: StrokeStyle(lineWidth: 2 * strokeScale, lineCap: .round, lineJoin: .round))
+            let palette = BeckMapPalette.resolve(for: colorScheme)
+            let walkWidth = CGFloat(BeckMapWalkingLink.width(in: document)) * scale
             for terminal in cable.network.terminals {
                 guard let anchor = CableCarSchematic.anchors[terminal.id] else { continue }
                 let point = screen(anchor)
                 let selected = cable.selectedTerminalID == terminal.id
-                if selected, let rail = document.stationMarkers.first(where: { $0.stationID == terminal.railStationID }) {
-                    let railPoint = screen(CGPoint(x: rail.anchor.x, y: rail.anchor.y))
-                    var walk = Path(); walk.move(to: point); walk.addLine(to: railPoint)
-                    context.stroke(walk, with: .color(.secondary), style: StrokeStyle(lineWidth: 2, dash: [3, 4]))
-                    let walkLabel = Text("Walk").font(.system(size: 11 * min(typeScale, 1.5))).foregroundStyle(.primary)
-                    context.draw(walkLabel, at: CGPoint(x: (point.x + railPoint.x) / 2, y: (point.y + railPoint.y) / 2 - 12))
-                }
                 let showsIcon = selected || scale >= 1.1
                 let radius: CGFloat = selected ? 17 : showsIcon ? 13 : 8.5 * scale
+                // TfL shows each terminal's walking interchange with a dotted link.
+                if let stationID = terminal.railStationID,
+                   let rail = BeckMapWalkingLink.roundel(of: stationID, nearest: anchor, in: document) {
+                    let railPoint = screen(rail.centre)
+                    BeckMapWalkingLink.draw(
+                        from: point, startRadius: radius, to: railPoint, endRadius: rail.outerRadius * scale,
+                        width: walkWidth, color: palette.stationOutline, in: &context
+                    )
+                    if selected {
+                        let walkLabel = Text("Walk").font(.system(size: 11 * min(typeScale, 1.5))).foregroundStyle(.primary)
+                        context.draw(walkLabel, at: CGPoint(x: (point.x + railPoint.x) / 2, y: (point.y + railPoint.y) / 2 - 12))
+                    }
+                }
                 let circle = Path(ellipseIn: CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2))
                 context.fill(circle, with: .color(selected ? .red : Color(.systemBackground)))
                 context.stroke(circle, with: .color(.red), lineWidth: showsIcon ? 2 : 3.5 * scale)

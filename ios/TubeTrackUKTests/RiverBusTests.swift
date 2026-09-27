@@ -275,6 +275,26 @@ struct RiverBusTests {
         #expect(geometry.path(from: from, to: to).count > 10)
     }
 
+    @Test func tflPiersHaveWalkingLinksToNearbyStationRoundels() throws {
+        let anchors = try #require(RiverBundle.load("RiverSchematic", as: [RiverSchematicAnchor].self))
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: TubeGraph.bundled())
+        let linked = anchors.filter { !($0.walkingLinkStationIDs ?? []).isEmpty }
+        // The September 2026 TfL map joins 13 piers to stations.
+        #expect(linked.count == 13)
+        #expect(Set(anchors.first { $0.id == "930GTMP" }?.walkingLinkStationIDs ?? [])
+            == ["940GZZLUTWH", "940GZZDLTWG"])
+        for anchor in linked {
+            for stationID in anchor.walkingLinkStationIDs ?? [] {
+                let roundel = try #require(
+                    BeckMapWalkingLink.roundel(of: stationID, nearest: anchor.markerPoint, in: document)
+                )
+                #expect(roundel.outerRadius > 0, "\(stationID) needs an interchange roundel")
+                let length = hypot(roundel.centre.x - anchor.markerPoint.x, roundel.centre.y - anchor.markerPoint.y)
+                #expect(length < 110, "\(anchor.id) is \(length) units from \(stationID)")
+            }
+        }
+    }
+
     @Test func crossRiverSchematicHasARealSegmentAndReversePathIsSymmetric() throws {
         let anchors = try #require(RiverBundle.load("RiverSchematic", as: [RiverSchematicAnchor].self))
         let document = try BeckMapRepository().load(region: .fullUnderground, graph: TubeGraph.bundled())

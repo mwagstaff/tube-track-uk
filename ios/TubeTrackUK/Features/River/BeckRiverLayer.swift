@@ -3,6 +3,7 @@ import UIKit
 
 struct RiverPierPlacement {
     let pier: RiverPier
+    let anchor: RiverSchematicAnchor
     let point: CGPoint
     let riverPoint: CGPoint
     let labelFrame: CGRect?
@@ -48,7 +49,8 @@ enum RiverSchematicLayout {
                 }
                 if let labelFrame { occupied.append(labelFrame.insetBy(dx: -4, dy: -4)) }
             }
-            result.append(RiverPierPlacement(pier: pier, point: point, riverPoint: screen(anchor.riverPoint), labelFrame: labelFrame))
+            result.append(RiverPierPlacement(pier: pier, anchor: anchor, point: point,
+                                             riverPoint: screen(anchor.riverPoint), labelFrame: labelFrame))
         }
         return result
     }
@@ -66,6 +68,11 @@ struct BeckRiverLayer: View {
     let canvasSize: CGSize
     let typeScale: CGFloat
     let blocked: [CGRect]
+
+    /// Pier discs match a TfL roundel's outer size at overview zoom.
+    static func markerRadius(selected: Bool, scale: CGFloat) -> CGFloat {
+        selected ? 16 : scale >= 1.1 ? 12 : 11.4 * scale
+    }
 
     var body: some View {
         let river = appState.river
@@ -92,15 +99,31 @@ struct BeckRiverLayer: View {
                     }
                 }
             }
+            // TfL joins piers to nearby stations with dotted walking links.
+            let palette = BeckMapPalette.resolve(for: colorScheme)
+            let walkWidth = CGFloat(BeckMapWalkingLink.width(in: document)) * scale
+            for item in placements {
+                for stationID in item.anchor.walkingLinkStationIDs ?? [] {
+                    guard let roundel = BeckMapWalkingLink.roundel(
+                        of: stationID, nearest: item.anchor.markerPoint, in: document
+                    ) else { continue }
+                    BeckMapWalkingLink.draw(
+                        from: item.point, startRadius: Self.markerRadius(selected: item.pier.id == river.selectedPierId, scale: scale),
+                        to: CGPoint(x: roundel.centre.x * scale + canvasOffset.width, y: roundel.centre.y * scale + canvasOffset.height),
+                        endRadius: roundel.outerRadius * scale,
+                        width: walkWidth, color: palette.stationOutline, in: &context
+                    )
+                }
+            }
             for item in placements {
                 let selected = item.pier.id == river.selectedPierId
                 var leader = Path(); leader.move(to: item.riverPoint); leader.addLine(to: item.point)
                 context.stroke(leader, with: .color(.blue.opacity(0.7)), lineWidth: 1)
                 let showsIcon = selected || scale >= 1.1
-                let r: CGFloat = selected ? 16 : showsIcon ? 12 : 8.5 * scale
+                let r = Self.markerRadius(selected: selected, scale: scale)
                 let circle = Path(ellipseIn: CGRect(x: item.point.x - r, y: item.point.y - r, width: r * 2, height: r * 2))
                 context.fill(circle, with: .color(selected ? .blue : Color(.systemBackground)))
-                context.stroke(circle, with: .color(.blue), lineWidth: selected ? 2.5 : showsIcon ? 1.5 : 3.5 * scale)
+                context.stroke(circle, with: .color(.blue), lineWidth: selected ? 2.5 : showsIcon ? 1.5 : max(1, 2 * scale))
                 if showsIcon {
                     var icon = context.resolve(Image(systemName: "ferry.fill"))
                     icon.shading = .color(selected ? .white : .blue)

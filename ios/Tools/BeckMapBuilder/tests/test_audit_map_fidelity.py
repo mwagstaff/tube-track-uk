@@ -131,6 +131,34 @@ class MapFidelityAuditTests(unittest.TestCase):
             "segments": [{"id": "central:a:b"}],
         }
 
+    def through_document(self, markers):
+        """A horizontal line a (10, 10) - m (20, 10) - b (30, 10)."""
+        document = self.document(markers)
+        document["paths"] = [
+            {"id": "path-am", "commands": [
+                {"op": "move", "to": {"x": 10, "y": 10}}, {"op": "line", "to": {"x": 20, "y": 10}},
+            ]},
+            {"id": "path-mb", "commands": [
+                {"op": "move", "to": {"x": 20, "y": 10}}, {"op": "line", "to": {"x": 30, "y": 10}},
+            ]},
+        ]
+        document["segments"] = [
+            {
+                "id": f"central:{a}:{b}", "lineID": "central",
+                "fromStationID": a, "toStationID": b,
+                "fromPort": {"x": start, "y": 10}, "toPort": {"x": start + 10, "y": 10},
+                "pathID": path_id, "pathDirection": "forward", "translation": {"x": 0, "y": 0},
+            }
+            for a, b, start, path_id in (("a", "m", 10, "path-am"), ("m", "b", 20, "path-mb"))
+        ]
+        return document
+
+    def through_graph(self):
+        return {
+            "stations": [{"id": "a"}, {"id": "m"}, {"id": "b"}],
+            "segments": [{"id": "central:a:m"}, {"id": "central:m:b"}],
+        }
+
     def test_canonical_connector_is_not_flagged(self):
         markers = [
             marker("a", "A", [circle(10, 10), connector((10, 10), (20, 20)), circle(20, 20)]),
@@ -152,21 +180,28 @@ class MapFidelityAuditTests(unittest.TestCase):
         self.assertEqual(finding.evidence["stationID"], "a")
 
     def test_perpendicular_tick_passes_and_skewed_tick_fails(self):
-        passing = [
-            marker("a", "A", [tick((10, 3), (10, 17))]),
-            marker("b", "B", [tick((20, 3), (20, 17))], anchor=(20, 10)),
+        # Termini carry a bar centred across the line end; the through station
+        # a one-sided tick from the line centre.
+        termini = [
+            marker("a", "A", [tick((10, -4), (10, 24))]),
+            marker("b", "B", [tick((30, -4), (30, 24))], anchor=(30, 10)),
         ]
-        audit = audit_module.MapFidelityAudit(self.document(passing), self.graph(), self.manifest())
+        passing = termini + [marker("m", "M", [tick((20, 10), (20, -4))], anchor=(20, 10))]
+        audit = audit_module.MapFidelityAudit(
+            self.through_document(passing), self.through_graph(), self.manifest()
+        )
         audit.audit_ticks()
-        self.assertNotIn("tick-not-perpendicular", {finding.code for finding in audit.findings})
+        codes = {finding.code for finding in audit.findings}
+        self.assertNotIn("tick-not-perpendicular", codes)
+        self.assertNotIn("tick-not-on-route-port", codes)
 
-        failing = [
-            marker("a", "A", [tick((3, 10), (17, 10))]),
-            marker("b", "B", [tick((20, 3), (20, 17))], anchor=(20, 10)),
-        ]
-        audit = audit_module.MapFidelityAudit(self.document(failing), self.graph(), self.manifest())
+        failing = termini + [marker("m", "M", [tick((20, 10), (34, 10))], anchor=(20, 10))]
+        audit = audit_module.MapFidelityAudit(
+            self.through_document(failing), self.through_graph(), self.manifest()
+        )
         audit.audit_ticks()
-        self.assertIn("tick-not-perpendicular", {finding.code for finding in audit.findings})
+        finding = next(finding for finding in audit.findings if finding.code == "tick-not-perpendicular")
+        self.assertEqual(finding.evidence["stationID"], "m")
 
     def test_route_angle_candidate_is_grouped_by_line(self):
         markers = [
@@ -201,14 +236,38 @@ class MapFidelityAuditTests(unittest.TestCase):
         codes = {finding.code for finding in audit.findings}
         self.assertIn("tick-not-on-route-port", codes)
 
-    def test_small_shared_corridor_roundel_offset_is_medium(self):
+    def test_roundel_spanning_an_offset_lane_is_attached(self):
+        # TfL roundels sit over parallel lanes, so a port inside the ring counts.
         markers = [
             marker("a", "A", [circle(10, 14)]),
             marker("b", "B", [circle(20, 10)], anchor=(20, 10)),
         ]
         audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
         audit.audit_roundels()
+        self.assertNotIn("roundel-not-on-route-port", {finding.code for finding in audit.findings})
+
+    def test_roundel_beside_its_port_is_high(self):
+        markers = [
+            marker("a", "A", [circle(10, 22)]),
+            marker("b", "B", [circle(20, 10)], anchor=(20, 10)),
+        ]
+        audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
+        audit.audit_roundels()
         finding = next(finding for finding in audit.findings if finding.code == "roundel-not-on-route-port")
+        self.assertEqual(finding.severity, "high")
+
+    def test_roundel_near_a_connector_end_is_medium(self):
+        markers = [
+            marker("a", "A", [circle(10, 10), connector((10, 10), (10, 40))]),
+            marker("b", "B", [circle(20, 10)], anchor=(20, 10)),
+            marker("c", "C", [circle(12, 40)], anchor=(12, 40)),
+        ]
+        audit = audit_module.MapFidelityAudit(self.document(markers), self.graph(), self.manifest())
+        audit.audit_roundels()
+        finding = next(
+            finding for finding in audit.findings
+            if finding.code == "roundel-not-on-route-port" and finding.evidence["stationID"] == "c"
+        )
         self.assertEqual(finding.severity, "medium")
 
     def test_markdown_output_is_deterministic(self):
@@ -259,7 +318,7 @@ class MapFidelityAuditTests(unittest.TestCase):
         kinds = [primitive["kind"] for primitive in document["stationMarkers"][0]["primitives"]]
         self.assertEqual(kinds, ["circle"])
 
-    def test_skewed_tick_is_regenerated_from_local_path_tangent(self):
+    def test_skewed_terminus_bar_is_regenerated_from_local_path_tangent(self):
         markers = [
             marker("a", "A", [tick((3, 10), (17, 10))]),
             marker("b", "B", [tick((20, 3), (20, 17))], anchor=(20, 10)),
@@ -269,7 +328,25 @@ class MapFidelityAuditTests(unittest.TestCase):
         corrected = document["stationMarkers"][0]["primitives"][0]["tick"]
         self.assertEqual(corrected["start"]["x"], 10)
         self.assertEqual(corrected["end"]["x"], 10)
-        self.assertEqual(abs(corrected["end"]["y"] - corrected["start"]["y"]), 14)
+        self.assertAlmostEqual(
+            abs(corrected["end"]["y"] - corrected["start"]["y"]),
+            2 * normalize_module.TICK_HALF_LENGTH,
+            places=3,
+        )
+
+    def test_skewed_through_tick_is_regenerated_on_its_side(self):
+        markers = [
+            marker("a", "A", [tick((10, 0.23), (10, 19.77))]),
+            marker("m", "M", [tick((20, 10), (27, 3))], anchor=(20, 10)),
+            marker("b", "B", [tick((30, 0.23), (30, 19.77))], anchor=(30, 10)),
+        ]
+        document = self.through_document(markers)
+        self.assertEqual(normalize_module._normalize_tick_angles(document), 1)
+        corrected = document["stationMarkers"][1]["primitives"][0]["tick"]
+        self.assertEqual(corrected["start"], {"x": 20, "y": 10})
+        self.assertEqual(corrected["end"], {
+            "x": 20, "y": round(10 - normalize_module.TICK_HALF_LENGTH, 3)
+        })
 
     def test_bundled_map_has_no_critical_fidelity_findings(self):
         document = audit_module.load_json(
@@ -306,14 +383,18 @@ class MapFidelityAuditTests(unittest.TestCase):
                 payload["start"]["y"], payload["end"]["y"], places=3
             )
 
+        # TfL links the two Hammersmith stations with a walking interchange.
         hammersmith = markers["940GZZLUHSC"]
         self.assertEqual(
             [primitive["kind"] for primitive in hammersmith["primitives"]],
-            ["circle"],
+            ["walkingConnector", "circle"],
         )
         self.assertEqual(
             set(hammersmith["lineIDs"]), {"circle", "hammersmith-city"}
         )
+        walk = hammersmith["primitives"][0]["walkingConnector"]
+        self.assertEqual(walk["start"], hammersmith["anchor"])
+        self.assertEqual(walk["end"], markers["940GZZLUHSD"]["anchor"])
 
         shepherds_bush = connector("910GSHPDSB")
         self.assertEqual(shepherds_bush["kind"], "walkingConnector")
@@ -334,20 +415,16 @@ class MapFidelityAuditTests(unittest.TestCase):
             self.assertTrue(ports)
             return ports[0]
 
+        # Through-station ticks run from the line centre towards the name.
         for station_id in ("940GZZLUSBM", "940GZZLUGHK"):
-            marker_record = markers[station_id]
-            tick_centres = {
-                primitive["tick"]["lineID"]: (
-                    (primitive["tick"]["start"]["x"] + primitive["tick"]["end"]["x"]) / 2,
-                    (primitive["tick"]["start"]["y"] + primitive["tick"]["end"]["y"]) / 2,
-                )
-                for primitive in marker_record["primitives"]
+            ticks = {
+                primitive["tick"]["lineID"]: primitive["tick"]
+                for primitive in markers[station_id]["primitives"]
                 if primitive["kind"] == "tick"
             }
             for line_id in ("circle", "hammersmith-city"):
-                port = line_port(station_id, line_id)
-                self.assertAlmostEqual(tick_centres[line_id][0], port["x"], places=3)
-                self.assertAlmostEqual(tick_centres[line_id][1], port["y"], places=3)
+                self.assertEqual(ticks[line_id]["start"], line_port(station_id, line_id))
+                self.assertLess(ticks[line_id]["end"]["x"], ticks[line_id]["start"]["x"])
 
         # The two coloured halves of each western stop must share one
         # perpendicular across the diagonal route at high zoom.
@@ -358,39 +435,36 @@ class MapFidelityAuditTests(unittest.TestCase):
                 if primitive["kind"] == "tick"
             }
             self.assertEqual(set(ticks), {"circle", "hammersmith-city"})
-            centres = {
-                line_id: (
-                    (tick["start"]["x"] + tick["end"]["x"]) / 2,
-                    (tick["start"]["y"] + tick["end"]["y"]) / 2,
-                )
-                for line_id, tick in ticks.items()
-            }
-            circle_centre = centres["circle"]
-            hammersmith_centre = centres["hammersmith-city"]
+            starts = {line_id: tick["start"] for line_id, tick in ticks.items()}
+            # The lanes' TfL ticks sit within 0.1 units of one perpendicular.
             self.assertAlmostEqual(
-                circle_centre[0] - hammersmith_centre[0],
-                circle_centre[1] - hammersmith_centre[1],
-                delta=0.01,
+                starts["circle"]["x"] - starts["hammersmith-city"]["x"],
+                starts["circle"]["y"] - starts["hammersmith-city"]["y"],
+                delta=0.15,
             )
-            for line_id, centre in centres.items():
-                port = line_port(station_id, line_id)
-                self.assertAlmostEqual(centre[0], port["x"], places=3)
-                self.assertAlmostEqual(centre[1], port["y"], places=3)
+            for line_id, start in starts.items():
+                self.assertEqual(start, line_port(station_id, line_id))
 
     def test_canada_water_has_one_physical_roundel_on_both_routes(self):
         document = json.loads((IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json").read_text())
         ids = {"940GZZLUCWR", "910GCNDAW"}
         markers = [m for m in document["stationMarkers"] if m["stationID"] in ids]
         self.assertEqual(len(markers), 2)  # Both departure feeds remain selectable.
-        centre = {"x": 2704.938, "y": 1918.0}
+        centre = markers[0]["anchor"]
         for marker in markers:
             self.assertEqual(marker["anchor"], centre)
-            self.assertEqual(marker["primitives"], [circle(centre["x"], centre["y"])])
+            self.assertEqual([p["kind"] for p in marker["primitives"]], ["circle"])
+            self.assertEqual(marker["primitives"][0]["circle"]["centre"], centre)
+        # The Jubilee and Windrush lines both pass under the one TfL roundel.
+        radius = markers[0]["primitives"][0]["circle"]["radius"]
         for segment in document["segments"]:
-            if segment["fromStationID"] in ids:
-                self.assertEqual(segment["fromPort"], centre)
-            if segment["toStationID"] in ids:
-                self.assertEqual(segment["toPort"], centre)
+            for port_key, station_key in (("fromPort", "fromStationID"), ("toPort", "toStationID")):
+                if segment[station_key] in ids:
+                    port = segment[port_key]
+                    self.assertLess(
+                        ((port["x"] - centre["x"]) ** 2 + (port["y"] - centre["y"]) ** 2) ** 0.5,
+                        radius,
+                    )
         label = next(l for l in document["labels"] if l["stationID"] == "940GZZLUCWR")
         self.assertIn("910GCNDAW", label["associatedStationIDs"])
 
@@ -420,13 +494,11 @@ class MapFidelityAuditTests(unittest.TestCase):
         }
         self.assertEqual(set(ticks), {"circle", "district"})
         for line_id, tick_record in ticks.items():
-            centre = {
-                axis: (tick_record["start"][axis] + tick_record["end"][axis]) / 2
-                for axis in ("x", "y")
-            }
-            self.assertEqual(centre, port("940GZZLUHSK", line_id))
+            self.assertEqual(tick_record["start"], port("940GZZLUHSK", line_id))
             self.assertEqual(tick_record["start"]["y"], tick_record["end"]["y"])
-        self.assertEqual(ticks["circle"]["start"]["y"], ticks["district"]["start"]["y"])
+        self.assertAlmostEqual(
+            ticks["circle"]["start"]["y"], ticks["district"]["start"]["y"], delta=0.05
+        )
 
         for station_id, line_id in (
             ("940GZZLUSKT", "bakerloo"), ("910GSKENTON", "lioness")
@@ -434,9 +506,10 @@ class MapFidelityAuditTests(unittest.TestCase):
             marker_record = markers[station_id]
             self.assertEqual(marker_record["anchor"], port(station_id, line_id))
             self.assertLess(port("940GZZLUNKP", "metropolitan")["y"], marker_record["anchor"]["y"])
-        self.assertEqual(
+        self.assertAlmostEqual(
             markers["940GZZLUSKT"]["anchor"]["y"],
             markers["910GSKENTON"]["anchor"]["y"],
+            delta=0.05,
         )
 
         kenton = markers["940GZZLUKEN"]["anchor"]
@@ -444,17 +517,24 @@ class MapFidelityAuditTests(unittest.TestCase):
         for station_id in ("940GZZLUKEN", "910GKTON", "940GZZLUNKP"):
             self.assertIn("circle", [p["kind"] for p in markers[station_id]["primitives"]])
         northwick = markers["940GZZLUNKP"]["anchor"]
-        self.assertEqual(northwick, port("940GZZLUNKP", "metropolitan"))
-        link = next(
+        northwick_port = port("940GZZLUNKP", "metropolitan")
+        self.assertAlmostEqual(northwick["x"], northwick_port["x"], delta=0.5)
+        self.assertAlmostEqual(northwick["y"], northwick_port["y"], delta=0.5)
+        # One dotted walking link joins the Northwick Park and Kenton roundels.
+        links = [
             primitive["walkingConnector"]
-            for primitive in markers["940GZZLUNKP"]["primitives"]
+            for station_id in ("940GZZLUNKP", "940GZZLUKEN", "910GKTON")
+            for primitive in markers[station_id]["primitives"]
             if primitive["kind"] == "walkingConnector"
-        )
-        self.assertEqual(link["start"], northwick)
-        self.assertEqual(link["end"], kenton)
+        ]
+        self.assertEqual(len(links), 1)
+        ends = sorted((links[0]["start"], links[0]["end"]), key=lambda p: p["x"])
+        for end, anchor in zip(ends, (northwick, kenton)):
+            self.assertAlmostEqual(end["x"], anchor["x"], delta=0.05)
+            self.assertAlmostEqual(end["y"], anchor["y"], delta=0.05)
         self.assertAlmostEqual(
-            abs(kenton["x"] - northwick["x"]),
-            abs(kenton["y"] - northwick["y"]),
+            abs(ends[1]["x"] - ends[0]["x"]),
+            abs(ends[1]["y"] - ends[0]["y"]),
             places=3,
         )
         self.assertIn("910GKTON", labels["940GZZLUKEN"]["associatedStationIDs"])
@@ -476,9 +556,15 @@ class MapFidelityAuditTests(unittest.TestCase):
             marker["stationID"]: marker for marker in document["stationMarkers"]
         }
 
+        # The Metropolitan runs through Willesden Green without stopping, so
+        # TfL draws a plain Jubilee tick there, not an interchange.
+        self.assertEqual(
+            [(p["kind"], p["tick"]["lineID"]) for p in markers["940GZZLUWIG"]["primitives"]],
+            [("tick", "jubilee")],
+        )
+
         for station_id in (
             "940GZZLUWYP",
-            "940GZZLUWIG",
             "910GWHMDSTD",
             "940GZZLUFYR",
             "910GFNCHLYR",
@@ -509,12 +595,20 @@ class MapFidelityAuditTests(unittest.TestCase):
                 if primitive["kind"] == "walkingConnector"
             )
             payload = primitive["walkingConnector"]
-            self.assertEqual(payload["start"], markers[underground_id]["anchor"])
-            self.assertEqual(payload["end"], markers[mildmay_id]["anchor"])
+            # Links join TfL symbol centres, squared to 45 degrees: the
+            # Overground roundel and one of the Underground station's roundels.
+            ends = {(round(payload[end]["x"]), round(payload[end]["y"])) for end in ("start", "end")}
+            mildmay_anchor = markers[mildmay_id]["anchor"]
+            self.assertIn((round(mildmay_anchor["x"]), round(mildmay_anchor["y"])), ends)
+            underground_circles = {
+                (round(p["circle"]["centre"]["x"]), round(p["circle"]["centre"]["y"]))
+                for p in markers[underground_id]["primitives"] if p["kind"] == "circle"
+            }
+            self.assertTrue(ends & underground_circles)
         self.assertAlmostEqual(
             markers["910GWHMDSTD"]["anchor"]["y"],
             markers["910GFNCHLYR"]["anchor"]["y"],
-            places=3,
+            delta=0.05,
         )
 
         protected_segments = {

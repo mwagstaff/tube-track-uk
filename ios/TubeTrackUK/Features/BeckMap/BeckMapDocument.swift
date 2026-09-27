@@ -197,6 +197,14 @@ struct BeckMapLinePrimitive: Codable, Hashable, Sendable {
     let width: Double
 }
 
+extension BeckMapLinePrimitive {
+    /// A TfL interchange bar is `width` wide with a white core a third as wide.
+    var coreWidth: Double { width / 3 }
+
+    /// A TfL walking link is a row of square dots separated by half a dot.
+    var walkingDash: [CGFloat] { [CGFloat(width), CGFloat(width) / 2] }
+}
+
 /// An ordinary station mark is an authored stroke perpendicular to its route.
 /// It carries its line colour explicitly because station artwork is rendered in
 /// a later pass than the route paths.

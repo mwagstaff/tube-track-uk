@@ -485,10 +485,12 @@ final class TubeGameEngine {
             configuration: configuration
         ) else { return }
         scoreTracker.refreshCompletedLines(lineHubIDs: network.lineHubIDs)
+        // The label floats above the station symbol; a line may pass under a
+        // roundel away from its centre, so the arrival port is not used.
         recentStationConsumptions.append(TubeGameStationConsumption(
             hubID: hub.id,
             stationName: hub.name,
-            position: player.position,
+            position: node.point,
             lineID: lineID,
             pointsAwarded: scoreEvent.total,
             eatenAtElapsedTime: arrivalElapsedTime

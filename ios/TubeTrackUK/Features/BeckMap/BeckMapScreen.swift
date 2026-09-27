@@ -1254,7 +1254,7 @@ struct BeckMapCanvas: View {
                 style: StrokeStyle(
                     lineWidth: batch.lineWidth,
                     lineCap: .butt,
-                    dash: [8, 5]
+                    dash: [batch.lineWidth, batch.lineWidth / 2]
                 )
             )
         }
@@ -1308,7 +1308,7 @@ struct BeckMapCanvas: View {
                 markerContext.stroke(
                     path,
                     with: .color(palette.paper),
-                    style: StrokeStyle(lineWidth: max(1, connector.width - 2.2), lineCap: .round)
+                    style: StrokeStyle(lineWidth: connector.coreWidth, lineCap: .round)
                 )
             case let .walkingConnector(connector, path):
                 markerContext.stroke(
@@ -1317,7 +1317,7 @@ struct BeckMapCanvas: View {
                     style: StrokeStyle(
                         lineWidth: connector.width,
                         lineCap: .butt,
-                        dash: [8, 5]
+                        dash: connector.walkingDash
                     )
                 )
             case let .circle(circle, path):
@@ -1384,12 +1384,12 @@ struct BeckMapCanvas: View {
                     context.stroke(
                         path,
                         with: .color(outline),
-                        style: StrokeStyle(lineWidth: connector.width + (selected ? 2 : 1.8), lineCap: .round)
+                        style: StrokeStyle(lineWidth: connector.width + (selected ? 2 : 0), lineCap: .round)
                     )
                     context.stroke(
                         path,
                         with: .color(palette.paper),
-                        style: StrokeStyle(lineWidth: connector.width - 2.2, lineCap: .round)
+                        style: StrokeStyle(lineWidth: connector.coreWidth, lineCap: .round)
                     )
                 case let .walkingConnector(connector, path):
                     context.stroke(
@@ -1398,7 +1398,7 @@ struct BeckMapCanvas: View {
                         style: StrokeStyle(
                             lineWidth: connector.width + (selected ? 1.5 : 0),
                             lineCap: .butt,
-                            dash: [8, 5]
+                            dash: connector.walkingDash
                         )
                     )
                 case let .circle(circle, path):
@@ -2874,9 +2874,9 @@ struct BeckMapCanvas: View {
                 for primitive in marker.primitives {
                     switch primitive {
                     case let .connector(connector, path):
-                        connectorOutlinePaths[connector.width + 1.8, default: Path()]
+                        connectorOutlinePaths[connector.width, default: Path()]
                             .addPath(path)
-                        connectorInnerPaths[connector.width - 2.2, default: Path()]
+                        connectorInnerPaths[connector.coreWidth, default: Path()]
                             .addPath(path)
                     case let .walkingConnector(connector, path):
                         walkingConnectorPaths[connector.width, default: Path()]

@@ -4,7 +4,9 @@
 The map builders preserve explicit roundels and connectors for interchanges.
 After every network has been composed, this pass replaces a remaining roundel
 with a tick only when the station belongs to one line, has no colocated station
-record, and is not touched by authored connector artwork.
+record, is not touched by authored connector artwork and is not drawn as an
+interchange by the TfL reference (National Rail and River Bus interchanges are
+single-line roundels on the official map).
 """
 
 from __future__ import annotations
@@ -15,6 +17,7 @@ import math
 from collections import Counter
 from pathlib import Path
 
+import reference_alignment
 from map_geometry import (
     Point,
     acute_angle as _acute_angle,
@@ -31,8 +34,11 @@ from map_geometry import (
 
 CONNECTION_KINDS = {"connector", "walkingConnector"}
 CONNECTION_TOLERANCE = 10.0
-TICK_HALF_LENGTH = 7.0
-TICK_WIDTH = 3.2
+REFERENCE_SYMBOL_TOLERANCE = 1.0
+# TfL ticks run one tick length out from the line centre on the station-name
+# side; a terminus has a bar of twice that length centred across the line end.
+TICK_HALF_LENGTH = reference_alignment.TICK_LENGTH
+TICK_WIDTH = reference_alignment.TICK_WIDTH
 PATH_ATTACHMENT_TOLERANCE = 1.0
 TICK_ANGLE_TOLERANCE_DEGREES = 0.5
 
@@ -177,23 +183,56 @@ def _nearest_station_endpoint(
     return min(matches, key=lambda match: (match[0], match[3]), default=None)
 
 
-def _tick(line_id: str, centre: Point, tangent: Point) -> dict:
+def _normal(line_id: str, tangent: Point) -> Point:
     magnitude = math.hypot(*tangent)
     if magnitude <= 0.001:
         raise ValueError(f"Cannot draw a tick for {line_id} from a zero tangent")
-    normal = (
+    return (
         -tangent[1] / magnitude * TICK_HALF_LENGTH,
         tangent[0] / magnitude * TICK_HALF_LENGTH,
     )
+
+
+def _tick_record(line_id: str, start: Point, end: Point) -> dict:
     return {
         "kind": "tick",
         "tick": {
             "lineID": line_id,
-            "start": _rounded((centre[0] - normal[0], centre[1] - normal[1])),
-            "end": _rounded((centre[0] + normal[0], centre[1] + normal[1])),
+            "start": _rounded(start),
+            "end": _rounded(end),
             "width": TICK_WIDTH,
         },
     }
+
+
+def _tick(line_id: str, centre: Point, tangent: Point) -> dict:
+    """A terminus bar centred across the end of the line."""
+    normal = _normal(line_id, tangent)
+    return _tick_record(
+        line_id,
+        (centre[0] - normal[0], centre[1] - normal[1]),
+        (centre[0] + normal[0], centre[1] + normal[1]),
+    )
+
+
+def _one_sided_tick(line_id: str, port: Point, tangent: Point, towards: Point | None) -> dict:
+    """A through-station tick from the line centre towards `towards`."""
+    normal = _normal(line_id, tangent)
+    side = 1.0
+    if towards is not None:
+        along = (towards[0] - port[0]) * normal[0] + (towards[1] - port[1]) * normal[1]
+        side = -1.0 if along < 0 else 1.0
+    return _tick_record(
+        line_id, port, (port[0] + side * normal[0], port[1] + side * normal[1])
+    )
+
+
+def _station_degree(document: dict, station_id: str, line_id: str) -> int:
+    return sum(
+        1 for segment in document["segments"]
+        if segment["lineID"] == line_id
+        and station_id in {segment["fromStationID"], segment["toStationID"]}
+    )
 
 
 def _circle(centre: Point) -> dict:
@@ -201,10 +240,19 @@ def _circle(centre: Point) -> dict:
         "kind": "circle",
         "circle": {
             "centre": _rounded(centre),
-            "radius": 8.5,
-            "outlineWidth": 3.5,
+            "radius": reference_alignment.ROUNDEL_RADIUS,
+            "outlineWidth": reference_alignment.ROUNDEL_OUTLINE_WIDTH,
         },
     }
+
+
+def _reference_symbol_centres(reference: dict | None) -> list[Point]:
+    if reference is None:
+        path = reference_alignment.REFERENCE_PATH
+        if not path.exists():
+            return []
+        reference = json.loads(path.read_text())
+    return [(float(symbol["x"]), float(symbol["y"])) for symbol in reference["symbols"]]
 
 
 def _promote_connector_endpoint_ticks(document: dict) -> int:
@@ -222,16 +270,17 @@ def _promote_connector_endpoint_ticks(document: dict) -> int:
             continue
         candidates: list[tuple[float, str, dict, list[int]]] = []
         for marker in markers:
+            # A tick anchors at its start (through stations) or midpoint (termini).
             matching_ticks = [
                 index
                 for index, primitive in enumerate(marker["primitives"])
                 if primitive["kind"] == "tick"
-                and _distance(
-                    endpoint,
-                    _midpoint(
+                and min(
+                    _distance(endpoint, _point(primitive["tick"]["start"])),
+                    _distance(endpoint, _midpoint(
                         _point(primitive["tick"]["start"]),
                         _point(primitive["tick"]["end"]),
-                    ),
+                    )),
                 ) <= PATH_ATTACHMENT_TOLERANCE
             ]
             anchor_distance = _distance(endpoint, _point(marker["anchor"]))
@@ -252,6 +301,10 @@ def _promote_connector_endpoint_ticks(document: dict) -> int:
 
 
 def _normalize_tick_angles(document: dict) -> int:
+    """Regenerate skewed ticks from the local route tangent.
+
+    A tick that starts on its station port is a one-sided through-station
+    tick and keeps its side; one centred on the port is a terminus bar."""
     paths_by_id = {path["id"]: path for path in document["paths"]}
     corrected = 0
     for marker in document["stationMarkers"]:
@@ -262,28 +315,43 @@ def _normalize_tick_angles(document: dict) -> int:
             start = _point(tick["start"])
             end = _point(tick["end"])
             centre = _midpoint(start, end)
-            match = _nearest_station_endpoint(
-                document, paths_by_id, marker["stationID"], tick["lineID"], centre
+            one_sided = _nearest_station_endpoint(
+                document, paths_by_id, marker["stationID"], tick["lineID"], start
             )
+            if one_sided is not None and one_sided[0] <= PATH_ATTACHMENT_TOLERANCE:
+                match, anchor = one_sided, start
+            else:
+                match = _nearest_station_endpoint(
+                    document, paths_by_id, marker["stationID"], tick["lineID"], centre
+                )
+                anchor = centre
             if match is None or match[0] > PATH_ATTACHMENT_TOLERANCE:
                 continue
             tick_vector = (end[0] - start[0], end[1] - start[1])
             deviation = abs(90.0 - _acute_angle(tick_vector, match[2]))
             if deviation <= TICK_ANGLE_TOLERANCE_DEGREES:
                 continue
-            marker["primitives"][index] = _tick(tick["lineID"], centre, match[2])
+            if anchor is start:
+                marker["primitives"][index] = _one_sided_tick(tick["lineID"], start, match[2], end)
+            else:
+                marker["primitives"][index] = _tick(tick["lineID"], centre, match[2])
             corrected += 1
     return corrected
 
 
-def normalize(document: dict, graph: dict) -> int:
+def normalize(document: dict, graph: dict, reference: dict | None = None) -> int:
     """Normalize ordinary ticks and interchange endpoints after composition."""
+    reference_centres = _reference_symbol_centres(reference)
     stations_by_id = {station["id"]: station for station in graph["stations"]}
     hub_sizes = Counter(
         station.get("hubID") or station["id"] for station in graph["stations"]
     )
     paths_by_id = {path["id"]: path for path in document["paths"]}
     connector_endpoints = _connector_endpoints(document["stationMarkers"])
+    labels: dict[str, Point] = {}
+    for label in document.get("labels", []):
+        for station_id in (label["stationID"], *label.get("associatedStationIDs", ())):
+            labels.setdefault(station_id, _point(label["position"]))
     normalized_count = 0
 
     for marker in document["stationMarkers"]:
@@ -301,6 +369,11 @@ def normalize(document: dict, graph: dict) -> int:
             or hub_sizes[hub_id] != 1
             or marker["stationID"] in ADDITIONAL_CONNECTED_STATION_IDS
             or _is_connected(marker, connector_endpoints)
+            or any(
+                _distance(centre, symbol) <= REFERENCE_SYMBOL_TOLERANCE
+                for centre in circle_points
+                for symbol in reference_centres
+            )
         ):
             continue
 
@@ -311,10 +384,20 @@ def normalize(document: dict, graph: dict) -> int:
         ]
         if not any(primitive["kind"] == "tick" for primitive in retained):
             for centre in circle_points:
-                tangent = _station_tangent(
+                match = _nearest_station_endpoint(
                     document, paths_by_id, marker["stationID"], line_id, centre
                 )
-                retained.append(_tick(line_id, centre, tangent))
+                if match is None:
+                    tangent = _station_tangent(
+                        document, paths_by_id, marker["stationID"], line_id, centre
+                    )
+                    retained.append(_tick(line_id, centre, tangent))
+                elif _station_degree(document, marker["stationID"], line_id) == 1:
+                    retained.append(_tick(line_id, match[1], match[2]))
+                else:
+                    retained.append(_one_sided_tick(
+                        line_id, match[1], match[2], labels.get(marker["stationID"])
+                    ))
         marker["primitives"] = retained
         normalized_count += 1
 

@@ -439,7 +439,11 @@ class MapFidelityAudit:
                 connector_match = nearest(centre, connector_endpoints)
                 path_distance = None if path_match is None else path_match[0]
                 connector_distance = None if connector_match is None else connector_match[0]
-                attached_to_path = path_distance is not None and path_distance <= medium_port_tolerance
+                # A TfL roundel may span parallel lanes: the route is attached
+                # when its station port lies inside the ring.
+                attached_to_path = path_distance is not None and path_distance <= max(
+                    medium_port_tolerance, float(circle["radius"])
+                )
                 shared_expectation = shared_roundel_expectations.get(marker["stationID"])
                 if shared_expectation is not None:
                     shared_ports = [
@@ -496,10 +500,14 @@ class MapFidelityAudit:
         }
 
     def audit_ticks(self) -> None:
+        """TfL ticks run from the line centre outwards; a terminus has a bar
+        centred across the end of the line."""
         baseline = self.manifest["baselineStyles"]["tick"]
         style_tolerance = float(self.manifest["thresholds"]["styleTolerance"])
         port_tolerance = float(self.manifest["thresholds"]["tickPortDistanceArtworkUnits"])
         angle_tolerance = float(self.manifest["thresholds"]["tickPerpendicularDegrees"])
+        one_sided_length = float(baseline["length"])
+        terminus_length = float(baseline.get("terminusLength", 2 * one_sided_length))
         lengths: list[float] = []
         perpendicular_candidates = 0
         for marker in self.document["stationMarkers"]:
@@ -508,13 +516,13 @@ class MapFidelityAudit:
                     continue
                 tick = primitive["tick"]
                 start, end = point(tick["start"]), point(tick["end"])
-                centre = midpoint(start, end)
                 tick_vector = end[0] - start[0], end[1] - start[1]
                 length = math.hypot(*tick_vector)
                 lengths.append(length)
-                if abs(length - float(baseline["length"])) > style_tolerance or abs(
-                    float(tick["width"]) - float(baseline["width"])
-                ) > style_tolerance:
+                is_terminus_bar = abs(length - terminus_length) <= style_tolerance
+                if not (
+                    abs(length - one_sided_length) <= style_tolerance or is_terminus_bar
+                ) or abs(float(tick["width"]) - float(baseline["width"])) > style_tolerance:
                     self.add(
                         "medium", "ticks", "tick-style-variant",
                         f"{marker['stationID']} primitive {primitive_index}",
@@ -524,17 +532,18 @@ class MapFidelityAudit:
                         stationID=marker["stationID"], lineID=tick["lineID"],
                         length=round(length, 3), width=tick["width"], baseline=baseline,
                     )
+                anchor = midpoint(start, end) if is_terminus_bar else start
                 path_match = self._nearest_station_endpoint(
-                    centre, marker["stationID"], tick["lineID"]
+                    anchor, marker["stationID"], tick["lineID"]
                 )
                 if path_match is None or path_match[0] > port_tolerance:
                     self.add(
                         "high", "ticks", "tick-not-on-route-port",
                         f"{marker['stationID']} primitive {primitive_index}",
-                        "A station tick is not centred on its exact station endpoint.",
+                        "A station tick does not start on its exact station endpoint.",
                         "The station mark can float beside the route or attach to the wrong line.",
-                        "Align the route endpoint and tick centre from the same reviewed source coordinate.",
-                        stationID=marker["stationID"], lineID=tick["lineID"], centre=centre,
+                        "Align the route endpoint and tick from the same reviewed source coordinate.",
+                        stationID=marker["stationID"], lineID=tick["lineID"], anchor=anchor,
                         nearestDistance=None if path_match is None else round(path_match[0], 3),
                     )
                     continue
@@ -763,8 +772,11 @@ class MapFidelityAudit:
                     (distance(circle_centre, shared_centre) for circle_centre in circles),
                     default=None,
                 )
+                # A walking link to a neighbouring stop may share the marker.
                 if (
-                    primitive_kinds != ["circle"]
+                    primitive_kinds.count("circle") != 1
+                    or "connector" in primitive_kinds
+                    or "tick" in primitive_kinds
                     or centre_distance is None
                     or centre_distance > tolerance
                 ):
@@ -773,7 +785,7 @@ class MapFidelityAudit:
                         station_id,
                         "The shared terminus must use one roundel centred across both line ports.",
                         "Multiple glyphs imply an interchange between separate passenger nodes.",
-                        "Replace the connector and line-specific roundels with one centred roundel.",
+                        "Replace any bar and line-specific symbols with one centred roundel.",
                         stationID=station_id, lineIDs=line_ids,
                         primitiveKinds=primitive_kinds,
                         nearestDistance=(
@@ -783,15 +795,21 @@ class MapFidelityAudit:
                     )
                 checked_rows += 1
                 continue
+            terminus_length = float(self.manifest["baselineStyles"]["tick"].get(
+                "terminusLength", 2 * float(self.manifest["baselineStyles"]["tick"]["length"])
+            ))
             for line_id, ports in ports_by_line.items():
+                # One-sided ticks start on the line; terminus bars are centred.
                 ticks = [
-                    midpoint(
-                        point(primitive["tick"]["start"]),
-                        point(primitive["tick"]["end"]),
-                    )
+                    midpoint(start, end)
+                    if abs(distance(start, end) - terminus_length) <= 0.01
+                    else start
                     for primitive in marker["primitives"]
                     if primitive["kind"] == "tick"
                     and primitive["tick"]["lineID"] == line_id
+                    for start, end in [(
+                        point(primitive["tick"]["start"]), point(primitive["tick"]["end"])
+                    )]
                 ]
                 symbols = ticks or circles
                 nearest_distance = min(
@@ -1008,18 +1026,18 @@ def html_report(
                 connector_outlines.append(
                     f'<line x1="{payload["start"]["x"]}" y1="{payload["start"]["y"]}" '
                     f'x2="{payload["end"]["x"]}" y2="{payload["end"]["y"]}" '
-                    f'stroke="#121417" stroke-width="{float(payload["width"]) + 1.8}" stroke-linecap="round"/>'
+                    f'stroke="#121417" stroke-width="{float(payload["width"])}" stroke-linecap="round"/>'
                 )
                 connector_inners.append(
                     f'<line x1="{payload["start"]["x"]}" y1="{payload["start"]["y"]}" '
                     f'x2="{payload["end"]["x"]}" y2="{payload["end"]["y"]}" '
-                    f'stroke="#ffffff" stroke-width="{float(payload["width"]) - 2.2}" stroke-linecap="round"/>'
+                    f'stroke="#ffffff" stroke-width="{float(payload["width"]) / 3}" stroke-linecap="round"/>'
                 )
             elif kind == "walkingConnector":
                 walking_connectors.append(
                     f'<line x1="{payload["start"]["x"]}" y1="{payload["start"]["y"]}" '
                     f'x2="{payload["end"]["x"]}" y2="{payload["end"]["y"]}" '
-                    f'stroke="#121417" stroke-width="{payload["width"]}" stroke-dasharray="8 5"/>'
+                    f'stroke="#121417" stroke-width="{payload["width"]}" stroke-dasharray="{payload["width"]} {payload["width"] / 2}"/>'
                 )
             elif kind == "tick":
                 colour = line_colours.get(payload["lineID"], "#cf2f3c")
