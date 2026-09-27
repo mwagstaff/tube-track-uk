@@ -297,11 +297,11 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
     "Waterloo": (-34, 25, "trailing"),
     # Both names sit in deliberately open areas so their high-priority labels
     # remain placeable before the user reaches maximum zoom.
-    "Edgware Road (Circle Line)": (0, 48, "centre"),
+    # Leave the southeast Paddington label clear of this two-line name.
+    "Edgware Road (Circle Line)": (33, 45, "leading"),
     "Bond Street": (-36, -24, "trailing"),
-    # Both semantic Paddington records share one visible station name. Their
-    # preferred label directions converge on the same southeast label area.
-    "Paddington": (108, 70, "leading"),
+    # The name sits east of the diagonal interchange, above the Elizabeth line.
+    "Paddington": (123, 94, "leading"),
     "Paddington (H&C Line)-Underground": (63, 40, "leading"),
     # Royal Oak is deliberately displayed on the outward diagonal approach,
     # matching the official map's separation from Paddington.
@@ -1337,26 +1337,24 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                 ],
             }
         elif station["name"] in {"Paddington", "Paddington (H&C Line)-Underground"}:
-            main_id = stations_by_name["Paddington"]["id"]
-            hammersmith_id = stations_by_name["Paddington (H&C Line)-Underground"]["id"]
-            main_shared_port = average_point([
-                line_port(selected_segments, main_id, "circle"),
-                line_port(selected_segments, main_id, "district"),
-            ])
-            hammersmith_endpoint = average_point([
-                line_port(selected_segments, hammersmith_id, "circle"),
-                line_port(selected_segments, hammersmith_id, "hammersmith-city"),
-            ])
-            # The H&C/Circle paths are horizontal immediately west of their
-            # semantic endpoint. Display their shared roundel on that real
-            # corridor, separating the three-node chain as on the official
-            # map without inventing an off-line averaged point.
-            hammersmith_shared_port = (
-                hammersmith_endpoint[0] - 45,
-                hammersmith_endpoint[1],
-            )
+            # The source map places the four Paddington roundels on one
+            # southeast 45-degree diagonal. The old semantic endpoints put
+            # the H&C roundel on its horizontal run and the Circle/District
+            # roundel above the branch bend. Use the centres of the traced
+            # diagonal and vertical corridors instead. The Elizabeth port is
+            # already at the source position on its horizontal route.
+            elizabeth_port = (1458.781, 1474.985)
+            diagonal_offset = elizabeth_port[1] - elizabeth_port[0]
+            hammersmith_shared_port = (1377.05, 1377.05 + diagonal_offset)
+            main_shared_port = (1414.422, 1414.422 + diagonal_offset)
             if station["name"] == "Paddington":
-                bakerloo_port = line_port(selected_segments, main_id, "bakerloo")
+                bakerloo_route_port = line_port(
+                    selected_segments, station["id"], "bakerloo"
+                )
+                bakerloo_port = (
+                    bakerloo_route_port[1] - diagonal_offset,
+                    bakerloo_route_port[1],
+                )
                 marker = {
                     "stationID": station_id,
                     "name": station["name"],
@@ -1364,11 +1362,12 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                     "anchor": vector.rounded(bakerloo_port),
                     "hitRadius": 24,
                     # The companion marker supplies the middle H&C/Circle
-                    # roundel. This marker owns the Bakerloo and Circle/District
-                    # roundels plus the two continuous internal links.
+                    # roundel. These links also connect the Elizabeth roundel
+                    # to the same continuous 45-degree interchange.
                     "primitives": [
                         connector(bakerloo_port, hammersmith_shared_port),
                         connector(hammersmith_shared_port, main_shared_port),
+                        connector(main_shared_port, elizabeth_port),
                         circle(bakerloo_port),
                         circle(main_shared_port),
                     ],
