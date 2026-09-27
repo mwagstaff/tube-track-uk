@@ -1501,10 +1501,10 @@
           862.149
         ],
         "nearestConnector": {
-          "endpoint": "end",
-          "kind": "connector",
+          "endpoint": "start",
+          "kind": "walkingConnector",
           "primitiveIndex": 0,
-          "stationID": "940GZZLUWYP"
+          "stationID": "940GZZLUNKP"
         },
         "nearestDistance": 4.55,
         "nearestPath": {
@@ -2031,12 +2031,12 @@
     "connectors": {
       "byKind": {
         "connector": 80,
-        "walkingConnector": 4
+        "walkingConnector": 5
       },
-      "count": 84,
+      "count": 85,
       "nearestAxis": {
         "0 degrees": 10,
-        "45 degrees": 51,
+        "45 degrees": 52,
         "90 degrees": 23
       },
       "records": [
@@ -3452,6 +3452,28 @@
           "angleDegrees": 45.0,
           "deviationDegrees": 0.0,
           "end": [
+            1149.008,
+            874.14
+          ],
+          "kind": "walkingConnector",
+          "length": 86.909,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            1087.554,
+            935.594
+          ],
+          "stationID": "940GZZLUNKP",
+          "stationName": "Northwick Park"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
             1377.05,
             1393.254
           ],
@@ -3894,10 +3916,10 @@
       "labels": 458,
       "paths": 620,
       "primitives": {
-        "circle": 175,
+        "circle": 178,
         "connector": 80,
-        "tick": 410,
-        "walkingConnector": 4
+        "tick": 407,
+        "walkingConnector": 5
       },
       "routes": 93,
       "segments": 619,
@@ -3926,10 +3948,10 @@
       ]
     },
     "roundels": {
-      "count": 175,
+      "count": 178,
       "styles": [
         {
-          "count": 175,
+          "count": 178,
           "outlineWidth": 3.5,
           "radius": 8.5
         }
@@ -3962,7 +3984,7 @@
       "sharedStationRowsChecked": 3
     },
     "ticks": {
-      "count": 410,
+      "count": 407,
       "maximumLength": 14.001,
       "minimumLength": 13.999,
       "nonPerpendicular": 0

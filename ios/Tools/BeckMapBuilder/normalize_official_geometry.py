@@ -28,6 +28,12 @@ WALKING_CONNECTOR_WIDTH = 4.5
 # the Central-line roundel.
 SHEPHERDS_BUSH_MILDMAY_PORT = (1290.079, 1716.082)
 
+# Source-measured station rows on straight shared-service corridors.
+HIGH_STREET_KENSINGTON_ROW = 1746.0
+SOUTH_KENTON_ROW = 976.0
+KENTON_SHARED_PORT = (1149.008, 874.14)
+NORTHWICK_PARK_WALK_PORT = (1087.554, 935.594)
+
 # The northwest Jubilee and Metropolitan lanes run in parallel at 45 degrees.
 # These station positions are traced from the locked April 2026 map.  The
 # original semantic splits around West Hampstead were attached to intermediate
@@ -392,6 +398,61 @@ def apply(document: dict) -> int:
     for label in document["labels"]:
         if label["stationID"] == "940GZZLUCWR":
             label["associatedStationIDs"] = ["910GCNDAW"]
+
+    # The District and Circle ticks at High Street Kensington share one
+    # horizontal bar across their parallel vertical tracks in the source map.
+    high_street_ports = []
+    for line_id in ("district", "circle"):
+        old_port = _line_port(document, "940GZZLUHSK", line_id)
+        port = (old_port[0], HIGH_STREET_KENSINGTON_ROW)
+        _set_line_port(document, "940GZZLUHSK", line_id, port)
+        high_street_ports.append((line_id, port))
+    high_street_anchor = (
+        sum(port[0] for _, port in high_street_ports) / len(high_street_ports),
+        HIGH_STREET_KENSINGTON_ROW,
+    )
+    _replace_marker(
+        document,
+        "940GZZLUHSK",
+        high_street_anchor,
+        [_tick(line_id, port, (0, 1)) for line_id, port in high_street_ports],
+    )
+
+    # South Kenton is below the Metropolitan crossing. Both Bakerloo and
+    # Lioness stop ports move together on their existing straight runs.
+    for station_id, line_id in (
+        ("940GZZLUSKT", "bakerloo"),
+        ("910GSKENTON", "lioness"),
+    ):
+        old_port = _line_port(document, station_id, line_id)
+        port = (old_port[0], SOUTH_KENTON_ROW)
+        _set_line_port(document, station_id, line_id, port)
+        _replace_marker(document, station_id, port, [_tick(line_id, port, (0, 1))])
+
+    # Kenton's two semantic records share one physical roundel. Northwick
+    # Park sits on the Metropolitan line, exactly 45 degrees southwest of it.
+    for station_id in ("940GZZLUKEN", "910GKTON"):
+        _replace_marker(
+            document, station_id, KENTON_SHARED_PORT,
+            [_circle(KENTON_SHARED_PORT)],
+        )
+    _set_line_port(
+        document, "940GZZLUNKP", "metropolitan", NORTHWICK_PARK_WALK_PORT
+    )
+    _replace_marker(
+        document,
+        "940GZZLUNKP",
+        NORTHWICK_PARK_WALK_PORT,
+        [
+            _connector(
+                NORTHWICK_PARK_WALK_PORT, KENTON_SHARED_PORT, walking=True
+            ),
+            _circle(NORTHWICK_PARK_WALK_PORT),
+        ],
+    )
+    for label in document["labels"]:
+        if label["stationID"] == "940GZZLUKEN":
+            label["position"] = _rounded((1125.0, 878.0))
 
     # The official symbols at both stations use level interchange bars. Their
     # route centre-lines land a few units apart because paths and glyphs were

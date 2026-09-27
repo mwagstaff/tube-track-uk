@@ -498,7 +498,7 @@ No findings.
 - Description: A roundel centre is not attached to its authored route or an interchange connector.
 - Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
 - Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
-- Evidence: `{"centre":[660.125,862.149],"nearestConnector":{"endpoint":"end","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUWYP"},"nearestDistance":4.55,"nearestPath":{"lineID":"piccadilly","pathID":"beck.v1.path.piccadilly.uxbridge.western-fan.v1.5","segmentID":"piccadilly:940GZZLUEAE:940GZZLURYL","side":"to"},"stationID":"940GZZLURYL"}`
+- Evidence: `{"centre":[660.125,862.149],"nearestConnector":{"endpoint":"start","kind":"walkingConnector","primitiveIndex":0,"stationID":"940GZZLUNKP"},"nearestDistance":4.55,"nearestPath":{"lineID":"piccadilly","pathID":"beck.v1.path.piccadilly.uxbridge.western-fan.v1.5","segmentID":"piccadilly:940GZZLUEAE:940GZZLURYL","side":"to"},"stationID":"940GZZLURYL"}`
 
 #### `non-canonical-straight-runs` - central
 

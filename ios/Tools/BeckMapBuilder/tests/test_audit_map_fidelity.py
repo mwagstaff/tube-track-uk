@@ -394,6 +394,72 @@ class MapFidelityAuditTests(unittest.TestCase):
         label = next(l for l in document["labels"] if l["stationID"] == "940GZZLUCWR")
         self.assertIn("910GCNDAW", label["associatedStationIDs"])
 
+    def test_kensington_and_kenton_markers_follow_shared_route_geometry(self):
+        document = json.loads((
+            IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json"
+        ).read_text())
+        markers = {record["stationID"]: record for record in document["stationMarkers"]}
+        labels = {record["stationID"]: record for record in document["labels"]}
+
+        def port(station_id, line_id):
+            points = [
+                segment[key]
+                for segment in document["segments"]
+                if segment["lineID"] == line_id
+                for key, endpoint in (("fromPort", "fromStationID"), ("toPort", "toStationID"))
+                if segment[endpoint] == station_id
+            ]
+            self.assertTrue(points)
+            self.assertTrue(all(point == points[0] for point in points))
+            return points[0]
+
+        high_street = markers["940GZZLUHSK"]
+        ticks = {
+            primitive["tick"]["lineID"]: primitive["tick"]
+            for primitive in high_street["primitives"]
+        }
+        self.assertEqual(set(ticks), {"circle", "district"})
+        for line_id, tick_record in ticks.items():
+            centre = {
+                axis: (tick_record["start"][axis] + tick_record["end"][axis]) / 2
+                for axis in ("x", "y")
+            }
+            self.assertEqual(centre, port("940GZZLUHSK", line_id))
+            self.assertEqual(tick_record["start"]["y"], tick_record["end"]["y"])
+        self.assertEqual(ticks["circle"]["start"]["y"], ticks["district"]["start"]["y"])
+
+        for station_id, line_id in (
+            ("940GZZLUSKT", "bakerloo"), ("910GSKENTON", "lioness")
+        ):
+            marker_record = markers[station_id]
+            self.assertEqual(marker_record["anchor"], port(station_id, line_id))
+            self.assertLess(port("940GZZLUNKP", "metropolitan")["y"], marker_record["anchor"]["y"])
+        self.assertEqual(
+            markers["940GZZLUSKT"]["anchor"]["y"],
+            markers["910GSKENTON"]["anchor"]["y"],
+        )
+
+        kenton = markers["940GZZLUKEN"]["anchor"]
+        self.assertEqual(kenton, markers["910GKTON"]["anchor"])
+        for station_id in ("940GZZLUKEN", "910GKTON", "940GZZLUNKP"):
+            self.assertIn("circle", [p["kind"] for p in markers[station_id]["primitives"]])
+        northwick = markers["940GZZLUNKP"]["anchor"]
+        self.assertEqual(northwick, port("940GZZLUNKP", "metropolitan"))
+        link = next(
+            primitive["walkingConnector"]
+            for primitive in markers["940GZZLUNKP"]["primitives"]
+            if primitive["kind"] == "walkingConnector"
+        )
+        self.assertEqual(link["start"], northwick)
+        self.assertEqual(link["end"], kenton)
+        self.assertAlmostEqual(
+            abs(kenton["x"] - northwick["x"]),
+            abs(kenton["y"] - northwick["y"]),
+            places=3,
+        )
+        self.assertIn("910GKTON", labels["940GZZLUKEN"]["associatedStationIDs"])
+        self.assertIn("910GSKENTON", labels["940GZZLUSKT"]["associatedStationIDs"])
+
     def test_bundled_official_geometry_normalization_is_idempotent(self):
         document = json.loads((
             IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json"

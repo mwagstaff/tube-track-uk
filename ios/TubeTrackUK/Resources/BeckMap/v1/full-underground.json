@@ -3941,7 +3941,7 @@
       "id": "label.940GZZLUHSK",
       "position": {
         "x": 1426.266,
-        "y": 1724.201
+        "y": 1738.012
       },
       "priority": 10,
       "rotationDegrees": 0,
@@ -4068,16 +4068,19 @@
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GKTON"
+      ],
       "id": "label.940GZZLUKEN",
       "position": {
         "x": 1125.0,
         "y": 878.0
       },
-      "priority": 5,
+      "priority": 10,
       "rotationDegrees": 0,
       "stationID": "940GZZLUKEN",
       "text": "Kenton",
-      "visibilityTier": "local"
+      "visibilityTier": "network"
     },
     {
       "alignment": "leading",
@@ -4594,7 +4597,7 @@
       "alignment": "trailing",
       "id": "label.940GZZLUNKP",
       "position": {
-        "x": 1070.0,
+        "x": 1070.763,
         "y": 917.0
       },
       "priority": 5,
@@ -5195,10 +5198,13 @@
     },
     {
       "alignment": "trailing",
+      "associatedStationIDs": [
+        "910GSKENTON"
+      ],
       "id": "label.940GZZLUSKT",
       "position": {
         "x": 1125.0,
-        "y": 940.0
+        "y": 981.198
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -6484,7 +6490,7 @@
           "op": "line",
           "to": {
             "x": 1142.469,
-            "y": 934.802
+            "y": 976.0
           }
         }
       ],
@@ -6496,7 +6502,7 @@
           "op": "move",
           "to": {
             "x": 1142.469,
-            "y": 934.802
+            "y": 976.0
           }
         },
         {
@@ -8704,7 +8710,7 @@
           "op": "line",
           "to": {
             "x": 1418.578,
-            "y": 1740.177
+            "y": 1746.0
           }
         }
       ],
@@ -8716,7 +8722,7 @@
           "op": "move",
           "to": {
             "x": 1418.578,
-            "y": 1740.177
+            "y": 1746.0
           }
         },
         {
@@ -10617,7 +10623,7 @@
           "op": "line",
           "to": {
             "x": 1410.266,
-            "y": 1724.201
+            "y": 1746.0
           }
         }
       ],
@@ -10629,7 +10635,7 @@
           "op": "move",
           "to": {
             "x": 1410.266,
-            "y": 1724.201
+            "y": 1746.0
           }
         },
         {
@@ -16085,7 +16091,7 @@
           "op": "move",
           "to": {
             "x": 1155.547,
-            "y": 934.802
+            "y": 976.0
           }
         },
         {
@@ -16436,7 +16442,7 @@
           "op": "line",
           "to": {
             "x": 1155.547,
-            "y": 934.802
+            "y": 976.0
           }
         }
       ],
@@ -17225,7 +17231,7 @@
         {
           "op": "line",
           "to": {
-            "x": 1086.791,
+            "x": 1087.554,
             "y": 935.594
           }
         }
@@ -17237,7 +17243,7 @@
         {
           "op": "move",
           "to": {
-            "x": 1086.791,
+            "x": 1087.554,
             "y": 935.594
           }
         },
@@ -28455,7 +28461,7 @@
     {
       "fromPort": {
         "x": 1142.469,
-        "y": 934.802
+        "y": 976.0
       },
       "fromStationID": "940GZZLUSKT",
       "id": "bakerloo:940GZZLUKEN:940GZZLUSKT",
@@ -28604,7 +28610,7 @@
       "pathID": "beck.v1.path.bakerloo.northwest-connector.v1.13",
       "toPort": {
         "x": 1142.469,
-        "y": 934.802
+        "y": 976.0
       },
       "toStationID": "940GZZLUSKT",
       "translation": {
@@ -30124,7 +30130,7 @@
       "pathID": "beck.v1.path.circle.edgware-branch.western-fan.v1.0",
       "toPort": {
         "x": 1418.578,
-        "y": 1740.177
+        "y": 1746.0
       },
       "toStationID": "940GZZLUHSK",
       "translation": {
@@ -30155,7 +30161,7 @@
     {
       "fromPort": {
         "x": 1418.578,
-        "y": 1740.177
+        "y": 1746.0
       },
       "fromStationID": "940GZZLUHSK",
       "id": "circle:940GZZLUHSK:940GZZLUNHG",
@@ -30904,7 +30910,7 @@
       "pathID": "beck.v1.path.district.edgware-branch.western-fan.v1.0",
       "toPort": {
         "x": 1410.266,
-        "y": 1724.201
+        "y": 1746.0
       },
       "toStationID": "940GZZLUHSK",
       "translation": {
@@ -31255,7 +31261,7 @@
     {
       "fromPort": {
         "x": 1410.266,
-        "y": 1724.201
+        "y": 1746.0
       },
       "fromStationID": "940GZZLUHSK",
       "id": "district:940GZZLUHSK:940GZZLUNHG",
@@ -34735,7 +34741,7 @@
     {
       "fromPort": {
         "x": 1155.547,
-        "y": 934.802
+        "y": 976.0
       },
       "fromStationID": "910GSKENTON",
       "id": "lioness:910GKTON:910GSKENTON",
@@ -34764,7 +34770,7 @@
       "pathID": "beck.v1.path.lioness.euston-watford.official.v1.9",
       "toPort": {
         "x": 1155.547,
-        "y": 934.802
+        "y": 976.0
       },
       "toStationID": "910GSKENTON",
       "translation": {
@@ -35263,7 +35269,7 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.metropolitan.uxbridge-main.northwest-connector.v1.8",
       "toPort": {
-        "x": 1086.791,
+        "x": 1087.554,
         "y": 935.594
       },
       "toStationID": "940GZZLUNKP",
@@ -35394,7 +35400,7 @@
     },
     {
       "fromPort": {
-        "x": 1086.791,
+        "x": 1087.554,
         "y": 935.594
       },
       "fromStationID": "940GZZLUNKP",
@@ -43120,7 +43126,7 @@
     },
     {
       "anchor": {
-        "x": 1155.547,
+        "x": 1149.008,
         "y": 874.14
       },
       "hitRadius": 14,
@@ -43130,19 +43136,15 @@
       "name": "Kenton",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 1162.547,
+          "circle": {
+            "centre": {
+              "x": 1149.008,
               "y": 874.14
             },
-            "lineID": "lioness",
-            "start": {
-              "x": 1148.547,
-              "y": 874.14
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "910GKTON"
@@ -44142,7 +44144,7 @@
     {
       "anchor": {
         "x": 1155.547,
-        "y": 934.802
+        "y": 976.0
       },
       "hitRadius": 14,
       "lineIDs": [
@@ -44154,13 +44156,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1162.547,
-              "y": 934.802
+              "x": 1148.547,
+              "y": 976.0
             },
             "lineID": "lioness",
             "start": {
-              "x": 1148.547,
-              "y": 934.802
+              "x": 1162.547,
+              "y": 976.0
             },
             "width": 3.2
           }
@@ -51763,7 +51765,7 @@
     {
       "anchor": {
         "x": 1414.422,
-        "y": 1732.189
+        "y": 1746.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -51776,13 +51778,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1411.578,
-              "y": 1740.177
+              "x": 1403.266,
+              "y": 1746.0
             },
-            "lineID": "circle",
+            "lineID": "district",
             "start": {
-              "x": 1425.578,
-              "y": 1740.177
+              "x": 1417.266,
+              "y": 1746.0
             },
             "width": 3.2
           }
@@ -51791,13 +51793,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1403.266,
-              "y": 1724.201
+              "x": 1411.578,
+              "y": 1746.0
             },
-            "lineID": "district",
+            "lineID": "circle",
             "start": {
-              "x": 1417.266,
-              "y": 1724.201
+              "x": 1425.578,
+              "y": 1746.0
             },
             "width": 3.2
           }
@@ -52084,7 +52086,7 @@
     },
     {
       "anchor": {
-        "x": 1142.469,
+        "x": 1149.008,
         "y": 874.14
       },
       "hitRadius": 24,
@@ -52094,19 +52096,15 @@
       "name": "Kenton",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
-            "end": {
-              "x": 1149.469,
+          "circle": {
+            "centre": {
+              "x": 1149.008,
               "y": 874.14
             },
-            "lineID": "bakerloo",
-            "start": {
-              "x": 1135.469,
-              "y": 874.14
-            },
-            "width": 3.2
-          }
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUKEN"
@@ -53433,7 +53431,7 @@
     },
     {
       "anchor": {
-        "x": 1086.791,
+        "x": 1087.554,
         "y": 935.594
       },
       "hitRadius": 24,
@@ -53443,19 +53441,29 @@
       "name": "Northwick Park",
       "primitives": [
         {
-          "kind": "tick",
-          "tick": {
+          "kind": "walkingConnector",
+          "walkingConnector": {
             "end": {
-              "x": 1086.791,
-              "y": 942.594
+              "x": 1149.008,
+              "y": 874.14
             },
-            "lineID": "metropolitan",
             "start": {
-              "x": 1086.791,
-              "y": 928.594
+              "x": 1087.554,
+              "y": 935.594
             },
-            "width": 3.2
+            "width": 4.5
           }
+        },
+        {
+          "circle": {
+            "centre": {
+              "x": 1087.554,
+              "y": 935.594
+            },
+            "outlineWidth": 3.5,
+            "radius": 8.5
+          },
+          "kind": "circle"
         }
       ],
       "stationID": "940GZZLUNKP"
@@ -54960,7 +54968,7 @@
     {
       "anchor": {
         "x": 1142.469,
-        "y": 934.802
+        "y": 976.0
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -54972,13 +54980,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1149.469,
-              "y": 934.802
+              "x": 1135.469,
+              "y": 976.0
             },
             "lineID": "bakerloo",
             "start": {
-              "x": 1135.469,
-              "y": 934.802
+              "x": 1149.469,
+              "y": 976.0
             },
             "width": 3.2
           }
