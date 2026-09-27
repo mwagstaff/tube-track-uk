@@ -295,6 +295,38 @@ struct RiverBusTests {
         }
     }
 
+    @Test func tflPiersStayVisibleWhenZoomedOut() throws {
+        let network = try #require(RiverBundle.load("RiverNetwork", as: RiverNetwork.self))
+        let anchors = try #require(RiverBundle.load("RiverSchematic", as: [RiverSchematicAnchor].self))
+        let linked = Set(anchors.filter { !($0.walkingLinkStationIDs ?? []).isEmpty }.map(\.id))
+        for scale: CGFloat in [0.2, 0.35, 0.6] {
+            let placements = RiverSchematicLayout.placements(
+                network: network, anchors: anchors, selected: nil, lineId: nil,
+                scale: scale, offset: .zero, viewport: CGSize(width: 4_800 * scale, height: 3_700 * scale),
+                typeScale: 1, blocked: []
+            )
+            #expect(linked.isSubset(of: Set(placements.map(\.pier.id))), "missing TfL piers at scale \(scale)")
+        }
+    }
+
+    @Test func everyPierIsCentredOnARiverBankEdge() throws {
+        let anchors = try #require(RiverBundle.load("RiverSchematic", as: [RiverSchematicAnchor].self))
+        let document = try BeckMapRepository().load(region: .fullUnderground, graph: TubeGraph.bundled())
+        let waterway = try #require(document.waterways?.first { $0.id == "river-thames" })
+        let path = try #require(document.paths.first { $0.id == waterway.pathID })
+        let points: [CGPoint] = path.commands.compactMap {
+            switch $0 { case let .move(to), let .line(to): CGPoint(x: to.x, y: to.y); default: nil }
+        }
+        // TfL centres pier symbols on the bank edge line: half the river band
+        // plus half its outline from the centreline.
+        let bankEdge = waterway.strokeWidth / 2 + waterway.outlineWidth / 2
+        for anchor in anchors {
+            let projection = try #require(RiverPolyline.project(anchor.markerPoint, onto: points))
+            let distance = hypot(projection.point.x - anchor.markerPoint.x, projection.point.y - anchor.markerPoint.y)
+            #expect(abs(distance - bankEdge) < 0.01, "\(anchor.id) is \(distance) from the river centreline")
+        }
+    }
+
     @Test func crossRiverSchematicHasARealSegmentAndReversePathIsSymmetric() throws {
         let anchors = try #require(RiverBundle.load("RiverSchematic", as: [RiverSchematicAnchor].self))
         let document = try BeckMapRepository().load(region: .fullUnderground, graph: TubeGraph.bundled())

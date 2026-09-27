@@ -334,8 +334,11 @@ python3 Tools/BeckMapBuilder/extract_tfl_reference.py --svg /tmp/tfl.svg \
 
 River Bus piers and cable-car terminals are drawn by their own layers.
 `RiverSchematic.json` places the 13 piers that the TfL map shows at TfL's
-positions and lists the stations each one joins with a walking link; the
-cable-car layer uses TfL's terminal positions and route.
+points along the river and lists the stations each one joins with a walking
+link; the cable-car layer uses TfL's terminal positions and route. As on the
+TfL map, every pier symbol is centred on its river bank edge line. Rerun
+`python3 Tools/BeckMapBuilder/place_river_piers.py` after changing the river
+geometry or a pier's river point.
 
 ## Background images
 

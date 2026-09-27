@@ -17,19 +17,28 @@ enum RiverSchematicLayout {
         var occupied = blocked
         var markers: [CGRect] = []
         var result: [RiverPierPlacement] = []
+        // Piers the TfL map shows, with walking links to stations, are always
+        // drawn like the stations they serve.
+        func prominent(_ anchor: RiverSchematicAnchor) -> Bool {
+            anchor.major || !(anchor.walkingLinkStationIDs ?? []).isEmpty
+        }
         let ordered = anchors.sorted {
             if ($0.id == selected) != ($1.id == selected) { return $0.id == selected }
-            if $0.major != $1.major { return $0.major }
+            if prominent($0) != prominent($1) { return prominent($0) }
             return $0.id < $1.id
         }
         func screen(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * scale + offset.width, y: p.y * scale + offset.height) }
         for anchor in ordered {
             guard let pier = network.pier(anchor.id),
                   lineId == nil || pier.lineIds.contains(lineId!) || pier.id == selected,
-                  anchor.major || scale >= 0.55 || pier.id == selected else { continue }
+                  prominent(anchor) || scale >= 0.55 || pier.id == selected else { continue }
             let point = screen(anchor.markerPoint)
-            let hit = CGRect(x: point.x - 22, y: point.y - 22, width: 44, height: 44)
-            guard bounds.intersects(hit), !markers.contains(where: { $0.intersects(hit) }) || pier.id == selected else { continue }
+            // Piers only give way to piers they would actually overlap.
+            let radius = BeckRiverLayer.markerRadius(selected: pier.id == selected, scale: scale) + 1
+            let hit = CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2)
+            guard bounds.intersects(hit),
+                  !markers.contains(where: { $0.intersects(hit) }) || pier.id == selected || prominent(anchor)
+            else { continue }
             markers.append(hit)
             var labelFrame: CGRect?
             if scale >= 1.1 || pier.id == selected {
@@ -69,9 +78,11 @@ struct BeckRiverLayer: View {
     let typeScale: CGFloat
     let blocked: [CGRect]
 
-    /// Pier discs match a TfL roundel's outer size at overview zoom.
+    /// Pier discs match a TfL roundel's outer size, with a legible minimum
+    /// once they show their boat icon.
     static func markerRadius(selected: Bool, scale: CGFloat) -> CGFloat {
-        selected ? 16 : scale >= 1.1 ? 12 : 11.4 * scale
+        let tflRadius = 11.4 * scale
+        return selected ? max(16, tflRadius + 2) : scale >= 1.1 ? max(12, tflRadius) : tflRadius
     }
 
     var body: some View {
@@ -116,9 +127,9 @@ struct BeckRiverLayer: View {
                 }
             }
             for item in placements {
+                // As on the TfL map, each pier is centred on its river bank
+                // edge (RiverSchematic.json), so no leader to the river is drawn.
                 let selected = item.pier.id == river.selectedPierId
-                var leader = Path(); leader.move(to: item.riverPoint); leader.addLine(to: item.point)
-                context.stroke(leader, with: .color(.blue.opacity(0.7)), lineWidth: 1)
                 let showsIcon = selected || scale >= 1.1
                 let r = Self.markerRadius(selected: selected, scale: scale)
                 let circle = Path(ellipseIn: CGRect(x: item.point.x - r, y: item.point.y - r, width: r * 2, height: r * 2))
@@ -127,7 +138,9 @@ struct BeckRiverLayer: View {
                 if showsIcon {
                     var icon = context.resolve(Image(systemName: "ferry.fill"))
                     icon.shading = .color(selected ? .white : .blue)
-                    context.draw(icon, in: CGRect(x: item.point.x - 8, y: item.point.y - 8, width: 16, height: 16))
+                    let iconSize = r * 1.35
+                    context.draw(icon, in: CGRect(x: item.point.x - iconSize / 2, y: item.point.y - iconSize / 2,
+                                                  width: iconSize, height: iconSize))
                 }
                 if let frame = item.labelFrame {
                     context.fill(Path(roundedRect: frame, cornerRadius: 4), with: .color(Color(.systemBackground).opacity(0.94)))
