@@ -303,9 +303,11 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
     # The name sits east of the diagonal interchange, above the Elizabeth line.
     "Paddington": (123, 94, "leading"),
     "Paddington (H&C Line)-Underground": (63, 40, "leading"),
-    # Royal Oak is deliberately displayed on the outward diagonal approach,
-    # matching the official map's separation from Paddington.
+    # These four stops occupy the long southwest diagonal in the TfL artwork.
     "Royal Oak": (-18, -16, "trailing"),
+    "Westbourne Park": (12, 24, "leading"),
+    "Ladbroke Grove": (16, 24, "leading"),
+    "Latimer Road": (16, 22, "leading"),
     "Hammersmith (H&C Line)": (-18, 0, "trailing"),
     # Keep Ruislip's name attached to its corrected shared-corridor stop,
     # rather than retaining the earlier label position at the Central crossing.
@@ -338,6 +340,7 @@ LABEL_OVERRIDES: dict[str, tuple[float, float, str]] = {
 LABEL_TEXT_OVERRIDES: dict[str, str] = {
     "Edgware Road (Circle Line)": "Edgware Road\n(Circle Line)",
     "Bond Street": "Bond\nStreet",
+    "Westbourne Park": "Westbourne\nPark",
 }
 
 
@@ -1137,6 +1140,81 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         final_command["to"] = extended_endpoint
         segment["toPort"] = extended_endpoint
 
+    # The slice's semantic stops on the western H&C/Circle diagonal were
+    # compressed toward Paddington. Split the existing traced route at the
+    # four tick positions measured from the TfL map. The route itself stays
+    # intact: only its station boundaries move along straight path commands.
+    western_stop_ids = (
+        "940GZZLULRD",  # Latimer Road
+        "940GZZLULAD",  # Ladbroke Grove
+        "940GZZLUWSP",  # Westbourne Park
+        "940GZZLURYO",  # Royal Oak
+    )
+    # At the first three stops, centre the paired lane ports on one
+    # perpendicular. The original lane splits were displaced slightly along
+    # the diagonal, making their coloured tick halves visibly step apart.
+    # Royal Oak already has matching lane ports and keeps its source position.
+    western_stop_port_x = {
+        "circle": (1199.911, 1235.912, 1275.913, 1307.891),
+        "hammersmith-city": (1194.090, 1230.088, 1270.087, 1302.110),
+    }
+    western_route_ids = ("940GZZLUWLA", *western_stop_ids, "940GZZLUPAH")
+    for line_id, stop_xs in western_stop_port_x.items():
+        route_segments = [
+            selected_segments[f"{line_id}:{min(a, b)}:{max(a, b)}"]
+            for a, b in zip(western_route_ids, western_route_ids[1:])
+        ]
+        if any(segment["pathDirection"] != "forward" for segment in route_segments):
+            raise ValueError(f"Unexpected {line_id} western path direction")
+        whole_path = copy.deepcopy(
+            selected_paths[route_segments[0]["pathID"]]["commands"]
+        )
+        for segment in route_segments[1:]:
+            commands = selected_paths[segment["pathID"]]["commands"]
+            if (
+                commands[0]["op"] != "move"
+                or commands[0]["to"] != whole_path[-1]["to"]
+            ):
+                raise ValueError(f"Disconnected {line_id} western approach")
+            whole_path.extend(copy.deepcopy(commands[1:]))
+
+        split_paths = [[copy.deepcopy(whole_path[0])]]
+        current = whole_path[0]["to"]
+        stop_index = 0
+        for command in whole_path[1:]:
+            end = command["to"]
+            if command["op"] == "line":
+                while (
+                    stop_index < len(stop_xs)
+                    and current["x"] < stop_xs[stop_index] <= end["x"]
+                ):
+                    fraction = (
+                        (stop_xs[stop_index] - current["x"])
+                        / (end["x"] - current["x"])
+                    )
+                    port = vector.rounded((
+                        stop_xs[stop_index],
+                        current["y"] + fraction * (end["y"] - current["y"]),
+                    ))
+                    split_paths[-1].append({"op": "line", "to": port})
+                    split_paths.append([{"op": "move", "to": port}])
+                    current = port
+                    stop_index += 1
+            elif (
+                stop_index < len(stop_xs)
+                and current["x"] < stop_xs[stop_index] <= end["x"]
+            ):
+                raise ValueError(f"{line_id} western stop falls inside a curve")
+            if end != current:
+                split_paths[-1].append(copy.deepcopy(command))
+            current = end
+        if stop_index != len(western_stop_ids) or len(split_paths) != len(route_segments):
+            raise ValueError(f"Could not split all {line_id} western stops")
+        for segment, commands in zip(route_segments, split_paths):
+            selected_paths[segment["pathID"]]["commands"] = commands
+            segment["fromPort"] = commands[0]["to"]
+            segment["toPort"] = commands[-1]["to"]
+
     markers: list[dict] = []
     labels: list[dict] = []
     for station_id, station in stations_by_id.items():
@@ -1381,13 +1459,13 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
                     "hitRadius": 24,
                     "primitives": [circle(hammersmith_shared_port)],
                 }
-        elif station["name"] == "Royal Oak":
-            # Place the two ticks on the exact outward diagonal portions of
-            # their authored paths, before those paths straighten into
-            # Paddington. This preserves topology while giving Royal Oak the
-            # same visual breathing room used by the official map.
-            circle_port = (1382.062, 1394.063)
-            hammersmith_port = (1376.281, 1388.203)
+        elif station["name"] in {
+            "Royal Oak", "Westbourne Park", "Ladbroke Grove", "Latimer Road"
+        }:
+            circle_port = line_port(selected_segments, station_id, "circle")
+            hammersmith_port = line_port(
+                selected_segments, station_id, "hammersmith-city"
+            )
             anchor = average_point([circle_port, hammersmith_port])
             marker = {
                 "stationID": station_id,

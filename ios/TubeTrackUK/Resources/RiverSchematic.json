@@ -84,9 +84,9 @@
     "id": "930GWMP",
     "x": 1940,
     "y": 1950,
-    "offsetX": 0,
-    "offsetY": 27,
-    "labelSide": 1,
+    "offsetX": -20,
+    "offsetY": 18,
+    "labelSide": -1,
     "major": false
   },
   {

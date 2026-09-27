@@ -349,6 +349,34 @@ class MapFidelityAuditTests(unittest.TestCase):
                 self.assertAlmostEqual(tick_centres[line_id][0], port["x"], places=3)
                 self.assertAlmostEqual(tick_centres[line_id][1], port["y"], places=3)
 
+        # The two coloured halves of each western stop must share one
+        # perpendicular across the diagonal route at high zoom.
+        for station_id in ("940GZZLUWSP", "940GZZLULAD", "940GZZLULRD"):
+            ticks = {
+                primitive["tick"]["lineID"]: primitive["tick"]
+                for primitive in markers[station_id]["primitives"]
+                if primitive["kind"] == "tick"
+            }
+            self.assertEqual(set(ticks), {"circle", "hammersmith-city"})
+            centres = {
+                line_id: (
+                    (tick["start"]["x"] + tick["end"]["x"]) / 2,
+                    (tick["start"]["y"] + tick["end"]["y"]) / 2,
+                )
+                for line_id, tick in ticks.items()
+            }
+            circle_centre = centres["circle"]
+            hammersmith_centre = centres["hammersmith-city"]
+            self.assertAlmostEqual(
+                circle_centre[0] - hammersmith_centre[0],
+                circle_centre[1] - hammersmith_centre[1],
+                delta=0.01,
+            )
+            for line_id, centre in centres.items():
+                port = line_port(station_id, line_id)
+                self.assertAlmostEqual(centre[0], port["x"], places=3)
+                self.assertAlmostEqual(centre[1], port["y"], places=3)
+
     def test_canada_water_has_one_physical_roundel_on_both_routes(self):
         document = json.loads((IOS_ROOT / "TubeTrackUK/Resources/BeckMap/v1/full-underground.json").read_text())
         ids = {"940GZZLUCWR", "910GCNDAW"}

@@ -8,7 +8,7 @@ Pass for the audited map layer. The artwork is authored, data-driven, and restra
 
 - Reference: Transport for London Standard Tube Map (April 2026)
 - Artwork: `tube-track-uk.beck.full-underground.v1`
-- Findings: 78 total (high: 40, medium: 38)
+- Findings: 74 total (high: 36, medium: 38)
 - Status: candidate deviations require visual confirmation against the locked reference before geometry changes
 
 ### Most important next steps
@@ -24,7 +24,7 @@ Pass for the audited map layer. The artwork is authored, data-driven, and restra
 
 No findings.
 
-### High (40)
+### High (36)
 
 #### `connector-angle-review` - 910GBARKING primitive 0
 
@@ -226,22 +226,6 @@ No findings.
 - Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
 - Evidence: `{"angleDegrees":14.8,"deviationDegrees":14.8,"end":[1410.266,1683.976],"kind":"connector","length":6.205,"nearestCanonicalAngle":0.0,"start":[1416.265,1682.391],"stationID":"940GZZLUNHG","stationName":"Notting Hill Gate"}`
 
-#### `connector-angle-review` - 940GZZLUPAC primitive 0
-
-- Category: connectors
-- Description: A connector is 33.189 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
-- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
-- Evidence: `{"angleDegrees":33.189,"deviationDegrees":11.811,"end":[1414.989,1381.627],"kind":"connector","length":53.78,"nearestCanonicalAngle":45.0,"start":[1369.982,1352.188],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
-
-#### `connector-angle-review` - 940GZZLUPAC primitive 1
-
-- Category: connectors
-- Description: A connector is 29.097 degrees rather than horizontal, vertical, or 45 degrees.
-- Impact: An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.
-- Recommendation: Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.
-- Evidence: `{"angleDegrees":29.097,"deviationDegrees":15.903,"end":[1459.978,1406.664],"kind":"connector","length":51.487,"nearestCanonicalAngle":45.0,"start":[1414.989,1381.627],"stationID":"940GZZLUPAC","stationName":"Paddington"}`
-
 #### `connector-angle-review` - 940GZZLUSTD primitive 0
 
 - Category: connectors
@@ -329,22 +313,6 @@ No findings.
 - Impact: The symbol can appear visually detached or imply the wrong interchange relationship.
 - Recommendation: Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.
 - Evidence: `{"centre":[1172.907,1276.111],"nearestConnector":{"endpoint":"start","kind":"connector","primitiveIndex":0,"stationID":"940GZZLUPAC"},"nearestDistance":13.078,"nearestPath":{"lineID":"lioness","pathID":"beck.v1.path.lioness.euston-watford.official.v1.3","segmentID":"lioness:910GKENSLG:910GQPRK","side":"from"},"stationID":"910GQPRK"}`
-
-#### `tick-not-on-route-port` - 940GZZLURYO primitive 0
-
-- Category: ticks
-- Description: A station tick is not centred on its exact station endpoint.
-- Impact: The station mark can float beside the route or attach to the wrong line.
-- Recommendation: Align the route endpoint and tick centre from the same reviewed source coordinate.
-- Evidence: `{"centre":[1382.062,1394.063],"lineID":"circle","nearestDistance":29.204,"stationID":"940GZZLURYO"}`
-
-#### `tick-not-on-route-port` - 940GZZLURYO primitive 1
-
-- Category: ticks
-- Description: A station tick is not centred on its exact station endpoint.
-- Impact: The station mark can float beside the route or attach to the wrong line.
-- Recommendation: Align the route endpoint and tick centre from the same reviewed source coordinate.
-- Evidence: `{"centre":[1376.281,1388.203],"lineID":"hammersmith-city","nearestDistance":27.885,"stationID":"940GZZLURYO"}`
 
 ### Medium (38)
 
@@ -535,26 +503,18 @@ No findings.
 #### `non-canonical-straight-runs` - central
 
 - Category: routes
-- Description: 3 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
+- Description: 2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
 - Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
 - Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
-- Evidence: `{"candidates":[{"angleDegrees":47.857,"commandIndex":1,"deviationDegrees":2.857,"length":67.741,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.central.east-connector.v1.4","segmentID":"central:940GZZLUBLG:940GZZLULVT"},{"angleDegrees":30.018,"commandIndex":1,"deviationDegrees":14.982,"length":100.71,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.central.east-connector.v1.3","segmentID":"central:940GZZLUBNK:940GZZLULVT"},{"angleDegrees":79.295,"commandIndex":3,"deviationDegrees":10.705,"length":40.215,"nearestCanonicalAngle":90.0,"pathID":"beck.v1.path.central.east-connector.v1.2","segmentID":"central:940GZZLUBNK:940GZZLUSPU"}],"count":3,"lineID":"central","maximumDeviationDegrees":14.982}`
+- Evidence: `{"candidates":[{"angleDegrees":47.857,"commandIndex":1,"deviationDegrees":2.857,"length":67.741,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.central.east-connector.v1.4","segmentID":"central:940GZZLUBLG:940GZZLULVT"},{"angleDegrees":30.018,"commandIndex":1,"deviationDegrees":14.982,"length":100.71,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.central.east-connector.v1.3","segmentID":"central:940GZZLUBNK:940GZZLULVT"}],"count":2,"lineID":"central","maximumDeviationDegrees":14.982}`
 
 #### `non-canonical-straight-runs` - circle
-
-- Category: routes
-- Description: 4 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
-- Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
-- Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
-- Evidence: `{"candidates":[{"angleDegrees":36.777,"commandIndex":1,"deviationDegrees":8.223,"length":116.884,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.circle.shared-central.full.v1.6","segmentID":"circle:940GZZLUBBN:940GZZLUFCN"},{"angleDegrees":3.204,"commandIndex":3,"deviationDegrees":3.204,"length":81.628,"nearestCanonicalAngle":0.0,"pathID":"beck.v1.path.circle.east-connector.v1.0","segmentID":"circle:940GZZLUCST:940GZZLUMMT"},{"angleDegrees":36.777,"commandIndex":1,"deviationDegrees":8.223,"length":112.713,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.circle.shared-central.full.v1.5","segmentID":"circle:940GZZLUFCN:940GZZLUKSX"},{"angleDegrees":1.95,"commandIndex":1,"deviationDegrees":1.95,"length":134.046,"nearestCanonicalAngle":0.0,"pathID":"beck.v1.path.circle.east-connector.v1.1","segmentID":"circle:940GZZLUMMT:940GZZLUTWH"}],"count":4,"lineID":"circle","maximumDeviationDegrees":8.223}`
-
-#### `non-canonical-straight-runs` - district
 
 - Category: routes
 - Description: 2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
 - Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
 - Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
-- Evidence: `{"candidates":[{"angleDegrees":2.633,"commandIndex":3,"deviationDegrees":2.633,"length":81.617,"nearestCanonicalAngle":0.0,"pathID":"beck.v1.path.district.east-connector.v1.0","segmentID":"district:940GZZLUCST:940GZZLUMMT"},{"angleDegrees":1.753,"commandIndex":1,"deviationDegrees":1.753,"length":120.556,"nearestCanonicalAngle":0.0,"pathID":"beck.v1.path.district.east-connector.v1.1","segmentID":"district:940GZZLUMMT:940GZZLUTWH"}],"count":2,"lineID":"district","maximumDeviationDegrees":2.633}`
+- Evidence: `{"candidates":[{"angleDegrees":36.777,"commandIndex":1,"deviationDegrees":8.223,"length":116.884,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.circle.shared-central.full.v1.6","segmentID":"circle:940GZZLUBBN:940GZZLUFCN"},{"angleDegrees":36.777,"commandIndex":1,"deviationDegrees":8.223,"length":112.713,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.circle.shared-central.full.v1.5","segmentID":"circle:940GZZLUFCN:940GZZLUKSX"}],"count":2,"lineID":"circle","maximumDeviationDegrees":8.223}`
 
 #### `non-canonical-straight-runs` - dlr
 
@@ -579,6 +539,14 @@ No findings.
 - Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
 - Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
 - Evidence: `{"candidates":[{"angleDegrees":36.775,"commandIndex":1,"deviationDegrees":8.225,"length":116.892,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.hammersmith-city.shared-central.full.v1.6","segmentID":"hammersmith-city:940GZZLUBBN:940GZZLUFCN"},{"angleDegrees":36.775,"commandIndex":1,"deviationDegrees":8.225,"length":112.717,"nearestCanonicalAngle":45.0,"pathID":"beck.v1.path.hammersmith-city.shared-central.full.v1.5","segmentID":"hammersmith-city:940GZZLUFCN:940GZZLUKSX"}],"count":2,"lineID":"hammersmith-city","maximumDeviationDegrees":8.225}`
+
+#### `non-canonical-straight-runs` - jubilee
+
+- Category: routes
+- Description: 1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.
+- Impact: An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.
+- Recommendation: Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.
+- Evidence: `{"candidates":[{"angleDegrees":0.298,"commandIndex":1,"deviationDegrees":0.298,"length":102.234,"nearestCanonicalAngle":0.0,"pathID":"beck.v1.path.jubilee.east-connector.v1.2","segmentID":"jubilee:940GZZLUCWR:940GZZLUCYF"}],"count":1,"lineID":"jubilee","maximumDeviationDegrees":0.298}`
 
 #### `non-canonical-straight-runs` - metropolitan
 

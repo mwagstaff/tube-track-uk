@@ -665,58 +665,6 @@
     {
       "category": "connectors",
       "code": "connector-angle-review",
-      "description": "A connector is 33.189 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 33.189,
-        "deviationDegrees": 11.811,
-        "end": [
-          1414.989,
-          1381.627
-        ],
-        "kind": "connector",
-        "length": 53.78,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1369.982,
-          1352.188
-        ],
-        "stationID": "940GZZLUPAC",
-        "stationName": "Paddington"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUPAC primitive 0",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
-      "description": "A connector is 29.097 degrees rather than horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "angleDegrees": 29.097,
-        "deviationDegrees": 15.903,
-        "end": [
-          1459.978,
-          1406.664
-        ],
-        "kind": "connector",
-        "length": 51.487,
-        "nearestCanonicalAngle": 45.0,
-        "start": [
-          1414.989,
-          1381.627
-        ],
-        "stationID": "940GZZLUPAC",
-        "stationName": "Paddington"
-      },
-      "impact": "An unintended angle weakens the interchange grammar and can expose independently inferred glyph positions.",
-      "location": "940GZZLUPAC primitive 1",
-      "recommendation": "Trace the connector and both glyph centres from the locked source; allow exceptions only by stable station ID.",
-      "severity": "high"
-    },
-    {
-      "category": "connectors",
-      "code": "connector-angle-review",
       "description": "A connector is 55.232 degrees rather than horizontal, vertical, or 45 degrees.",
       "evidence": {
         "angleDegrees": 55.232,
@@ -1001,42 +949,6 @@
       "impact": "The symbol can appear visually detached or imply the wrong interchange relationship.",
       "location": "910GQPRK primitive 0",
       "recommendation": "Compare the centre with the official station artwork and move the corresponding path, connector, and glyph together.",
-      "severity": "high"
-    },
-    {
-      "category": "ticks",
-      "code": "tick-not-on-route-port",
-      "description": "A station tick is not centred on its exact station endpoint.",
-      "evidence": {
-        "centre": [
-          1382.062,
-          1394.063
-        ],
-        "lineID": "circle",
-        "nearestDistance": 29.204,
-        "stationID": "940GZZLURYO"
-      },
-      "impact": "The station mark can float beside the route or attach to the wrong line.",
-      "location": "940GZZLURYO primitive 0",
-      "recommendation": "Align the route endpoint and tick centre from the same reviewed source coordinate.",
-      "severity": "high"
-    },
-    {
-      "category": "ticks",
-      "code": "tick-not-on-route-port",
-      "description": "A station tick is not centred on its exact station endpoint.",
-      "evidence": {
-        "centre": [
-          1376.281,
-          1388.203
-        ],
-        "lineID": "hammersmith-city",
-        "nearestDistance": 27.885,
-        "stationID": "940GZZLURYO"
-      },
-      "impact": "The station mark can float beside the route or attach to the wrong line.",
-      "location": "940GZZLURYO primitive 1",
-      "recommendation": "Align the route endpoint and tick centre from the same reviewed source coordinate.",
       "severity": "high"
     },
     {
@@ -1611,7 +1523,7 @@
     {
       "category": "routes",
       "code": "non-canonical-straight-runs",
-      "description": "3 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
+      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
       "evidence": {
         "candidates": [
           {
@@ -1631,18 +1543,9 @@
             "nearestCanonicalAngle": 45.0,
             "pathID": "beck.v1.path.central.east-connector.v1.3",
             "segmentID": "central:940GZZLUBNK:940GZZLULVT"
-          },
-          {
-            "angleDegrees": 79.295,
-            "commandIndex": 3,
-            "deviationDegrees": 10.705,
-            "length": 40.215,
-            "nearestCanonicalAngle": 90.0,
-            "pathID": "beck.v1.path.central.east-connector.v1.2",
-            "segmentID": "central:940GZZLUBNK:940GZZLUSPU"
           }
         ],
-        "count": 3,
+        "count": 2,
         "lineID": "central",
         "maximumDeviationDegrees": 14.982
       },
@@ -1654,7 +1557,7 @@
     {
       "category": "routes",
       "code": "non-canonical-straight-runs",
-      "description": "4 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
+      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
       "evidence": {
         "candidates": [
           {
@@ -1667,15 +1570,6 @@
             "segmentID": "circle:940GZZLUBBN:940GZZLUFCN"
           },
           {
-            "angleDegrees": 3.204,
-            "commandIndex": 3,
-            "deviationDegrees": 3.204,
-            "length": 81.628,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.circle.east-connector.v1.0",
-            "segmentID": "circle:940GZZLUCST:940GZZLUMMT"
-          },
-          {
             "angleDegrees": 36.777,
             "commandIndex": 1,
             "deviationDegrees": 8.223,
@@ -1683,57 +1577,14 @@
             "nearestCanonicalAngle": 45.0,
             "pathID": "beck.v1.path.circle.shared-central.full.v1.5",
             "segmentID": "circle:940GZZLUFCN:940GZZLUKSX"
-          },
-          {
-            "angleDegrees": 1.95,
-            "commandIndex": 1,
-            "deviationDegrees": 1.95,
-            "length": 134.046,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.circle.east-connector.v1.1",
-            "segmentID": "circle:940GZZLUMMT:940GZZLUTWH"
           }
         ],
-        "count": 4,
+        "count": 2,
         "lineID": "circle",
         "maximumDeviationDegrees": 8.223
       },
       "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
       "location": "circle",
-      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
-      "severity": "medium"
-    },
-    {
-      "category": "routes",
-      "code": "non-canonical-straight-runs",
-      "description": "2 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
-      "evidence": {
-        "candidates": [
-          {
-            "angleDegrees": 2.633,
-            "commandIndex": 3,
-            "deviationDegrees": 2.633,
-            "length": 81.617,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.district.east-connector.v1.0",
-            "segmentID": "district:940GZZLUCST:940GZZLUMMT"
-          },
-          {
-            "angleDegrees": 1.753,
-            "commandIndex": 1,
-            "deviationDegrees": 1.753,
-            "length": 120.556,
-            "nearestCanonicalAngle": 0.0,
-            "pathID": "beck.v1.path.district.east-connector.v1.1",
-            "segmentID": "district:940GZZLUMMT:940GZZLUTWH"
-          }
-        ],
-        "count": 2,
-        "lineID": "district",
-        "maximumDeviationDegrees": 2.633
-      },
-      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
-      "location": "district",
       "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
       "severity": "medium"
     },
@@ -1845,6 +1696,31 @@
       },
       "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
       "location": "hammersmith-city",
+      "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
+      "severity": "medium"
+    },
+    {
+      "category": "routes",
+      "code": "non-canonical-straight-runs",
+      "description": "1 straight route command(s) deviate from horizontal, vertical, or 45 degrees.",
+      "evidence": {
+        "candidates": [
+          {
+            "angleDegrees": 0.298,
+            "commandIndex": 1,
+            "deviationDegrees": 0.298,
+            "length": 102.234,
+            "nearestCanonicalAngle": 0.0,
+            "pathID": "beck.v1.path.jubilee.east-connector.v1.2",
+            "segmentID": "jubilee:940GZZLUCWR:940GZZLUCYF"
+          }
+        ],
+        "count": 1,
+        "lineID": "jubilee",
+        "maximumDeviationDegrees": 0.298
+      },
+      "impact": "An unexplained angle may expose slice-seam drift, but the official artwork also contains intentional exceptions.",
+      "location": "jubilee",
       "recommendation": "Compare each command with the locked artwork; correct only source mismatches and retain traced exceptions.",
       "severity": "medium"
     },
@@ -2154,13 +2030,13 @@
   "metrics": {
     "connectors": {
       "byKind": {
-        "connector": 79,
+        "connector": 80,
         "walkingConnector": 4
       },
-      "count": 83,
+      "count": 84,
       "nearestAxis": {
         "0 degrees": 10,
-        "45 degrees": 50,
+        "45 degrees": 51,
         "90 degrees": 23
       },
       "records": [
@@ -2251,28 +2127,6 @@
           ],
           "stationID": "910GCLPHMJC",
           "stationName": "Clapham Junction"
-        },
-        {
-          "angleDegrees": 89.853,
-          "deviationDegrees": 0.147,
-          "end": [
-            2704.938,
-            1942.197
-          ],
-          "kind": "connector",
-          "length": 24.197,
-          "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
-          "roundelEndpointDistances": [
-            0.0,
-            0.0
-          ],
-          "start": [
-            2705.0,
-            1918.0
-          ],
-          "stationID": "910GCNDAW",
-          "stationName": "Canada Water"
         },
         {
           "angleDegrees": 89.602,
@@ -3155,16 +3009,38 @@
           "stationName": "Canary Wharf"
         },
         {
-          "angleDegrees": 89.761,
-          "deviationDegrees": 0.239,
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
           "end": [
-            600.003,
+            600.109,
+            1682.391
+          ],
+          "kind": "connector",
+          "length": 25.188,
+          "nearestCanonicalAngle": 90.0,
+          "primitiveIndex": 0,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            600.109,
+            1657.203
+          ],
+          "stationID": "940GZZLUEBY",
+          "stationName": "Ealing Broadway"
+        },
+        {
+          "angleDegrees": 90.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            600.109,
             1707.781
           ],
           "kind": "connector",
           "length": 25.39,
           "nearestCanonicalAngle": 90.0,
-          "primitiveIndex": 0,
+          "primitiveIndex": 1,
           "roundelEndpointDistances": [
             0.0,
             0.0
@@ -3573,14 +3449,14 @@
           "stationName": "Notting Hill Gate"
         },
         {
-          "angleDegrees": 33.189,
-          "deviationDegrees": 11.811,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1414.989,
-            1381.627
+            1377.05,
+            1393.254
           ],
           "kind": "connector",
-          "length": 53.78,
+          "length": 58.076,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 0,
           "roundelEndpointDistances": [
@@ -3588,21 +3464,21 @@
             0.0
           ],
           "start": [
-            1369.982,
+            1335.984,
             1352.188
           ],
           "stationID": "940GZZLUPAC",
           "stationName": "Paddington"
         },
         {
-          "angleDegrees": 29.097,
-          "deviationDegrees": 15.903,
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
           "end": [
-            1459.978,
-            1406.664
+            1414.422,
+            1430.626
           ],
           "kind": "connector",
-          "length": 51.487,
+          "length": 52.852,
           "nearestCanonicalAngle": 45.0,
           "primitiveIndex": 1,
           "roundelEndpointDistances": [
@@ -3610,8 +3486,30 @@
             0.0
           ],
           "start": [
-            1414.989,
-            1381.627
+            1377.05,
+            1393.254
+          ],
+          "stationID": "940GZZLUPAC",
+          "stationName": "Paddington"
+        },
+        {
+          "angleDegrees": 45.0,
+          "deviationDegrees": 0.0,
+          "end": [
+            1458.781,
+            1474.985
+          ],
+          "kind": "connector",
+          "length": 62.733,
+          "nearestCanonicalAngle": 45.0,
+          "primitiveIndex": 2,
+          "roundelEndpointDistances": [
+            0.0,
+            0.0
+          ],
+          "start": [
+            1414.422,
+            1430.626
           ],
           "stationID": "940GZZLUPAC",
           "stationName": "Paddington"
@@ -3996,8 +3894,8 @@
       "labels": 458,
       "paths": 620,
       "primitives": {
-        "circle": 174,
-        "connector": 79,
+        "circle": 175,
+        "connector": 80,
         "tick": 410,
         "walkingConnector": 4
       },
@@ -4028,10 +3926,10 @@
       ]
     },
     "roundels": {
-      "count": 174,
+      "count": 175,
       "styles": [
         {
-          "count": 174,
+          "count": 175,
           "outlineWidth": 3.5,
           "radius": 8.5
         }
@@ -4039,12 +3937,12 @@
       "unmatchedRoutePorts": 4
     },
     "routeAngleCandidatesByLine": {
-      "central": 3,
-      "circle": 4,
-      "district": 2,
+      "central": 2,
+      "circle": 2,
       "dlr": 2,
       "elizabeth": 3,
       "hammersmith-city": 2,
+      "jubilee": 1,
       "metropolitan": 4,
       "mildmay": 2,
       "northern": 4,
@@ -4055,8 +3953,8 @@
       "windrush": 1
     },
     "routeCommands": {
-      "cubic": 332,
-      "line": 971,
+      "cubic": 333,
+      "line": 980,
       "move": 619
     },
     "sourceVerifiedGeometry": {
@@ -4105,16 +4003,15 @@
   "schemaVersion": 1,
   "summary": {
     "byCategory": {
-      "connectors": 57,
+      "connectors": 55,
       "roundels": 4,
       "routes": 14,
-      "styles": 1,
-      "ticks": 2
+      "styles": 1
     },
     "bySeverity": {
-      "high": 40,
+      "high": 36,
       "medium": 38
     },
-    "findingCount": 78
+    "findingCount": 74
   }
 }

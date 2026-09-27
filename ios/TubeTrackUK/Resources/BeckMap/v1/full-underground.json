@@ -4187,8 +4187,8 @@
       "alignment": "leading",
       "id": "label.940GZZLULAD",
       "position": {
-        "x": 1316.513,
-        "y": 1469.605
+        "x": 1249.0,
+        "y": 1561.023
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -4252,8 +4252,8 @@
       "alignment": "leading",
       "id": "label.940GZZLULRD",
       "position": {
-        "x": 1266.484,
-        "y": 1519.563
+        "x": 1213.001,
+        "y": 1594.97
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5028,8 +5028,8 @@
       "alignment": "trailing",
       "id": "label.940GZZLURYO",
       "position": {
-        "x": 1361.171,
-        "y": 1375.133
+        "x": 1287.001,
+        "y": 1449.128
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -5939,13 +5939,13 @@
       "alignment": "leading",
       "id": "label.940GZZLUWSP",
       "position": {
-        "x": 1366.585,
-        "y": 1419.652
+        "x": 1285.0,
+        "y": 1521.081
       },
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "940GZZLUWSP",
-      "text": "Westbourne Park",
+      "text": "Westbourne\nPark",
       "visibilityTier": "local"
     },
     {
@@ -9279,8 +9279,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1252.906,
-            "y": 1522.967
+            "x": 1199.911,
+            "y": 1575.881
           }
         }
       ],
@@ -9291,8 +9291,53 @@
         {
           "op": "move",
           "to": {
+            "x": 1199.911,
+            "y": 1575.881
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1235.912,
+            "y": 1539.935
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.western.western-fan.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1235.912,
+            "y": 1539.935
+          }
+        },
+        {
+          "op": "line",
+          "to": {
             "x": 1252.906,
             "y": 1522.967
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1275.913,
+            "y": 1499.995
+          }
+        }
+      ],
+      "id": "beck.v1.path.circle.western.western-fan.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1275.913,
+            "y": 1499.995
           }
         },
         {
@@ -9315,33 +9360,28 @@
             "x": 1302.917,
             "y": 1473.015
           }
-        }
-      ],
-      "id": "beck.v1.path.circle.western.western-fan.v1.4"
-    },
-    {
-      "commands": [
-        {
-          "op": "move",
-          "to": {
-            "x": 1302.917,
-            "y": 1473.015
-          }
         },
         {
           "op": "line",
           "to": {
-            "x": 1352.989,
-            "y": 1423.066
+            "x": 1307.891,
+            "y": 1468.053
           }
         }
       ],
-      "id": "beck.v1.path.circle.western.western-fan.v1.5"
+      "id": "beck.v1.path.circle.western.western-fan.v1.6"
     },
     {
       "commands": [
         {
           "op": "move",
+          "to": {
+            "x": 1307.891,
+            "y": 1468.053
+          }
+        },
+        {
+          "op": "line",
           "to": {
             "x": 1352.989,
             "y": 1423.066
@@ -9371,18 +9411,6 @@
         },
         {
           "op": "line",
-          "to": {
-            "x": 1410.063,
-            "y": 1385.766
-          }
-        }
-      ],
-      "id": "beck.v1.path.circle.western.western-fan.v1.6"
-    },
-    {
-      "commands": [
-        {
-          "op": "move",
           "to": {
             "x": 1410.063,
             "y": 1385.766
@@ -14853,8 +14881,8 @@
         {
           "op": "line",
           "to": {
-            "x": 1248.063,
-            "y": 1516.16
+            "x": 1194.09,
+            "y": 1570.059
           }
         }
       ],
@@ -14865,8 +14893,53 @@
         {
           "op": "move",
           "to": {
+            "x": 1194.09,
+            "y": 1570.059
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1230.088,
+            "y": 1534.11
+          }
+        }
+      ],
+      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.4"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1230.088,
+            "y": 1534.11
+          }
+        },
+        {
+          "op": "line",
+          "to": {
             "x": 1248.063,
             "y": 1516.16
+          }
+        },
+        {
+          "op": "line",
+          "to": {
+            "x": 1270.087,
+            "y": 1494.166
+          }
+        }
+      ],
+      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.5"
+    },
+    {
+      "commands": [
+        {
+          "op": "move",
+          "to": {
+            "x": 1270.087,
+            "y": 1494.166
           }
         },
         {
@@ -14889,33 +14962,28 @@
             "x": 1298.109,
             "y": 1466.194
           }
-        }
-      ],
-      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.4"
-    },
-    {
-      "commands": [
-        {
-          "op": "move",
-          "to": {
-            "x": 1298.109,
-            "y": 1466.194
-          }
         },
         {
           "op": "line",
           "to": {
-            "x": 1348.181,
-            "y": 1416.239
+            "x": 1302.11,
+            "y": 1462.202
           }
         }
       ],
-      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.5"
+      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.6"
     },
     {
       "commands": [
         {
           "op": "move",
+          "to": {
+            "x": 1302.11,
+            "y": 1462.202
+          }
+        },
+        {
+          "op": "line",
           "to": {
             "x": 1348.181,
             "y": 1416.239
@@ -14938,18 +15006,6 @@
             "y": 1377.515
           },
           "op": "cubic",
-          "to": {
-            "x": 1402.024,
-            "y": 1377.485
-          }
-        }
-      ],
-      "id": "beck.v1.path.hammersmith-city.western.western-fan.v1.6"
-    },
-    {
-      "commands": [
-        {
-          "op": "move",
           "to": {
             "x": 1402.024,
             "y": 1377.485
@@ -30118,8 +30174,8 @@
     },
     {
       "fromPort": {
-        "x": 1252.906,
-        "y": 1522.967
+        "x": 1199.911,
+        "y": 1575.881
       },
       "fromStationID": "940GZZLULRD",
       "id": "circle:940GZZLULAD:940GZZLULRD",
@@ -30127,8 +30183,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.circle.western.western-fan.v1.4",
       "toPort": {
-        "x": 1302.917,
-        "y": 1473.015
+        "x": 1235.912,
+        "y": 1539.935
       },
       "toStationID": "940GZZLULAD",
       "translation": {
@@ -30138,8 +30194,8 @@
     },
     {
       "fromPort": {
-        "x": 1302.917,
-        "y": 1473.015
+        "x": 1235.912,
+        "y": 1539.935
       },
       "fromStationID": "940GZZLULAD",
       "id": "circle:940GZZLULAD:940GZZLUWSP",
@@ -30147,8 +30203,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.circle.western.western-fan.v1.5",
       "toPort": {
-        "x": 1352.989,
-        "y": 1423.066
+        "x": 1275.913,
+        "y": 1499.995
       },
       "toStationID": "940GZZLUWSP",
       "translation": {
@@ -30167,8 +30223,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.circle.western.western-fan.v1.3",
       "toPort": {
-        "x": 1252.906,
-        "y": 1522.967
+        "x": 1199.911,
+        "y": 1575.881
       },
       "toStationID": "940GZZLULRD",
       "translation": {
@@ -30218,8 +30274,8 @@
     },
     {
       "fromPort": {
-        "x": 1410.063,
-        "y": 1385.766
+        "x": 1307.891,
+        "y": 1468.053
       },
       "fromStationID": "940GZZLURYO",
       "id": "circle:940GZZLUPAH:940GZZLURYO",
@@ -30238,8 +30294,8 @@
     },
     {
       "fromPort": {
-        "x": 1352.989,
-        "y": 1423.066
+        "x": 1275.913,
+        "y": 1499.995
       },
       "fromStationID": "940GZZLUWSP",
       "id": "circle:940GZZLURYO:940GZZLUWSP",
@@ -30247,8 +30303,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.circle.western.western-fan.v1.6",
       "toPort": {
-        "x": 1410.063,
-        "y": 1385.766
+        "x": 1307.891,
+        "y": 1468.053
       },
       "toStationID": "940GZZLURYO",
       "translation": {
@@ -33638,8 +33694,8 @@
     },
     {
       "fromPort": {
-        "x": 1248.063,
-        "y": 1516.16
+        "x": 1194.09,
+        "y": 1570.059
       },
       "fromStationID": "940GZZLULRD",
       "id": "hammersmith-city:940GZZLULAD:940GZZLULRD",
@@ -33647,8 +33703,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.4",
       "toPort": {
-        "x": 1298.109,
-        "y": 1466.194
+        "x": 1230.088,
+        "y": 1534.11
       },
       "toStationID": "940GZZLULAD",
       "translation": {
@@ -33658,8 +33714,8 @@
     },
     {
       "fromPort": {
-        "x": 1298.109,
-        "y": 1466.194
+        "x": 1230.088,
+        "y": 1534.11
       },
       "fromStationID": "940GZZLULAD",
       "id": "hammersmith-city:940GZZLULAD:940GZZLUWSP",
@@ -33667,8 +33723,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.5",
       "toPort": {
-        "x": 1348.181,
-        "y": 1416.239
+        "x": 1270.087,
+        "y": 1494.166
       },
       "toStationID": "940GZZLUWSP",
       "translation": {
@@ -33687,8 +33743,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.3",
       "toPort": {
-        "x": 1248.063,
-        "y": 1516.16
+        "x": 1194.09,
+        "y": 1570.059
       },
       "toStationID": "940GZZLULRD",
       "translation": {
@@ -33738,8 +33794,8 @@
     },
     {
       "fromPort": {
-        "x": 1402.024,
-        "y": 1377.485
+        "x": 1302.11,
+        "y": 1462.202
       },
       "fromStationID": "940GZZLURYO",
       "id": "hammersmith-city:940GZZLUPAH:940GZZLURYO",
@@ -33798,8 +33854,8 @@
     },
     {
       "fromPort": {
-        "x": 1348.181,
-        "y": 1416.239
+        "x": 1270.087,
+        "y": 1494.166
       },
       "fromStationID": "940GZZLUWSP",
       "id": "hammersmith-city:940GZZLURYO:940GZZLUWSP",
@@ -33807,8 +33863,8 @@
       "pathDirection": "forward",
       "pathID": "beck.v1.path.hammersmith-city.western.western-fan.v1.6",
       "toPort": {
-        "x": 1402.024,
-        "y": 1377.485
+        "x": 1302.11,
+        "y": 1462.202
       },
       "toStationID": "940GZZLURYO",
       "translation": {
@@ -52328,8 +52384,8 @@
     },
     {
       "anchor": {
-        "x": 1300.513,
-        "y": 1469.605
+        "x": 1233.0,
+        "y": 1537.023
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -52342,13 +52398,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1307.86,
-              "y": 1477.971
+              "x": 1240.862,
+              "y": 1544.885
             },
             "lineID": "circle",
             "start": {
-              "x": 1297.973,
-              "y": 1468.06
+              "x": 1230.962,
+              "y": 1534.985
             },
             "width": 3.2
           }
@@ -52357,13 +52413,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1303.053,
-              "y": 1471.149
+              "x": 1235.038,
+              "y": 1539.06
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1293.165,
-              "y": 1461.238
+              "x": 1225.138,
+              "y": 1529.16
             },
             "width": 3.2
           }
@@ -52486,8 +52542,8 @@
     },
     {
       "anchor": {
-        "x": 1250.484,
-        "y": 1519.563
+        "x": 1197.001,
+        "y": 1572.97
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -52500,13 +52556,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1257.852,
-              "y": 1527.921
+              "x": 1204.861,
+              "y": 1580.831
             },
             "lineID": "circle",
             "start": {
-              "x": 1247.96,
-              "y": 1518.014
+              "x": 1194.961,
+              "y": 1570.931
             },
             "width": 3.2
           }
@@ -52515,13 +52571,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1253.009,
-              "y": 1521.113
+              "x": 1199.04,
+              "y": 1575.009
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1243.116,
-              "y": 1511.207
+              "x": 1189.14,
+              "y": 1565.109
             },
             "width": 3.2
           }
@@ -54443,8 +54499,8 @@
     },
     {
       "anchor": {
-        "x": 1379.171,
-        "y": 1391.133
+        "x": 1305.001,
+        "y": 1465.128
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -54457,13 +54513,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1387.012,
-              "y": 1399.013
+              "x": 1312.841,
+              "y": 1473.003
             },
             "lineID": "circle",
             "start": {
-              "x": 1377.112,
-              "y": 1389.113
+              "x": 1302.941,
+              "y": 1463.103
             },
             "width": 3.2
           }
@@ -54472,13 +54528,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1381.231,
-              "y": 1393.153
+              "x": 1307.06,
+              "y": 1467.152
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1371.331,
-              "y": 1383.253
+              "x": 1297.16,
+              "y": 1457.252
             },
             "width": 3.2
           }
@@ -56853,8 +56909,8 @@
     },
     {
       "anchor": {
-        "x": 1350.585,
-        "y": 1419.652
+        "x": 1273.0,
+        "y": 1497.081
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -56867,13 +56923,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1357.932,
-              "y": 1428.021
+              "x": 1280.863,
+              "y": 1504.945
             },
             "lineID": "circle",
             "start": {
-              "x": 1348.045,
-              "y": 1418.11
+              "x": 1270.963,
+              "y": 1495.045
             },
             "width": 3.2
           }
@@ -56882,13 +56938,13 @@
           "kind": "tick",
           "tick": {
             "end": {
-              "x": 1353.125,
-              "y": 1421.194
+              "x": 1275.037,
+              "y": 1499.116
             },
             "lineID": "hammersmith-city",
             "start": {
-              "x": 1343.237,
-              "y": 1411.283
+              "x": 1265.137,
+              "y": 1489.216
             },
             "width": 3.2
           }
