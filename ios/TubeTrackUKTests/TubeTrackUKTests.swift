@@ -1758,16 +1758,16 @@ struct TubeTrackUKTests {
         }
 
         let expectedLines: [(String, CGPoint, TubeLineID)] = [
-            ("940GZZLUECT", CGPoint(x: 1_376.141, y: 1_843.188), .piccadilly),
-            ("940GZZLUHSD", CGPoint(x: 1_171.929, y: 1_843.188), .piccadilly),
-            ("940GZZLUTNG", CGPoint(x: 919.842, y: 1_843.188), .piccadilly),
-            ("940GZZLUACT", CGPoint(x: 707.996, y: 1_843.219), .piccadilly),
-            ("940GZZLUECM", CGPoint(x: 667.578, y: 1_773.965), .piccadilly),
-            ("940GZZLUEBY", CGPoint(x: 600.003, y: 1_707.781), .district),
-            ("940GZZLUSKS", CGPoint(x: 1_524.013, y: 1_843.164), .piccadilly),
-            ("940GZZLUBND", CGPoint(x: 1_682, y: 1_620), .jubilee),
-            ("940GZZLUWSM", CGPoint(x: 1_885.992, y: 1_855.985), .jubilee),
-            ("940GZZLUVIC", CGPoint(x: 1_729.02, y: 1_844.839), .victoria),
+            ("940GZZLUECT", CGPoint(x: 1_374.688, y: 1_842.977), .piccadilly),
+            ("940GZZLUHSD", CGPoint(x: 1_172.891, y: 1_843.141), .piccadilly),
+            ("940GZZLUTNG", CGPoint(x: 920.719, y: 1_842.766), .piccadilly),
+            ("940GZZLUACT", CGPoint(x: 707.508, y: 1_842.617), .piccadilly),
+            ("940GZZLUECM", CGPoint(x: 667.508, y: 1_772.883), .piccadilly),
+            ("940GZZLUEBY", CGPoint(x: 598.906, y: 1_707.766), .district),
+            ("940GZZLUSKS", CGPoint(x: 1_523.375, y: 1_842.773), .piccadilly),
+            ("940GZZLUBND", CGPoint(x: 1_681.969, y: 1_647.906), .jubilee),
+            ("940GZZLUWSM", CGPoint(x: 1_872.297, y: 1_842.398), .jubilee),
+            ("940GZZLUVIC", CGPoint(x: 1_728.672, y: 1_842.375), .victoria),
         ]
 
         for (stationID, point, expectedLineID) in expectedLines {
@@ -1780,17 +1780,17 @@ struct TubeTrackUKTests {
         let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
 
         #expect(BeckMapStationMarkerHitTester.nearestMarker(
-            to: CGPoint(x: 1_524.013, y: 1_843.164),
+            to: CGPoint(x: 1_523.375, y: 1_842.773),
             among: document.stationMarkers,
             minimumHitRadius: 12
         )?.stationID == "940GZZLUSKS")
         #expect(BeckMapStationMarkerHitTester.nearestMarker(
-            to: CGPoint(x: 1_682, y: 1_620),
+            to: CGPoint(x: 1_681.969, y: 1_647.906),
             among: document.stationMarkers,
             minimumHitRadius: 12
         )?.stationID == "940GZZLUBND")
         #expect(BeckMapStationMarkerHitTester.nearestMarker(
-            to: CGPoint(x: 1_767.999, y: 1_561.797),
+            to: CGPoint(x: 1_768.156, y: 1_561.734),
             among: document.stationMarkers,
             minimumHitRadius: 12
         )?.stationID == "910GBONDST")
@@ -1807,19 +1807,19 @@ struct TubeTrackUKTests {
         let cameraOffset = CGSize(width: -821.5, height: 367.25)
         let screenTapOffset = CGVector(dx: 9, dy: -7)
         let expectedSelections: [(String, CGPoint, TubeLineID)] = [
-            ("910GBARKING", CGPoint(x: 3_587.523, y: 1_525.187), .suffragette),
-            ("940GZZLUWHM", CGPoint(x: 3_229.053, y: 1_518.282), .jubilee),
-            ("910GWBRMPTN", CGPoint(x: 1_306.969, y: 1_948.626), .mildmay),
-            ("940GZZLUECT", CGPoint(x: 1_376.141, y: 1_843.188), .piccadilly),
-            ("940GZZLUHSD", CGPoint(x: 1_171.929, y: 1_843.188), .piccadilly),
-            ("940GZZLUTNG", CGPoint(x: 919.842, y: 1_843.188), .piccadilly),
-            ("940GZZLUACT", CGPoint(x: 707.996, y: 1_843.219), .piccadilly),
-            ("940GZZLUECM", CGPoint(x: 667.578, y: 1_773.965), .piccadilly),
-            ("940GZZLUEBY", CGPoint(x: 600.003, y: 1_707.781), .district),
-            ("940GZZLUSKS", CGPoint(x: 1_524.013, y: 1_843.164), .piccadilly),
-            ("940GZZLUBND", CGPoint(x: 1_682, y: 1_620), .jubilee),
-            ("940GZZLUWSM", CGPoint(x: 1_885.992, y: 1_855.985), .jubilee),
-            ("940GZZLUVIC", CGPoint(x: 1_729.02, y: 1_844.839), .victoria),
+            ("910GBARKING", CGPoint(x: 3_574.742, y: 1_520.922), .suffragette),
+            ("940GZZLUWHM", CGPoint(x: 3_253.062, y: 1_517.797), .jubilee),
+            ("910GWBRMPTN", CGPoint(x: 1_306.961, y: 1_948.273), .mildmay),
+            ("940GZZLUECT", CGPoint(x: 1_374.688, y: 1_842.977), .piccadilly),
+            ("940GZZLUHSD", CGPoint(x: 1_172.891, y: 1_843.141), .piccadilly),
+            ("940GZZLUTNG", CGPoint(x: 920.719, y: 1_842.766), .piccadilly),
+            ("940GZZLUACT", CGPoint(x: 707.508, y: 1_842.617), .piccadilly),
+            ("940GZZLUECM", CGPoint(x: 667.508, y: 1_772.883), .piccadilly),
+            ("940GZZLUEBY", CGPoint(x: 598.906, y: 1_707.766), .district),
+            ("940GZZLUSKS", CGPoint(x: 1_523.375, y: 1_842.773), .piccadilly),
+            ("940GZZLUBND", CGPoint(x: 1_681.969, y: 1_647.906), .jubilee),
+            ("940GZZLUWSM", CGPoint(x: 1_872.297, y: 1_842.398), .jubilee),
+            ("940GZZLUVIC", CGPoint(x: 1_728.672, y: 1_842.375), .victoria),
         ]
 
         for (stationID, artworkPoint, expectedLineID) in expectedSelections {

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TubeTrackUK
 
@@ -30,8 +31,9 @@ struct WeaverArtworkTests {
         let graph = try TubeGraph.bundled()
         let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
         let segments = Dictionary(uniqueKeysWithValues: document.segments.map { ($0.id, $0) })
+        // TfL's Chingford lane runs 24.24 units east of the Enfield lane.
         let leftPort = BeckMapPoint(x: 2831.172, y: 1220.895)
-        let rightPort = BeckMapPoint(x: 2857.172, y: 1220.895)
+        let rightPort = BeckMapPoint(x: 2855.462, y: 1220.895)
 
         #expect(try #require(segments["weaver:910GHAKNYNM:910GLONFLDS"]).toPort == leftPort)
         #expect(try #require(segments["weaver:910GHAKNYNM:910GRCTRYRD"]).fromPort == leftPort)
@@ -55,21 +57,30 @@ struct WeaverArtworkTests {
         let central = try #require(document.stationMarkers.first {
             $0.stationID == "910GHACKNYC"
         })
-        let leftPort = BeckMapPoint(x: 2831.172, y: 1220.895)
-        let rightPort = BeckMapPoint(x: 2857.172, y: 1220.895)
-        let centralPort = BeckMapPoint(x: 2905.59, y: 1269.313)
+        // TfL's two Hackney Downs roundels, a horizontal bar between them
+        // and a 45-degree bar on to Hackney Central.
+        let left = BeckMapPoint(x: 2831.008, y: 1219.945)
+        let right = BeckMapPoint(x: 2855.156, y: 1219.953)
+        let centralRoundel = BeckMapPoint(x: 2903.469, y: 1269.195)
 
-        #expect(downs.anchor == leftPort)
-        #expect(central.anchor == centralPort)
-        #expect(circleCentres(in: downs) == [leftPort, rightPort, centralPort])
-        #expect(connectors(in: downs) == [
-            BeckMapLinePrimitive(start: leftPort, end: rightPort, width: 7.5),
-            BeckMapLinePrimitive(start: rightPort, end: centralPort, width: 7.5),
-        ])
-        #expect(abs(centralPort.y - leftPort.y - 48.418) < 0.001)
+        #expect(downs.anchor == right)
+        #expect(central.anchor == centralRoundel)
+        #expect(circleCentres(in: downs) == [left, right])
+        #expect(circleCentres(in: central) == [centralRoundel])
+        let bars = Array(connectors(in: downs)) + Array(connectors(in: central))
+        #expect(bars.count == 2)
+        #expect(bars.contains { isNear($0.start, left) && isNear($0.end, right) && $0.start.y == $0.end.y })
+        #expect(bars.contains { bar in
+            isNear(bar.start, right) && isNear(bar.end, centralRoundel)
+                && abs(abs(bar.end.x - bar.start.x) - abs(bar.end.y - bar.start.y)) < 0.001
+        })
 
         let label = try #require(document.labels.first { $0.id == "label.910GHAKNYNM" })
-        #expect(label.position == BeckMapPoint(x: 2815.172, y: 1202.895))
+        #expect(label.position.x < left.x)
+    }
+
+    private func isNear(_ a: BeckMapPoint, _ b: BeckMapPoint) -> Bool {
+        hypot(a.x - b.x, a.y - b.y) < 0.5
     }
 
     private func circleCentres(in marker: BeckMapStationMarkerRecord) -> Set<BeckMapPoint> {

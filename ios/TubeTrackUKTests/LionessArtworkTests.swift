@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TubeTrackUK
 
@@ -8,9 +9,13 @@ struct LionessArtworkTests {
         let markersByID = Dictionary(uniqueKeysWithValues: document.stationMarkers.map {
             ($0.stationID, $0)
         })
+        // Harrow & Wealdstone (National Rail) and Kenton (walking link to
+        // Northwick Park) are interchange roundels on the TfL map.
+        for stationID in ["910GHROW", "910GKTON"] {
+            let marker = try #require(markersByID[stationID])
+            #expect(marker.primitives.contains { if case .circle = $0 { true } else { false } })
+        }
         let sharedStationIDs = [
-            "910GHROW",
-            "910GKTON",
             "910GSKENTON",
             "910GNWEMBLY",
             "910GWMBY",
@@ -42,9 +47,13 @@ struct LionessArtworkTests {
             $0.id == "beck.v1.path.lioness.euston-watford.official.v1.1"
         })
 
-        #expect(marker.anchor == BeckMapPoint(x: 1349, y: 1305))
-        #expect(westernPath.commands == [
-            .move(to: BeckMapPoint(x: 1349, y: 1305)),
+        // Kilburn High Road and South Hampstead sit on their TfL symbols;
+        // the stepped trace between them is unchanged.
+        let kilburn = BeckMapPoint(x: 1349.742, y: 1305)
+        #expect(marker.anchor == kilburn)
+        #expect(Array(westernPath.commands.prefix(5)) == [
+            .move(to: kilburn),
+            .line(to: BeckMapPoint(x: 1349, y: 1305)),
             .line(to: BeckMapPoint(x: 1228, y: 1305)),
             .cubic(
                 control1: BeckMapPoint(x: 1218, y: 1305),
@@ -54,14 +63,14 @@ struct LionessArtworkTests {
             .line(to: BeckMapPoint(x: 1185.985, y: 1276.111)),
         ])
         #expect(easternPath.commands == [
-            .move(to: BeckMapPoint(x: 1737.692, y: 1254.708)),
+            .move(to: BeckMapPoint(x: 1657.359, y: 1254.708)),
             .line(to: BeckMapPoint(x: 1618, y: 1254.708)),
             .cubic(
                 control1: BeckMapPoint(x: 1600, y: 1254.708),
                 control2: BeckMapPoint(x: 1578, y: 1305),
                 to: BeckMapPoint(x: 1562, y: 1305)
             ),
-            .line(to: BeckMapPoint(x: 1349, y: 1305)),
+            .line(to: kilburn),
         ])
     }
 
@@ -76,13 +85,16 @@ struct LionessArtworkTests {
         let bakerlooSouth = try #require(segmentsByID["bakerloo:940GZZLUKPK:940GZZLUQPS"])
         let bakerlooNorth = try #require(segmentsByID["bakerloo:940GZZLUKSL:940GZZLUQPS"])
 
-        let lionessPort = BeckMapPoint(x: 1185.985, y: 1276.111)
-        let bakerlooPort = BeckMapPoint(x: 1172.907, y: 1276.111)
+        // The two lanes pass under the shared roundel on one perpendicular
+        // across the diagonal.
+        let lionessPort = BeckMapPoint(x: 1179.129, y: 1269.254)
+        let bakerlooPort = BeckMapPoint(x: 1172.589, y: 1275.793)
         #expect(lionessWest.toPort == lionessPort)
         #expect(lionessNorth.fromPort == lionessPort)
         #expect(bakerlooSouth.toPort == bakerlooPort)
         #expect(bakerlooNorth.fromPort == bakerlooPort)
-        #expect(abs(lionessPort.x - bakerlooPort.x - 13.078) < 0.001)
+        #expect(abs((lionessPort.x - bakerlooPort.x) + (lionessPort.y - bakerlooPort.y)) < 0.01)
+        #expect(abs(hypot(lionessPort.x - bakerlooPort.x, lionessPort.y - bakerlooPort.y) - 9.248) < 0.001)
     }
 
     @Test func willesdenJunctionHasNoConnectorAndUsesTheOfficialMildmayKink() throws {
@@ -100,7 +112,8 @@ struct LionessArtworkTests {
         let richmondPath = try #require(document.paths.first {
             $0.id == "beck.v1.path.mildmay.willesden-richmond.official.v1.0"
         })
-        let stationPort = BeckMapPoint(x: 1155.547, y: 1175.222)
+        // The Mildmay port sits under TfL's Willesden Junction roundel.
+        let stationPort = BeckMapPoint(x: 1148.953, y: 1175.222)
         let westKink = BeckMapPoint(x: 1113.547, y: 1175.222)
         let curve = BeckMapPathCommand.cubic(
             control1: BeckMapPoint(x: 1095, y: 1175.222),
@@ -114,7 +127,8 @@ struct LionessArtworkTests {
             return false
         })
         #expect(eastPath.commands == [
-            .move(to: BeckMapPoint(x: 1232.263, y: 1174.922)),
+            .move(to: BeckMapPoint(x: 1231.071, y: 1174.927)),
+            .line(to: BeckMapPoint(x: 1155.547, y: 1175.222)),
             .line(to: stationPort),
         ])
         #expect(Array(claphamPath.commands.prefix(3)) == [

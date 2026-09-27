@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TubeTrackUK
 
@@ -11,14 +12,18 @@ struct EastInterchangeArtworkTests {
         let dlrMarker = try #require(document.stationMarkers.first {
             $0.stationID == "940GZZDLWHM"
         })
-        let sharedPort = BeckMapPoint(x: 3280.781, y: 1545.945)
-        let jubileePort = BeckMapPoint(x: 3229.053, y: 1518.282)
+        let sharedPort = BeckMapPoint(x: 3280.789, y: 1545.531)
+        let jubileePort = BeckMapPoint(x: 3253.062, y: 1517.797)
 
         #expect(dlrMarker.anchor == sharedPort)
         #expect(circleCentres(in: [tubeMarker, dlrMarker]) == [jubileePort, sharedPort])
-        #expect(connectors(in: [tubeMarker, dlrMarker]) == [
-            BeckMapLinePrimitive(start: jubileePort, end: sharedPort, width: 7.5),
-        ])
+        let bars = connectors(in: [tubeMarker, dlrMarker])
+        #expect(bars.count == 1)
+        for bar in bars {
+            #expect(isNear(bar.start, jubileePort) && isNear(bar.end, sharedPort))
+            #expect(abs(abs(bar.end.x - bar.start.x) - abs(bar.end.y - bar.start.y)) < 0.001)
+            #expect(bar.width == 12.4)
+        }
 
         let subSurfaceSegments = document.segments.filter {
             ($0.fromStationID == tubeMarker.stationID || $0.toStationID == tubeMarker.stationID)
@@ -29,7 +34,7 @@ struct EastInterchangeArtworkTests {
             let stationPort = segment.fromStationID == tubeMarker.stationID
                 ? segment.fromPort
                 : segment.toPort
-            return stationPort?.x == sharedPort.x
+            return stationPort.map { abs($0.x - sharedPort.x) < 0.05 } == true
         })
 
         let label = try #require(document.labels.first { $0.id == "label.940GZZLUWHM" })
@@ -48,8 +53,8 @@ struct EastInterchangeArtworkTests {
         let elizabethMarker = try #require(document.stationMarkers.first {
             $0.stationID == "910GWCHAPXR"
         })
-        let sharedPort = BeckMapPoint(x: 2704.938, y: 1545)
-        let elizabethPort = BeckMapPoint(x: 2735.05, y: 1516.281)
+        let sharedPort = BeckMapPoint(x: 2704.852, y: 1545.617)
+        let elizabethPort = BeckMapPoint(x: 2735.141, y: 1516.258)
 
         #expect(tubeMarker.anchor == sharedPort)
         #expect(windrushMarker.anchor == sharedPort)
@@ -57,9 +62,15 @@ struct EastInterchangeArtworkTests {
             sharedPort,
             elizabethPort,
         ])
-        #expect(connectors(in: [tubeMarker, windrushMarker, elizabethMarker]) == [
-            BeckMapLinePrimitive(start: sharedPort, end: elizabethPort, width: 7.5),
-        ])
+        let bars = connectors(in: [tubeMarker, windrushMarker, elizabethMarker])
+        #expect(bars.count == 1)
+        for bar in bars {
+            #expect(
+                (isNear(bar.start, sharedPort) && isNear(bar.end, elizabethPort))
+                    || (isNear(bar.start, elizabethPort) && isNear(bar.end, sharedPort))
+            )
+            #expect(abs(abs(bar.end.x - bar.start.x) - abs(bar.end.y - bar.start.y)) < 0.001)
+        }
 
         let windrushSegments = document.segments.filter {
             $0.fromStationID == windrushMarker.stationID || $0.toStationID == windrushMarker.stationID
@@ -69,11 +80,17 @@ struct EastInterchangeArtworkTests {
             let stationPort = segment.fromStationID == windrushMarker.stationID
                 ? segment.fromPort
                 : segment.toPort
-            return stationPort == sharedPort
+            return stationPort.map { isNear($0, sharedPort) } == true
         })
 
         let label = try #require(document.labels.first { $0.id == "label.940GZZLUWPL" })
         #expect(label.associatedStationIDs == [windrushMarker.stationID, elizabethMarker.stationID])
+    }
+
+    /// Bars are squared to 45 degrees about their midpoint, so their ends
+    /// sit within a fraction of a unit of the TfL symbol centres.
+    private func isNear(_ a: BeckMapPoint, _ b: BeckMapPoint) -> Bool {
+        hypot(a.x - b.x, a.y - b.y) < 0.5
     }
 
     private func circleCentres(

@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TubeTrackUK
 
@@ -12,20 +13,20 @@ struct RichmondBranchArtworkTests {
             (
                 "940GZZLURMD",
                 "910GRICHMND",
-                BeckMapPoint(x: 580.971, y: 2139.592),
-                BeckMapPoint(x: 598.908, y: 2157.53)
+                BeckMapPoint(x: 572.734, y: 2145.43),
+                BeckMapPoint(x: 591.852, y: 2164.648)
             ),
             (
                 "940GZZLUKWG",
                 "910GKEWGRDN",
-                BeckMapPoint(x: 652.261, y: 2068.301),
-                BeckMapPoint(x: 670.199, y: 2086.239)
+                BeckMapPoint(x: 644.523, y: 2073.633),
+                BeckMapPoint(x: 663.789, y: 2093.18)
             ),
             (
                 "940GZZLUGBY",
                 "910GGNRSBRY",
-                BeckMapPoint(x: 766.339, y: 1954.224),
-                BeckMapPoint(x: 784.276, y: 1972.162)
+                BeckMapPoint(x: 745.969, y: 1974.828),
+                BeckMapPoint(x: 764.016, y: 1992.859)
             ),
         ]
 
@@ -37,17 +38,15 @@ struct RichmondBranchArtworkTests {
                 station.districtPort,
                 station.mildmayPort,
             ])
-            #expect(connectors(in: [district, mildmay]) == [
-                BeckMapLinePrimitive(
-                    start: station.districtPort,
-                    end: station.mildmayPort,
-                    width: 7.5
-                ),
-            ])
-            #expect(abs(
-                (station.mildmayPort.x - station.districtPort.x)
-                    - (station.mildmayPort.y - station.districtPort.y)
-            ) < 0.002)
+            // One 45-degree bar between the two TfL roundels.
+            let bars = connectors(in: [district, mildmay])
+            #expect(bars.count == 1)
+            for bar in bars {
+                #expect(hypot(bar.start.x - station.districtPort.x, bar.start.y - station.districtPort.y) < 0.5)
+                #expect(hypot(bar.end.x - station.mildmayPort.x, bar.end.y - station.mildmayPort.y) < 0.5)
+                #expect(abs((bar.end.x - bar.start.x) - (bar.end.y - bar.start.y)) < 0.002)
+                #expect(bar.width == 12.4)
+            }
         }
     }
 

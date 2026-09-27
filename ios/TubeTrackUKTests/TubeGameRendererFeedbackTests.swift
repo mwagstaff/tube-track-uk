@@ -25,10 +25,11 @@ struct TubeGameRendererFeedbackTests {
 
         #expect(circles.count == 2)
         #expect(connectors.count == 1)
-        #expect(Set(circles.map { CGPoint(x: $0.centre.x, y: $0.centre.y) }) == Set([
-            CGPoint(x: connectors[0].start.x, y: connectors[0].start.y),
-            CGPoint(x: connectors[0].end.x, y: connectors[0].end.y),
-        ]))
+        // The bar is squared to the TfL axis, so each end sits within a
+        // fraction of a unit of its roundel's centre.
+        for end in [connectors[0].start, connectors[0].end] {
+            #expect(circles.contains { hypot($0.centre.x - end.x, $0.centre.y - end.y) < 0.5 })
+        }
         let destinations = Set(network.railConnections(fromHubID: marker.hubID).map(\.toStationID))
         #expect(destinations == [
             "940GZZLUEAC",

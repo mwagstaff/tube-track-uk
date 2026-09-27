@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import TubeTrackUK
 
@@ -10,12 +11,13 @@ struct ElizabethArtworkTests {
             $0.stationID == stationID
         })
 
-        #expect(marker.anchor == BeckMapPoint(x: 339.843, y: 1657.188))
+        // TfL's roundel sits just above the shared Elizabeth line port.
+        #expect(marker.anchor == BeckMapPoint(x: 336.289, y: 1657.086))
         #expect(marker.primitives == [
             .circle(.init(
                 centre: marker.anchor,
-                radius: 8.5,
-                outlineWidth: 3.5
+                radius: 10.36,
+                outlineWidth: 4.14
             )),
         ])
 
@@ -26,6 +28,9 @@ struct ElizabethArtworkTests {
             return nil
         }
         #expect(stationPorts.count == 3)
-        #expect(stationPorts.allSatisfy { $0 == marker.anchor })
+        #expect(Set(stationPorts).count == 1)
+        #expect(stationPorts.allSatisfy {
+            hypot($0.x - marker.anchor.x, $0.y - marker.anchor.y) < 0.5
+        })
     }
 }
