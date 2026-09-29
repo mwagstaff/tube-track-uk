@@ -531,10 +531,18 @@ private struct StationDepartureGroupView: View {
                 Text(StationDepartureMetadata.destinationLabel(for: arrival))
                     .font(.appSubheadline(.medium))
                     .lineLimit(2)
+                    .strikethrough(arrival.isCancelled)
+                    .foregroundStyle(arrival.isCancelled ? .secondary : .primary)
                 if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
                     Text(platform)
                         .font(.appCaption2())
                         .foregroundStyle(.secondary)
+                }
+                if let note = StationDepartureMetadata.serviceNote(for: arrival) {
+                    Text(note)
+                        .font(.appCaption2(.semibold))
+                        .foregroundStyle(arrival.isCancelled ? Color.red : Color.orange)
+                        .lineLimit(2)
                 }
             }
             Spacer(minLength: 10)
@@ -546,7 +554,7 @@ private struct StationDepartureGroupView: View {
             )
             .font(.appSubheadline(.bold))
             .monospacedDigit()
-            .foregroundStyle(Color.departureAccent)
+            .foregroundStyle(arrival.isCancelled ? Color.red : Color.departureAccent)
             .lineLimit(1)
             .fixedSize(horizontal: true, vertical: false)
         }

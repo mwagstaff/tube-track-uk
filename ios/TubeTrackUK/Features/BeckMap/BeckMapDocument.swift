@@ -22,6 +22,9 @@ struct BeckMapDocument: Codable, Hashable, Sendable {
     let stationMarkers: [BeckMapStationMarkerRecord]
     let labels: [BeckMapLabelRecord]
     let routes: [BeckMapRouteRecord]
+    /// Routes drawn on past their last mapped station to a "Towards" arrow,
+    /// as TfL draws National Rail leaving the map.
+    var lineExtensions: [BeckMapLineExtensionRecord]? = nil
     var supportedLineIDs: [TubeLineID]? = nil
 
     var lineCoverage: Set<TubeLineID> {
@@ -66,11 +69,19 @@ struct BeckMapStyleRecord: Codable, Hashable, Sendable {
     var parallelRouteInnerStrokeWidth: Double { routeStrokeWidth / 3 }
 
     func parallelRouteOuterStrokeWidth(for lineID: TubeLineID) -> Double {
-        lineID == .tram ? 8.844 : parallelRouteOuterStrokeWidth
+        switch lineID {
+        case .tram: 8.844
+        case .thameslink: 8.84
+        default: parallelRouteOuterStrokeWidth
+        }
     }
 
     func parallelRouteInnerStrokeWidth(for lineID: TubeLineID) -> Double {
-        lineID == .tram ? 2.768 : parallelRouteInnerStrokeWidth
+        switch lineID {
+        case .tram: 2.768
+        case .thameslink: 3.128
+        default: parallelRouteInnerStrokeWidth
+        }
     }
 }
 
@@ -168,6 +179,16 @@ struct BeckMapWaterwayRecord: Codable, Identifiable, Hashable, Sendable {
     let pathID: String
     let strokeWidth: Double
     let outlineWidth: Double
+}
+
+/// A line continuing off the map beyond `stationID`: a stroke in the line's
+/// style plus a filled arrowhead pointing where the trains go.
+struct BeckMapLineExtensionRecord: Codable, Identifiable, Hashable, Sendable {
+    let id: String
+    let lineID: TubeLineID
+    let stationID: String
+    let pathID: String
+    let arrowhead: [BeckMapPoint]
 }
 
 enum BeckMapPathDirection: String, Codable, Hashable, Sendable {

@@ -75,6 +75,9 @@ from `server-tooling/monitoring/install-alerting.zsh` (`TargetDown`,
 - `GET /api/v2/planned-works?from=YYYY-MM-DD&to=YYYY-MM-DD`
 - `GET /api/v1/arrival-departures/:stopId?lineId=:lineId`
 - `GET /api/v1/timetables/:lineId/:stopId`
+- `GET /api/v1/thameslink/departures?stopIds=910GFRNDNLT,910GSTPXBOX`
+- `GET /api/v1/national-rail/status`
+- `GET /api/v1/thameslink/trains`
 - `GET /api/v1/stations?query=Waterloo`
 - `GET /api/v1/journeys?from=940GZZLUWLO&to=940GZZLUKSX&timeMode=now&accessibility=none`
 - `GET /healthcheck`
@@ -82,6 +85,84 @@ from `server-tooling/monitoring/install-alerting.zsh` (`TargetDown`,
 
 The production Caddy route strips the public `/tube-track` prefix before
 proxying requests to this service.
+
+## Lines added after the first app releases
+
+Released app builds decode line identifiers strictly: one unknown line makes
+them reject a whole status, planned-works or journey response. Lines added
+since then (`GATED_LINE_IDS` in `lib/line-gating.js`, currently `thameslink`)
+are only included when the client names them, for example
+`/api/v1/status?include=thameslink`. `/status`, both `/planned-works` versions
+and `/line-colours` honour `include`; push always sees every line. New app
+builds send `include` from `TubeTrackAPIClient` and decode line lists lossily,
+so a future line can be added to the set the same way.
+
+## Thameslink and National Rail
+
+TfL has no bulk arrivals feed for National Rail (`/Mode/national-rail/Arrivals`
+and `/Line/thameslink/Arrivals` return nothing), so Thameslink is not part of
+the live poller. `/api/v1/thameslink/departures` reads TfL's per-station
+`/StopPoint/{id}/ArrivalDepartures?lineIds=thameslink` on demand, cached for
+30 seconds per stop and shared with `/api/v1/arrival-departures`. Rows are
+scheduled calls with a `status` (`onTime`, `delayed`, `cancelled`, `unknown`),
+TfL's `cause`, `scheduledDeparture` and `expectedDeparture`; a cancelled train
+stays on the board. Only the Thameslink stops the app maps are accepted (up to
+six per request); St Pancras's Thameslink platforms are `910GSTPXBOX`.
+
+Thameslink boards carry `Northbound`/`Southbound` from
+`data/thameslink-directions.json`, which classifies every Thameslink terminus
+by whether it lies north of the core. Regenerate it after TfL changes the
+line's stops:
+
+```sh
+node scripts/build-thameslink-directions.js
+```
+
+Thameslink status comes from `/Line/thameslink/Status`, merged into
+`/api/v1/status` (`lib/line-status.js`); if that request fails the TfL-mode
+statuses are still served, with the line listed in `meta.unavailableLineIds`.
+### Estimated Thameslink trains
+
+TfL publishes no Thameslink vehicle positions or train identities, so
+`/api/v1/thameslink/trains` places trains from the station boards, much as the
+River Bus estimator places boats (`lib/thameslink-trains.js`). A train is on
+the board of every station it has yet to call at; the call with no earlier call
+of the same train is its next stop. Its direction, and the branch it came in on
+at a junction, come from TfL's calling patterns (`/Line/thameslink/Route/Sequence`)
+where they agree; otherwise from a chain of its later calls, each one run time
+after the last, or from the board it most recently left. It is then walked back
+from its next stop by learned run times, at most three stations. A train that
+could have come from either side of a junction, or whose way round the Sutton
+loop is unclear, is left off rather than drawn on the wrong track.
+
+The estimate reads all 65 mapped boards through the shared 30-second stop cache
+and runs at most every 45 seconds, only while someone is viewing live trains;
+it fails (503) rather than guess when more than a fifth of the boards are
+missing. Each train carries the segment it is on (`previousStationId`,
+`nextStationId`, `progress`, `secondsToNextStation`) and its next call
+(`nextStopId`, `expectedArrival`), which differ when a fast train runs through.
+
+The network, stop coordinates and TfL calling patterns it uses are generated:
+
+```sh
+node scripts/build-thameslink-directions.js
+node scripts/build-thameslink-network.js
+```
+
+Tracked Thameslink Live Activities use the same source: the notifier fetches
+each tracked station's board once per pass (at most 40 Thameslink stops a pass),
+projects it like a Tube board and adds `status` (`delayed` or `cancelled`) to
+each departure. A change of status is an urgent push. A failed or stale fetch
+never empties a tracked board.
+
+Journeys include National Rail only for clients that send `include=thameslink`,
+and then only legs Thameslink can make (its route options are filtered to
+Thameslink). A journey needing any other operator is still rejected. Journey
+disruptions read realtime status by line, so Thameslink legs are checked too.
+
+`/api/v1/national-rail/status` reports the other National Rail operators
+(Southern, Southeastern, Great Northern and so on) for stations the app shares
+with them, trimmed to `{id, name, lineStatuses}`.
 
 ## Long-range planned works (v2)
 
@@ -143,8 +224,10 @@ Never commit the TfL key or a local `.env` file.
 
 ## Line colours for connection pills
 
-`GET /api/v1/line-colours` returns all 20 supported lines: the 11 Tube lines,
-DLR, Elizabeth line, London Trams and the six named Overground lines. It uses
+`GET /api/v1/line-colours` returns the 20 original lines: the 11 Tube lines,
+DLR, Elizabeth line, London Trams and the six named Overground lines.
+`GET /api/v1/line-colours?include=thameslink` adds Thameslink (mode
+`national-rail`), making 21. It uses
 TubeTrack UK's display palette, rounded to 8-bit sRGB, and makes no upstream
 requests. It is available before the live cache is ready and is cacheable for
 one day (`Cache-Control: public, max-age=86400`).

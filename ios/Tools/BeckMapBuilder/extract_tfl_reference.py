@@ -43,6 +43,7 @@ LINE_COLOURS = {
     "dlr": (36, 179, 169), "elizabeth": (105, 61, 161), "tram": (105, 194, 47),
     "liberty": (79, 93, 98), "lioness": (248, 156, 14), "mildmay": (36, 134, 203),
     "suffragette": (89, 195, 100), "weaver": (176, 35, 127), "windrush": (237, 25, 46),
+    "thameslink": (214, 111, 170),
 }
 
 ROUNDEL_RADIUS = 12.43          # outer radius of an ordinary TfL roundel ring

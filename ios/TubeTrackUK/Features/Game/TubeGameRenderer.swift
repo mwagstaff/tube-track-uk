@@ -353,20 +353,22 @@ struct TubeGamePlayfield: View {
                     style: StrokeStyle(
                         lineWidth: segment.lineID == .tram
                             ? 8.844
-                            : model.parallelRouteOuterStrokeWidth,
+                            : segment.lineID == .thameslink ? 8.84 : model.parallelRouteOuterStrokeWidth,
                         lineCap: .round,
                         lineJoin: .round
                     )
                 )
+                let innerDash = segment.lineID.schematicInnerDash ?? []
                 mapContext.stroke(
                     path,
                     with: .color(palette.paper),
                     style: StrokeStyle(
                         lineWidth: segment.lineID == .tram
                             ? 2.768
-                            : model.parallelRouteInnerStrokeWidth,
-                        lineCap: .round,
-                        lineJoin: .round
+                            : segment.lineID == .thameslink ? 3.128 : model.parallelRouteInnerStrokeWidth,
+                        lineCap: innerDash.isEmpty ? .round : .butt,
+                        lineJoin: .round,
+                        dash: innerDash
                     )
                 )
             } else {
@@ -1206,6 +1208,7 @@ enum TubeGameSwipeHintPresentation {
         case .suffragette: "SUF"
         case .weaver: "WEA"
         case .windrush: "WIN"
+        case .thameslink: "TLK"
         }
     }
 

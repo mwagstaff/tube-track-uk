@@ -168,7 +168,8 @@ test('planner enriches before ranking and retains a less-disrupted alternative',
     const planner = new JourneyPlanner({ stations, clock: () => now, client: { fetchJSON: async path => {
         if (path.startsWith('/StopPoint')) return {};
         if (path.startsWith('/Journey')) return { journeys: [itinerary('victoria', 900_000), itinerary('northern', 1200_000)] };
-        if (path.includes('/Mode/')) return [line('victoria', [issue(6, 'Severe delays')]), line('northern')];
+        // The realtime feed is the undated one; planned works carry a date range.
+        if (path.endsWith('/Status')) return [line('victoria', [issue(6, 'Severe delays')]), line('northern')];
         return allGood;
     } } });
     const response = await planner.plan({ from: '940A', to: '940B' });

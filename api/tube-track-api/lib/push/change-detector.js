@@ -28,6 +28,7 @@ export const REASONS = Object.freeze({
     boardMembership: 'board_membership',
     platform: 'platform',
     destination: 'destination',
+    serviceStatus: 'service_status',
     severity: 'severity',
     boardEmptied: 'board_emptied',
     heartbeat: 'heartbeat'
@@ -41,6 +42,7 @@ const URGENT_REASONS = new Set([
     REASONS.boardMembership,
     REASONS.platform,
     REASONS.destination,
+    REASONS.serviceStatus,
     REASONS.severity
 ]);
 
@@ -147,6 +149,10 @@ function decideOnMerit({
         }
         if (next[index].destination !== previous[index]?.destination) {
             return verdict(REASONS.destination);
+        }
+        // A National Rail train that is cancelled or delayed changes the plan.
+        if ((next[index].status ?? null) !== (previous[index]?.status ?? null)) {
+            return verdict(REASONS.serviceStatus);
         }
     }
 

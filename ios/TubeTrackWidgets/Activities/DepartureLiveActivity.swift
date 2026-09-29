@@ -199,6 +199,9 @@ private struct DepartureActivityWatchCard: View {
         guard !departures.isEmpty else { return heading + ", no departures due" + staleDescription }
         let trains = departures.enumerated().map { index, departure in
             let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+            if departure.isCancelled {
+                return "\(index == 0 ? "Next" : "Then") \(departure.destination), cancelled"
+            }
             return "\(index == 0 ? "Next" : "Then") \(departure.destination), "
                 + "\(isStale ? "last predicted" : "due") \(prediction)"
         }
@@ -333,6 +336,8 @@ private struct DepartureActivityRow: View {
 
     private var accessibilityLabel: String {
         let time = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+        if departure.isCancelled { return "\(position), \(departure.destination), cancelled" }
+        if departure.isDelayed { return "\(position), \(departure.destination), delayed, expected \(time)" }
         return isStale
             ? "\(position), \(departure.destination), predicted \(time), live updates paused"
             : "\(position), \(departure.destination), \(time)"
@@ -349,7 +354,9 @@ private struct DepartureCountdown: View {
     var body: some View {
         Group {
             if let departure {
-                if isStale {
+                if departure.isCancelled {
+                    Text("Cancelled")
+                } else if isStale {
                     Text(departure.expectedAt, style: .time)
                 } else {
                     Text(DepartureCountdownFormatStyle(expectedAt: departure.expectedAt).format(.now))

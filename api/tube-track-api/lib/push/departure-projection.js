@@ -28,6 +28,7 @@ export const DIRECTION_FILTERS = Object.freeze([
 ]);
 
 export const MAXIMUM_DEPARTURES = 4;
+const RAIL_SERVICE_STATUSES = new Set(['delayed', 'cancelled']);
 
 // Mirrors the truncation in ContentState.Departure so a board built here cannot
 // encode larger than the one the app built.
@@ -251,6 +252,9 @@ export function projectBoard({
             id: arrival.vehicleId ?? arrival.id,
             destination: destinationLabel(arrival).slice(0, DESTINATION_LIMIT),
             platform: compactPlatformLabel(arrival)?.slice(0, PLATFORM_LIMIT) ?? null,
-            expectedAtEpoch: Math.round(expectedAtMs(arrival) / 1_000)
+            expectedAtEpoch: Math.round(expectedAtMs(arrival) / 1_000),
+            // National Rail boards say when a train is late or will not run;
+            // Tube predictions carry no status and keep their shape.
+            ...(RAIL_SERVICE_STATUSES.has(arrival.status) ? { status: arrival.status } : {})
         }));
 }

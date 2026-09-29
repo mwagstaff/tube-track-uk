@@ -38,8 +38,15 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         attributes: DepartureActivityAttributes,
         frequentPushesEnabled: Bool
     ) async throws {
+        let hubStopIDs = StationIndex.bundled.hub(containing: attributes.stationHubID)?.stopIDs
+            ?? [attributes.stationHubID]
+        // National Rail boards are fetched stop by stop, so send only the
+        // stops that line calls at, not the whole interchange.
+        let lineStopIDs = attributes.lineID?.isNationalRail == true
+            ? hubStopIDs.filter { StationIndex.bundled.entry(id: $0)?.lineIDs.contains(attributes.lineID!) == true }
+            : hubStopIDs
         let stopIDs = attributes.isRiver ? [attributes.stationHubID]
-            : StationIndex.bundled.hub(containing: attributes.stationHubID)?.stopIDs ?? [attributes.stationHubID]
+            : lineStopIDs.isEmpty ? hubStopIDs : lineStopIDs
         let body = RegistrationBody(
             activityId: attributes.activityID,
             token: token,

@@ -173,6 +173,20 @@ public struct TfLStopPoint: Codable, Equatable, Sendable {
     }
 }
 
+/// National Rail boards publish scheduled calls with a running status rather
+/// than vehicle predictions. Tube-style predictions leave this unset.
+public enum RailServiceStatus: String, Codable, Sendable {
+    case onTime
+    case delayed
+    case cancelled
+    case unknown
+
+    public init(from decoder: Decoder) throws {
+        let value = try decoder.singleValueContainer().decode(String.self)
+        self = RailServiceStatus(rawValue: value) ?? .unknown
+    }
+}
+
 public struct TfLArrivalPrediction: Codable, Sendable {
     public let id: String
     public let vehicleId: String?
@@ -187,11 +201,17 @@ public struct TfLArrivalPrediction: Codable, Sendable {
     public let expectedArrival: Date?
     public let timeToStation: Int?
     public let currentLocation: String?
+    /// The timetabled departure, when the source is a National Rail board.
+    public let scheduledDeparture: Date?
+    public let serviceStatus: RailServiceStatus?
+    /// TfL's published reason for a delay or cancellation.
+    public let serviceCause: String?
 
     private enum CodingKeys: String, CodingKey {
         case id, vehicleId, lineId, stationName, naptanId, stopId, platformName
         case direction, destinationName, destinationNaptanId, destinationStopId
-        case towards, expectedArrival, timeToStation, currentLocation
+        case towards, expectedArrival, expectedDeparture, timeToStation, currentLocation
+        case scheduledDeparture, status, cause
     }
 
     public init(
@@ -207,7 +227,10 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         towards: String?,
         expectedArrival: Date?,
         timeToStation: Int?,
-        currentLocation: String?
+        currentLocation: String?,
+        scheduledDeparture: Date? = nil,
+        serviceStatus: RailServiceStatus? = nil,
+        serviceCause: String? = nil
     ) {
         self.id = id
         self.vehicleId = vehicleId
@@ -222,6 +245,9 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         self.expectedArrival = expectedArrival
         self.timeToStation = timeToStation
         self.currentLocation = currentLocation
+        self.scheduledDeparture = scheduledDeparture
+        self.serviceStatus = serviceStatus
+        self.serviceCause = serviceCause
     }
 
     public init(from decoder: Decoder) throws {
@@ -239,8 +265,12 @@ public struct TfLArrivalPrediction: Codable, Sendable {
             ?? container.decodeIfPresent(String.self, forKey: .destinationNaptanId)
         towards = try container.decodeIfPresent(String.self, forKey: .towards)
         expectedArrival = try container.decodeIfPresent(Date.self, forKey: .expectedArrival)
+            ?? container.decodeIfPresent(Date.self, forKey: .expectedDeparture)
         timeToStation = try container.decodeIfPresent(Int.self, forKey: .timeToStation)
         currentLocation = try container.decodeIfPresent(String.self, forKey: .currentLocation)
+        scheduledDeparture = try container.decodeIfPresent(Date.self, forKey: .scheduledDeparture)
+        serviceStatus = try container.decodeIfPresent(RailServiceStatus.self, forKey: .status)
+        serviceCause = try container.decodeIfPresent(String.self, forKey: .cause)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -258,6 +288,22 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         try container.encodeIfPresent(expectedArrival, forKey: .expectedArrival)
         try container.encodeIfPresent(timeToStation, forKey: .timeToStation)
         try container.encodeIfPresent(currentLocation, forKey: .currentLocation)
+        try container.encodeIfPresent(scheduledDeparture, forKey: .scheduledDeparture)
+        try container.encodeIfPresent(serviceStatus, forKey: .status)
+        try container.encodeIfPresent(serviceCause, forKey: .cause)
+    }
+
+    public var isCancelled: Bool { serviceStatus == .cancelled }
+
+    /// A National Rail departure running later than its timetabled time.
+    public var delayedFromSchedule: Date? {
+        guard serviceStatus != .cancelled,
+              let scheduledDeparture,
+              let expectedArrival,
+              expectedArrival.timeIntervalSince(scheduledDeparture) >= 60 else {
+            return nil
+        }
+        return scheduledDeparture
     }
 
     /// TfL's `id` is not unique for every departure. DLR predictions, in

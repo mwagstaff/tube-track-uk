@@ -2,13 +2,16 @@ import compression from 'compression';
 import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
 import { LINE_COLOURS } from './line-colours.js';
+import { includedLineIDs, visibleLines } from './line-gating.js';
+import { loadLineStatuses } from './line-status.js';
 import { plannedWorksV2Response, PlannedWorksSourceError } from './planned-works.js';
 import { createPushRoutes } from './push-routes.js';
 import { createRiverRoutes, createRiverDataSource } from './river.js';
 import { createCableCarRoutes } from './cable-car.js';
+import { createNationalRailRoutes } from './national-rail.js';
+import { createThameslinkRoutes } from './thameslink.js';
 import { clientMetadata, USAGE_FEATURES } from './usage.js';
 
-const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 const LINE_IDS = LINE_COLOURS.map((line) => line.id).join(',');
 const MODE_BY_LINE_ID = new Map(LINE_COLOURS.map((line) => [line.id, line.mode]));
 
@@ -128,10 +131,13 @@ export function createApp({
     });
     app.use('/api/v1/river', createRiverRoutes({ client, resourceCache }));
     app.use('/api/v1/cable-car', createCableCarRoutes({ client, resourceCache }));
+    app.use('/api/v1/thameslink', createThameslinkRoutes({ client, resourceCache }));
+    app.use('/api/v1/national-rail', createNationalRailRoutes({ client, resourceCache }));
 
     app.get('/api/v1/line-colours', (req, res) => {
+        const lines = visibleLines(LINE_COLOURS, includedLineIDs(req.query));
         res.set('Cache-Control', 'public, max-age=86400');
-        res.json({ data: LINE_COLOURS, meta: { source: 'tubetrack', count: LINE_COLOURS.length } });
+        res.json({ data: lines, meta: { source: 'tubetrack', count: lines.length } });
     });
 
     app.get('/api/v1/stations', (req, res, next) => {
@@ -248,15 +254,15 @@ export function createApp({
 
     app.get('/api/v1/status', async (req, res, next) => {
         try {
-            const result = await resourceCache.get('status', {
-                freshForMs: 60_000,
-                load: () => client.fetchJSON(`/Line/Mode/${STATUS_MODES}/Status`, {
-                    query: { detail: 'true' },
-                    metricLabel: 'status'
-                })
-            });
+            const included = includedLineIDs(req.query);
+            const result = await loadLineStatuses({ client, resourceCache });
+            const unavailableLineIds = visibleLines(result.meta.unavailableLineIds ?? [], included, (id) => id);
+            const { unavailableLineIds: _, ...meta } = result.meta;
             res.set('Cache-Control', 'public, max-age=30, stale-if-error=300');
-            res.json(result);
+            res.json({
+                data: visibleLines(result.data, included),
+                meta: unavailableLineIds.length ? { ...meta, unavailableLineIds } : meta
+            });
         } catch (error) {
             next(error);
         }
@@ -293,7 +299,7 @@ export function createApp({
                 })
             });
             res.set('Cache-Control', 'public, max-age=3600, stale-if-error=86400');
-            res.json(result);
+            res.json({ ...result, data: visibleLines(result.data, includedLineIDs(req.query)) });
         } catch (error) {
             next(error);
         }
@@ -340,6 +346,9 @@ export function createApp({
                 apiResultPromise
             ]);
             const response = plannedWorksV2Response({ from, to, pdfSnapshot, apiResult });
+            const works = visibleLines(response.data.works, includedLineIDs(req.query), (work) => work.lineId);
+            response.data.works = works;
+            response.meta.count = works.length;
             res.set('Cache-Control', 'public, max-age=3600, stale-if-error=86400');
             res.json(response);
         } catch (error) {

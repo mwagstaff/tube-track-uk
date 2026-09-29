@@ -90,6 +90,25 @@ struct LiveActivityPushRegistrarTests {
         #expect(json["frequentPushesEnabled"] as? Bool == false)
     }
 
+    @Test func thameslinkRegistrationSendsOnlyItsOwnPlatformsAtAnInterchange() async throws {
+        RegistrationURLProtocol.prepare(statusCode: 201)
+        try await registrar().register(
+            token: String(repeating: "ab", count: 32),
+            attributes: DepartureActivityAttributes(
+                activityID: "TL-1", stationHubID: "HUBZFD", stationName: "Farringdon",
+                lineID: .thameslink, direction: "Northbound", directionFilter: .northbound,
+                startedAt: Date(timeIntervalSince1970: 1_800_000_000),
+                hardEndsAt: Date(timeIntervalSince1970: 1_800_005_400)
+            ),
+            frequentPushesEnabled: true
+        )
+        let body = try #require(RegistrationURLProtocol.lastBody)
+        let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        #expect(json["lineId"] as? String == "thameslink")
+        #expect(json["direction"] as? String == "northbound")
+        #expect(json["stopIds"] as? [String] == ["910GFRNDNLT"])
+    }
+
     @Test func riverRegistrationUsesThePierAndRawServiceID() async throws {
         RegistrationURLProtocol.prepare(statusCode: 201)
         let attributes = DepartureActivityAttributes(

@@ -41,6 +41,19 @@ struct EngineeringWork: Identifiable, Codable, Hashable, Sendable {
 struct PlannedWorksV2Data: Decodable, Sendable {
     let works: [PlannedWorkV2]
     let coverage: PlannedWorksV2Coverage
+
+    private enum CodingKeys: String, CodingKey { case works, coverage }
+
+    init(works: [PlannedWorkV2], coverage: PlannedWorksV2Coverage) {
+        self.works = works
+        self.coverage = coverage
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        works = try container.decode(LossyList<PlannedWorkV2>.self, forKey: .works).elements
+        coverage = try container.decode(PlannedWorksV2Coverage.self, forKey: .coverage)
+    }
 }
 
 struct PlannedWorksV2Coverage: Decodable, Sendable {

@@ -32,6 +32,7 @@ public actor StationArrivalsService {
     private static let destinationFailureCacheLifetime: TimeInterval = 60
     private static let arrivalDepartureLineIDs: Set<String> = [
         TubeLineID.elizabeth.rawValue,
+        TubeLineID.thameslink.rawValue,
         TubeLineID.liberty.rawValue,
         TubeLineID.lioness.rawValue,
         TubeLineID.mildmay.rawValue,
@@ -80,8 +81,29 @@ public actor StationArrivalsService {
         var predictions: [TfLArrivalPrediction] = []
         var serverUpdatedAt: Date?
         var isStale = false
+        let nationalRailStationIDs = sortedStationIDs.filter(Self.servesNationalRail)
         do {
-            for stationID in sortedStationIDs {
+            if !nationalRailStationIDs.isEmpty {
+                // National Rail has no bulk prediction feed; its boards come
+                // from TfL's per-station departures. A failure there must not
+                // hide the Underground or Overground trains at the same place.
+                do {
+                    let response: TubeTrackAPIResponse<[TfLArrivalPrediction]> = try await client.getSnapshot(
+                        "/api/v1/thameslink/departures",
+                        queryItems: [URLQueryItem(
+                            name: "stopIds", value: nationalRailStationIDs.joined(separator: ",")
+                        )],
+                        forceRefresh: forceRefresh
+                    )
+                    serverUpdatedAt = min(serverUpdatedAt ?? response.updatedAt, response.updatedAt)
+                    isStale = isStale || response.stale
+                    predictions.append(contentsOf: response.data)
+                } catch {
+                    try Task.checkCancellation()
+                    isStale = true
+                }
+            }
+            for stationID in sortedStationIDs where !Self.servesOnlyNationalRail(stationID) {
                 let response: TubeTrackAPIResponse<[TfLArrivalPrediction]> = try await client.getSnapshot(
                     "/api/v1/arrivals/\(stationID)",
                     forceRefresh: forceRefresh
@@ -314,6 +336,17 @@ public actor StationArrivalsService {
         arrivalsByStationSet = arrivalsByStationSet.filter {
             now.timeIntervalSince($0.value.fetchedAt) < Self.arrivalsStaleLifetime
         }
+    }
+
+    private static func servesNationalRail(_ stationID: String) -> Bool {
+        StationIndex.bundled.entry(id: stationID)?.lineIDs.contains(where: \.isNationalRail) == true
+    }
+
+    private static func servesOnlyNationalRail(_ stationID: String) -> Bool {
+        guard let lineIDs = StationIndex.bundled.entry(id: stationID)?.lineIDs, !lineIDs.isEmpty else {
+            return false
+        }
+        return lineIDs.allSatisfy(\.isNationalRail)
     }
 
     private static func normalizedID(_ value: String?) -> String? {
@@ -733,7 +766,10 @@ private extension TfLArrivalPrediction {
             towards: towards,
             expectedArrival: expectedArrival,
             timeToStation: timeToStation.map { max(0, $0 - elapsed) },
-            currentLocation: currentLocation
+            currentLocation: currentLocation,
+            scheduledDeparture: scheduledDeparture,
+            serviceStatus: serviceStatus,
+            serviceCause: serviceCause
         )
     }
 
@@ -751,7 +787,10 @@ private extension TfLArrivalPrediction {
             towards: destination?.name,
             expectedArrival: expectedArrival,
             timeToStation: timeToStation,
-            currentLocation: currentLocation
+            currentLocation: currentLocation,
+            scheduledDeparture: scheduledDeparture,
+            serviceStatus: serviceStatus,
+            serviceCause: serviceCause
         )
     }
 
@@ -769,7 +808,10 @@ private extension TfLArrivalPrediction {
             towards: towards,
             expectedArrival: expectedArrival,
             timeToStation: timeToStation,
-            currentLocation: currentLocation
+            currentLocation: currentLocation,
+            scheduledDeparture: scheduledDeparture,
+            serviceStatus: serviceStatus,
+            serviceCause: serviceCause
         )
     }
 }

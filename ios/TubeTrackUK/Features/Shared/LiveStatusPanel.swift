@@ -513,6 +513,7 @@ struct LiveStatusPanel: View {
                 }
                 if appState.isViewingLiveStatus {
                     liveDisruptionsContent
+                    NationalRailStatusRows()
                     if appState.river.isEnabled {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 8) { RiverStatusRows(lineIds: nil) }

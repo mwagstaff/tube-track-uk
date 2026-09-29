@@ -21,6 +21,7 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
     case suffragette
     case weaver
     case windrush
+    case thameslink
 
     public var id: String { rawValue }
 
@@ -46,6 +47,7 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .suffragette: "Suffragette line"
         case .weaver: "Weaver line"
         case .windrush: "Windrush line"
+        case .thameslink: "Thameslink"
         }
     }
 
@@ -73,6 +75,7 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .suffragette: "Suf"
         case .weaver: "Wea"
         case .windrush: "Win"
+        case .thameslink: "TL"
         }
     }
 
@@ -82,7 +85,7 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity,
         .dlr, .elizabeth,
         .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush,
-        .tram,
+        .tram, .thameslink,
     ]
 
     public var widgetDisplayRank: Int {
@@ -116,7 +119,7 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
              .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity:
             true
         case .dlr, .elizabeth, .tram, .liberty, .lioness, .mildmay, .suffragette,
-             .weaver, .windrush:
+             .weaver, .windrush, .thameslink:
             false
         }
     }
@@ -127,8 +130,20 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
         case .elizabeth: "elizabeth-line"
         case .tram: "tram"
         case .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush: "overground"
+        case .thameslink: "national-rail"
         default: "tube"
         }
+    }
+
+    /// National Rail lines have per-station departure boards but no vehicle
+    /// positions: their live trains are estimated from those boards, never
+    /// read from the bulk live-arrivals feed.
+    public var isNationalRail: Bool { modeName == "national-rail" }
+
+    /// TfL draws National Rail with a dashed white inset inside its casing.
+    /// Lengths are in Beck artwork units (four per PDF point).
+    public var schematicInnerDash: [CGFloat]? {
+        isNationalRail ? [3.412 * 4, 1.707 * 4] : nil
     }
 
     public var usesParallelSchematicStroke: Bool { !isUnderground }
@@ -145,6 +160,8 @@ public enum TubeLineID: String, Codable, CaseIterable, Identifiable, Sendable {
             "TrainMarkerTram"
         case .elizabeth, .liberty, .lioness, .mildmay, .suffragette, .weaver, .windrush:
             "TrainMarkerOverground"
+        case .thameslink:
+            "TrainMarkerThameslink"
         case .bakerloo, .central, .circle, .district, .hammersmithCity, .jubilee,
              .metropolitan, .northern, .piccadilly, .victoria, .waterlooCity:
             "TrainMarkerTube"
@@ -177,6 +194,7 @@ extension Color {
         case .suffragette: Color(red: 0.350_006, green: 0.764_206, blue: 0.392_731)
         case .weaver: Color(red: 0.690_094, green: 0.135_376, blue: 0.496_674)
         case .windrush: Color(red: 0.929_001, green: 0.098_816, blue: 0.181_976)
+        case .thameslink: Color(red: 214.0 / 255.0, green: 111.0 / 255.0, blue: 170.0 / 255.0)
         }
     }
 }

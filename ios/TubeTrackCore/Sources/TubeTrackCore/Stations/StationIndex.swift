@@ -139,8 +139,11 @@ public struct StationIndex: Sendable {
     }
 
     private static func hub(id: String, members: [StationIndexEntry]) -> StationHub {
-        // Prefer the plain name ("Bank") over a suffixed one ("Bank DLR Station").
-        let representative = members.min {
+        // Prefer the plain name ("Bank") over a suffixed one ("Bank DLR Station"),
+        // and a TfL name over a National Rail platform's ("King's Cross
+        // St. Pancras", not "St Pancras International").
+        let named = members.filter { !$0.lineIDs.allSatisfy(\.isNationalRail) }
+        let representative = (named.isEmpty ? members : named).min {
             if $0.name.count != $1.name.count { return $0.name.count < $1.name.count }
             return $0.id < $1.id
         }!

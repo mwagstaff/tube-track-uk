@@ -133,7 +133,11 @@ struct BeckMapRepositoryTests {
             let touchesConnection = connectorEndpoints.contains { endpoint in
                 hypot(endpoint.x - marker.anchor.x, endpoint.y - marker.anchor.y) <= 10
             }
+            // TfL draws most National Rail stations with roundels (other
+            // operators, or step-free access); the reference alignment
+            // reproduces its choice station by station.
             return station.lineIDs.count == 1
+                && !station.lineIDs[0].isNationalRail
                 && hubSizes[hubID] == 1
                 && !additionalConnectedStationIDs.contains(marker.stationID)
                 && !tflInterchangeRoundelStationIDs.contains(marker.stationID)
@@ -318,7 +322,8 @@ struct BeckMapRepositoryTests {
             ("910GWLTWCEN", 40),
             ("910GHGHI", 45),
             ("910GCLDNNRB", 55),
-            ("910GWHMDSTD", 55),
+            // Includes TfL's walking link on to West Hampstead Thameslink.
+            ("910GWHMDSTD", 85),
             ("910GFNCHLYR", 90),
             ("910GBARKING", 60),
         ]
@@ -581,15 +586,31 @@ struct BeckMapRepositoryTests {
                 firstCircle.x - secondCircle.x,
                 firstCircle.y - secondCircle.y
             ) > 40)
-            let link = try #require(second.primitives.compactMap { primitive -> BeckMapLinePrimitive? in
-                switch primitive {
-                case let .connector(connector): walking ? nil : connector
-                case let .walkingConnector(connector): walking ? connector : nil
-                case .circle, .tick: nil
+            // The tram stop is linked into the interchange: at Wimbledon the
+            // bar now runs from the Thameslink platforms between the two.
+            let hubCircles = document.stationMarkers
+                .filter { graph.stationsByID[$0.stationID]?.hubID == graph.stationsByID[firstID]?.hubID }
+                .flatMap(circles)
+            let links = document.stationMarkers.flatMap { marker in
+                marker.primitives.compactMap { primitive -> BeckMapLinePrimitive? in
+                    switch primitive {
+                    case let .connector(connector): walking ? nil : connector
+                    case let .walkingConnector(connector): walking ? connector : nil
+                    case .circle, .tick: nil
+                    }
                 }
-            }.first)
-            #expect(hypot(link.start.x - firstCircle.x, link.start.y - firstCircle.y) < 0.5)
-            #expect(hypot(link.end.x - secondCircle.x, link.end.y - secondCircle.y) < 0.5)
+            }
+            func touches(_ point: BeckMapPoint, _ circle: BeckMapPoint) -> Bool {
+                hypot(point.x - circle.x, point.y - circle.y) < 0.5
+            }
+            #expect(links.contains { link in
+                let ends = [link.start, link.end]
+                return ends.contains { touches($0, secondCircle) }
+                    && ends.contains { end in
+                        !touches(end, secondCircle) && hubCircles.contains { touches(end, $0) }
+                    }
+            })
+            _ = firstCircle
         }
     }
 
@@ -1358,11 +1379,12 @@ struct BeckMapRepositoryTests {
         #expect(kingsCrossLink.end.y > kingsCrossLink.start.y)
         #expect(isFortyFiveDegrees(kingsCrossLink))
 
-        // Farringdon's bar joins the sub-surface roundel to the Elizabeth line
-        // disc and is drawn by the Elizabeth line record.
+        // Farringdon's bar joins the sub-surface roundel to the disc the
+        // Elizabeth line and Thameslink share, and is drawn by one of them.
         let farringdonGeometry = try marker("940GZZLUFCN")
         let farringdonLink = try #require(
-            (connectors(farringdonGeometry) + connectors(try marker("910GFRNDXR"))).first
+            (connectors(farringdonGeometry) + connectors(try marker("910GFRNDXR"))
+                + connectors(try marker("910GFRNDNLT"))).first
         )
         #expect(isFortyFiveDegrees(farringdonLink))
         // From King's Cross the sub-surface lanes turn down TfL's 45-degree
@@ -1552,7 +1574,7 @@ struct BeckMapRepositoryTests {
 
         let farringdon = try marker("940GZZLUFCN")
         let farringdonElizabeth = try marker("910GFRNDXR")
-        let farringdonGroup = try group(["940GZZLUFCN", "910GFRNDXR"])
+        let farringdonGroup = try group(["940GZZLUFCN", "910GFRNDXR", "910GFRNDNLT"])
         #expect(roundels(farringdonGroup).contains(farringdon.anchor))
         #expect(roundels(farringdonGroup).contains(farringdonElizabeth.anchor))
         #expect(joins(farringdonGroup, farringdon.anchor, farringdonElizabeth.anchor))
@@ -1596,7 +1618,7 @@ struct BeckMapRepositoryTests {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
         let labelsByStationID = Dictionary(
-            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+            uniqueKeysWithValues: document.labels.filter { !$0.id.contains(".towards.") }.map { ($0.stationID, $0) }
         )
 
         for stationID in ["940GZZLUVIC", "940GZZLUSTD", "940GZZLUCYF"] {
@@ -1610,8 +1632,8 @@ struct BeckMapRepositoryTests {
             .mapValues(\.count)
         #expect(tierCounts[.overview] == 17)
         #expect(tierCounts[.network] == 70)
-        #expect(tierCounts[.local] == 188)
-        #expect(tierCounts[.minor] == 183)
+        #expect(tierCounts[.local] == 193)
+        #expect(tierCounts[.minor] == 232)
     }
 
     @Test func splitPhysicalHubsShareTheirCanonicalLabel() throws {
@@ -1732,7 +1754,7 @@ struct BeckMapRepositoryTests {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
         let labelsByStationID = Dictionary(
-            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+            uniqueKeysWithValues: document.labels.filter { !$0.id.contains(".towards.") }.map { ($0.stationID, $0) }
         )
 
         #expect(labelsByStationID["940GZZLURYL"]?.text == "Rayners Lane")
@@ -1757,7 +1779,7 @@ struct BeckMapRepositoryTests {
         let graph = try TubeGraph.bundled()
         let document = try repository.load(region: .fullUnderground, graph: graph)
         let labels = Dictionary(
-            uniqueKeysWithValues: document.labels.map { ($0.stationID, $0) }
+            uniqueKeysWithValues: document.labels.filter { !$0.id.contains(".towards.") }.map { ($0.stationID, $0) }
         )
         let markers = Dictionary(
             uniqueKeysWithValues: document.stationMarkers.map { ($0.stationID, $0) }

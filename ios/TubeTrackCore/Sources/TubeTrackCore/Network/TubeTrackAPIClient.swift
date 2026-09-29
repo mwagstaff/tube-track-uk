@@ -149,7 +149,8 @@ public actor TubeTrackAPIClient {
         ) else {
             throw TubeTrackAPIClientError.invalidURL
         }
-        components.queryItems = queryItems.isEmpty ? nil : queryItems
+        let allQueryItems = queryItems + Self.lineOptInQueryItems(for: path)
+        components.queryItems = allQueryItems.isEmpty ? nil : allQueryItems
         guard let url = components.url else { throw TubeTrackAPIClientError.invalidURL }
 
         var request = URLRequest(url: url)
@@ -215,6 +216,19 @@ public actor TubeTrackAPIClient {
                 )
             }
         }
+    }
+
+    /// The server withholds lines newer than the first releases (they decode
+    /// line ids strictly) unless a client names them in `include`.
+    public nonisolated static let optInLineIDs: [TubeLineID] = [.thameslink]
+
+    nonisolated static func lineOptInQueryItems(for path: String) -> [URLQueryItem] {
+        let gatedPaths: Set<String> = [
+            "/api/v1/status", "/api/v1/planned-works", "/api/v2/planned-works", "/api/v1/line-colours",
+            "/api/v1/journeys",
+        ]
+        guard gatedPaths.contains(path) else { return [] }
+        return [URLQueryItem(name: "include", value: optInLineIDs.map(\.rawValue).joined(separator: ","))]
     }
 
     private nonisolated static func retryAfterDate(

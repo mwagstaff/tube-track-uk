@@ -32,7 +32,6 @@ struct TubeGameTrainSimulation: Sendable {
             lineRoutes.shuffle(using: &generator)
 
             for trainIndex in 0 ..< quota {
-                let routeMetrics = lineRoutes[trainIndex % lineRoutes.count]
                 let desiredFraction = min(
                     0.9,
                     max(
@@ -41,13 +40,36 @@ struct TubeGameTrainSimulation: Sendable {
                             + generator.nextDouble(in: -0.06 ... 0.06)
                     )
                 )
-                guard let placement = routeMetrics.placement(
+                // Prefer this train's route, then the line's others, so a short
+                // route near the player never forces a train on top of them.
+                let rotation = (0 ..< lineRoutes.count).map {
+                    lineRoutes[(trainIndex + $0) % lineRoutes.count]
+                }
+                var chosen: (RouteMetrics, Placement)?
+                for candidate in rotation {
+                    if let placement = candidate.placement(
+                        nearFraction: desiredFraction,
+                        minimumHubHops: 8,
+                        hopDistances: hopDistances,
+                        network: network,
+                        requiresDistantLeg: true,
+                        generator: &generator
+                    ) {
+                        chosen = (candidate, placement)
+                        break
+                    }
+                }
+                if chosen == nil, let placement = rotation[0].placement(
                     nearFraction: desiredFraction,
                     minimumHubHops: 8,
                     hopDistances: hopDistances,
                     network: network,
+                    requiresDistantLeg: false,
                     generator: &generator
-                ) else { continue }
+                ) {
+                    chosen = (rotation[0], placement)
+                }
+                guard let (routeMetrics, placement) = chosen else { continue }
                 let fallbackDirection = trainIndex.isMultiple(of: 2) ? 1 : -1
 
                 builtStates.append(TrainState(
@@ -219,19 +241,25 @@ private extension TubeGameTrainSimulation {
             minimumHubHops: Int,
             hopDistances: [String: Int],
             network: TubeGameNetwork,
+            requiresDistantLeg: Bool,
             generator: inout SplitMix64
         ) -> Placement? {
             let targetDistance = totalLength * CGFloat(min(1, max(0, fraction)))
-            let eligibleIndices = legs.indices.filter { index in
+            // Hubs at each end of a leg, as hops from the player's start.
+            let legHops = legs.indices.map { index -> Int in
                 let leg = legs[index].leg
                 guard let fromHubID = network.node(stationID: leg.fromStationID)?.hubID,
                       let toHubID = network.node(stationID: leg.toStationID)?.hubID else {
-                    return false
+                    return -1
                 }
-                return (hopDistances[fromHubID] ?? .max) >= minimumHubHops
-                    && (hopDistances[toHubID] ?? .max) >= minimumHubHops
+                return min(hopDistances[fromHubID] ?? .max, hopDistances[toHubID] ?? .max)
             }
-            let candidateIndices = eligibleIndices.isEmpty ? Array(legs.indices) : eligibleIndices
+            guard let farthest = legHops.max() else { return nil }
+            if requiresDistantLeg && farthest < minimumHubHops { return nil }
+            // A route that never gets far enough away still uses its farthest
+            // legs, never whichever leg happens to sit beside the player.
+            let threshold = min(minimumHubHops, farthest)
+            let candidateIndices = legs.indices.filter { legHops[$0] >= threshold }
             guard let legIndex = candidateIndices.min(by: { lhs, rhs in
                 let lhsMidpoint = (cumulativeLengths[lhs] + cumulativeLengths[lhs + 1]) / 2
                 let rhsMidpoint = (cumulativeLengths[rhs] + cumulativeLengths[rhs + 1]) / 2

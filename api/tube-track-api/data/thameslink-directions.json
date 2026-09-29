@@ -1,0 +1,960 @@
+{
+  "source": "https://api.tfl.gov.uk/Line/thameslink/StopPoints",
+  "stopIds": [
+    "910GABWD",
+    "910GALEXNDP",
+    "910GARLSEY",
+    "910GASHWELC",
+    "910GBALCOMB",
+    "910GBALDOCK",
+    "910GBATABAL",
+    "910GBCKNHMH",
+    "910GBCKNHMJ",
+    "910GBEDFDM",
+    "910GBELNGHM",
+    "910GBICKLEY",
+    "910GBIGLSWD",
+    "910GBLFR",
+    "910GBLKHTH",
+    "910GBRENTX",
+    "910GBRGHTN",
+    "910GBRNHRST",
+    "910GBROMLYS",
+    "910GBURGESH",
+    "910GBXLYHTH",
+    "910GCAMBDGE",
+    "910GCATFORD",
+    "910GCFPK",
+    "910GCHATHAM",
+    "910GCOLSDNS",
+    "910GCRAWLEY",
+    "910GCRKLWD",
+    "910GCRLN",
+    "910GCRSHLTN",
+    "910GCTMSLNK",
+    "910GCUFFLEY",
+    "910GDARTFD",
+    "910GDENMRKH",
+    "910GDEPTFD",
+    "910GDORMANS",
+    "910GEARLSWD",
+    "910GECROYDN",
+    "910GEGRNSTD",
+    "910GELPHNAC",
+    "910GELTHAM",
+    "910GELTR",
+    "910GENFC",
+    "910GESTFLDS",
+    "910GEYNSFD",
+    "910GFAYGATE",
+    "910GFLITWCK",
+    "910GFNPK",
+    "910GFOXTON",
+    "910GFRNDNLT",
+    "910GGLNGHMK",
+    "910GGNHT",
+    "910GGNWH",
+    "910GGORDONH",
+    "910GGRVSEND",
+    "910GGTWK",
+    "910GHADLYWD",
+    "910GHASOCKS",
+    "910GHATFILD",
+    "910GHDON",
+    "910GHERNEH",
+    "910GHFDN",
+    "910GHIGM",
+    "910GHITCHIN",
+    "910GHKBG",
+    "910GHNTNGDN",
+    "910GHORLEY",
+    "910GHORSHAM",
+    "910GHRGY",
+    "910GHRLG",
+    "910GHRPNDN",
+    "910GHRSTGRN",
+    "910GHYDNSRD",
+    "910GHYWRDSH",
+    "910GIFIELD",
+    "910GKNEBWTH",
+    "910GKNGX",
+    "910GKNTSHTN",
+    "910GLBGHJN",
+    "910GLEAGRVE",
+    "910GLEWISHM",
+    "910GLHVN",
+    "910GLINGFLD",
+    "910GLNDNBDC",
+    "910GLTCE",
+    "910GLUTOAPY",
+    "910GLUTON",
+    "910GMAZEH",
+    "910GMELDRTH",
+    "910GMERSTHM",
+    "910GMITCHMJ",
+    "910GMLHB",
+    "910GMORDENS",
+    "910GNBARNET",
+    "910GNEWSGAT",
+    "910GNORWDJ",
+    "910GNRTHFLT",
+    "910GNUNHEAD",
+    "910GOKLGHPK",
+    "910GORPNGTN",
+    "910GOTFORD",
+    "910GOXTED",
+    "910GPALMRSG",
+    "910GPBRO",
+    "910GPCKHMRY",
+    "910GPETSWD",
+    "910GPLMS",
+    "910GPOTRSBR",
+    "910GPRSP",
+    "910GPURLEY",
+    "910GRADLETT",
+    "910GRAINHMK",
+    "910GRBRN",
+    "910GRCHT",
+    "910GRDLSDWN",
+    "910GREDHILL",
+    "910GROYSTON",
+    "910GSALFDS",
+    "910GSCROYDN",
+    "910GSDSD",
+    "910GSHLIER",
+    "910GSHPRTH",
+    "910GSHRMKT",
+    "910GSHRTLND",
+    "910GSLADEGN",
+    "910GSMERTON",
+    "910GSNDY",
+    "910GSTALBCY",
+    "910GSTCR",
+    "910GSTEVNGE",
+    "910GSTMRYC",
+    "910GSTNEOTS",
+    "910GSTPX",
+    "910GSTPXBOX",
+    "910GSTRETHM",
+    "910GSTROOD",
+    "910GSUTTON",
+    "910GSUTTONC",
+    "910GSVNOAKS",
+    "910GSWLY",
+    "910GSWNSCMB",
+    "910GTHBDGS",
+    "910GTOOTING",
+    "910GTULSEH",
+    "910GUWRLNGH",
+    "910GVICTRIC",
+    "910GWATONAS",
+    "910GWCOMBEP",
+    "910GWHMPSTM",
+    "910GWHYTELF",
+    "910GWIMBLDN",
+    "910GWIMLCHS",
+    "910GWLDNGHM",
+    "910GWLWYNGC",
+    "910GWLWYNN",
+    "910GWNMHILL",
+    "910GWOLWCHA",
+    "910GWSUTTON",
+    "910GWVLSFLD"
+  ],
+  "coordinates": {
+    "910GABWD": [
+      51.49106,
+      0.12139
+    ],
+    "910GALEXNDP": [
+      51.59792,
+      -0.12023
+    ],
+    "910GARLSEY": [
+      52.02603,
+      -0.26632
+    ],
+    "910GASHWELC": [
+      52.03077,
+      -0.10979
+    ],
+    "910GBALCOMB": [
+      51.05552,
+      -0.13693
+    ],
+    "910GBALDOCK": [
+      51.99287,
+      -0.18756
+    ],
+    "910GBATABAL": [
+      51.28976,
+      0.19423
+    ],
+    "910GBCKNHMH": [
+      51.42458,
+      -0.01595
+    ],
+    "910GBCKNHMJ": [
+      51.41103,
+      -0.02581
+    ],
+    "910GBEDFDM": [
+      52.13619,
+      -0.47944
+    ],
+    "910GBELNGHM": [
+      51.43291,
+      -0.01933
+    ],
+    "910GBICKLEY": [
+      51.4001,
+      0.04524
+    ],
+    "910GBIGLSWD": [
+      52.08468,
+      -0.26119
+    ],
+    "910GBLFR": [
+      51.51181,
+      -0.10333
+    ],
+    "910GBLKHTH": [
+      51.4658,
+      0.00887
+    ],
+    "910GBRENTX": [
+      51.56843,
+      -0.22549
+    ],
+    "910GBRGHTN": [
+      50.82901,
+      -0.14128
+    ],
+    "910GBRNHRST": [
+      51.46496,
+      0.15965
+    ],
+    "910GBROMLYS": [
+      51.39998,
+      0.01734
+    ],
+    "910GBURGESH": [
+      50.95366,
+      -0.12741
+    ],
+    "910GBXLYHTH": [
+      51.4635,
+      0.13373
+    ],
+    "910GCAMBDGE": [
+      52.19407,
+      0.13746
+    ],
+    "910GCATFORD": [
+      51.44441,
+      -0.02632
+    ],
+    "910GCFPK": [
+      51.45519,
+      -0.0365
+    ],
+    "910GCHATHAM": [
+      51.38038,
+      0.52115
+    ],
+    "910GCOLSDNS": [
+      51.31584,
+      -0.13789
+    ],
+    "910GCRAWLEY": [
+      51.11221,
+      -0.18667
+    ],
+    "910GCRKLWD": [
+      51.55845,
+      -0.21268
+    ],
+    "910GCRLN": [
+      51.48681,
+      0.03126
+    ],
+    "910GCRSHLTN": [
+      51.36845,
+      -0.16637
+    ],
+    "910GCTMSLNK": [
+      51.51394,
+      -0.10359
+    ],
+    "910GCUFFLEY": [
+      51.70872,
+      -0.10978
+    ],
+    "910GDARTFD": [
+      51.44737,
+      0.21925
+    ],
+    "910GDENMRKH": [
+      51.4682,
+      -0.08936
+    ],
+    "910GDEPTFD": [
+      51.47885,
+      -0.02627
+    ],
+    "910GDORMANS": [
+      51.15579,
+      -0.00431
+    ],
+    "910GEARLSWD": [
+      51.22733,
+      -0.17082
+    ],
+    "910GECROYDN": [
+      51.37545,
+      -0.09278
+    ],
+    "910GEGRNSTD": [
+      51.12627,
+      -0.0179
+    ],
+    "910GELPHNAC": [
+      51.49403,
+      -0.09872
+    ],
+    "910GELTHAM": [
+      51.45564,
+      0.05247
+    ],
+    "910GELTR": [
+      51.65307,
+      -0.28008
+    ],
+    "910GENFC": [
+      51.65325,
+      -0.0907
+    ],
+    "910GESTFLDS": [
+      51.40774,
+      -0.15465
+    ],
+    "910GEYNSFD": [
+      51.36272,
+      0.20439
+    ],
+    "910GFAYGATE": [
+      51.09589,
+      -0.26302
+    ],
+    "910GFLITWCK": [
+      52.00364,
+      -0.49526
+    ],
+    "910GFNPK": [
+      51.5643,
+      -0.10629
+    ],
+    "910GFOXTON": [
+      52.11921,
+      0.05631
+    ],
+    "910GFRNDNLT": [
+      51.52017,
+      -0.10521
+    ],
+    "910GGLNGHMK": [
+      51.38656,
+      0.54985
+    ],
+    "910GGNHT": [
+      51.45037,
+      0.28029
+    ],
+    "910GGNWH": [
+      51.47814,
+      -0.01334
+    ],
+    "910GGORDONH": [
+      51.66333,
+      -0.09461
+    ],
+    "910GGRVSEND": [
+      51.44135,
+      0.36664
+    ],
+    "910GGTWK": [
+      51.15649,
+      -0.16104
+    ],
+    "910GHADLYWD": [
+      51.6685,
+      -0.17617
+    ],
+    "910GHASOCKS": [
+      50.92462,
+      -0.14595
+    ],
+    "910GHATFILD": [
+      51.76388,
+      -0.21559
+    ],
+    "910GHDON": [
+      51.58007,
+      -0.23867
+    ],
+    "910GHERNEH": [
+      51.45331,
+      -0.10229
+    ],
+    "910GHFDN": [
+      51.79886,
+      -0.09179
+    ],
+    "910GHIGM": [
+      51.42656,
+      0.46628
+    ],
+    "910GHITCHIN": [
+      51.95328,
+      -0.26348
+    ],
+    "910GHKBG": [
+      51.37672,
+      -0.15329
+    ],
+    "910GHNTNGDN": [
+      52.32865,
+      -0.19207
+    ],
+    "910GHORLEY": [
+      51.16877,
+      -0.16105
+    ],
+    "910GHORSHAM": [
+      51.06607,
+      -0.31927
+    ],
+    "910GHRGY": [
+      51.57736,
+      -0.10514
+    ],
+    "910GHRLG": [
+      51.96206,
+      -0.49569
+    ],
+    "910GHRPNDN": [
+      51.81464,
+      -0.35148
+    ],
+    "910GHRSTGRN": [
+      51.24443,
+      0.00394
+    ],
+    "910GHYDNSRD": [
+      51.42545,
+      -0.18882
+    ],
+    "910GHYWRDSH": [
+      51.00568,
+      -0.10508
+    ],
+    "910GIFIELD": [
+      51.11562,
+      -0.21477
+    ],
+    "910GKNEBWTH": [
+      51.86686,
+      -0.18729
+    ],
+    "910GKNGX": [
+      51.53088,
+      -0.12293
+    ],
+    "910GKNTSHTN": [
+      51.55049,
+      -0.14036
+    ],
+    "910GLBGHJN": [
+      51.4663,
+      -0.10218
+    ],
+    "910GLEAGRVE": [
+      51.90516,
+      -0.4585
+    ],
+    "910GLEWISHM": [
+      51.46569,
+      -0.01402
+    ],
+    "910GLHVN": [
+      51.07975,
+      -0.30798
+    ],
+    "910GLINGFLD": [
+      51.17645,
+      -0.00717
+    ],
+    "910GLNDNBDC": [
+      51.50502,
+      -0.08609
+    ],
+    "910GLTCE": [
+      51.97996,
+      -0.22926
+    ],
+    "910GLUTOAPY": [
+      51.87244,
+      -0.39588
+    ],
+    "910GLUTON": [
+      51.88231,
+      -0.41404
+    ],
+    "910GMAZEH": [
+      51.48262,
+      0.00291
+    ],
+    "910GMELDRTH": [
+      52.09072,
+      0.00894
+    ],
+    "910GMERSTHM": [
+      51.26415,
+      -0.15023
+    ],
+    "910GMITCHMJ": [
+      51.39295,
+      -0.15776
+    ],
+    "910GMLHB": [
+      51.61309,
+      -0.24924
+    ],
+    "910GMORDENS": [
+      51.39612,
+      -0.19946
+    ],
+    "910GNBARNET": [
+      51.64858,
+      -0.173
+    ],
+    "910GNEWSGAT": [
+      51.61411,
+      -0.14304
+    ],
+    "910GNORWDJ": [
+      51.39702,
+      -0.07522
+    ],
+    "910GNRTHFLT": [
+      51.44585,
+      0.32433
+    ],
+    "910GNUNHEAD": [
+      51.46683,
+      -0.05227
+    ],
+    "910GOKLGHPK": [
+      51.63768,
+      -0.16621
+    ],
+    "910GORPNGTN": [
+      51.3733,
+      0.08909
+    ],
+    "910GOTFORD": [
+      51.31316,
+      0.19678
+    ],
+    "910GOXTED": [
+      51.25791,
+      -0.00483
+    ],
+    "910GPALMRSG": [
+      51.61831,
+      -0.11044
+    ],
+    "910GPBRO": [
+      52.57498,
+      -0.24984
+    ],
+    "910GPCKHMRY": [
+      51.47003,
+      -0.06941
+    ],
+    "910GPETSWD": [
+      51.38862,
+      0.07448
+    ],
+    "910GPLMS": [
+      51.4898,
+      0.08426
+    ],
+    "910GPOTRSBR": [
+      51.69707,
+      -0.1926
+    ],
+    "910GPRSP": [
+      50.84594,
+      -0.15517
+    ],
+    "910GPURLEY": [
+      51.33758,
+      -0.11403
+    ],
+    "910GRADLETT": [
+      51.68519,
+      -0.31724
+    ],
+    "910GRAINHMK": [
+      51.36631,
+      0.61134
+    ],
+    "910GRBRN": [
+      51.41419,
+      -0.00756
+    ],
+    "910GRCHT": [
+      51.38965,
+      0.50686
+    ],
+    "910GRDLSDWN": [
+      51.33249,
+      -0.09939
+    ],
+    "910GREDHILL": [
+      51.2402,
+      -0.1659
+    ],
+    "910GROYSTON": [
+      52.05308,
+      -0.02692
+    ],
+    "910GSALFDS": [
+      51.20175,
+      -0.16249
+    ],
+    "910GSCROYDN": [
+      51.36297,
+      -0.09346
+    ],
+    "910GSDSD": [
+      51.34828,
+      -0.09368
+    ],
+    "910GSHLIER": [
+      51.3899,
+      -0.19877
+    ],
+    "910GSHPRTH": [
+      52.11416,
+      0.03132
+    ],
+    "910GSHRMKT": [
+      51.33222,
+      0.18889
+    ],
+    "910GSHRTLND": [
+      51.4058,
+      0.00178
+    ],
+    "910GSLADEGN": [
+      51.46779,
+      0.19049
+    ],
+    "910GSMERTON": [
+      51.40299,
+      -0.20516
+    ],
+    "910GSNDY": [
+      52.12473,
+      -0.28119
+    ],
+    "910GSTALBCY": [
+      51.75047,
+      -0.32754
+    ],
+    "910GSTCR": [
+      51.45133,
+      0.26377
+    ],
+    "910GSTEVNGE": [
+      51.90169,
+      -0.20711
+    ],
+    "910GSTMRYC": [
+      51.39475,
+      0.10638
+    ],
+    "910GSTNEOTS": [
+      52.23157,
+      -0.24741
+    ],
+    "910GSTPX": [
+      51.53239,
+      -0.12719
+    ],
+    "910GSTPXBOX": [
+      51.53217,
+      -0.12734
+    ],
+    "910GSTRETHM": [
+      51.42581,
+      -0.13155
+    ],
+    "910GSTROOD": [
+      51.39655,
+      0.50019
+    ],
+    "910GSUTTON": [
+      51.35953,
+      -0.19121
+    ],
+    "910GSUTTONC": [
+      51.37489,
+      -0.19634
+    ],
+    "910GSVNOAKS": [
+      51.27687,
+      0.18167
+    ],
+    "910GSWLY": [
+      51.39339,
+      0.16922
+    ],
+    "910GSWNSCMB": [
+      51.44907,
+      0.30954
+    ],
+    "910GTHBDGS": [
+      51.11692,
+      -0.16118
+    ],
+    "910GTOOTING": [
+      51.41985,
+      -0.16128
+    ],
+    "910GTULSEH": [
+      51.43986,
+      -0.10508
+    ],
+    "910GUWRLNGH": [
+      51.30851,
+      -0.07795
+    ],
+    "910GVICTRIC": [
+      51.49526,
+      -0.14456
+    ],
+    "910GWATONAS": [
+      51.85644,
+      -0.11943
+    ],
+    "910GWCOMBEP": [
+      51.4842,
+      0.0184
+    ],
+    "910GWHMPSTM": [
+      51.54848,
+      -0.19184
+    ],
+    "910GWHYTELF": [
+      51.30996,
+      -0.08115
+    ],
+    "910GWIMBLDN": [
+      51.42122,
+      -0.20637
+    ],
+    "910GWIMLCHS": [
+      51.40956,
+      -0.21403
+    ],
+    "910GWLDNGHM": [
+      51.29016,
+      -0.05187
+    ],
+    "910GWLWYNGC": [
+      51.80105,
+      -0.20407
+    ],
+    "910GWLWYNN": [
+      51.8235,
+      -0.19209
+    ],
+    "910GWNMHILL": [
+      51.63394,
+      -0.1009
+    ],
+    "910GWOLWCHA": [
+      51.48991,
+      0.06919
+    ],
+    "910GWSUTTON": [
+      51.36585,
+      -0.20517
+    ],
+    "910GWVLSFLD": [
+      50.9643,
+      -0.12079
+    ]
+  },
+  "directions": {
+    "910GABWD": "Southbound",
+    "910GALEXNDP": "Northbound",
+    "910GARLSEY": "Northbound",
+    "910GASHWELC": "Northbound",
+    "910GBALCOMB": "Southbound",
+    "910GBALDOCK": "Northbound",
+    "910GBATABAL": "Southbound",
+    "910GBCKNHMH": "Southbound",
+    "910GBCKNHMJ": "Southbound",
+    "910GBEDFDM": "Northbound",
+    "910GBELNGHM": "Southbound",
+    "910GBICKLEY": "Southbound",
+    "910GBIGLSWD": "Northbound",
+    "910GBLFR": "Southbound",
+    "910GBLKHTH": "Southbound",
+    "910GBRENTX": "Northbound",
+    "910GBRGHTN": "Southbound",
+    "910GBRNHRST": "Southbound",
+    "910GBROMLYS": "Southbound",
+    "910GBURGESH": "Southbound",
+    "910GBXLYHTH": "Southbound",
+    "910GCAMBDGE": "Northbound",
+    "910GCATFORD": "Southbound",
+    "910GCFPK": "Southbound",
+    "910GCHATHAM": "Southbound",
+    "910GCOLSDNS": "Southbound",
+    "910GCRAWLEY": "Southbound",
+    "910GCRKLWD": "Northbound",
+    "910GCRLN": "Southbound",
+    "910GCRSHLTN": "Southbound",
+    "910GCTMSLNK": "Southbound",
+    "910GCUFFLEY": "Northbound",
+    "910GDARTFD": "Southbound",
+    "910GDENMRKH": "Southbound",
+    "910GDEPTFD": "Southbound",
+    "910GDORMANS": "Southbound",
+    "910GEARLSWD": "Southbound",
+    "910GECROYDN": "Southbound",
+    "910GEGRNSTD": "Southbound",
+    "910GELPHNAC": "Southbound",
+    "910GELTHAM": "Southbound",
+    "910GELTR": "Northbound",
+    "910GENFC": "Northbound",
+    "910GESTFLDS": "Southbound",
+    "910GEYNSFD": "Southbound",
+    "910GFAYGATE": "Southbound",
+    "910GFLITWCK": "Northbound",
+    "910GFNPK": "Northbound",
+    "910GFOXTON": "Northbound",
+    "910GFRNDNLT": "Southbound",
+    "910GGLNGHMK": "Southbound",
+    "910GGNHT": "Southbound",
+    "910GGNWH": "Southbound",
+    "910GGORDONH": "Northbound",
+    "910GGRVSEND": "Southbound",
+    "910GGTWK": "Southbound",
+    "910GHADLYWD": "Northbound",
+    "910GHASOCKS": "Southbound",
+    "910GHATFILD": "Northbound",
+    "910GHDON": "Northbound",
+    "910GHERNEH": "Southbound",
+    "910GHFDN": "Northbound",
+    "910GHIGM": "Southbound",
+    "910GHITCHIN": "Northbound",
+    "910GHKBG": "Southbound",
+    "910GHNTNGDN": "Northbound",
+    "910GHORLEY": "Southbound",
+    "910GHORSHAM": "Southbound",
+    "910GHRGY": "Northbound",
+    "910GHRLG": "Northbound",
+    "910GHRPNDN": "Northbound",
+    "910GHRSTGRN": "Southbound",
+    "910GHYDNSRD": "Southbound",
+    "910GHYWRDSH": "Southbound",
+    "910GIFIELD": "Southbound",
+    "910GKNEBWTH": "Northbound",
+    "910GKNTSHTN": "Northbound",
+    "910GLBGHJN": "Southbound",
+    "910GLEAGRVE": "Northbound",
+    "910GLEWISHM": "Southbound",
+    "910GLHVN": "Southbound",
+    "910GLINGFLD": "Southbound",
+    "910GLNDNBDC": "Southbound",
+    "910GLTCE": "Northbound",
+    "910GLUTOAPY": "Northbound",
+    "910GLUTON": "Northbound",
+    "910GMAZEH": "Southbound",
+    "910GMELDRTH": "Northbound",
+    "910GMERSTHM": "Southbound",
+    "910GMITCHMJ": "Southbound",
+    "910GMLHB": "Northbound",
+    "910GMORDENS": "Southbound",
+    "910GNBARNET": "Northbound",
+    "910GNEWSGAT": "Northbound",
+    "910GNORWDJ": "Southbound",
+    "910GNRTHFLT": "Southbound",
+    "910GNUNHEAD": "Southbound",
+    "910GOKLGHPK": "Northbound",
+    "910GORPNGTN": "Southbound",
+    "910GOTFORD": "Southbound",
+    "910GOXTED": "Southbound",
+    "910GPALMRSG": "Northbound",
+    "910GPBRO": "Northbound",
+    "910GPCKHMRY": "Southbound",
+    "910GPETSWD": "Southbound",
+    "910GPLMS": "Southbound",
+    "910GPOTRSBR": "Northbound",
+    "910GPRSP": "Southbound",
+    "910GPURLEY": "Southbound",
+    "910GRADLETT": "Northbound",
+    "910GRAINHMK": "Southbound",
+    "910GRBRN": "Southbound",
+    "910GRCHT": "Southbound",
+    "910GRDLSDWN": "Southbound",
+    "910GREDHILL": "Southbound",
+    "910GROYSTON": "Northbound",
+    "910GSALFDS": "Southbound",
+    "910GSCROYDN": "Southbound",
+    "910GSDSD": "Southbound",
+    "910GSHLIER": "Southbound",
+    "910GSHPRTH": "Northbound",
+    "910GSHRMKT": "Southbound",
+    "910GSHRTLND": "Southbound",
+    "910GSLADEGN": "Southbound",
+    "910GSMERTON": "Southbound",
+    "910GSNDY": "Northbound",
+    "910GSTALBCY": "Northbound",
+    "910GSTCR": "Southbound",
+    "910GSTEVNGE": "Northbound",
+    "910GSTMRYC": "Southbound",
+    "910GSTNEOTS": "Northbound",
+    "910GSTRETHM": "Southbound",
+    "910GSTROOD": "Southbound",
+    "910GSUTTON": "Southbound",
+    "910GSUTTONC": "Southbound",
+    "910GSVNOAKS": "Southbound",
+    "910GSWLY": "Southbound",
+    "910GSWNSCMB": "Southbound",
+    "910GTHBDGS": "Southbound",
+    "910GTOOTING": "Southbound",
+    "910GTULSEH": "Southbound",
+    "910GUWRLNGH": "Southbound",
+    "910GVICTRIC": "Southbound",
+    "910GWATONAS": "Northbound",
+    "910GWCOMBEP": "Southbound",
+    "910GWHMPSTM": "Northbound",
+    "910GWHYTELF": "Southbound",
+    "910GWIMBLDN": "Southbound",
+    "910GWIMLCHS": "Southbound",
+    "910GWLDNGHM": "Southbound",
+    "910GWLWYNGC": "Northbound",
+    "910GWLWYNN": "Northbound",
+    "910GWNMHILL": "Northbound",
+    "910GWOLWCHA": "Southbound",
+    "910GWSUTTON": "Southbound",
+    "910GWVLSFLD": "Southbound"
+  }
+}

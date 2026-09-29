@@ -435,3 +435,90 @@ test('a river empty poll needs a second distinct source update before replacing 
     assert.equal(client.sends.length, 2);
     assert.deepEqual(client.sends[1].payload.aps['content-state'].departures, []);
 });
+
+function thameslinkDeparture({ id = 'tl-1', minutes = 5, direction = 'Northbound', status = 'onTime',
+    destinationName = 'Bedford', stopId = '910GFRNDNLT' } = {}) {
+    const expected = new Date(NOW_MS + minutes * 60_000).toISOString();
+    return {
+        id, stopId, stationName: 'Farringdon', lineId: 'thameslink', lineName: 'Thameslink',
+        platformName: 'Platform 4', direction, destinationStopId: '910GBEDFDM', destinationName,
+        scheduledDeparture: expected, expectedDeparture: expected,
+        timeToStation: minutes * 60, status, cause: null
+    };
+}
+
+function thameslinkSubscription(overrides = {}) {
+    return subscription({
+        id: 'activity-tl', hubId: 'HUBZFD', lineId: 'thameslink', direction: 'northbound',
+        stopIds: ['940GZZLUFCN', '910GFRNDXR', '910GFRNDNLT'], ...overrides
+    });
+}
+
+function thameslinkSource(departures, updatedAtMs = NOW_MS - 10_000, stale = false) {
+    return { data: departures, meta: { updatedAt: new Date(updatedAtMs).toISOString(), stale } };
+}
+
+test('Thameslink pushes read the per-station board, filter direction and carry service status', async () => {
+    const requested = [];
+    const { notifier, client } = await fixture({
+        rows: [thameslinkSubscription()],
+        statuses: async () => [{ id: 'thameslink', lineStatuses: [{ statusSeverity: 9, statusSeverityDescription: 'Minor Delays', reason: 'Signal failure' }] }]
+    });
+    notifier.thameslink = {
+        departures: async (stopIds) => {
+            requested.push(stopIds);
+            return thameslinkSource([
+                thameslinkDeparture({ id: 'cancelled', minutes: 3, status: 'cancelled' }),
+                thameslinkDeparture({ id: 'south', minutes: 4, direction: 'Southbound', destinationName: 'Brighton' }),
+                thameslinkDeparture({ id: 'late', minutes: 9, status: 'delayed' })
+            ]);
+        }
+    };
+    await notifier.notify(snapshotWith([]));
+    // Only the Thameslink platforms of the interchange are fetched.
+    assert.deepEqual(requested, [['910GFRNDNLT']]);
+    assert.equal(client.sends.length, 1);
+    const state = client.sends[0].payload.aps['content-state'];
+    assert.deepEqual(state.departures.map((row) => [row.id, row.destination, row.platform, row.status]), [
+        ['cancelled', 'Bedford', 'Platform 4', 'cancelled'],
+        ['late', 'Bedford', 'Platform 4', 'delayed']
+    ]);
+    assert.equal(state.updatedAtEpoch, NOW_MS / 1000 - 10);
+    assert.equal(state.conditionRank, 1);
+});
+
+test('a train being cancelled is pushed at once, and failures never empty a Thameslink board', async () => {
+    const { notifier, client, store } = await fixture({ rows: [thameslinkSubscription()] });
+    let source = thameslinkSource([thameslinkDeparture()]);
+    notifier.thameslink = { departures: async () => source };
+    await notifier.notify(snapshotWith([]));
+    assert.equal(client.sends.length, 1);
+
+    for (const failing of [
+        async () => { throw new Error('offline'); },
+        async () => thameslinkSource([], NOW_MS, true),
+        async () => thameslinkSource([], NOW_MS - 91_000)
+    ]) {
+        notifier.thameslink = { departures: failing };
+        await notifier.notify(snapshotWith([]));
+    }
+    assert.equal(client.sends.length, 1);
+    assert.equal(store.get('activity-tl').lastBoard[0].id, 'tl-1');
+
+    source = thameslinkSource([thameslinkDeparture({ status: 'cancelled' })], NOW_MS - 5_000);
+    notifier.thameslink = { departures: async () => source };
+    await notifier.notify(snapshotWith([]));
+    assert.equal(client.sends.length, 2);
+    assert.equal(client.sends[1].priority, 10);
+    assert.equal(client.sends[1].payload.aps['content-state'].departures[0].status, 'cancelled');
+});
+
+test('boards tracking the same station share one fetch per pass', async () => {
+    const { notifier } = await fixture({
+        rows: [thameslinkSubscription(), thameslinkSubscription({ id: 'activity-tl-2', token: 'bb'.repeat(32) })]
+    });
+    let calls = 0;
+    notifier.thameslink = { departures: async () => { calls += 1; return thameslinkSource([thameslinkDeparture()]); } };
+    await notifier.notify(snapshotWith([]));
+    assert.equal(calls, 1);
+});

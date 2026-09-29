@@ -24,13 +24,19 @@ actor TubeTrainService: LiveTrainFetching {
         var tramPredictionsByVehicleID: [String: [TfLLiveTrainPrediction]] = [:]
         var dlrPredictions: [TfLLiveTrainPrediction] = []
 
+        // National Rail trains are estimated server-side from departure boards;
+        // everything else comes from the bulk live-arrivals feed.
+        let bulkLines = requestedLines.filter { !$0.isNationalRail }
+        async let nationalRailTrains = requested.contains(.thameslink)
+            ? thameslinkTrains() : []
+
         try Task.checkCancellation()
-        let predictions: [TfLLiveTrainPrediction] = try await client.get(
+        let predictions: [TfLLiveTrainPrediction] = bulkLines.isEmpty ? [] : try await client.get(
             "/api/v1/live",
             queryItems: [
                 URLQueryItem(
                     name: "lineIds",
-                    value: requestedLines.map(\.rawValue).joined(separator: ",")
+                    value: bulkLines.map(\.rawValue).joined(separator: ",")
                 ),
             ]
         )
@@ -132,9 +138,58 @@ actor TubeTrainService: LiveTrainFetching {
             repository: repository,
             now: now
         ))
+        trains.append(contentsOf: await nationalRailTrains)
 
         return trains.sorted { $0.id < $1.id }
     }
+
+    /// Thameslink positions estimated from station boards. A failure loses
+    /// those markers only, never the Tube, DLR or tram trains beside them.
+    private func thameslinkTrains() async -> [LiveTubeTrain] {
+        guard let response: TubeTrackAPIResponse<[ThameslinkTrainEstimate]> = try? await client.getSnapshot(
+            "/api/v1/thameslink/trains"
+        ) else {
+            return []
+        }
+        return response.data.compactMap { estimate in
+            guard let segment = repository.segment(
+                between: estimate.previousStationId,
+                and: estimate.nextStationId,
+                on: .thameslink
+            ) else {
+                return nil
+            }
+            return LiveTubeTrain(
+                id: estimate.id,
+                vehicleID: estimate.id,
+                lineID: .thameslink,
+                destination: estimate.destination,
+                direction: nil,
+                previousStationID: estimate.previousStationId,
+                nextStationID: estimate.nextStationId,
+                segmentID: segment.id,
+                progress: max(0, min(1, estimate.progress)),
+                secondsToNextStation: max(estimate.secondsToNextStation, 1),
+                // The server estimated these positions at this moment; moving
+                // them on from then keeps a cached answer from lagging behind.
+                updatedAt: response.updatedAt,
+                nextStopID: estimate.nextStopId == estimate.nextStationId ? nil : estimate.nextStopId,
+                nextStopExpectedAt: estimate.nextStopId == estimate.nextStationId ? nil : estimate.expectedArrival
+            )
+        }
+    }
+}
+
+/// One train placed by the server from Thameslink departure boards.
+struct ThameslinkTrainEstimate: Decodable, Sendable {
+    let id: String
+    let destination: String?
+    let previousStationId: String
+    let nextStationId: String
+    let progress: Double
+    let secondsToNextStation: Int
+    let nextStopId: String?
+    let expectedArrival: Date?
 }
 
 struct TramVehicleRouteContext: Equatable, Sendable {
@@ -647,6 +702,8 @@ private struct DLRRouteCandidate: Sendable {
 }
 
 enum TubeTrainRequestBatcher {
+    /// Lines to show live trains for; National Rail lines are fetched
+    /// separately from the bulk feed (see `TubeTrainService.fetch`).
     static func requestedLines(for lineIDs: Set<TubeLineID>) -> [TubeLineID] {
         (lineIDs.isEmpty ? TubeLineID.allCases : Array(lineIDs))
             .filter(\.supportsEstimatedTrains)

@@ -51,7 +51,7 @@ struct TubeTrackUKTests {
     }
 
     @Test func allTubeLinesHaveDisplayNames() {
-        #expect(TubeLineID.allCases.count == 20)
+        #expect(TubeLineID.allCases.count == 21)
         #expect(TubeLineID.undergroundCases.count == 11)
         #expect(TubeLineID.allCases.allSatisfy { !$0.displayName.isEmpty })
         #expect(TubeLineID.dlr.modeName == "dlr")
@@ -70,13 +70,15 @@ struct TubeTrackUKTests {
         #expect(TubeLineID.lioness.liveTrainMarkerAssetName == "TrainMarkerOverground")
         #expect(TubeLineID.elizabeth.liveTrainMarkerAssetName == "TrainMarkerOverground")
         #expect(TubeLineID.tram.liveTrainMarkerAssetName == "TrainMarkerTram")
+        #expect(TubeLineID.thameslink.liveTrainMarkerAssetName == "TrainMarkerThameslink")
+        #expect(TubeLineID.allCases.allSatisfy { UIImage(named: $0.liveTrainMarkerAssetName) != nil })
     }
 
     @Test func bundledGraphHasCompleteConnectedData() throws {
         let graph = try TubeGraph.bundled()
-        #expect(graph.lines.count == 20)
-        #expect(graph.stations.count == 509)
-        #expect(graph.segments.count == 618)
+        #expect(graph.lines.count == 21)
+        #expect(graph.stations.count == 571)
+        #expect(graph.segments.count == 683)
         #expect(graph.segments.allSatisfy { $0.geographicPoints.count >= 2 })
         #expect(graph.segments.filter { $0.geographicPoints.count > 2 }.count > 340)
         #expect(graph.source.attribution.contains("OpenStreetMap contributors"))
@@ -101,7 +103,7 @@ struct TubeTrackUKTests {
         #expect(bankStops.allSatisfy { $0.interchange })
 
         let wimbledonTram = try #require(graph.stationsByID["940GZZCRWMB"])
-        #expect(Set(graph.lineIDs(at: wimbledonTram)) == [.district, .tram])
+        #expect(Set(graph.lineIDs(at: wimbledonTram)) == [.district, .tram, .thameslink])
     }
 
     @Test func realWorldRailLinesUseDetailedTrackGeometry() throws {

@@ -269,9 +269,12 @@ struct RealWorldMapScreen: View {
         let affectedPolylines = renderData.polylines(covering: affectedSegmentIDs)
         let mobileCoverageMode = appState.mobileCoverageMode
         let mobileCoverage = appState.mobileCoverage
+        // TubeGraph's lookup is computed. Resolve it once, not once for every
+        // segment in each coverage pass during a camera or touch update.
+        let graphSegmentsByID = mobileCoverageMode.isActive ? appState.graph?.segmentsByID : nil
         let availableCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
             guard mobileCoverageMode.isActive,
-                  let graphSegment = appState.graph?.segmentsByID[segment.id],
+                  let graphSegment = graphSegmentsByID?[segment.id],
                   mobileCoverage?.availability(
                       for: graphSegment,
                       mode: mobileCoverageMode
@@ -280,7 +283,7 @@ struct RealWorldMapScreen: View {
         })
         let unknownCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
             guard mobileCoverageMode.isActive,
-                  let graphSegment = appState.graph?.segmentsByID[segment.id],
+                  let graphSegment = graphSegmentsByID?[segment.id],
                   mobileCoverage?.availability(
                       for: graphSegment,
                       mode: mobileCoverageMode
@@ -998,7 +1001,7 @@ private struct RealWorldTrainCanvas: View {
                            at: timeline.date,
                            visibleBounds: CGRect(origin: .zero, size: viewport.size), stationBoard: stationBoard
                        ),
-                       let nextStopName = stationsByID[train.nextStationID]?.name {
+                       let nextStopName = stationsByID[train.callingStationID]?.name {
                         TrainMapCalloutOverlay(
                             train: train,
                             servicePresentation: .resolve(
@@ -1076,11 +1079,20 @@ private extension MKCoordinateRegion {
     }
 }
 
+@MainActor
 struct RealWorldMapRenderData {
     let graphID: String
     let segments: [RealWorldRenderedSegment]
     let polylines: [RealWorldRenderedPolyline]
     let pathsBySegmentID: [String: RealWorldRenderPath]
+    private let allSegmentIDs: Set<String>
+    private let overlayCache = OverlayCache()
+
+    private final class OverlayCache {
+        // Four groups are used per render (affected/unaffected and two coverage
+        // groups). Retain a small bounded working set across presentation changes.
+        var entries: [(ids: Set<String>, polylines: [RealWorldRenderedPolyline])] = []
+    }
 
     init(graph: TubeGraph) {
         let stationsByID = graph.stationsByID
@@ -1095,14 +1107,23 @@ struct RealWorldMapRenderData {
         }
         graphID = graph.generatedAt
         segments = renderedSegments
+        allSegmentIDs = Set(renderedSegments.map(\.id))
         polylines = RealWorldPolylineBuilder.polylines(from: renderedSegments)
         pathsBySegmentID = Dictionary(uniqueKeysWithValues: renderedSegments.map { ($0.id, $0.path) })
     }
 
     func polylines(covering segmentIDs: Set<String>) -> [RealWorldRenderedPolyline] {
-        RealWorldPolylineBuilder.polylines(
+        guard !segmentIDs.isEmpty else { return [] }
+        if segmentIDs == allSegmentIDs { return polylines }
+        if let cached = overlayCache.entries.first(where: { $0.ids == segmentIDs }) {
+            return cached.polylines
+        }
+        let result = RealWorldPolylineBuilder.polylines(
             from: segments.filter { segmentIDs.contains($0.id) }
         )
+        if overlayCache.entries.count == 8 { overlayCache.entries.removeFirst() }
+        overlayCache.entries.append((segmentIDs, result))
+        return result
     }
 }
 
@@ -1356,7 +1377,7 @@ struct RealWorldRenderPath {
         case .victoria: 8
         case .waterlooCity: -4
         case .central, .northern, .dlr, .elizabeth, .tram, .liberty, .lioness, .mildmay,
-             .suffragette, .weaver, .windrush: 0
+             .suffragette, .weaver, .windrush, .thameslink: 0
         }
     }
 }

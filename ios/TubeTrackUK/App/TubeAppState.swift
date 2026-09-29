@@ -110,6 +110,7 @@ final class TubeAppState {
     let journeyPlanner: JourneyPlannerModel
     let cableCar: CableCarState
     let river: RiverBusState
+    let nationalRail: NationalRailStatusState
     let favourites: FavouriteStopsStore
     var showsWorks = false
     private static let appearanceModeKey = "appearanceMode"
@@ -250,6 +251,7 @@ final class TubeAppState {
         self.apiClient = sharedClient
         self.cableCar = CableCarState(client: sharedClient, defaults: defaults, cache: snapshotCache)
         self.river = RiverBusState(client: sharedClient, defaults: defaults, cache: snapshotCache)
+        self.nationalRail = NationalRailStatusState(client: sharedClient, cache: snapshotCache)
         self.favourites = FavouriteStopsStore(defaults: defaults)
         self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient))
         self.snapshotCache = snapshotCache
@@ -589,6 +591,10 @@ final class TubeAppState {
             statusError = error.localizedDescription
             isUsingCachedStatus = statusUpdatedAt != nil
         }
+        // Other operators' status is secondary: it runs after the lines' own
+        // status is published, and its failure is reported separately.
+        guard !Task.isCancelled else { return }
+        await nationalRail.refresh(forceRefresh: forceRefresh)
     }
 
     func refreshWorks(

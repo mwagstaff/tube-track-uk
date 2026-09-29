@@ -1,0 +1,245 @@
+{
+  "schemaVersion": 1,
+  "source": "Transport for London Unified API StopPoint lineModeGroups",
+  "operators": [
+    {
+      "id": "avanti-west-coast",
+      "name": "Avanti West Coast",
+      "stationIDs": [
+        "910GEUSTON",
+        "910GWATFJDC"
+      ]
+    },
+    {
+      "id": "c2c",
+      "name": "c2c",
+      "stationIDs": [
+        "910GBARKING",
+        "910GLIVST",
+        "910GLIVSTLL",
+        "910GSTFD",
+        "910GUPMNSTR"
+      ]
+    },
+    {
+      "id": "east-midlands-railway",
+      "name": "East Midlands Railway",
+      "stationIDs": [
+        "910GKNTSHTN",
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "gatwick-express",
+      "name": "Gatwick Express",
+      "stationIDs": [
+        "910GECROYDN",
+        "910GSCROYDN"
+      ]
+    },
+    {
+      "id": "grand-central",
+      "name": "Grand Central",
+      "stationIDs": [
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "great-northern",
+      "name": "Great Northern",
+      "stationIDs": [
+        "910GFNPK",
+        "910GHGHI",
+        "910GNBARNET",
+        "910GNEWSGAT",
+        "910GOKLGHPK",
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "great-western-railway",
+      "name": "Great Western Railway",
+      "stationIDs": [
+        "910GACTONML",
+        "910GBNHAM",
+        "910GEALINGB",
+        "910GHAYESAH",
+        "910GIVER",
+        "910GLANGLEY",
+        "910GMDNHEAD",
+        "910GPADTLL",
+        "910GPADTON",
+        "910GRDNGSTN",
+        "910GSLOUGH",
+        "910GSTHALL",
+        "910GTAPLOW",
+        "910GTWYFORD",
+        "910GWDRYTON",
+        "910GWEALING"
+      ]
+    },
+    {
+      "id": "greater-anglia",
+      "name": "Greater Anglia",
+      "stationIDs": [
+        "910GBRUCGRV",
+        "910GBTHNLGR",
+        "910GCAMHTH",
+        "910GCHESHNT",
+        "910GCLAPTON",
+        "910GEDMNGRN",
+        "910GGIDEAPK",
+        "910GHAKNYNM",
+        "910GILFORD",
+        "910GLIVST",
+        "910GLIVSTLL",
+        "910GLONFLDS",
+        "910GRCTRYRD",
+        "910GROMFORD",
+        "910GSBURY",
+        "910GSEVNSIS",
+        "910GSHENFLD",
+        "910GSIVRST",
+        "910GSTFD",
+        "910GSTKNWNG",
+        "910GSTMFDHL",
+        "910GSVNKNGS",
+        "910GTHBLDSG",
+        "910GTURKYST",
+        "910GWHHRTLA"
+      ]
+    },
+    {
+      "id": "heathrow-express",
+      "name": "Heathrow Express",
+      "stationIDs": [
+        "910GHTRWAPT",
+        "910GHTRWTM5",
+        "910GPADTLL",
+        "910GPADTON"
+      ]
+    },
+    {
+      "id": "hull-trains",
+      "name": "Hull Trains",
+      "stationIDs": [
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "london-north-eastern-railway",
+      "name": "London North Eastern Railway",
+      "stationIDs": [
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "lumo",
+      "name": "Lumo",
+      "stationIDs": [
+        "910GSTPXBOX"
+      ]
+    },
+    {
+      "id": "south-western-railway",
+      "name": "South Western Railway",
+      "stationIDs": [
+        "910GCLPHMJ1",
+        "910GCLPHMJC",
+        "910GRDNGSTN",
+        "910GRICHMND",
+        "910GWIMBLDN"
+      ]
+    },
+    {
+      "id": "southeastern",
+      "name": "Southeastern",
+      "stationIDs": [
+        "910GABWD",
+        "910GABWDXR",
+        "910GBCKNHMH",
+        "910GBELNGHM",
+        "910GBICKLEY",
+        "910GBLFR",
+        "910GBROMLYS",
+        "910GCATFORD",
+        "910GCFPK",
+        "910GCRLN",
+        "910GDARTFD",
+        "910GDENMRKH",
+        "910GDEPTFD",
+        "910GECROYDN",
+        "910GELPHNAC",
+        "910GGNWH",
+        "910GHERNEH",
+        "910GLBGHJN",
+        "910GLNDNBDC",
+        "910GMAZEH",
+        "910GNORWDJ",
+        "910GNUNHEAD",
+        "910GNWCRELL",
+        "910GORPNGTN",
+        "910GPCKHMRY",
+        "910GPETSWD",
+        "910GPLMS",
+        "910GRBRN",
+        "910GSHRTLND",
+        "910GSLADEGN",
+        "910GSTMRYC",
+        "910GSTPXBOX",
+        "910GSWLY",
+        "910GWCOMBEP",
+        "910GWOLWCHA"
+      ]
+    },
+    {
+      "id": "southern",
+      "name": "Southern",
+      "stationIDs": [
+        "910GANERLEY",
+        "910GBROCKLY",
+        "910GCLPHMJ1",
+        "910GCLPHMJC",
+        "910GCOLSDNS",
+        "910GCRSHLTN",
+        "910GCRYSTLP",
+        "910GCSEAH",
+        "910GECROYDN",
+        "910GESTFLDS",
+        "910GFORESTH",
+        "910GHKBG",
+        "910GHONROPK",
+        "910GHROW",
+        "910GKENOLYM",
+        "910GLNDNBDC",
+        "910GMITCHMJ",
+        "910GNEWXGTE",
+        "910GNORWDJ",
+        "910GPCKHMQD",
+        "910GPCKHMRY",
+        "910GPENEW",
+        "910GPURLEY",
+        "910GSCROYDN",
+        "910GSHPDSB",
+        "910GSTRETHM",
+        "910GSUTTON",
+        "910GSYDENHM",
+        "910GTULSEH",
+        "910GWATFJDC",
+        "910GWBRMPTN",
+        "910GWCROYDN",
+        "910GWMBY"
+      ]
+    },
+    {
+      "id": "west-midlands-trains",
+      "name": "West Midlands Trains",
+      "stationIDs": [
+        "910GBUSHYDC",
+        "910GEUSTON",
+        "910GHROW",
+        "910GWATFJDC"
+      ]
+    }
+  ]
+}

@@ -66,6 +66,9 @@ struct StationDetailCard: View {
                     onSelectLine: appState.selectDepartureLine
                 )
                 .id("\(station.id):\(appState.stationSelectionGeneration)")
+                StationNationalRailOperators(
+                    stationIDs: appState.graph?.stations(inSamePlaceAs: station).map(\.id) ?? [station.id]
+                )
                 CardUpdateFooter(updatedAt: appState.stationArrivalsSourceUpdatedAt ?? appState.stationArrivalsUpdatedAt,
                     isOffline: appState.isOffline,
                     isStale: appState.stationArrivalsStale || appState.stationArrivalsError != nil)
@@ -326,7 +329,7 @@ private struct TrainMapCallout: View {
     }
 
     private var remainingSeconds: Int {
-        train.remainingSecondsToNextStation(at: date)
+        train.secondsToNextStop(at: date)
     }
 
     private var directionName: String? {
@@ -342,7 +345,7 @@ private struct TrainMapCallout: View {
     private var lineHeaderForeground: Color {
         switch train.lineID {
         case .circle, .hammersmithCity, .jubilee, .victoria, .waterlooCity,
-             .dlr, .tram, .lioness, .mildmay, .suffragette:
+             .dlr, .tram, .lioness, .mildmay, .suffragette, .thameslink:
             .black
         case .bakerloo, .central, .district, .metropolitan, .northern,
              .piccadilly, .elizabeth, .liberty, .weaver,

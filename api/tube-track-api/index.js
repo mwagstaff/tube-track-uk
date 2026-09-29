@@ -8,12 +8,12 @@ import { PlannedTrackClosuresSource } from './lib/planned-works.js';
 import { ApnsClient, ApnsTokenSigner } from './lib/push/apns.js';
 import { LiveActivityNotifier } from './lib/push/notifier.js';
 import { PushTokenStore } from './lib/push/token-store.js';
+import { loadLineStatuses } from './lib/line-status.js';
 import { createRiverDataSource } from './lib/river.js';
+import { createThameslinkDataSource } from './lib/thameslink.js';
 import { ResourceCache } from './lib/resource-cache.js';
 import { TfLClient } from './lib/tfl-client.js';
 import { UsageStore } from './lib/usage-store.js';
-
-const STATUS_MODES = 'tube,dlr,elizabeth-line,overground,tram';
 
 /**
  * Builds the push stack, or nothing at all when APNs is not configured.
@@ -59,20 +59,12 @@ async function createPushStack({ config, logger, metrics, resourceCache, client 
             client: apns,
             topic: config.push.liveActivityTopic,
             river: createRiverDataSource({ client, resourceCache }),
+            thameslink: createThameslinkDataSource({ client, resourceCache }),
             logger,
             metrics,
             // Reuses the cache behind /api/v1/status, so a tracked board's
             // headline costs no extra TfL request in the common case.
-            statuses: async () => {
-                const result = await resourceCache.get('status', {
-                    freshForMs: 60_000,
-                    load: () => client.fetchJSON(`/Line/Mode/${STATUS_MODES}/Status`, {
-                        query: { detail: 'true' },
-                        metricLabel: 'status'
-                    })
-                });
-                return result.data;
-            }
+            statuses: async () => (await loadLineStatuses({ client, resourceCache })).data
         });
 
         metrics.setPushTokens(store.countByType());

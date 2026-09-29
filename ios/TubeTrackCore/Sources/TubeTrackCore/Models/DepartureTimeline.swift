@@ -29,7 +29,10 @@ public enum DepartureTimeline {
                 towards: arrival.towards,
                 expectedArrival: producedAt.addingTimeInterval(TimeInterval(seconds)),
                 timeToStation: seconds,
-                currentLocation: arrival.currentLocation
+                currentLocation: arrival.currentLocation,
+                scheduledDeparture: arrival.scheduledDeparture,
+                serviceStatus: arrival.serviceStatus,
+                serviceCause: arrival.serviceCause
             )
         }
     }

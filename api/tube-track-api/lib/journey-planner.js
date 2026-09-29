@@ -2,10 +2,19 @@ import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { JourneyDisruptions } from './journey-disruptions.js';
 import { explicitInstant, parseJourneyTime, tflDateTime } from './journey-time.js';
+import { includedLineIDs } from './line-gating.js';
 
 const catalogue = JSON.parse(readFileSync(new URL('../data/journey-stations.json', import.meta.url)));
 const MODES = 'tube,dlr,overground,elizabeth-line,tram';
-const RAIL_MODES = new Set(MODES.split(','));
+// Thameslink is the only National Rail line the app draws. Clients that know
+// it ask for it (`include=thameslink`); any other operator's leg still rejects
+// the whole journey rather than silently sending someone onto a Southern train.
+const NATIONAL_RAIL_MODE = 'national-rail';
+const NATIONAL_RAIL_LINE_IDS = new Set(['thameslink']);
+const RAIL_MODES = new Set([...MODES.split(','), NATIONAL_RAIL_MODE]);
+// TfL's journey data names St Pancras's main station; the app's Thameslink
+// stop is its own platforms, which is the stop departures are published for.
+const NATIONAL_RAIL_STOP_ALIASES = new Map([['910GSTPX', '910GSTPXBOX']]);
 const ACCESSIBILITY = { none: 'NoRequirements', platform: 'StepFreeToPlatform', train: 'StepFreeToVehicle' };
 const hash = (value) => createHash('sha256').update(value).digest('hex').slice(0, 20);
 const clean = (value) => String(value ?? '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
@@ -46,7 +55,8 @@ export class JourneyPlanner {
     }
 
     validate(query) {
-        const allowed = new Set(['from', 'to', 'timeMode', 'time', 'accessibility']);
+        // `include` opts a client into newer lines (see line-gating.js).
+        const allowed = new Set(['from', 'to', 'timeMode', 'time', 'accessibility', 'include']);
         if (Object.entries(query).some(([key, value]) => !allowed.has(key) || typeof value !== 'string')) {
             throw new JourneyError('INVALID_QUERY', 'Use one value per supported journey parameter.');
         }
@@ -68,7 +78,8 @@ export class JourneyPlanner {
         if (!Object.hasOwn(ACCESSIBILITY, accessibility)) {
             throw new JourneyError('INVALID_ACCESSIBILITY', 'Choose none, platform or train.');
         }
-        return { from, to, timeMode, requestedAt, accessibility };
+        const nationalRail = includedLineIDs(query).has('thameslink');
+        return { from, to, timeMode, requestedAt, accessibility, nationalRail };
     }
 
     async fetch(path, options = {}) {
@@ -106,7 +117,7 @@ export class JourneyPlanner {
         const request = this.validate(query);
         const key = JSON.stringify([request.from.id, request.to.id, request.timeMode,
             request.timeMode === 'now' ? Math.floor(request.requestedAt / 15_000) : request.requestedAt,
-            request.accessibility]);
+            request.accessibility, request.nationalRail]);
         let entry = this.cache.get(key);
         const cached = !!entry && entry.expiresAt > this.clock();
         if (!cached) {
@@ -161,7 +172,8 @@ export class JourneyPlanner {
             : Math.ceil(request.requestedAt / 60_000) * 60_000;
         const query = {
             ...tflDateTime(queryTime), timeIs: request.timeMode === 'arriveBy' ? 'Arriving' : 'Departing',
-            mode: MODES, journeyPreference: 'LeastTime', includeAlternativeRoutes: 'true',
+            mode: request.nationalRail ? `${MODES},${NATIONAL_RAIL_MODE}` : MODES,
+            journeyPreference: 'LeastTime', includeAlternativeRoutes: 'true',
             calcOneDirection: 'true', useRealTimeLiveArrivals: 'true', applyHtmlMarkup: 'false',
             accessibilityPreference: ACCESSIBILITY[request.accessibility]
         };
@@ -242,15 +254,20 @@ export function normalizeJourney(raw, request) {
     for (const [index, leg] of raw.legs.entries()) {
         const mode = leg.mode?.id;
         if (!RAIL_MODES.has(mode) && mode !== 'walking') return null;
+        const nationalRailLine = mode === NATIONAL_RAIL_MODE
+            ? (leg.routeOptions ?? []).map((r) => r.lineIdentifier?.id ?? r.id).find((id) => NATIONAL_RAIL_LINE_IDS.has(id))
+            : null;
+        if (mode === NATIONAL_RAIL_MODE && (!request.nationalRail || !nationalRailLine)) return null;
         const start = parseJourneyTime(leg.departureTime, anchor);
         const end = parseJourneyTime(leg.arrivalTime, start ?? anchor);
         if (start === null || end === null || end < start || start < anchor) return null;
         anchor = end;
-        const point = (p) => ({ id: p?.naptanId ?? p?.id ?? '', name: clean(p?.commonName), platform: clean(p?.platformName) || null });
+        const stopId = (id) => (nationalRailLine ? NATIONAL_RAIL_STOP_ALIASES.get(id) : null) ?? id ?? '';
+        const point = (p) => ({ id: stopId(p?.naptanId ?? p?.id), name: clean(p?.commonName), platform: clean(p?.platformName) || null });
         const lines = (leg.routeOptions ?? []).map((r) => ({
             id: r.lineIdentifier?.id ?? r.id ?? '', name: clean(r.lineIdentifier?.name ?? r.name),
             direction: clean(r.directions?.join(' / '))
-        })).filter((line) => line.name);
+        })).filter((line) => line.name && (!nationalRailLine || line.id === nationalRailLine));
         const warnings = [...(leg.disruptions ?? []), ...(leg.plannedWorks ?? []).map((w) => ({ ...w, category: 'PlannedWork' }))]
             .map((w) => normalizeWarning(w, index)).filter(Boolean);
         const scheduledDeparture = parseJourneyTime(leg.scheduledDepartureTime, start);
@@ -264,7 +281,7 @@ export function normalizeJourney(raw, request) {
             timing: scheduledDeparture !== null && scheduledDeparture !== start
                 || scheduledArrival !== null && scheduledArrival !== end ? 'adjusted' : 'estimated',
             durationMinutes: Math.round((end - start) / 60_000), warnings,
-            stops: (leg.path?.stopPoints ?? []).map((p) => ({ id: p.id ?? '', name: clean(p.name) }))
+            stops: (leg.path?.stopPoints ?? []).map((p) => ({ id: stopId(p.id), name: clean(p.name) }))
         });
     }
     if (anchor > arrival || !legs.some((l) => RAIL_MODES.has(l.mode))) return null;

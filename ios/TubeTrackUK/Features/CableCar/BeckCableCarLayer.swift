@@ -91,9 +91,9 @@ struct BeckCableCarLayer: View {
                     context.draw(label, in: frame.insetBy(dx: 4, dy: 2))
                 }
             }
-            if cable.presentation.kind != .open {
+            if cable.presentation.kind != .open && !cable.presentation.isClosed {
                 let center = screen(CableCarSchematic.midpoint)
-                let text = scale >= 0.9 || cable.hasSelection ? cable.presentation.headline : cable.presentation.isClosed ? "Closed" : "Cable Car"
+                let text = scale >= 0.9 || cable.hasSelection ? cable.presentation.headline : "Cable Car"
                 let label = context.resolve(Text(text).font(.system(size: 11 * min(typeScale, 1.5), weight: .semibold)).foregroundStyle(.primary))
                 let size = label.measure(in: CGSize(width: 200, height: 70))
                 let frame = CGRect(x: center.x - size.width / 2 - 7, y: center.y - size.height - 13, width: size.width + 14, height: size.height + 8)

@@ -54,7 +54,7 @@ struct BeckMapTests {
             disruptions: disruptions
         )
 
-        #expect(summary.count(for: .lines) == 20)
+        #expect(summary.count(for: .lines) == 21)
         #expect(summary.goodServiceLineIDs == [.circle])
         #expect(summary.minorDelayLineIDs == [.victoria])
         #expect(summary.majorIssueLineIDs == [.central])
@@ -124,8 +124,8 @@ struct BeckMapTests {
             disruptions: disruptions
         )
 
-        #expect(summary.count(for: .lines) == 20)
-        #expect(summary.count(for: .goodService) == 17)
+        #expect(summary.count(for: .lines) == 21)
+        #expect(summary.count(for: .goodService) == 18)
         #expect(summary.minorDelayLineIDs == [.metropolitan])
         #expect(summary.majorIssueLineIDs == [.elizabeth, .victoria])
         #expect(summary.closedLineIDs.isEmpty)
@@ -185,10 +185,10 @@ struct BeckMapTests {
             isViewingLiveStatus: false
         )
 
-        #expect(summary.count(for: .lines) == 20)
+        #expect(summary.count(for: .lines) == 21)
         #expect(summary.disruptedLineIDs == [.central, .dlr])
         #expect(summary.count(for: .disrupted) == 2)
-        #expect(summary.count(for: .goodService) == 18)
+        #expect(summary.count(for: .goodService) == 19)
         #expect(summary.minorDelayLineIDs.isEmpty)
         #expect(summary.majorIssueLineIDs.isEmpty)
         #expect(summary.closedLineIDs.isEmpty)

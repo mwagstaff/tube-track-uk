@@ -20,7 +20,8 @@ const lines = [
     ['mildmay', 'Mildmay line', 'overground', '#2486CB', '#000000'],
     ['suffragette', 'Suffragette line', 'overground', '#59C364', '#000000'],
     ['weaver', 'Weaver line', 'overground', '#B0237F', '#FFFFFF'],
-    ['windrush', 'Windrush line', 'overground', '#ED192E', '#000000']
+    ['windrush', 'Windrush line', 'overground', '#ED192E', '#000000'],
+    ['thameslink', 'Thameslink', 'national-rail', '#D66FAA', '#000000']
 ];
 
 export const LINE_COLOURS = Object.freeze(lines.map(([id, name, mode, colour, textColour]) =>

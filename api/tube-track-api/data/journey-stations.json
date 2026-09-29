@@ -1,5 +1,5 @@
 {
-  "version": "2026-08-23T20:26:26.921154+00:00",
+  "version": "2026-09-27T22:46:18.999647+00:00",
   "attribution": "Powered by TfL Open Data",
   "stations": [
     {
@@ -22,14 +22,16 @@
       "id": "HUBABW",
       "name": "Abbey Wood",
       "stopIds": [
-        "910GABWDXR"
+        "910GABWDXR",
+        "910GABWD"
       ],
       "aliases": [
         "Abbey Wood",
         "abbey wood"
       ],
       "lineIds": [
-        "elizabeth"
+        "elizabeth",
+        "thameslink"
       ],
       "latitude": 51.491284,
       "longitude": 0.121087
@@ -503,6 +505,22 @@
       "longitude": -0.187938
     },
     {
+      "id": "910GBCKNHMH",
+      "name": "Beckenham Hill",
+      "stopIds": [
+        "910GBCKNHMH"
+      ],
+      "aliases": [
+        "Beckenham Hill",
+        "beckenham hill"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.424583,
+      "longitude": -0.015951
+    },
+    {
       "id": "HUBBEK",
       "name": "Beckenham Junction",
       "stopIds": [
@@ -615,6 +633,22 @@
       "longitude": -0.17774
     },
     {
+      "id": "910GBELNGHM",
+      "name": "Bellingham",
+      "stopIds": [
+        "910GBELNGHM"
+      ],
+      "aliases": [
+        "Bellingham",
+        "bellingham"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.432913,
+      "longitude": -0.019331
+    },
+    {
       "id": "940GZZLUBZP",
       "name": "Belsize Park",
       "stopIds": [
@@ -679,6 +713,22 @@
       "longitude": -0.059568
     },
     {
+      "id": "910GBICKLEY",
+      "name": "Bickley",
+      "stopIds": [
+        "910GBICKLEY"
+      ],
+      "aliases": [
+        "Bickley",
+        "bickley"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.400104,
+      "longitude": 0.045241
+    },
+    {
       "id": "HUBBIR",
       "name": "Birkbeck",
       "stopIds": [
@@ -698,7 +748,8 @@
       "id": "HUBBFR",
       "name": "Blackfriars",
       "stopIds": [
-        "940GZZLUBKF"
+        "940GZZLUBKF",
+        "910GBLFR"
       ],
       "aliases": [
         "Blackfriars",
@@ -706,7 +757,8 @@
       ],
       "lineIds": [
         "circle",
-        "district"
+        "district",
+        "thameslink"
       ],
       "latitude": 51.511581,
       "longitude": -0.103659
@@ -878,6 +930,22 @@
       "longitude": -0.213622
     },
     {
+      "id": "910GBRENTX",
+      "name": "Brent Cross West",
+      "stopIds": [
+        "910GBRENTX"
+      ],
+      "aliases": [
+        "Brent Cross West",
+        "brent cross west"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.568429,
+      "longitude": -0.225488
+    },
+    {
       "id": "910GBRTWOOD",
       "name": "Brentwood",
       "stopIds": [
@@ -924,6 +992,22 @@
       ],
       "latitude": 51.464649,
       "longitude": -0.037537
+    },
+    {
+      "id": "910GBROMLYS",
+      "name": "Bromley South",
+      "stopIds": [
+        "910GBROMLYS"
+      ],
+      "aliases": [
+        "Bromley South",
+        "bromley south"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.399976,
+      "longitude": 0.017344
     },
     {
       "id": "940GZZLUBBB",
@@ -1278,6 +1362,38 @@
       "longitude": -0.385939
     },
     {
+      "id": "910GCRSHLTN",
+      "name": "Carshalton",
+      "stopIds": [
+        "910GCRSHLTN"
+      ],
+      "aliases": [
+        "Carshalton",
+        "carshalton"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.368454,
+      "longitude": -0.166368
+    },
+    {
+      "id": "910GCATFORD",
+      "name": "Catford",
+      "stopIds": [
+        "910GCATFORD"
+      ],
+      "aliases": [
+        "Catford",
+        "catford"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.444407,
+      "longitude": -0.026317
+    },
+    {
       "id": "940GZZCRCTR",
       "name": "Centrale",
       "stopIds": [
@@ -1374,6 +1490,22 @@
       ],
       "latitude": 51.50741,
       "longitude": -0.127277
+    },
+    {
+      "id": "910GCRLN",
+      "name": "Charlton",
+      "stopIds": [
+        "910GCRLN"
+      ],
+      "aliases": [
+        "Charlton",
+        "charlton"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.486813,
+      "longitude": 0.031258
     },
     {
       "id": "940GZZLUCSM",
@@ -1486,6 +1618,22 @@
       ],
       "latitude": 51.373708,
       "longitude": -0.104361
+    },
+    {
+      "id": "910GCTMSLNK",
+      "name": "City Thameslink",
+      "stopIds": [
+        "910GCTMSLNK"
+      ],
+      "aliases": [
+        "City Thameslink",
+        "city thameslink"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.513936,
+      "longitude": -0.10359
     },
     {
       "id": "940GZZLUCPC",
@@ -1650,6 +1798,22 @@
       "longitude": -0.05956
     },
     {
+      "id": "910GCOLSDNS",
+      "name": "Coulsdon South",
+      "stopIds": [
+        "910GCOLSDNS"
+      ],
+      "aliases": [
+        "Coulsdon South",
+        "coulsdon south"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.315838,
+      "longitude": -0.137887
+    },
+    {
       "id": "940GZZLUCGN",
       "name": "Covent Garden",
       "stopIds": [
@@ -1664,6 +1828,38 @@
       ],
       "latitude": 51.513093,
       "longitude": -0.124436
+    },
+    {
+      "id": "910GCRKLWD",
+      "name": "Cricklewood",
+      "stopIds": [
+        "910GCRKLWD"
+      ],
+      "aliases": [
+        "Cricklewood",
+        "cricklewood"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.558453,
+      "longitude": -0.212677
+    },
+    {
+      "id": "910GCFPK",
+      "name": "Crofton Park",
+      "stopIds": [
+        "910GCFPK"
+      ],
+      "aliases": [
+        "Crofton Park",
+        "crofton park"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.455189,
+      "longitude": -0.036503
     },
     {
       "id": "940GZZDLCLA",
@@ -1846,6 +2042,22 @@
       "longitude": -0.075701
     },
     {
+      "id": "910GDARTFD",
+      "name": "Dartford",
+      "stopIds": [
+        "910GDARTFD"
+      ],
+      "aliases": [
+        "Dartford",
+        "dartford"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.447371,
+      "longitude": 0.219248
+    },
+    {
       "id": "940GZZLUDBN",
       "name": "Debden",
       "stopIds": [
@@ -1872,10 +2084,27 @@
         "denmark hill"
       ],
       "lineIds": [
+        "thameslink",
         "windrush"
       ],
       "latitude": 51.468203,
       "longitude": -0.089361
+    },
+    {
+      "id": "910GDEPTFD",
+      "name": "Deptford",
+      "stopIds": [
+        "910GDEPTFD"
+      ],
+      "aliases": [
+        "Deptford",
+        "deptford"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.478848,
+      "longitude": -0.02627
     },
     {
       "id": "940GZZDLDEP",
@@ -2014,13 +2243,15 @@
       "id": "HUBECY",
       "name": "East Croydon",
       "stopIds": [
-        "940GZZCRECR"
+        "940GZZCRECR",
+        "910GECROYDN"
       ],
       "aliases": [
         "East Croydon",
         "east croydon"
       ],
       "lineIds": [
+        "thameslink",
         "tram"
       ],
       "latitude": 51.374863,
@@ -2178,7 +2409,8 @@
       "id": "HUBEPH",
       "name": "Elephant & Castle",
       "stopIds": [
-        "940GZZLUEAC"
+        "940GZZLUEAC",
+        "910GELPHNAC"
       ],
       "aliases": [
         "Elephant & Castle",
@@ -2187,7 +2419,8 @@
       ],
       "lineIds": [
         "bakerloo",
-        "northern"
+        "northern",
+        "thameslink"
       ],
       "latitude": 51.494536,
       "longitude": -0.100606
@@ -2223,6 +2456,23 @@
       ],
       "latitude": 51.398474,
       "longitude": -0.049557
+    },
+    {
+      "id": "910GELTR",
+      "name": "Elstree & Borehamwood",
+      "stopIds": [
+        "910GELTR"
+      ],
+      "aliases": [
+        "Elstree & Borehamwood",
+        "elstree & borehamwood",
+        "elstree and borehamwood"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.653069,
+      "longitude": -0.280081
     },
     {
       "id": "940GZZDLELV",
@@ -2367,7 +2617,8 @@
       "name": "Farringdon",
       "stopIds": [
         "940GZZLUFCN",
-        "910GFRNDXR"
+        "910GFRNDXR",
+        "910GFRNDNLT"
       ],
       "aliases": [
         "Farringdon",
@@ -2377,7 +2628,8 @@
         "circle",
         "elizabeth",
         "hammersmith-city",
-        "metropolitan"
+        "metropolitan",
+        "thameslink"
       ],
       "latitude": 51.520252,
       "longitude": -0.104913
@@ -2452,7 +2704,8 @@
       "id": "HUBFPK",
       "name": "Finsbury Park",
       "stopIds": [
-        "940GZZLUFPK"
+        "940GZZLUFPK",
+        "910GFNPK"
       ],
       "aliases": [
         "Finsbury Park",
@@ -2460,6 +2713,7 @@
       ],
       "lineIds": [
         "piccadilly",
+        "thameslink",
         "victoria"
       ],
       "latitude": 51.564158,
@@ -2765,14 +3019,18 @@
       "id": "HUBGNW",
       "name": "Greenwich DLR Station",
       "stopIds": [
-        "940GZZDLGRE"
+        "940GZZDLGRE",
+        "910GGNWH"
       ],
       "aliases": [
         "Greenwich DLR Station",
-        "greenwich dlr station"
+        "greenwich dlr station",
+        "Greenwich",
+        "greenwich"
       ],
       "lineIds": [
-        "dlr"
+        "dlr",
+        "thameslink"
       ],
       "latitude": 51.478087,
       "longitude": -0.013673
@@ -2794,6 +3052,22 @@
       ],
       "latitude": 51.491803,
       "longitude": -0.275267
+    },
+    {
+      "id": "910GHKBG",
+      "name": "Hackbridge",
+      "stopIds": [
+        "910GHKBG"
+      ],
+      "aliases": [
+        "Hackbridge",
+        "hackbridge"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.37672,
+      "longitude": -0.15329
     },
     {
       "id": "910GHACKNYC",
@@ -3097,6 +3371,22 @@
       "longitude": -0.423191
     },
     {
+      "id": "910GHYDNSRD",
+      "name": "Haydons Road",
+      "stopIds": [
+        "910GHYDNSRD"
+      ],
+      "aliases": [
+        "Haydons Road",
+        "haydons road"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.425448,
+      "longitude": -0.188815
+    },
+    {
       "id": "910GHAYESAH",
       "name": "Hayes & Harlington",
       "stopIds": [
@@ -3185,6 +3475,22 @@
       "longitude": -0.452265
     },
     {
+      "id": "910GHDON",
+      "name": "Hendon",
+      "stopIds": [
+        "910GHDON"
+      ],
+      "aliases": [
+        "Hendon",
+        "hendon"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.580068,
+      "longitude": -0.238674
+    },
+    {
       "id": "940GZZLUHCL",
       "name": "Hendon Central",
       "stopIds": [
@@ -3199,6 +3505,22 @@
       ],
       "latitude": 51.583301,
       "longitude": -0.226424
+    },
+    {
+      "id": "910GHERNEH",
+      "name": "Herne Hill",
+      "stopIds": [
+        "910GHERNEH"
+      ],
+      "aliases": [
+        "Herne Hill",
+        "herne hill"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.453305,
+      "longitude": -0.102289
     },
     {
       "id": "940GZZDLHEQ",
@@ -3648,14 +3970,16 @@
       "id": "HUBKTN",
       "name": "Kentish Town",
       "stopIds": [
-        "940GZZLUKSH"
+        "940GZZLUKSH",
+        "910GKNTSHTN"
       ],
       "aliases": [
         "Kentish Town",
         "kentish town"
       ],
       "lineIds": [
-        "northern"
+        "northern",
+        "thameslink"
       ],
       "latitude": 51.550312,
       "longitude": -0.140733
@@ -3796,11 +4120,14 @@
       "id": "HUBKGX",
       "name": "King's Cross St. Pancras",
       "stopIds": [
-        "940GZZLUKSX"
+        "940GZZLUKSX",
+        "910GSTPXBOX"
       ],
       "aliases": [
         "King's Cross St. Pancras",
-        "king's cross st. pancras"
+        "king's cross st. pancras",
+        "St Pancras International",
+        "st pancras international"
       ],
       "lineIds": [
         "circle",
@@ -3808,6 +4135,7 @@
         "metropolitan",
         "northern",
         "piccadilly",
+        "thameslink",
         "victoria"
       ],
       "latitude": 51.530663,
@@ -4117,7 +4445,8 @@
       "id": "HUBLBG",
       "name": "London Bridge",
       "stopIds": [
-        "940GZZLULNB"
+        "940GZZLULNB",
+        "910GLNDNBDC"
       ],
       "aliases": [
         "London Bridge",
@@ -4125,7 +4454,8 @@
       ],
       "lineIds": [
         "jubilee",
-        "northern"
+        "northern",
+        "thameslink"
       ],
       "latitude": 51.505721,
       "longitude": -0.088873
@@ -4161,6 +4491,22 @@
       ],
       "latitude": 51.541153,
       "longitude": -0.057753
+    },
+    {
+      "id": "910GLBGHJN",
+      "name": "Loughborough Junction",
+      "stopIds": [
+        "910GLBGHJN"
+      ],
+      "aliases": [
+        "Loughborough Junction",
+        "loughborough junction"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.466298,
+      "longitude": -0.102182
     },
     {
       "id": "940GZZLULGN",
@@ -4308,6 +4654,22 @@
       "longitude": -0.163207
     },
     {
+      "id": "910GMAZEH",
+      "name": "Maze Hill",
+      "stopIds": [
+        "910GMAZEH"
+      ],
+      "aliases": [
+        "Maze Hill",
+        "maze hill"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.482625,
+      "longitude": 0.002914
+    },
+    {
       "id": "940GZZCRMTP",
       "name": "Merton Park",
       "stopIds": [
@@ -4342,6 +4704,22 @@
       "longitude": -0.03364
     },
     {
+      "id": "910GMLHB",
+      "name": "Mill Hill Broadway",
+      "stopIds": [
+        "910GMLHB"
+      ],
+      "aliases": [
+        "Mill Hill Broadway",
+        "mill hill broadway"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.613093,
+      "longitude": -0.24924
+    },
+    {
       "id": "940GZZLUMHL",
       "name": "Mill Hill East",
       "stopIds": [
@@ -4374,16 +4752,34 @@
       "longitude": -0.1709
     },
     {
+      "id": "910GESTFLDS",
+      "name": "Mitcham Eastfields",
+      "stopIds": [
+        "910GESTFLDS"
+      ],
+      "aliases": [
+        "Mitcham Eastfields",
+        "mitcham eastfields"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.407739,
+      "longitude": -0.154646
+    },
+    {
       "id": "HUBMJT",
       "name": "Mitcham Junction",
       "stopIds": [
-        "940GZZCRMJT"
+        "940GZZCRMJT",
+        "910GMITCHMJ"
       ],
       "aliases": [
         "Mitcham Junction",
         "mitcham junction"
       ],
       "lineIds": [
+        "thameslink",
         "tram"
       ],
       "latitude": 51.392868,
@@ -4474,6 +4870,22 @@
       "longitude": -0.192834
     },
     {
+      "id": "910GMORDENS",
+      "name": "Morden South",
+      "stopIds": [
+        "910GMORDENS"
+      ],
+      "aliases": [
+        "Morden South",
+        "morden south"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.396116,
+      "longitude": -0.199461
+    },
+    {
       "id": "940GZZLUMTC",
       "name": "Mornington Crescent",
       "stopIds": [
@@ -4538,6 +4950,22 @@
       "longitude": -0.017412
     },
     {
+      "id": "910GNBARNET",
+      "name": "New Barnet",
+      "stopIds": [
+        "910GNBARNET"
+      ],
+      "aliases": [
+        "New Barnet",
+        "new barnet"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.648575,
+      "longitude": -0.172997
+    },
+    {
       "id": "HUBNWX",
       "name": "New Cross ELL",
       "stopIds": [
@@ -4568,6 +4996,22 @@
       ],
       "latitude": 51.475128,
       "longitude": -0.040399
+    },
+    {
+      "id": "910GNEWSGAT",
+      "name": "New Southgate",
+      "stopIds": [
+        "910GNEWSGAT"
+      ],
+      "aliases": [
+        "New Southgate",
+        "new southgate"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.614114,
+      "longitude": -0.143038
     },
     {
       "id": "940GZZLUNBP",
@@ -4774,6 +5218,7 @@
         "norwood junction"
       ],
       "lineIds": [
+        "thameslink",
         "windrush"
       ],
       "latitude": 51.397019,
@@ -4796,6 +5241,38 @@
       ],
       "latitude": 51.509128,
       "longitude": -0.196104
+    },
+    {
+      "id": "910GNUNHEAD",
+      "name": "Nunhead",
+      "stopIds": [
+        "910GNUNHEAD"
+      ],
+      "aliases": [
+        "Nunhead",
+        "nunhead"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.466828,
+      "longitude": -0.052273
+    },
+    {
+      "id": "910GOKLGHPK",
+      "name": "Oakleigh Park",
+      "stopIds": [
+        "910GOKLGHPK"
+      ],
+      "aliases": [
+        "Oakleigh Park",
+        "oakleigh park"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.637678,
+      "longitude": -0.166209
     },
     {
       "id": "940GZZLUOAK",
@@ -4828,6 +5305,22 @@
       ],
       "latitude": 51.525864,
       "longitude": -0.08777
+    },
+    {
+      "id": "910GORPNGTN",
+      "name": "Orpington",
+      "stopIds": [
+        "910GORPNGTN"
+      ],
+      "aliases": [
+        "Orpington",
+        "orpington"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.373296,
+      "longitude": 0.089091
     },
     {
       "id": "940GZZLUOSY",
@@ -4950,6 +5443,7 @@
         "peckham rye"
       ],
       "lineIds": [
+        "thameslink",
         "windrush"
       ],
       "latitude": 51.470034,
@@ -4986,6 +5480,22 @@
       ],
       "latitude": 51.536717,
       "longitude": -0.323446
+    },
+    {
+      "id": "910GPETSWD",
+      "name": "Petts Wood",
+      "stopIds": [
+        "910GPETSWD"
+      ],
+      "aliases": [
+        "Petts Wood",
+        "petts wood"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.388619,
+      "longitude": 0.074481
     },
     {
       "id": "940GZZCRPHI",
@@ -5070,6 +5580,22 @@
       "longitude": 0.017451
     },
     {
+      "id": "910GPLMS",
+      "name": "Plumstead",
+      "stopIds": [
+        "910GPLMS"
+      ],
+      "aliases": [
+        "Plumstead",
+        "plumstead"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.489795,
+      "longitude": 0.084257
+    },
+    {
       "id": "940GZZDLPDK",
       "name": "Pontoon Dock DLR Station",
       "stopIds": [
@@ -5148,6 +5674,22 @@
       ],
       "latitude": 51.534302,
       "longitude": -0.012755
+    },
+    {
+      "id": "910GPURLEY",
+      "name": "Purley",
+      "stopIds": [
+        "910GPURLEY"
+      ],
+      "aliases": [
+        "Purley",
+        "purley"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.337579,
+      "longitude": -0.114035
     },
     {
       "id": "940GZZLUPYB",
@@ -5232,6 +5774,22 @@
       ],
       "latitude": 51.510312,
       "longitude": -0.187152
+    },
+    {
+      "id": "910GRBRN",
+      "name": "Ravensbourne",
+      "stopIds": [
+        "910GRBRN"
+      ],
+      "aliases": [
+        "Ravensbourne",
+        "ravensbourne"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.414188,
+      "longitude": -0.007557
     },
     {
       "id": "940GZZLURVP",
@@ -5686,6 +6244,22 @@
       "longitude": -0.075246
     },
     {
+      "id": "910GSHRTLND",
+      "name": "Shortlands",
+      "stopIds": [
+        "910GSHRTLND"
+      ],
+      "aliases": [
+        "Shortlands",
+        "shortlands"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.405801,
+      "longitude": 0.001784
+    },
+    {
       "id": "910GSIVRST",
       "name": "Silver Street",
       "stopIds": [
@@ -5700,6 +6274,22 @@
       ],
       "latitude": 51.614688,
       "longitude": -0.06724
+    },
+    {
+      "id": "910GSLADEGN",
+      "name": "Slade Green",
+      "stopIds": [
+        "910GSLADEGN"
+      ],
+      "aliases": [
+        "Slade Green",
+        "slade green"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.467786,
+      "longitude": 0.190491
     },
     {
       "id": "940GZZLUSSQ",
@@ -5765,6 +6355,22 @@
       ],
       "latitude": 51.499695,
       "longitude": -0.270157
+    },
+    {
+      "id": "910GSCROYDN",
+      "name": "South Croydon",
+      "stopIds": [
+        "910GSCROYDN"
+      ],
+      "aliases": [
+        "South Croydon",
+        "south croydon"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.362965,
+      "longitude": -0.093457
     },
     {
       "id": "940GZZLUSEA",
@@ -5849,6 +6455,22 @@
       ],
       "latitude": 51.570232,
       "longitude": -0.308433
+    },
+    {
+      "id": "910GSMERTON",
+      "name": "South Merton",
+      "stopIds": [
+        "910GSMERTON"
+      ],
+      "aliases": [
+        "South Merton",
+        "south merton"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.402993,
+      "longitude": -0.205157
     },
     {
       "id": "940GZZDLSOQ",
@@ -6011,6 +6633,22 @@
       "longitude": -0.105331
     },
     {
+      "id": "910GSHLIER",
+      "name": "St Helier",
+      "stopIds": [
+        "910GSHLIER"
+      ],
+      "aliases": [
+        "St Helier",
+        "st helier"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.389901,
+      "longitude": -0.198771
+    },
+    {
       "id": "910GSTJMSST",
       "name": "St James Street (London)",
       "stopIds": [
@@ -6025,6 +6663,22 @@
       ],
       "latitude": 51.580981,
       "longitude": -0.032918
+    },
+    {
+      "id": "910GSTMRYC",
+      "name": "St Mary Cray",
+      "stopIds": [
+        "910GSTMRYC"
+      ],
+      "aliases": [
+        "St Mary Cray",
+        "st mary cray"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.394749,
+      "longitude": 0.106384
     },
     {
       "id": "940GZZLUSJP",
@@ -6266,6 +6920,22 @@
       "longitude": -0.009638
     },
     {
+      "id": "910GSTRETHM",
+      "name": "Streatham",
+      "stopIds": [
+        "910GSTRETHM"
+      ],
+      "aliases": [
+        "Streatham",
+        "streatham"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.425808,
+      "longitude": -0.13155
+    },
+    {
       "id": "940GZZLUSUH",
       "name": "Sudbury Hill",
       "stopIds": [
@@ -6312,6 +6982,54 @@
       ],
       "latitude": 51.493196,
       "longitude": -0.047519
+    },
+    {
+      "id": "910GSUTTON",
+      "name": "Sutton",
+      "stopIds": [
+        "910GSUTTON"
+      ],
+      "aliases": [
+        "Sutton",
+        "sutton"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.359533,
+      "longitude": -0.191215
+    },
+    {
+      "id": "910GSUTTONC",
+      "name": "Sutton Common",
+      "stopIds": [
+        "910GSUTTONC"
+      ],
+      "aliases": [
+        "Sutton Common",
+        "sutton common"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.374891,
+      "longitude": -0.196343
+    },
+    {
+      "id": "910GSWLY",
+      "name": "Swanley",
+      "stopIds": [
+        "910GSWLY"
+      ],
+      "aliases": [
+        "Swanley",
+        "swanley"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.393387,
+      "longitude": 0.169225
     },
     {
       "id": "940GZZLUSWC",
@@ -6425,6 +7143,22 @@
       ],
       "latitude": 51.671759,
       "longitude": 0.103085
+    },
+    {
+      "id": "910GTOOTING",
+      "name": "Tooting",
+      "stopIds": [
+        "910GTOOTING"
+      ],
+      "aliases": [
+        "Tooting",
+        "tooting"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.419848,
+      "longitude": -0.161278
     },
     {
       "id": "940GZZLUTBC",
@@ -6558,6 +7292,22 @@
       ],
       "latitude": 51.556822,
       "longitude": -0.138433
+    },
+    {
+      "id": "910GTULSEH",
+      "name": "Tulse Hill",
+      "stopIds": [
+        "910GTULSEH"
+      ],
+      "aliases": [
+        "Tulse Hill",
+        "tulse hill"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.439861,
+      "longitude": -0.105077
     },
     {
       "id": "910GTURKYST",
@@ -7166,15 +7916,19 @@
       "name": "West Hampstead",
       "stopIds": [
         "940GZZLUWHP",
-        "910GWHMDSTD"
+        "910GWHMDSTD",
+        "910GWHMPSTM"
       ],
       "aliases": [
         "West Hampstead",
-        "west hampstead"
+        "west hampstead",
+        "West Hampstead Thameslink",
+        "west hampstead thameslink"
       ],
       "lineIds": [
         "jubilee",
-        "mildmay"
+        "mildmay",
+        "thameslink"
       ],
       "latitude": 51.546638,
       "longitude": -0.191059
@@ -7260,6 +8014,22 @@
       "longitude": 0.02246
     },
     {
+      "id": "910GWSUTTON",
+      "name": "West Sutton",
+      "stopIds": [
+        "910GWSUTTON"
+      ],
+      "aliases": [
+        "West Sutton",
+        "west sutton"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.365854,
+      "longitude": -0.205173
+    },
+    {
       "id": "940GZZLUWSP",
       "name": "Westbourne Park",
       "stopIds": [
@@ -7275,6 +8045,22 @@
       ],
       "latitude": 51.52111,
       "longitude": -0.201065
+    },
+    {
+      "id": "910GWCOMBEP",
+      "name": "Westcombe Park",
+      "stopIds": [
+        "910GWCOMBEP"
+      ],
+      "aliases": [
+        "Westcombe Park",
+        "westcombe park"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.484203,
+      "longitude": 0.018395
     },
     {
       "id": "940GZZDLWFE",
@@ -7404,7 +8190,8 @@
       "name": "Wimbledon",
       "stopIds": [
         "940GZZLUWIM",
-        "940GZZCRWMB"
+        "940GZZCRWMB",
+        "910GWIMBLDN"
       ],
       "aliases": [
         "Wimbledon",
@@ -7412,10 +8199,27 @@
       ],
       "lineIds": [
         "district",
+        "thameslink",
         "tram"
       ],
       "latitude": 51.421207,
       "longitude": -0.206573
+    },
+    {
+      "id": "910GWIMLCHS",
+      "name": "Wimbledon Chase",
+      "stopIds": [
+        "910GWIMLCHS"
+      ],
+      "aliases": [
+        "Wimbledon Chase",
+        "wimbledon chase"
+      ],
+      "lineIds": [
+        "thameslink"
+      ],
+      "latitude": 51.409558,
+      "longitude": -0.214031
     },
     {
       "id": "940GZZLUWIP",
@@ -7566,14 +8370,18 @@
       "id": "HUBWWA",
       "name": "Woolwich Arsenal DLR Station",
       "stopIds": [
-        "940GZZDLWLA"
+        "940GZZDLWLA",
+        "910GWOLWCHA"
       ],
       "aliases": [
         "Woolwich Arsenal DLR Station",
-        "woolwich arsenal dlr station"
+        "woolwich arsenal dlr station",
+        "Woolwich Arsenal",
+        "woolwich arsenal"
       ],
       "lineIds": [
-        "dlr"
+        "dlr",
+        "thameslink"
       ],
       "latitude": 51.490009,
       "longitude": 0.069127

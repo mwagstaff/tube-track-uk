@@ -62,7 +62,7 @@ struct MapMorphTransitionTests {
         let graph = try TubeGraph.bundled()
         let document = try BeckMapRepository().load(region: .fullUnderground, graph: graph)
         let markers = document.stationMarkers.filter {
-            $0.name == "East Croydon" || $0.name == "Lebanon Road"
+            $0.stationID == "940GZZCRECR" || $0.name == "Lebanon Road"
         }
         #expect(markers.count == 2)
         let bounds = markers.reduce(CGRect.null) { partial, marker in

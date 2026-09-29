@@ -9,8 +9,12 @@ import { MAXIMUM_DEPARTURES, projectBoard } from './departure-projection.js';
 import { isRiverBusLine } from '../river.js';
 import { projectRiverBoard, riverCondition } from './river-departure-projection.js';
 import { LINE_COLOURS } from '../line-colours.js';
+import { THAMESLINK_LINE_ID, THAMESLINK_STOP_IDS } from '../thameslink.js';
 
 const ACTIVITY_MAX_DURATION_MS = 90 * 60 * 1_000;
+// Each distinct Thameslink stop costs one TfL request per 30 seconds; beyond
+// this many in one pass, the remaining boards wait for the next one.
+const MAXIMUM_THAMESLINK_STOPS_PER_PASS = 40;
 const MODE_BY_LINE_ID = new Map(LINE_COLOURS.map((line) => [line.id, line.mode]));
 
 /**
@@ -32,6 +36,7 @@ export class LiveActivityNotifier {
         metrics,
         statuses = async () => [],
         river = null,
+        thameslink = null,
         clock = Date.now,
         maxDurationMs = ACTIVITY_MAX_DURATION_MS
     }) {
@@ -42,6 +47,7 @@ export class LiveActivityNotifier {
         this.metrics = metrics;
         this.statuses = statuses;
         this.river = river;
+        this.thameslink = thameslink;
         this.clock = clock;
         this.maxDurationMs = maxDurationMs;
     }
@@ -70,12 +76,13 @@ export class LiveActivityNotifier {
 
         const conditions = conditionsByLine(await this.#safeStatuses());
         const nowMs = this.clock();
+        const pass = { thameslinkBoards: new Map(), thameslinkStops: new Set() };
         let sent = 0;
 
         for (const row of rows) {
             if (staleModes.has(MODE_BY_LINE_ID.get(row.lineId))) continue;
             // eslint-disable-next-line no-await-in-loop
-            const outcome = await this.#considerRow({ row, snapshot, conditions, nowMs });
+            const outcome = await this.#considerRow({ row, snapshot, conditions, nowMs, pass });
             if (outcome === 'sent') sent += 1;
         }
 
@@ -93,7 +100,24 @@ export class LiveActivityNotifier {
         }
     }
 
-    async #considerRow({ row, snapshot, conditions, nowMs }) {
+    /**
+     * A tracked Thameslink board's departures, fetched per station on demand
+     * (National Rail has no bulk feed) and shared by every row in this pass.
+     */
+    async #thameslinkDepartures(stopIds, pass) {
+        const key = stopIds.join(',');
+        if (!pass.thameslinkBoards.has(key)) {
+            const added = stopIds.filter((id) => !pass.thameslinkStops.has(id));
+            if (pass.thameslinkStops.size + added.length > MAXIMUM_THAMESLINK_STOPS_PER_PASS) {
+                return { capped: true };
+            }
+            added.forEach((id) => pass.thameslinkStops.add(id));
+            pass.thameslinkBoards.set(key, this.thameslink.departures(stopIds));
+        }
+        return { result: await pass.thameslinkBoards.get(key) };
+    }
+
+    async #considerRow({ row, snapshot, conditions, nowMs, pass }) {
         if (row.startedAtMs && nowMs - row.startedAtMs > this.maxDurationMs) {
             // The client caps activities at 90 minutes and ends them itself;
             // this is the server letting go of one whose app never came back.
@@ -133,6 +157,33 @@ export class LiveActivityNotifier {
                 this.logger?.warn('push_river_unavailable', { error: error.message });
                 return 'unavailable';
             }
+        } else if (row.lineId === THAMESLINK_LINE_ID) {
+            // A failed or stale fetch must never empty a tracked board.
+            if (!this.thameslink) return 'unavailable';
+            const stopIds = [...new Set((row.stopIds ?? []).map((id) => String(id).toUpperCase()))]
+                .filter((id) => THAMESLINK_STOP_IDS.has(id)).sort();
+            if (!stopIds.length) return 'unavailable';
+            try {
+                const { result, capped } = await this.#thameslinkDepartures(stopIds, pass);
+                if (capped) {
+                    this.metrics?.recordPushSuppressed?.({ reason: 'thameslink_capacity' });
+                    return 'deferred';
+                }
+                sourceUpdatedAtMs = Date.parse(result?.meta?.updatedAt);
+                if (!result || result.meta.stale || !Number.isFinite(sourceUpdatedAtMs)
+                    || nowMs - sourceUpdatedAtMs > 90_000
+                    || sourceUpdatedAtMs < (row.lastSourceUpdatedAtMs ?? 0)) return 'stale';
+                board = projectBoard({
+                    arrivals: result.data.map((departure) => ({
+                        ...departure, expectedArrival: departure.expectedDeparture
+                    })),
+                    stopIds, lineId: row.lineId, direction: row.direction, limit: MAXIMUM_DEPARTURES
+                });
+            } catch (error) {
+                this.logger?.warn('push_thameslink_unavailable', { error: error.message });
+                return 'unavailable';
+            }
+            condition = conditions.get(row.lineId) ?? null;
         } else {
             board = projectBoard({
                 arrivals: snapshot.arrivals, stopIds: row.stopIds,

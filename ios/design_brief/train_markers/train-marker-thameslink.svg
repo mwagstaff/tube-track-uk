@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96">
+  <defs>
+    <clipPath id="body"><path d="M6 30 Q6 8 48 7 Q90 8 90 30 L90 83 Q90 90 83 90 L13 90 Q6 90 6 83 Z"/></clipPath>
+  </defs>
+  <path d="M6 30 Q6 8 48 7 Q90 8 90 30 L90 83 Q90 90 83 90 L13 90 Q6 90 6 83 Z" fill="#FFFFFF" stroke="#262A33" stroke-width="3.2"/>
+  <g clip-path="url(#body)">
+    <!-- Class 700: black mask round the windscreen, white nose below -->
+    <path d="M6 6 H90 V50 Q72 58 48 58 Q24 58 6 50 Z" fill="#20242C"/>
+    <path d="M17 14 Q48 8 79 14" fill="none" stroke="#3A404C" stroke-width="3"/>
+    <!-- Thameslink pink along the body sides and skirt -->
+    <path d="M6 50 Q9 52 12 53 L12 90 L6 90 Z" fill="#D66FAA"/>
+    <path d="M90 50 Q87 52 84 53 L84 90 L90 90 Z" fill="#D66FAA"/>
+    <rect x="6" y="78" width="84" height="8" fill="#D66FAA"/>
+    <rect x="6" y="86" width="84" height="6" fill="#262A33"/>
+  </g>
+  <rect x="37" y="14" width="22" height="4.5" rx="2" fill="#F7C22E"/>
+  <path d="M19 23 Q48 19 77 23 L75 47 Q48 51 21 47 Z" fill="#4A5160"/>
+  <path d="M19 23 Q48 19 77 23 L76.2 33 Q48 29 19.8 33 Z" fill="#59616F"/>
+  <path d="M42 46 L55 29" stroke="#1C1F26" stroke-width="1.6" stroke-linecap="round"/>
+  <path d="M55 29 L55 44" stroke="#1C1F26" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- headlights -->
+  <rect x="15" y="61" width="15" height="12" rx="4" fill="#262A33"/>
+  <rect x="66" y="61" width="15" height="12" rx="4" fill="#262A33"/>
+  <circle cx="22.5" cy="67" r="4" fill="#FFFFFF"/>
+  <circle cx="73.5" cy="67" r="4" fill="#FFFFFF"/>
+  <!-- Thameslink name bar -->
+  <rect x="33" y="62.5" width="30" height="9" rx="2.5" fill="#D66FAA"/>
+  <text x="48" y="69" font-family="Helvetica Neue, Helvetica, Arial" font-weight="700" font-size="5.3" fill="#FFFFFF" text-anchor="middle">THAMESLINK</text>
+  <!-- coupler -->
+  <rect x="39" y="82" width="18" height="7" rx="2" fill="#6B7280" stroke="#262A33" stroke-width="1.4"/>
+  <rect x="43" y="84.5" width="10" height="2" rx="1" fill="#262A33"/>
+</svg>

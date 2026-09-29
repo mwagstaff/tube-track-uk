@@ -590,21 +590,21 @@ class MapFidelityAuditTests(unittest.TestCase):
             ("940GZZLUFYR", "910GFNCHLYR"),
         )
         for underground_id, mildmay_id in walking_pairs:
-            primitive = next(
-                primitive for primitive in markers[mildmay_id]["primitives"]
-                if primitive["kind"] == "walkingConnector"
-            )
-            payload = primitive["walkingConnector"]
-            # Links join TfL symbol centres, squared to 45 degrees: the
-            # Overground roundel and one of the Underground station's roundels.
-            ends = {(round(payload[end]["x"]), round(payload[end]["y"])) for end in ("start", "end")}
-            mildmay_anchor = markers[mildmay_id]["anchor"]
-            self.assertIn((round(mildmay_anchor["x"]), round(mildmay_anchor["y"])), ends)
             underground_circles = {
                 (round(p["circle"]["centre"]["x"]), round(p["circle"]["centre"]["y"]))
                 for p in markers[underground_id]["primitives"] if p["kind"] == "circle"
             }
-            self.assertTrue(ends & underground_circles)
+            mildmay_anchor = markers[mildmay_id]["anchor"]
+            anchor = (round(mildmay_anchor["x"]), round(mildmay_anchor["y"]))
+            # Links join TfL symbol centres, squared to 45 degrees: the
+            # Overground roundel and one of the Underground station's roundels.
+            # West Hampstead also walks on to its Thameslink station.
+            links = [
+                {(round(p["walkingConnector"][end]["x"]), round(p["walkingConnector"][end]["y"]))
+                 for end in ("start", "end")}
+                for p in markers[mildmay_id]["primitives"] if p["kind"] == "walkingConnector"
+            ]
+            self.assertTrue(any(anchor in ends and ends & underground_circles for ends in links))
         self.assertAlmostEqual(
             markers["910GWHMDSTD"]["anchor"]["y"],
             markers["910GFNCHLYR"]["anchor"]["y"],

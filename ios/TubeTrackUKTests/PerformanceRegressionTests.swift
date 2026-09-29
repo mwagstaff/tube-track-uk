@@ -412,14 +412,14 @@ struct PerformanceRegressionTests {
         #expect(path.coordinate(at: 2)?.longitude == to.longitude)
     }
 
-    @Test func realWorldMapBatchesSegmentsIntoStableNonBranchingPolylines() throws {
+    @MainActor @Test func realWorldMapBatchesSegmentsIntoStableNonBranchingPolylines() throws {
         let graph = try TubeGraph.bundled()
         let renderData = RealWorldMapRenderData(graph: graph)
         let renderedSegmentIDs = renderData.polylines.flatMap(\.segmentIDs)
 
         #expect(renderedSegmentIDs.count == graph.segments.count)
         #expect(Set(renderedSegmentIDs) == Set(graph.segments.map(\.id)))
-        #expect(renderData.polylines.count < 100)
+        #expect(renderData.polylines.count < 120)
         #expect(renderData.polylines.allSatisfy { $0.coordinates.count >= 2 })
 
         let tramSegmentIDs = Set(graph.segments(for: .tram).map(\.id))

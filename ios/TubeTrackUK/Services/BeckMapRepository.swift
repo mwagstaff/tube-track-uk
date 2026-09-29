@@ -284,6 +284,26 @@ struct BeckMapRepository {
         for route in document.routes {
             try validate(route: route, segmentsByID: segmentsByID, markerIDs: markerIDs)
         }
+
+        try validateUnique((document.lineExtensions ?? []).map(\.id), kind: "line extension")
+        for lineExtension in document.lineExtensions ?? [] {
+            guard let path = pathsByID[lineExtension.pathID] else {
+                throw invalid(.missingPath(segmentID: lineExtension.id, pathID: lineExtension.pathID))
+            }
+            guard markerIDs.contains(lineExtension.stationID) else {
+                throw invalid(.missingStationMarker(
+                    stationID: lineExtension.stationID,
+                    context: "line extension \(lineExtension.id)"
+                ))
+            }
+            try validateTranslatedCoordinates(of: path, by: .zero, segmentID: lineExtension.id, in: canvas)
+            guard lineExtension.arrowhead.count >= 3 else {
+                throw invalid(.nonFiniteValue(context: "line extension \(lineExtension.id) arrowhead"))
+            }
+            for point in lineExtension.arrowhead {
+                try validate(point: point, context: "line extension \(lineExtension.id) arrowhead", in: canvas)
+            }
+        }
     }
 
     private func resourceURL(for region: BeckMapRegion) throws -> URL {

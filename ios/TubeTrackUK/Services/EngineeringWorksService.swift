@@ -126,7 +126,7 @@ actor EngineeringWorksService {
             // emergency rollback. It cannot establish long-range coverage, so
             // its requestedThrough value is deliberately left unknown.
             do {
-                let response: TubeTrackAPIResponse<[TfLLineStatus]> = try await client.getSnapshot(
+                let response: TubeTrackAPIResponse<LossyList<TfLLineStatus>> = try await client.getSnapshot(
                     "/api/v1/planned-works",
                     queryItems: queryItems,
                     forceRefresh: forceRefresh
@@ -134,7 +134,7 @@ actor EngineeringWorksService {
                 try Task.checkCancellation()
                 let fetchedAt = response.updatedAt
                 let works = EngineeringWorksBuilder(repository: repository).works(
-                    from: response.data,
+                    from: response.data.elements,
                     fetchedAt: fetchedAt
                 )
                 let snapshot = EngineeringWorksSnapshot(

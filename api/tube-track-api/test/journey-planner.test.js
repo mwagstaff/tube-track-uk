@@ -91,6 +91,27 @@ test('arrive-by chooses later departures meeting deadline; expired departures ar
     assert.equal(selectJourneys(journeys, request, now + 16 * 60_000).length, 0);
 });
 
+test('accepts Thameslink legs only for clients that include the line', () => {
+    const thameslink = itinerary({ mode: 'national-rail', line: 'thameslink' });
+    thameslink.legs[0].routeOptions.push({ lineIdentifier: { id: 'southern', name: 'Southern' }, directions: ['Beta'] });
+    assert.equal(normalizeJourney(thameslink, request), null);
+    const opted = normalizeJourney(thameslink, { ...request, nationalRail: true });
+    assert.equal(opted.legs[0].mode, 'national-rail');
+    assert.deepEqual(opted.legs[0].lines.map((line) => line.id), ['thameslink']);
+    assert.equal(opted.changes, 0);
+    // Another operator's train is never offered, even to an opted-in client.
+    assert.equal(normalizeJourney(itinerary({ mode: 'national-rail', line: 'southern' }), { ...request, nationalRail: true }), null);
+});
+
+test('asks TfL for National Rail only when the client includes Thameslink', async () => {
+    const { planner, calls } = makePlanner();
+    await planner.plan(query);
+    await planner.plan({ ...query, include: 'thameslink' });
+    const modes = [...new Set(calls.filter((call) => call.path.startsWith('/Journey/'))
+        .map((call) => call.query.mode))];
+    assert.deepEqual(modes, ['tube,dlr,overground,elizabeth-line,tram', 'tube,dlr,overground,elizabeth-line,tram,national-rail']);
+});
+
 test('rejects out-of-scope modes, invalid time sequences, and malformed upstream data', () => {
     assert.equal(normalizeJourney(itinerary({ mode: 'bus' }), request), null);
     assert.equal(normalizeJourney(itinerary({ mode: 'national-rail' }), request), null);

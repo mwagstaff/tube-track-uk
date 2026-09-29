@@ -39,12 +39,12 @@ struct TubeGameEngineTests {
         #expect(engine.collisionLineID == nil)
     }
 
-    @Test func fullNetworkUsesPhysicalHubIdentityAcrossAllTwentyLines() throws {
+    @Test func fullNetworkUsesPhysicalHubIdentityAcrossAllTwentyOneLines() throws {
         let network = try makeNetwork()
 
-        #expect(network.nodes.count == 509)
-        #expect(network.hubs.count == 457)
-        #expect(network.collectibleHubCount == 457)
+        #expect(network.nodes.count == 571)
+        #expect(network.hubs.count == 505)
+        #expect(network.collectibleHubCount == 505)
         #expect(Set(network.edges.compactMap(\.kind.lineID)) == Set(TubeLineID.allCases))
         #expect(Set(network.lineHubIDs.keys) == Set(TubeLineID.allCases))
         #expect(network.lineHubIDs.values.allSatisfy { !$0.isEmpty })
@@ -441,7 +441,7 @@ struct TubeGameEngineTests {
         #expect(branchDecision.shouldClearQueuedDirection)
     }
 
-    @Test func trainQuotasCoverAllLinesAndTotalTwentyNine() throws {
+    @Test func trainQuotasCoverAllLinesAndTotalThirtyTwo() throws {
         let network = try makeNetwork()
         let simulation = TubeGameTrainSimulation(
             network: network,
@@ -454,8 +454,8 @@ struct TubeGameEngineTests {
         #expect(TubeGameTrainSimulation.trainQuota(forSegmentCount: 29) == 1)
         #expect(TubeGameTrainSimulation.trainQuota(forSegmentCount: 30) == 2)
         #expect(TubeGameTrainSimulation.trainQuota(forSegmentCount: 60) == 3)
-        #expect(TubeGameTrainSimulation.totalTrainQuota(in: network) == 29)
-        #expect(simulation.snapshots.count == 29)
+        #expect(TubeGameTrainSimulation.totalTrainQuota(in: network) == 32)
+        #expect(simulation.snapshots.count == 32)
         #expect(Set(simulation.snapshots.map(\.lineID)) == Set(TubeLineID.allCases))
 
         let hopDistances = network.shortestHubHopDistances(from: "940GZZLUOXC")

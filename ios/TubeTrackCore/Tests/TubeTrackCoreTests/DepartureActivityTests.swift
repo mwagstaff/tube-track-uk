@@ -31,6 +31,41 @@ struct DepartureActivityTests {
         )
     }
 
+    @Test func nationalRailRowsCarryDelaysAndCancellationsButTubeRowsDoNot() throws {
+        func thameslink(_ id: String, _ status: RailServiceStatus, seconds: Int) -> TfLArrivalPrediction {
+            TfLArrivalPrediction(
+                id: id, vehicleId: nil, lineId: "thameslink", stationName: "Farringdon",
+                naptanId: "910GFRNDNLT", platformName: "Platform 4", direction: "Northbound",
+                destinationName: "Bedford", destinationNaptanId: "910GBEDFDM", towards: nil,
+                expectedArrival: updatedAt.addingTimeInterval(TimeInterval(seconds)),
+                timeToStation: seconds, currentLocation: nil,
+                scheduledDeparture: updatedAt.addingTimeInterval(TimeInterval(seconds)),
+                serviceStatus: status
+            )
+        }
+        let state = DepartureActivityBoard.contentState(
+            from: [thameslink("a", .cancelled, seconds: 60), thameslink("b", .onTime, seconds: 300),
+                   thameslink("c", .delayed, seconds: 600)],
+            lineID: .thameslink, direction: .northbound, condition: .good("Good service"),
+            updatedAt: updatedAt, sequence: 1
+        )
+        #expect(state.departures.map(\.status) == ["cancelled", nil, "delayed"])
+        #expect(state.departures[0].isCancelled && state.departures[2].isDelayed)
+        #expect(state.departures.map(\.platform) == ["Platform 4", "Platform 4", "Platform 4"])
+
+        let decoded = try JSONDecoder().decode(
+            DepartureActivityAttributes.ContentState.self, from: JSONEncoder().encode(state)
+        )
+        #expect(decoded == state)
+        // A pushed Tube board has no status key at all, and still decodes.
+        let tube = try JSONDecoder().decode(
+            DepartureActivityAttributes.ContentState.Departure.self,
+            from: Data(#"{"id":"1","destination":"Morden","expectedAtEpoch":1800000000}"#.utf8)
+        )
+        #expect(tube.status == nil && !tube.isCancelled)
+        #expect(sampleState().departures.allSatisfy { $0.status == nil })
+    }
+
     @Test func riverActivityRoundTripsWithItsServiceAndPierLink() throws {
         let attributes = DepartureActivityAttributes(
             activityID: "river", stationHubID: "930GCAD", stationName: "Cadogan Pier",

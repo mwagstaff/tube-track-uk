@@ -76,10 +76,32 @@ public enum StationDepartureMetadata {
         return "Check front of train"
     }
 
+    /// The running status of a National Rail departure, when it is not on time:
+    /// "Cancelled · <reason>" or "Delayed · timetabled 22:29".
+    public static func serviceNote(for arrival: TfLArrivalPrediction) -> String? {
+        if arrival.isCancelled {
+            guard let cause = normalized(arrival.serviceCause) else { return "Cancelled" }
+            return "Cancelled · \(cause)"
+        }
+        if let scheduled = arrival.delayedFromSchedule {
+            return "Delayed · timetabled \(scheduled.formatted(londonClockTime))"
+        }
+        if arrival.serviceStatus == .delayed { return "Delayed" }
+        return nil
+    }
+
+    private static var londonClockTime: Date.FormatStyle {
+        var style = Date.FormatStyle(date: .omitted, time: .shortened)
+        style.timeZone = TimeZone(identifier: "Europe/London") ?? .current
+        style.locale = Locale(identifier: "en_GB")
+        return style
+    }
+
     public static func departureTime(
         for arrival: TfLArrivalPrediction,
         now: Date = .now
     ) -> String {
+        if arrival.isCancelled { return "Cancelled" }
         let seconds: Int?
         if let expectedArrival = arrival.expectedArrival {
             seconds = max(0, Int(expectedArrival.timeIntervalSince(now)))

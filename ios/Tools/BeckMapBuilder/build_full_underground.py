@@ -21,6 +21,7 @@ import build_central_core_join as vector
 import build_rail_extensions as rail
 import build_overground_extensions as overground
 import build_tram_extensions as tram
+import build_thameslink_extensions as thameslink
 import normalize_official_geometry
 import normalize_station_markers
 
@@ -35,7 +36,7 @@ UNDERGROUND_LINE_IDS = {
 }
 MINOR_RAIL_LINE_IDS = {
     "dlr", "elizabeth", "liberty", "lioness", "mildmay", "suffragette",
-    "weaver", "windrush", "tram",
+    "weaver", "windrush", "tram", "thameslink",
 }
 
 # Full-map labels use an explicit level-of-detail hierarchy.  The overview set
@@ -1900,6 +1901,12 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
     tram.append_tram_artwork(
         root, graph, selected_paths, selected_segments, markers, labels, routes
     )
+    import reference_alignment
+
+    line_extensions = thameslink.append_thameslink_artwork(
+        root, graph, selected_paths, selected_segments, markers, labels, routes,
+        reference_alignment.Reference(json.loads(reference_alignment.REFERENCE_PATH.read_text())),
+    )
 
     markers_by_id = {marker["stationID"]: marker for marker in markers}
     labels_by_station_id = {label["stationID"]: label for label in labels}
@@ -2986,11 +2993,12 @@ def build(svg_path: Path, graph_path: Path, resources: Path) -> dict:
         "stationMarkers": sorted(markers, key=lambda value: value["stationID"]),
         "labels": sorted(labels, key=lambda value: value["id"]),
         "routes": sorted(routes.values(), key=lambda value: value["id"]),
+        "lineExtensions": sorted(line_extensions, key=lambda value: value["id"]),
         "supportedLineIDs": [
             "bakerloo", "central", "circle", "district", "hammersmith-city",
             "jubilee", "metropolitan", "northern", "piccadilly", "victoria",
             "waterloo-city", "dlr", "elizabeth", "liberty", "lioness",
-            "mildmay", "suffragette", "weaver", "windrush", "tram",
+            "mildmay", "suffragette", "weaver", "windrush", "tram", "thameslink",
         ],
     }
     normalize_official_geometry.apply(document)

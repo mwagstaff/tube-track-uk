@@ -31,7 +31,8 @@ public enum DepartureActivityBoard {
                     id: arrival.vehicleId ?? arrival.id,
                     destination: StationDepartureMetadata.destinationLabel(for: arrival),
                     platform: StationDepartureMetadata.compactPlatformLabel(for: arrival),
-                    expectedAt: expected
+                    expectedAt: expected,
+                    status: arrival.serviceStatus
                 )
             }
 

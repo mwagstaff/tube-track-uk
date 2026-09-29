@@ -55,8 +55,12 @@ enum WatchStatusData {
     static func load(lineIDs: [TubeLineID], now: Date = .now) async -> WatchStatusState {
         let cache = SnapshotCache()
         do {
-            let response = try await TubeTrackAPIClient(clientSurface: .watch).getSnapshot(
-                "/api/v1/status", as: [TfLLineStatus].self
+            let lossy = try await TubeTrackAPIClient(clientSurface: .watch).getSnapshot(
+                "/api/v1/status", as: LossyList<TfLLineStatus>.self
+            )
+            let response = TubeTrackAPIResponse(
+                data: lossy.data.elements, updatedAt: lossy.updatedAt,
+                cached: lossy.cached, stale: lossy.stale
             )
             try? await cache.save(
                 WatchCachedStatus(statuses: response.data, fetchedAt: response.updatedAt),

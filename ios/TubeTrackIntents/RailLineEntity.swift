@@ -40,6 +40,7 @@ extension TubeLineID {
         case "elizabeth-line": "Elizabeth line"
         case "overground": "Overground"
         case "tram": "Trams"
+        case "national-rail": "National Rail"
         default: modeName
         }
     }

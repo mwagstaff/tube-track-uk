@@ -51,12 +51,12 @@ actor TubeStatusService {
         }
 
         do {
-            let response: TubeTrackAPIResponse<[TfLLineStatus]> = try await client.getSnapshot(
+            let response: TubeTrackAPIResponse<LossyList<TfLLineStatus>> = try await client.getSnapshot(
                 "/api/v1/status",
                 forceRefresh: forceRefresh
             )
             try Task.checkCancellation()
-            let statuses = response.data
+            let statuses = response.data.elements
             let resolver = DisruptionResolver(repository: repository)
             let disruptions = statuses.flatMap(resolver.resolve).sorted { left, right in
                 if left.severity != right.severity { return left.severity < right.severity }

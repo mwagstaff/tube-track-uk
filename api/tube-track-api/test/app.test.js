@@ -59,19 +59,22 @@ test('line colours cover every supported line without live data or upstream call
     const catalogue = JSON.parse(await readFile(new URL('../data/journey-stations.json', import.meta.url)));
     await withServer(async ({ baseUrl, cache, upstreamRequests }) => {
         assert.equal(cache.read(), null);
-        const response = await fetch(`${baseUrl}/api/v1/line-colours`);
+        const legacy = await (await fetch(`${baseUrl}/api/v1/line-colours`)).json();
+        assert.deepEqual(legacy.meta, { source: 'tubetrack', count: 20 });
+        assert.ok(!legacy.data.some((line) => line.id === 'thameslink'));
+        const response = await fetch(`${baseUrl}/api/v1/line-colours?include=thameslink`);
         assert.equal(response.status, 200);
         assert.equal(response.headers.get('cache-control'), 'public, max-age=86400');
         const { data, meta } = await response.json();
-        assert.deepEqual(meta, { source: 'tubetrack', count: 20 });
-        assert.equal(data.length, 20);
+        assert.deepEqual(meta, { source: 'tubetrack', count: 21 });
+        assert.equal(data.length, 21);
         const byID = new Map(data.map((line) => [line.id, line]));
-        assert.equal(byID.size, 20);
+        assert.equal(byID.size, 21);
         assert.deepEqual([...byID.keys()].sort(), [
             'bakerloo', 'central', 'circle', 'district', 'hammersmith-city',
             'jubilee', 'metropolitan', 'northern', 'piccadilly', 'victoria',
             'waterloo-city', 'dlr', 'elizabeth', 'tram', 'liberty', 'lioness',
-            'mildmay', 'suffragette', 'weaver', 'windrush'
+            'mildmay', 'suffragette', 'weaver', 'windrush', 'thameslink'
         ].sort());
         for (const station of catalogue.stations) {
             for (const id of station.lineIds) assert.ok(byID.has(id), `Missing colour for ${id}`);
@@ -170,13 +173,57 @@ test('caches status requests and validates planned-work dates', async () => {
         const second = await fetch(`${baseUrl}/api/v1/status`);
         assert.equal(first.status, 200);
         assert.equal(second.status, 200);
-        assert.equal(upstreamRequests.length, 1);
+        assert.equal(upstreamRequests.length, 2);
         assert.match(upstreamRequests[0].path, /\/Line\/Mode\/.+\/Status/);
+        assert.equal(upstreamRequests[1].path, '/Line/thameslink/Status');
 
         const invalid = await fetch(`${baseUrl}/api/v1/planned-works?from=nope&to=2026-09-03`);
         assert.equal(invalid.status, 400);
         assert.equal((await invalid.json()).error.code, 'INVALID_DATE_RANGE');
     });
+});
+
+test('serves gated lines only to clients that opt in', async () => {
+    const tube = { id: 'victoria', name: 'Victoria', lineStatuses: [] };
+    const thameslink = { id: 'thameslink', name: 'Thameslink', lineStatuses: [] };
+    const client = {
+        fetchJSON: async (path) => path.startsWith('/Line/Mode/') ? [tube]
+            : path === '/Line/thameslink/Status' ? [thameslink]
+                : [tube, thameslink]
+    };
+    await withServer(async ({ baseUrl }) => {
+        const legacy = await (await fetch(`${baseUrl}/api/v1/status`)).json();
+        assert.deepEqual(legacy.data.map((line) => line.id), ['victoria']);
+        const current = await (await fetch(`${baseUrl}/api/v1/status?include=thameslink`)).json();
+        assert.deepEqual(current.data.map((line) => line.id), ['victoria', 'thameslink']);
+
+        const legacyWorks = await (await fetch(`${baseUrl}/api/v1/planned-works?from=2026-10-24&to=2026-10-26`)).json();
+        assert.deepEqual(legacyWorks.data.map((line) => line.id), ['victoria']);
+        const currentWorks = await (await fetch(`${baseUrl}/api/v1/planned-works?from=2026-10-24&to=2026-10-26&include=thameslink`)).json();
+        assert.deepEqual(currentWorks.data.map((line) => line.id), ['victoria', 'thameslink']);
+
+        const colours = await (await fetch(`${baseUrl}/api/v1/line-colours?include=thameslink`)).json();
+        assert.equal(colours.meta.count, 21);
+        assert.equal(colours.data.at(-1).mode, 'national-rail');
+    }, { client });
+});
+
+test('keeps TfL mode statuses when National Rail status is unavailable', async () => {
+    const client = {
+        fetchJSON: async (path) => {
+            if (path === '/Line/thameslink/Status') throw new Error('upstream down');
+            return [{ id: 'victoria', name: 'Victoria', lineStatuses: [] }];
+        }
+    };
+    await withServer(async ({ baseUrl }) => {
+        const response = await fetch(`${baseUrl}/api/v1/status?include=thameslink`);
+        assert.equal(response.status, 200);
+        const body = await response.json();
+        assert.deepEqual(body.data.map((line) => line.id), ['victoria']);
+        assert.deepEqual(body.meta.unavailableLineIds, ['thameslink']);
+        const legacy = await (await fetch(`${baseUrl}/api/v1/status`)).json();
+        assert.equal(legacy.meta.unavailableLineIds, undefined);
+    }, { client });
 });
 
 test('keeps v1 unchanged while v2 adds normalized long-range coverage', async () => {
@@ -347,4 +394,42 @@ test('healthcheck reports degraded (still ready) and the stale gauge flips when 
         assert.match(metrics, /tube_track_live_cache_stale\{service_name="tube-track-api"\} 1/);
         assert.match(metrics, /app_check_ok\{[^}]*check="live_cache_fresh"[^}]*\} 0/);
     });
+});
+
+test('serves Thameslink boards only for mapped Thameslink stops', async () => {
+    await withServer(async ({ baseUrl, upstreamRequests }) => {
+        const invalid = await fetch(`${baseUrl}/api/v1/thameslink/departures?stopIds=940GZZLUSVS`);
+        assert.equal(invalid.status, 400);
+        const response = await fetch(`${baseUrl}/api/v1/thameslink/departures?stopIds=910gstpxbox`);
+        assert.equal(response.status, 200);
+        assert.deepEqual((await response.json()).data, []);
+        assert.equal(upstreamRequests.at(-1).path, '/StopPoint/910GSTPXBOX/ArrivalDepartures');
+        assert.deepEqual(upstreamRequests.at(-1).options.query, { lineIds: 'thameslink' });
+
+        const operators = await fetch(`${baseUrl}/api/v1/national-rail/status`);
+        assert.equal(operators.status, 200);
+        assert.equal(upstreamRequests.at(-1).path, '/Line/Mode/national-rail/Status');
+    });
+});
+
+test('estimates Thameslink trains from every mapped board', async () => {
+    const snapshot = JSON.parse(await readFile(new URL('./fixtures/thameslink/boards-b2.json', import.meta.url)));
+    const requested = new Set();
+    const client = {
+        fetchJSON: async (path) => {
+            const stop = path.match(/^\/StopPoint\/([^/]+)\/ArrivalDepartures$/)?.[1];
+            if (stop) { requested.add(stop); return snapshot.boards[stop] ?? []; }
+            return [];
+        }
+    };
+    await withServer(async ({ baseUrl }) => {
+        const response = await fetch(`${baseUrl}/api/v1/thameslink/trains`);
+        assert.equal(response.status, 200);
+        const body = await response.json();
+        assert.equal(requested.size, 65);
+        // Positions depend on the clock; the estimator's own tests pin those.
+        assert.ok(Array.isArray(body.data));
+        assert.equal(body.meta.count, body.data.length);
+        assert.equal(body.meta.stale, false);
+    }, { client });
 });

@@ -92,14 +92,23 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
             public let destination: String
             public let platform: String?
             public let expectedAtEpoch: Int
+            /// "delayed" or "cancelled" for a National Rail train; absent when
+            /// it is running normally, and always absent for the Underground.
+            public let status: String?
 
             public var expectedAt: Date { Date(epochSeconds: expectedAtEpoch) }
+            public var isCancelled: Bool { status == RailServiceStatus.cancelled.rawValue }
+            public var isDelayed: Bool { status == RailServiceStatus.delayed.rawValue }
 
-            public init(id: String, destination: String, platform: String?, expectedAt: Date) {
+            public init(
+                id: String, destination: String, platform: String?, expectedAt: Date,
+                status: RailServiceStatus? = nil
+            ) {
                 self.id = id
                 self.destination = String(destination.prefix(28))
                 self.platform = platform.map { String($0.prefix(14)) }
                 expectedAtEpoch = expectedAt.epochSeconds
+                self.status = status.flatMap { [.delayed, .cancelled].contains($0) ? $0.rawValue : nil }
             }
 
             public init(from decoder: any Decoder) throws {
@@ -108,6 +117,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
                 destination = try container.decodeIfPresent(String.self, forKey: .destination) ?? "Check front of train"
                 platform = try container.decodeIfPresent(String.self, forKey: .platform)
                 expectedAtEpoch = try container.decodeIfPresent(Int.self, forKey: .expectedAtEpoch) ?? 0
+                status = try container.decodeIfPresent(String.self, forKey: .status)
             }
         }
 

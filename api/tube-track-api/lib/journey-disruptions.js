@@ -2,7 +2,6 @@ import { createHash } from 'node:crypto';
 import { ResourceCache } from './resource-cache.js';
 import { londonParts, parseJourneyTime } from './journey-time.js';
 
-const MODES = 'tube,dlr,overground,elizabeth-line,tram';
 const LIVE_TTL = 30_000;
 const WORKS_TTL = 300_000;
 const LOOKUP_TIMEOUT = 2_500;
@@ -57,7 +56,9 @@ export class JourneyDisruptions {
         // Both requests run together; a feed outage must not lose a valid route.
         const [realtime, plannedWorks] = await Promise.all([
             nearTerm
-                ? this.lookup('realtime', `/Line/Mode/${MODES}/Status`, LIVE_TTL, signal)
+                // By line rather than by mode: the catalogue's lines include
+                // Thameslink, which TfL files under the whole of National Rail.
+                ? this.lookup('realtime', `/Line/${this.lineIDs.join(',')}/Status`, LIVE_TTL, signal)
                 : { status: 'notApplicable', checkedAt: null, data: [] },
             // Dated feeds also contain realtime statuses, so near-term searches
             // need the same freshness as the live feed.

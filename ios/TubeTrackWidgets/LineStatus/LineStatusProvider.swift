@@ -79,11 +79,11 @@ struct LineStatusProvider: AppIntentTimelineProvider {
         Self.logger.notice("Loading status for \(lineIDs.count) lines (\(configuration.lines.count) configured)")
         do {
             let response = try await TubeTrackAPIClient(clientSurface: .widget).getSnapshot(
-                "/api/v1/status", as: [TfLLineStatus].self
+                "/api/v1/status", as: LossyList<TfLLineStatus>.self
             )
             return LineStatusEntry(
                 date: now,
-                rows: Self.rows(from: response.data, lineIDs: lineIDs, disruptionsFirst: configuration.disruptionsFirst),
+                rows: Self.rows(from: response.data.elements, lineIDs: lineIDs, disruptionsFirst: configuration.disruptionsFirst),
                 updatedAt: response.updatedAt,
                 isCached: response.cached || response.stale,
                 failed: false

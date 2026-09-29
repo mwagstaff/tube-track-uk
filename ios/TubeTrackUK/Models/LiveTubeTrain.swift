@@ -13,6 +13,18 @@ struct LiveTubeTrain: Identifiable, Codable, Hashable, Sendable {
     let progress: Double
     let secondsToNextStation: Int
     let updatedAt: Date
+    /// Where the train next calls, when that is beyond the end of its segment:
+    /// a National Rail fast service runs through stations without stopping.
+    var nextStopID: String? = nil
+    var nextStopExpectedAt: Date? = nil
+
+    /// The station the train next stops at, for passengers.
+    var callingStationID: String { nextStopID ?? nextStationID }
+
+    func secondsToNextStop(at date: Date) -> Int {
+        guard let nextStopExpectedAt else { return remainingSecondsToNextStation(at: date) }
+        return max(0, Int(nextStopExpectedAt.timeIntervalSince(date)))
+    }
 
     func projectedProgress(at date: Date) -> Double {
         guard secondsToNextStation > 0 else { return progress }
@@ -54,7 +66,9 @@ struct LiveTubeTrain: Identifiable, Codable, Hashable, Sendable {
             segmentID: routeSource.segmentID,
             progress: min(1, max(0, progress)),
             secondsToNextStation: max(1, secondsToNextStation),
-            updatedAt: updatedAt
+            updatedAt: updatedAt,
+            nextStopID: routeSource.nextStopID,
+            nextStopExpectedAt: routeSource.nextStopExpectedAt
         )
     }
 

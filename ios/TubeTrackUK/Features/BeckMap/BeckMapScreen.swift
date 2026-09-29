@@ -361,6 +361,7 @@ struct BeckMapCanvas: View {
     private var debugReferenceImage: UIImage? { renderCache.debugReferenceImage }
 
     @State private var camera = BeckMapLayerCamera()
+    @State private var labelLayoutCache = BeckMapLabelLayoutCache()
     @State private var renderScale: CGFloat = 0.35
     @State private var renderOffset = CGSize.zero
     @State private var minimumCameraScale: CGFloat = 0.2
@@ -558,7 +559,7 @@ struct BeckMapCanvas: View {
                                    ),
                                    CGRect(origin: .zero, size: viewport.size).contains(markerPoint),
                                    let nextStopName = appState.graph?
-                                       .stationsByID[train.nextStationID]?.name {
+                                       .stationsByID[train.callingStationID]?.name {
                                     TrainMapCalloutOverlay(
                                         train: train,
                                         servicePresentation: .resolve(
@@ -986,7 +987,32 @@ struct BeckMapCanvas: View {
                     )
                 }
             }
+            let outerWidth = lineGroup.lineID.usesParallelSchematicStroke
+                ? document.styles.parallelRouteOuterStrokeWidth(for: lineGroup.lineID)
+                : document.styles.routeStrokeWidth
+            let extensionColor = palette.routeColor(for: lineGroup.lineID, muted: uniformMuted ?? false)
+            if let extensionPath = lineGroup.extensionPath {
+                mapContext.stroke(
+                    extensionPath,
+                    with: .color(extensionColor),
+                    style: StrokeStyle(lineWidth: outerWidth, lineCap: .butt, lineJoin: .round)
+                )
+            }
+            if let arrowheadPath = lineGroup.arrowheadPath {
+                mapContext.fill(arrowheadPath, with: .color(extensionColor))
+            }
+            let innerDash = lineGroup.lineID.schematicInnerDash ?? []
             if lineGroup.lineID.usesParallelSchematicStroke {
+                // Dashes need butt caps: round caps would close the gaps.
+                let innerStyle = StrokeStyle(
+                    lineWidth: document.styles.parallelRouteInnerStrokeWidth(for: lineGroup.lineID),
+                    lineCap: innerDash.isEmpty ? .round : .butt,
+                    lineJoin: .round,
+                    dash: innerDash
+                )
+                if let extensionPath = lineGroup.extensionPath {
+                    mapContext.stroke(extensionPath, with: .color(palette.paper), style: innerStyle)
+                }
                 if presentation.showsMobileCoverage {
                     for (segment, _, coverage) in mixedSegments {
                         mapContext.stroke(
@@ -1004,11 +1030,7 @@ struct BeckMapCanvas: View {
                     mapContext.stroke(
                         lineGroup.combinedPath,
                         with: .color(palette.paper),
-                        style: StrokeStyle(
-                            lineWidth: document.styles.parallelRouteInnerStrokeWidth(for: lineGroup.lineID),
-                            lineCap: .round,
-                            lineJoin: .round
-                        )
+                        style: innerStyle
                     )
                 }
             }
@@ -2228,6 +2250,32 @@ struct BeckMapCanvas: View {
             return []
         }
 
+        let key = BeckMapLabelCacheKey(
+            documentID: document.identifier,
+            graphGeneratedAt: document.source.graphGeneratedAt,
+            presentation: presentation,
+            colorScheme: colorScheme,
+            cameraScale: cameraScale,
+            cameraOffset: cameraOffset,
+            canvasSize: viewport,
+            labelTypeScale: labelTypeScale
+        )
+        // Hit testing and river-label exclusions use the same geometry layout.
+        // Touch/chrome updates must not repeat the collision solver, including
+        // while this retained map is hidden behind the geographic map.
+        return labelLayoutCache.placements(for: key) {
+            makeStationLabelPlacements(
+                in: viewport, cameraScale: cameraScale, cameraOffset: cameraOffset
+            )
+        }
+    }
+
+    private func makeStationLabelPlacements(
+        in viewport: CGSize,
+        cameraScale: CGFloat,
+        cameraOffset: CGSize
+    ) -> [StationLabelPlacement] {
+
         let selectedStationID = presentation.selectedStationID
         let visibleLabels = renderedLabels.filter { renderedLabel in
             let label = renderedLabel.label
@@ -2687,16 +2735,33 @@ struct BeckMapCanvas: View {
                 seenLineIDs.insert(segment.lineID).inserted ? segment.lineID : nil
             }
             let segmentsByLineID = Dictionary(grouping: renderedSegments, by: \.lineID)
+            let extensionsByLineID = Dictionary(grouping: document.lineExtensions ?? [], by: \.lineID)
             self.renderedLineGroups = orderedLineIDs.map { lineID in
                 let segments = segmentsByLineID[lineID, default: []]
                 var combinedPath = Path()
                 for segment in segments {
                     combinedPath.addPath(segment.path)
                 }
+                var extensionPath = Path()
+                var arrowheadPath = Path()
+                for lineExtension in extensionsByLineID[lineID, default: []] {
+                    if let commands = paths[lineExtension.pathID] {
+                        extensionPath.addPath(BeckMapCanvas.makePath(commands: commands, translation: .zero))
+                    }
+                    if let first = lineExtension.arrowhead.first {
+                        arrowheadPath.move(to: CGPoint(first))
+                        for point in lineExtension.arrowhead.dropFirst() {
+                            arrowheadPath.addLine(to: CGPoint(point))
+                        }
+                        arrowheadPath.closeSubpath()
+                    }
+                }
                 return RenderedLineGroup(
                     lineID: lineID,
                     segments: segments,
-                    combinedPath: combinedPath
+                    combinedPath: combinedPath,
+                    extensionPath: extensionPath.isEmpty ? nil : extensionPath,
+                    arrowheadPath: arrowheadPath.isEmpty ? nil : arrowheadPath
                 )
             }
 
@@ -2818,6 +2883,9 @@ struct BeckMapCanvas: View {
         let lineID: TubeLineID
         let segments: [RenderedSegment]
         let combinedPath: Path
+        /// "Towards" continuations past the last mapped station, and their arrows.
+        var extensionPath: Path? = nil
+        var arrowheadPath: Path? = nil
     }
 
     struct RenderedWaterway {
@@ -3940,7 +4008,7 @@ private struct BeckMapArtworkCacheKey: Equatable {
     let canvasSize: CGSize
 }
 
-private struct BeckMapLabelCacheKey: Equatable {
+struct BeckMapLabelCacheKey: Equatable {
     let documentID: String
     let graphGeneratedAt: String
     let presentation: BeckMapPresentationSnapshot
@@ -3949,6 +4017,25 @@ private struct BeckMapLabelCacheKey: Equatable {
     let cameraOffset: CGSize
     let canvasSize: CGSize
     let labelTypeScale: CGFloat
+}
+
+/// One retained layout per canvas; a camera rebase or presentation change
+/// replaces it. This is intentionally not observable: memoization is not UI state.
+@MainActor
+final class BeckMapLabelLayoutCache {
+    private var key: BeckMapLabelCacheKey?
+    private var value: [StationLabelPlacement] = []
+
+    func placements(
+        for key: BeckMapLabelCacheKey,
+        build: () -> [StationLabelPlacement]
+    ) -> [StationLabelPlacement] {
+        if self.key == key { return value }
+        let placements = build()
+        self.key = key
+        value = placements
+        return placements
+    }
 }
 
 private struct BeckMapTrainCacheKey: Equatable {

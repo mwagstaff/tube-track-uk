@@ -280,6 +280,68 @@ For detailed geographic geometry, pass a reproducible OSM PBF containing
 Reviewed OSM geometry for every supported TfL rail line is retained during
 API-only refreshes; TfL route geometry is used as the fallback.
 
+A full refresh also picks up any TfL topology drift on every other line, which
+the authored Beck map may not match. To add or refresh specific lines only,
+leaving every other station and segment untouched:
+
+```sh
+python3 Tools/TubeGraphBuilder/build_graph.py --only-lines thameslink
+```
+
+Regenerate the derived station lists after any graph change:
+
+```sh
+python3 Tools/StationIndexBuilder/build_station_index.py
+node ../api/tube-track-api/scripts/build-journey-stations.js
+python3 Tools/MobileCoverageBuilder/build_mobile_coverage.py
+python3 Tools/NationalRailOperatorsBuilder/build_national_rail_operators.py
+```
+
+The last of these lists the other National Rail operators (Southern,
+Southeastern...) calling at each mapped station, from TfL StopPoint data, for
+the station cards and the status panel. Anonymous TfL requests are rate
+limited; set `TUBETRACK_UK_TFL_UNIFIED_API_KEY` to lift that.
+
+### Thameslink
+
+Thameslink is National Rail, and TfL's route sequences cover the whole
+network (Bedford to Brighton) as stopping patterns. `build_graph.py` clips it to
+the stations the TfL standard map draws, using `CURATED_LINE_RUNS`: all-stops
+runs that follow the map's own drawing. Every clipped TfL pattern must be a
+walk through those runs or the build fails, so a new TfL service pattern is
+caught rather than turned into a chord. St Pancras is `910GSTPXBOX`, the stop
+TfL publishes Thameslink departures against.
+
+TfL's Thameslink geometry is only station-to-station chords, so the real-world
+map's track comes from TrainTrack UK's routed OpenStreetMap railway graph. The
+tool matches each station to its CRS code by name (checked against its
+coordinates) and routes every segment between the stations' platform anchors,
+rejecting detours:
+
+```sh
+python3 Tools/TubeGraphBuilder/route_national_rail_geography.py \
+  --train-track ../../train-track-uk
+```
+
+Rerun it after `build_graph.py --only-lines thameslink`; later refreshes keep
+the routed geometry.
+
+The artwork comes from TfL's pink master paths
+(`Tools/BeckMapBuilder/build_thameslink_extensions.py`), including the dashed
+National Rail inset and the "Towards ..." arrows where the line leaves the map
+(`lineExtensions` in the document). `build_full_underground.py` includes it in
+full builds. To add Thameslink to an already-composed document in place:
+
+```sh
+python3 Tools/BeckMapBuilder/build_thameslink_extensions.py \
+  --svg /tmp/tfl.svg --graph TubeTrackUK/Resources/TubeGraph.json \
+  --document <document without Thameslink> \
+  --output TubeTrackUK/Resources/BeckMap/v1/full-underground.json
+```
+
+That pass finishes with the TfL reference alignment, which draws the stations'
+roundels, ticks and interchange bars from the reference.
+
 ## Auditing authored map fidelity
 
 The structural fidelity audit checks every route command, roundel, ordinary

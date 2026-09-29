@@ -451,6 +451,8 @@ private final class TabBarAppearanceController: UIViewController, UITabBarContro
     var reduceMotion = false
     var onMapTabSelected: () -> Void = {}
     private weak var configuredTabBar: UITabBar?
+    private var appliedBackgroundColor: UIColor?
+    private var appliedBackgroundIsTransparent: Bool?
     private weak var observedTabBarController: UITabBarController?
     private var forwardingDelegate: (any UITabBarControllerDelegate)?
 
@@ -474,20 +476,28 @@ private final class TabBarAppearanceController: UIViewController, UITabBarContro
         let tabBar = resolvedTabBarController.tabBar
         observeSelection(on: resolvedTabBarController)
 
-        let appearance = UITabBarAppearance()
-        if backgroundIsTransparent {
-            appearance.configureWithTransparentBackground()
-        } else {
-            appearance.configureWithOpaqueBackground()
-        }
-        appearance.backgroundColor = backgroundColor
-        if backgroundIsTransparent {
-            appearance.shadowColor = .clear
-        }
+        // Hiding chrome at pan onset changes only alpha. Reinstalling appearance
+        // here also rebuilds the tab bar's glass/layout on that first touch frame.
+        if configuredTabBar !== tabBar
+            || appliedBackgroundColor != backgroundColor
+            || appliedBackgroundIsTransparent != backgroundIsTransparent {
+            let appearance = UITabBarAppearance()
+            if backgroundIsTransparent {
+                appearance.configureWithTransparentBackground()
+            } else {
+                appearance.configureWithOpaqueBackground()
+            }
+            appearance.backgroundColor = backgroundColor
+            if backgroundIsTransparent {
+                appearance.shadowColor = .clear
+            }
 
-        tabBar.isTranslucent = backgroundIsTransparent
-        tabBar.standardAppearance = appearance
-        tabBar.scrollEdgeAppearance = appearance
+            tabBar.isTranslucent = backgroundIsTransparent
+            tabBar.standardAppearance = appearance
+            tabBar.scrollEdgeAppearance = appearance
+            appliedBackgroundColor = backgroundColor
+            appliedBackgroundIsTransparent = backgroundIsTransparent
+        }
 
         let targetAlpha = screenFurnitureVisible ? 1.0 : 0.0
         tabBar.isUserInteractionEnabled = screenFurnitureVisible

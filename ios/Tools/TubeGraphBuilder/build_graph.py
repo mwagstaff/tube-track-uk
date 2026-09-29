@@ -44,7 +44,53 @@ LINE_IDS = (
     "suffragette",
     "weaver",
     "windrush",
+    "thameslink",
 )
+
+# National Rail lines are clipped to the stations the TfL standard map draws.
+# TfL's route sequences describe stopping patterns across the whole network
+# (Bedford to Brighton), and their fast services would otherwise become chords
+# such as St Pancras-West Hampstead. These all-stops runs follow the map's own
+# drawing; every clipped TfL pattern must be a walk through them.
+CURATED_LINE_RUNS: dict[str, tuple[tuple[str, ...], ...]] = {
+    "thameslink": (
+        # Midland Main Line, core and Brighton Main Line.
+        ("910GELTR", "910GMLHB", "910GHDON", "910GBRENTX", "910GCRKLWD", "910GWHMPSTM",
+         "910GKNTSHTN", "910GSTPXBOX", "910GFRNDNLT", "910GCTMSLNK", "910GBLFR",
+         "910GLNDNBDC", "910GNORWDJ", "910GECROYDN", "910GSCROYDN", "910GPURLEY",
+         "910GCOLSDNS"),
+        # East Coast Main Line via the Canal Tunnels.
+        ("910GNBARNET", "910GOKLGHPK", "910GNEWSGAT", "910GFNPK", "910GSTPXBOX"),
+        # Elephant & Castle, the Wimbledon loop and the Sutton loop.
+        ("910GBLFR", "910GELPHNAC", "910GLBGHJN", "910GHERNEH", "910GTULSEH",
+         "910GSTRETHM", "910GTOOTING", "910GHYDNSRD", "910GWIMBLDN", "910GWIMLCHS",
+         "910GSMERTON", "910GMORDENS", "910GSHLIER", "910GSUTTONC", "910GWSUTTON",
+         "910GSUTTON", "910GCRSHLTN", "910GHKBG", "910GMITCHMJ", "910GESTFLDS",
+         "910GSTRETHM"),
+        # Catford loop to Orpington, and the Swanley branch at Bickley.
+        ("910GELPHNAC", "910GDENMRKH", "910GPCKHMRY", "910GNUNHEAD", "910GCFPK",
+         "910GCATFORD", "910GBELNGHM", "910GBCKNHMH", "910GRBRN", "910GSHRTLND",
+         "910GBROMLYS", "910GBICKLEY", "910GPETSWD", "910GORPNGTN"),
+        ("910GBICKLEY", "910GSTMRYC", "910GSWLY"),
+        # Greenwich line.
+        ("910GLNDNBDC", "910GDEPTFD", "910GGNWH", "910GMAZEH", "910GWCOMBEP", "910GCRLN",
+         "910GWOLWCHA", "910GPLMS", "910GABWD", "910GSLADEGN", "910GDARTFD"),
+    ),
+}
+
+# TfL publishes St Pancras's Thameslink platforms as their own stop, which is
+# the only one that returns Thameslink departures.
+CURATED_STOP_ALIASES: dict[str, str] = {"910GSTPX": "910GSTPXBOX"}
+
+CURATED_STATION_NAMES: dict[str, str] = {
+    "910GSTPXBOX": "St Pancras International",
+    "910GBLFR": "Blackfriars",
+    "910GSUTTON": "Sutton",
+    "910GSHLIER": "St Helier",
+    "910GABWD": "Abbey Wood",
+    "910GBRENTX": "Brent Cross West",
+}
+
 OUTPUT = Path(__file__).resolve().parents[2] / "TubeTrackUK" / "Resources" / "TubeGraph.json"
 
 # These coordinates are an original, topology-led central London composition.
@@ -194,6 +240,15 @@ def parse_args() -> argparse.Namespace:
         help="Filtered OSM PBF containing TfL rail route relations and railway ways.",
     )
     parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument(
+        "--only-lines",
+        type=lambda value: tuple(part for part in value.split(",") if part),
+        help=(
+            "Comma-separated line IDs to add or refresh in the existing output. "
+            "Every other line, station and segment is kept byte-for-byte, so a new "
+            "line can land without absorbing unrelated TfL topology drift."
+        ),
+    )
     return parser.parse_args()
 
 
@@ -204,6 +259,66 @@ def fetch_json(path: str) -> Any:
     )
     with urllib.request.urlopen(request, timeout=60) as response:
         return json.load(response)
+
+
+def curated_line_payload(line_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    """Clip a National Rail payload to its mapped stations and all-stops runs."""
+    runs = CURATED_LINE_RUNS[line_id]
+    allowed = {station_id for run in runs for station_id in run}
+    adjacency: defaultdict[str, set[str]] = defaultdict(set)
+    for run in runs:
+        for first, second in zip(run, run[1:]):
+            adjacency[first].add(second)
+            adjacency[second].add(first)
+
+    def connected(first: str, second: str) -> bool:
+        seen, frontier = {first}, [first]
+        while frontier:
+            current = frontier.pop()
+            if current == second:
+                return True
+            for neighbour in adjacency[current] - seen:
+                seen.add(neighbour)
+                frontier.append(neighbour)
+        return False
+
+    points: dict[str, dict[str, Any]] = {}
+    for sequence in payload.get("stopPointSequences", []):
+        for point in sequence.get("stopPoint", []):
+            station_id = CURATED_STOP_ALIASES.get(point.get("id"), point.get("id"))
+            if station_id in allowed:
+                points[station_id] = {**point, "id": station_id}
+    for station_id in sorted(allowed - set(points)):
+        point = fetch_json(f"/StopPoint/{urllib.parse.quote(station_id)}")
+        points[station_id] = {
+            "id": station_id,
+            "name": point.get("commonName", station_id),
+            "lat": point.get("lat"),
+            "lon": point.get("lon"),
+            "topMostParentId": point.get("hubNaptanCode") or point.get("stationNaptan"),
+        }
+    for station_id, name in CURATED_STATION_NAMES.items():
+        if station_id in points:
+            points[station_id]["name"] = name
+
+    for route in payload.get("orderedLineRoutes", []):
+        clipped = [
+            station_id
+            for station_id in (CURATED_STOP_ALIASES.get(value, value) for value in route.get("naptanIds", []))
+            if station_id in allowed
+        ]
+        for first, second in zip(clipped, clipped[1:]):
+            if not connected(first, second):
+                raise ValueError(
+                    f"{line_id} route {route.get('name')} joins {first} and {second}, "
+                    "which the curated map runs do not connect"
+                )
+
+    return {
+        **payload,
+        "stopPointSequences": [{"stopPoint": [points[station_id] for station_id in sorted(points)]}],
+        "orderedLineRoutes": [{"naptanIds": list(run)} for run in runs],
+    }
 
 
 def clean_station_name(name: str) -> str:
@@ -458,9 +573,50 @@ def routed_geographic_path(
     ]
 
 
+def merged_graph_parts(
+    existing: dict[str, Any],
+    stations: list[dict[str, Any]],
+    segments: list[dict[str, Any]],
+    lines: list[dict[str, Any]],
+    refreshed: set[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """Replace only the refreshed lines inside an existing graph."""
+    merged: dict[str, dict[str, Any]] = {}
+    for station in existing["stations"]:
+        kept = dict(station)
+        kept["lineIDs"] = [line_id for line_id in kept["lineIDs"] if line_id not in refreshed]
+        merged[kept["id"]] = kept
+    for station in stations:
+        if station["id"] in merged:
+            kept = merged[station["id"]]
+            kept["lineIDs"] = sorted(set(kept["lineIDs"]) | set(station["lineIDs"]))
+        else:
+            merged[station["id"]] = station
+    merged = {station_id: station for station_id, station in merged.items() if station["lineIDs"]}
+
+    hub_lines: defaultdict[str, set[str]] = defaultdict(set)
+    for station in merged.values():
+        hub_lines[station.get("hubID") or station["id"]].update(station["lineIDs"])
+    for station in merged.values():
+        station["interchange"] = len(hub_lines[station.get("hubID") or station["id"]]) > 1
+
+    kept_segments = [segment for segment in existing["segments"] if segment["lineID"] not in refreshed]
+    kept_lines = [line for line in existing["lines"] if line["id"] not in refreshed]
+    return list(merged.values()), kept_segments + segments, kept_lines + lines
+
+
 def main() -> int:
     args = parse_args()
+    line_ids = args.only_lines or LINE_IDS
+    unknown = set(line_ids) - set(LINE_IDS)
+    if unknown:
+        print(f"ERROR: unknown line IDs {sorted(unknown)}", file=sys.stderr)
+        return 1
+    existing_graph: dict[str, Any] | None = None
     existing_geography: dict[str, list[dict[str, float]]] = {}
+    if args.only_lines and not args.output.is_file():
+        print("ERROR: --only-lines needs an existing output graph to merge into", file=sys.stderr)
+        return 1
     if args.output.is_file():
         try:
             existing_graph = json.loads(args.output.read_text(encoding="utf-8"))
@@ -483,12 +639,14 @@ def main() -> int:
     station_lines: defaultdict[str, set[str]] = defaultdict(set)
     line_payloads: dict[str, dict[str, Any]] = {}
 
-    for line_id in LINE_IDS:
+    for line_id in line_ids:
         print(f"Fetching {line_id} topology...", file=sys.stderr)
         direction = "all" if line_id == "tram" else "outbound"
         payload = fetch_json(
             f"/Line/{urllib.parse.quote(line_id)}/Route/Sequence/{direction}?serviceTypes=Regular"
         )
+        if line_id in CURATED_LINE_RUNS:
+            payload = curated_line_payload(line_id, payload)
         line_payloads[line_id] = payload
 
         for sequence in payload.get("stopPointSequences", []):
@@ -497,6 +655,11 @@ def main() -> int:
                 latitude = point.get("lat")
                 longitude = point.get("lon")
                 if not station_id or latitude is None or longitude is None:
+                    continue
+                if station_id in station_records and line_id in CURATED_LINE_RUNS:
+                    # A shared station keeps its identity from the TfL line
+                    # that already serves it.
+                    station_lines[station_id].add(line_id)
                     continue
                 station_records[station_id] = {
                     "id": station_id,
@@ -511,12 +674,28 @@ def main() -> int:
             for station_id in route.get("naptanIds", []):
                 station_lines[station_id].add(line_id)
 
+    existing_stations: dict[str, dict[str, Any]] = {}
+    if args.only_lines and existing_graph is not None:
+        existing_stations = {station["id"]: station for station in existing_graph["stations"]}
+        for station_id, station in station_records.items():
+            if station_id in existing_stations:
+                kept = existing_stations[station_id]
+                station.update({key: kept[key] for key in ("name", "latitude", "longitude", "hubID") if key in kept})
+
     hub_lines: defaultdict[str, set[str]] = defaultdict(set)
     for station_id, station in station_records.items():
         hub_lines[station.get("hubID") or station_id].update(station_lines[station_id])
 
     stations: list[dict[str, Any]] = []
-    station_points = topology_schematic_points(station_records, line_payloads)
+    # Curated National Rail runs never move a station another line has placed;
+    # their own stations fall back to the geographic warp.
+    station_points = topology_schematic_points(
+        station_records,
+        {line_id: payload for line_id, payload in line_payloads.items() if line_id not in CURATED_LINE_RUNS},
+    )
+    for station_id, station in existing_stations.items():
+        if station_id in station_points:
+            station_points[station_id] = (station["schematicX"], station["schematicY"])
     for station_id, station in station_records.items():
         x, y = station_points[station_id]
         lines = sorted(station_lines[station_id])
@@ -537,7 +716,7 @@ def main() -> int:
     segments: list[dict[str, Any]] = []
     lines: list[dict[str, Any]] = []
 
-    for line_id in LINE_IDS:
+    for line_id in line_ids:
         payload = line_payloads[line_id]
         line_strings = geographic_line_strings(payload)
         segment_ids: list[str] = []
@@ -610,6 +789,9 @@ def main() -> int:
                 "routes": routes,
             }
         )
+
+    if args.only_lines and existing_graph is not None:
+        stations, segments, lines = merged_graph_parts(existing_graph, stations, segments, lines, set(line_ids))
 
     stations.sort(key=lambda station: station["name"])
     segments.sort(key=lambda segment: segment["id"])
