@@ -62,9 +62,29 @@ struct DepartureTrackButton: View {
     let action: () -> Void
 
     var body: some View {
+        DepartureBoardActionButton(
+            title: isTracking ? "Tracking" : "Track",
+            systemImage: isTracking ? "dot.radiowaves.left.and.right" : "pin",
+            isActive: isTracking,
+            action: action
+        )
+        .accessibilityLabel("\(isTracking ? "Stop tracking" : "Track") \(boardName) departures")
+        .accessibilityHint(isTracking
+            ? "Removes the departure board from the Lock Screen"
+            : "Shows this departure board on the Lock Screen")
+    }
+}
+
+/// Keeps the adjacent Schedule and Track actions visually identical.
+struct DepartureBoardActionButton: View {
+    let title: String
+    let systemImage: String
+    var isActive = false
+    let action: () -> Void
+
+    var body: some View {
         Button(action: action) {
-            Label(isTracking ? "Tracking" : "Track",
-                  systemImage: isTracking ? "dot.radiowaves.left.and.right" : "pin")
+            Label(title, systemImage: systemImage)
                 .font(.appCaption(.semibold))
                 .labelStyle(.titleAndIcon)
                 .padding(.horizontal, 10)
@@ -73,10 +93,6 @@ struct DepartureTrackButton: View {
         }
         .buttonStyle(.plain)
         .glassEffect(.regular.interactive(), in: .capsule)
-        .foregroundStyle(isTracking ? Color.departureAccent : .secondary)
-        .accessibilityLabel("\(isTracking ? "Stop tracking" : "Track") \(boardName) departures")
-        .accessibilityHint(isTracking
-            ? "Removes the departure board from the Lock Screen"
-            : "Shows this departure board on the Lock Screen")
+        .foregroundStyle(isActive ? Color.departureAccent : .secondary)
     }
 }

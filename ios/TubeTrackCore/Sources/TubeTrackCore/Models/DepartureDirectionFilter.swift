@@ -42,6 +42,10 @@ public enum DepartureDirectionFilter: String, CaseIterable, Sendable, Codable {
         allCases.first { $0 != .any && $0.matches(label) } ?? .any
     }
 
+    public static func available(in arrivals: [TfLArrivalPrediction], lineID: String) -> [DepartureDirectionFilter] {
+        available(in: arrivals.filter { $0.lineId == lineID })
+    }
+
     /// The filters worth offering for a set of live predictions — used to keep
     /// the picker honest where we do have data to hand.
     public static func available(in arrivals: [TfLArrivalPrediction]) -> [DepartureDirectionFilter] {

@@ -25,6 +25,10 @@ struct UnifiedMapScreen: View {
     @State private var realWorldOverviewOpacity = 1.0
     @State private var showsExploreHint = true
     @State private var exploreHintOpacity = 1.0
+    /// The renderers are Equatable, so SwiftUI may keep callbacks created in an
+    /// earlier body pass. Those callbacks read Reduce Motion from this state
+    /// rather than from a captured, possibly stale, environment value.
+    @State private var callbackReduceMotion = false
 
     var body: some View {
         ZStack {
@@ -36,6 +40,7 @@ struct UnifiedMapScreen: View {
                 onInteractionChange: setMapNavigation(active:),
                 onBackgroundTap: handleMapBackgroundTap
             )
+                .equatable()
                 .opacity(beckRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .beck)
 
@@ -48,6 +53,7 @@ struct UnifiedMapScreen: View {
                 onInteractionChange: setMapNavigation(active:),
                 onUserInteraction: handleMapInteraction
             )
+                .equatable()
                 .opacity(realWorldRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .realWorld)
 
@@ -140,6 +146,9 @@ struct UnifiedMapScreen: View {
                     }
                 }
             }
+        }
+        .onChange(of: reduceMotion, initial: true) { _, reduceMotion in
+            callbackReduceMotion = reduceMotion
         }
         .onDisappear {
             setMapNavigation(active: false)
@@ -261,7 +270,7 @@ struct UnifiedMapScreen: View {
     }
 
     private func setClosestStationPanel(hidden: Bool) {
-        if reduceMotion {
+        if callbackReduceMotion {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) {
@@ -279,7 +288,7 @@ struct UnifiedMapScreen: View {
         guard mapNavigationActive != active else { return }
         // Give a network-map drag immediate visual feedback and keep glass
         // compositing work out of its first frame. Animate the furniture's return.
-        if reduceMotion || (active && appState.mapPresentationMode == .beck) {
+        if callbackReduceMotion || (active && appState.mapPresentationMode == .beck) {
             var transaction = Transaction()
             transaction.disablesAnimations = true
             withTransaction(transaction) {

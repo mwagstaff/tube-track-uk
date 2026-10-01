@@ -5,8 +5,11 @@ struct GeographicRiverBoats: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let proxy: MapProxy
+    let camera: GeographicCameraState
 
     var body: some View {
+        // Redraw with the camera; the Map content itself no longer re-renders.
+        let _ = camera.region
         TimelineView(.periodic(from: .now, by: reduceMotion ? 30 : 1)) { timeline in
             Canvas { context, size in
                 let river = appState.river

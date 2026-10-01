@@ -10,6 +10,7 @@ import { isRiverBusLine } from '../river.js';
 import { projectRiverBoard, riverCondition } from './river-departure-projection.js';
 import { LINE_COLOURS } from '../line-colours.js';
 import { THAMESLINK_LINE_ID, THAMESLINK_STOP_IDS } from '../thameslink.js';
+import { correctRailBoard } from './rail-departures.js';
 
 const ACTIVITY_MAX_DURATION_MS = 90 * 60 * 1_000;
 // Each distinct Thameslink stop costs one TfL request per 30 seconds; beyond
@@ -37,6 +38,7 @@ export class LiveActivityNotifier {
         statuses = async () => [],
         river = null,
         thameslink = null,
+        railDepartures = null,
         clock = Date.now,
         maxDurationMs = ACTIVITY_MAX_DURATION_MS
     }) {
@@ -48,6 +50,7 @@ export class LiveActivityNotifier {
         this.statuses = statuses;
         this.river = river;
         this.thameslink = thameslink;
+        this.railDepartures = railDepartures;
         this.clock = clock;
         this.maxDurationMs = maxDurationMs;
     }
@@ -76,7 +79,7 @@ export class LiveActivityNotifier {
 
         const conditions = conditionsByLine(await this.#safeStatuses());
         const nowMs = this.clock();
-        const pass = { thameslinkBoards: new Map(), thameslinkStops: new Set() };
+        const pass = { thameslinkBoards: new Map(), thameslinkStops: new Set(), railBoards: new Map() };
         let sent = 0;
 
         for (const row of rows) {
@@ -118,7 +121,8 @@ export class LiveActivityNotifier {
     }
 
     async #considerRow({ row, snapshot, conditions, nowMs, pass }) {
-        if (row.startedAtMs && nowMs - row.startedAtMs > this.maxDurationMs) {
+        if (row.scheduleId && nowMs >= row.hardEndsAtMs) return 'awaiting_end';
+        if (!row.scheduleId && row.startedAtMs && nowMs - row.startedAtMs > this.maxDurationMs) {
             // The client caps activities at 90 minutes and ends them itself;
             // this is the server letting go of one whose app never came back.
             this.store.delete(row.id);
@@ -185,10 +189,21 @@ export class LiveActivityNotifier {
             }
             condition = conditions.get(row.lineId) ?? null;
         } else {
-            board = projectBoard({
-                arrivals: snapshot.arrivals, stopIds: row.stopIds,
-                lineId: row.lineId, direction: row.direction, limit: MAXIMUM_DEPARTURES
-            });
+            try {
+                const corrected = await correctRailBoard({
+                    arrivals: snapshot.arrivals, stopIds: row.stopIds ?? [], lineId: row.lineId,
+                    source: this.railDepartures, nowMs,
+                    previousUpdatedAtMs: row.lastSourceUpdatedAtMs ?? 0, boards: pass.railBoards
+                });
+                sourceUpdatedAtMs = corrected.updatedAtMs;
+                board = projectBoard({
+                    arrivals: corrected.arrivals, stopIds: corrected.stopIds,
+                    lineId: row.lineId, direction: row.direction, limit: MAXIMUM_DEPARTURES
+                });
+            } catch (error) {
+                this.logger?.warn('push_rail_departures_unavailable', { error: error.message });
+                return 'unavailable';
+            }
             condition = conditions.get(row.lineId) ?? null;
         }
 
@@ -230,7 +245,7 @@ export class LiveActivityNotifier {
             event: 'update',
             contentState,
             timestampSeconds: updatedAtSeconds,
-            staleDateSeconds: isRiver ? Math.floor(sourceUpdatedAtMs / 1_000) + 90
+            staleDateSeconds: row.scheduleId ? Math.min(Math.floor(row.hardEndsAtMs / 1000), updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1000)) : isRiver ? Math.floor(sourceUpdatedAtMs / 1_000) + 90
                 : updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1_000),
             relevanceScore: relevanceScore(board, nowMs)
         });
@@ -245,7 +260,7 @@ export class LiveActivityNotifier {
                 pushType: 'liveactivity',
                 priority: verdict.priority,
                 // No point delivering a departure board after the train has gone.
-                expiration: updatedAtSeconds + 10 * 60,
+                expiration: row.scheduleId ? Math.min(updatedAtSeconds + 60, Math.floor(row.hardEndsAtMs / 1000)) : updatedAtSeconds + 10 * 60,
                 payload
             };
             result = await this.client.send({ ...request, environment });

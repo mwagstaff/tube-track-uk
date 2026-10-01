@@ -425,9 +425,7 @@ private struct StationDepartureWarningView: View {
 
 private struct StationDepartureGroupView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
     @State private var isExpanded = false
-
     let group: StationDepartureGroup
     let now: Date
     var statuses: [TfLLineStatus] = []
@@ -439,23 +437,7 @@ private struct StationDepartureGroupView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 7) {
-                HStack(spacing: 7) {
-                    TubeLineDot(lineID: group.lineID, size: 9)
-                    Text(group.lineID.displayName)
-                        .font(.appSubheadline(.bold))
-                    Text(group.direction)
-                        .font(.appSubheadline())
-                        .foregroundStyle(.secondary)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityAddTraits(.isHeader)
-
-                if let tracking, let boardActivity, boardActivity.areActivitiesEnabled {
-                    Spacer(minLength: 6)
-                    trackButton(tracking: tracking, controller: boardActivity)
-                }
-            }
+            StationDepartureBoardHeader(group: group, statuses: statuses, tracking: tracking)
 
             VStack(spacing: 8) {
                 ForEach(visibleArrivals, id: \.departureIdentity) { arrival in
@@ -480,46 +462,6 @@ private struct StationDepartureGroupView: View {
                 .accessibilityValue(isExpanded ? "Expanded" : "Collapsed")
             }
         }
-    }
-
-    /// One tap yields station, line and direction — exactly the identity a
-    /// tracked board needs — so there is nothing further to configure.
-    @ViewBuilder
-    private func trackButton(
-        tracking: DepartureTrackingContext,
-        controller: StationBoardActivityController
-    ) -> some View {
-        let isTracking = controller.isTracking(
-            hubID: tracking.hubID,
-            lineID: group.lineID,
-            direction: group.direction
-        )
-        DepartureTrackButton(isTracking: isTracking, boardName: "\(group.lineID.displayName) \(group.direction)") {
-            Task { await toggleTracking(tracking, controller: controller, isTracking: isTracking) }
-        }
-    }
-
-    private func toggleTracking(
-        _ tracking: DepartureTrackingContext,
-        controller: StationBoardActivityController,
-        isTracking: Bool
-    ) async {
-        guard !isTracking else {
-            await controller.end(reason: .userEnded)
-            return
-        }
-        await controller.start(
-            hubID: tracking.hubID,
-            stationName: tracking.stationName,
-            lineID: group.lineID,
-            direction: DepartureDirectionFilter.resolve(label: group.direction),
-            directionLabel: group.direction,
-            arrivals: group.arrivals,
-            statuses: statuses,
-            // A board with no timestamp is one we just fetched; treating it as
-            // older than it is would start the activity already stale.
-            updatedAt: tracking.updatedAt ?? .now
-        )
     }
 
     private func departureRow(
@@ -570,6 +512,123 @@ private struct StationDepartureGroupView: View {
             }
         }
     }
+}
+
+struct StationDepartureBoardHeader: View {
+    @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
+
+    @Environment(ScheduledJourneyStore.self) private var scheduleStore: ScheduledJourneyStore?
+    @State private var scheduling: ScheduledJourney?
+    @State private var choosesPeriod = false
+    let group: StationDepartureGroup
+    var statuses: [TfLLineStatus] = []
+    var tracking: DepartureTrackingContext?
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 7) {
+                boardHeading.fixedSize(horizontal: true, vertical: false)
+                Spacer(minLength: 6)
+                boardActions
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                boardHeading
+                HStack {
+                    Spacer(minLength: 0)
+                    boardActions
+                }
+            }
+        }
+
+        .confirmationDialog("Use this station for", isPresented: $choosesPeriod, titleVisibility: .visible) {
+            Button("Morning departures") { schedule(morning: true) }
+            Button("Afternoon departures") { schedule(morning: false) }
+        }
+        .sheet(item: $scheduling) { journey in
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
+        }
+    }
+
+    private var boardHeading: some View {
+        HStack(spacing: 7) {
+            TubeLineDot(lineID: group.lineID, size: 9)
+            Text(group.lineID.displayName)
+                .font(.appSubheadline(.bold))
+            Text(group.direction)
+                .font(.appSubheadline())
+                .foregroundStyle(.secondary)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    @ViewBuilder private var boardActions: some View {
+        if let tracking {
+            HStack(spacing: 7) {
+                if scheduleStore != nil {
+                    DepartureBoardActionButton(title: "Schedule", systemImage: "calendar.badge.clock") {
+                        choosesPeriod = true
+                    }
+                    .accessibilityLabel("Schedule \(group.lineID.displayName) \(group.direction) departures")
+                    .accessibilityHint("Sets the days and times for this departure board")
+                }
+                if let boardActivity, boardActivity.areActivitiesEnabled {
+                    trackButton(tracking: tracking, controller: boardActivity)
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+        }
+    }
+
+    private func schedule(morning: Bool) {
+        guard let tracking, let hub = StationIndex.bundled.hub(containing: tracking.hubID) else { return }
+        let board = ScheduledBoard(hub: hub, line: group.lineID,
+            direction: DepartureDirectionFilter.resolve(label: group.direction))
+        let window = ScheduledJourneyWindow(startMinute: morning ? 480 : 960,
+            endMinute: morning ? 600 : 1080, board: board)
+        scheduling = ScheduledJourney(morning: morning ? window : nil, afternoon: morning ? nil : window)
+    }
+
+    /// One tap yields station, line and direction — exactly the identity a
+    /// tracked board needs — so there is nothing further to configure.
+    @ViewBuilder
+    private func trackButton(
+        tracking: DepartureTrackingContext,
+        controller: StationBoardActivityController
+    ) -> some View {
+        let isTracking = controller.isTracking(
+            hubID: tracking.hubID,
+            lineID: group.lineID,
+            direction: group.direction
+        )
+        DepartureTrackButton(isTracking: isTracking, boardName: "\(group.lineID.displayName) \(group.direction)") {
+            Task { await toggleTracking(tracking, controller: controller, isTracking: isTracking) }
+        }
+    }
+
+    private func toggleTracking(
+        _ tracking: DepartureTrackingContext,
+        controller: StationBoardActivityController,
+        isTracking: Bool
+    ) async {
+        guard !isTracking else {
+            await controller.end(reason: .userEnded)
+            return
+        }
+        await controller.start(
+            hubID: tracking.hubID,
+            stationName: tracking.stationName,
+            lineID: group.lineID,
+            direction: DepartureDirectionFilter.resolve(label: group.direction),
+            directionLabel: group.direction,
+            arrivals: group.arrivals,
+            statuses: statuses,
+            // A board with no timestamp is one we just fetched; treating it as
+            // older than it is would start the activity already stale.
+            updatedAt: tracking.updatedAt ?? .now
+        )
+    }
+
 }
 
 private struct StationDepartureButtonStyle: ButtonStyle {

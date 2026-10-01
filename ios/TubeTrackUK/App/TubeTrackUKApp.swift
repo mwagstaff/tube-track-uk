@@ -2,6 +2,8 @@ import SwiftUI
 
 @main
 struct TubeTrackUKApp: App {
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var scheduledJourneys = ScheduledJourneyStore()
     @State private var appState = TubeAppState()
     @State private var backgroundImageStore = AppBackgroundImageStore()
     @State private var gameHighScoreStore = TubeGameHighScoreStore()
@@ -22,6 +24,11 @@ struct TubeTrackUKApp: App {
         WindowGroup {
             RootTabView()
                 .environment(appState)
+                .environment(scheduledJourneys)
+                .task { await scheduledJourneys.refresh() }
+                .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { Task { await scheduledJourneys.refresh() } }
+                }
                 .environment(backgroundImageStore)
                 .environment(gameHighScoreStore)
                 .environment(gameCenter)

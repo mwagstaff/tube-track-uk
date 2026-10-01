@@ -13,6 +13,7 @@ import Foundation
 ///    here is a Live Activity frozen on a passenger's Lock Screen.
 public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     /// Correlates the activity with its server-side push subscription.
+    public let scheduleID: String?
     public let activityID: String
     public let stationHubID: String
     public let stationName: String
@@ -60,6 +61,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         lineIDRaw: String, direction: String, directionFilter: DepartureDirectionFilter,
         startedAt: Date, hardEndsAt: Date
     ) {
+        scheduleID = nil
         self.activityID = activityID
         self.stationHubID = stationHubID
         self.stationName = String(stationName.prefix(40))
@@ -72,6 +74,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
 
     public init(from decoder: any Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
+        scheduleID = try container.decodeIfPresent(String.self, forKey: .scheduleID)
         activityID = try container.decodeIfPresent(String.self, forKey: .activityID) ?? ""
         stationHubID = try container.decodeIfPresent(String.self, forKey: .stationHubID) ?? ""
         stationName = try container.decodeIfPresent(String.self, forKey: .stationName) ?? ""

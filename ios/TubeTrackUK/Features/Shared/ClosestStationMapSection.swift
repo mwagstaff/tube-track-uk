@@ -201,7 +201,14 @@ private struct ClosestStationMapPanel: View {
         } else {
             VStack(alignment: .leading, spacing: 7) {
                 ForEach(Array(selectedGroups.enumerated()), id: \.element.id) { index, group in
-                    CompactStationDepartureGroupView(group: group, now: now)
+                    CompactStationDepartureGroupView(group: group,
+                        trackingGroup: StationDepartureGroup.groups(from: arrivals, for: group.lineID)
+                            .first { $0.id == group.id } ?? group,
+                        now: now, statuses: appState.statuses,
+                        tracking: DepartureTrackingContext(hubID: station.hubID ?? station.id,
+                            stationName: station.name,
+                            updatedAt: appState.nearbyArrivalsSourceUpdatedAt[station.id]
+                                ?? appState.nearbyArrivalsUpdatedAtByStationID[station.id]))
                     if index < selectedGroups.count - 1 {
                         Divider()
                     }
@@ -261,21 +268,14 @@ private struct ClosestStationMapPanel: View {
 
 private struct CompactStationDepartureGroupView: View {
     let group: StationDepartureGroup
+    let trackingGroup: StationDepartureGroup
     let now: Date
+    let statuses: [TfLLineStatus]
+    let tracking: DepartureTrackingContext
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
-                TubeLineDot(lineID: group.lineID, size: 8)
-                Text(group.lineID.displayName)
-                    .fontWeight(.semibold)
-                Text(group.direction)
-                    .foregroundStyle(.secondary)
-            }
-            .font(.appCaption())
-            .lineLimit(1)
-            .accessibilityElement(children: .combine)
-            .accessibilityAddTraits(.isHeader)
+            StationDepartureBoardHeader(group: trackingGroup, statuses: statuses, tracking: tracking)
 
             ForEach(group.arrivals, id: \.departureIdentity) { arrival in
                 HStack(alignment: .firstTextBaseline, spacing: 8) {

@@ -5,6 +5,9 @@ import test from 'node:test';
 import { LiveActivityNotifier } from '../lib/push/notifier.js';
 import { PushTokenStore } from '../lib/push/token-store.js';
 import { HEARTBEAT_MS } from '../lib/push/change-detector.js';
+import { createRailDepartureSource } from '../lib/push/rail-departures.js';
+import { ResourceCache } from '../lib/resource-cache.js';
+import { JourneyScheduler } from '../lib/scheduled-journeys.js';
 
 const NOW_MS = 1_800_000_000_000;
 
@@ -44,7 +47,7 @@ function fakeClient({ responses = [] } = {}) {
     };
 }
 
-async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS } = {}) {
+async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS, railDepartures } = {}) {
     const store = new PushTokenStore({
         filePath: path.join(os.tmpdir(), `tube-track-notifier-${process.hrtime.bigint()}.json`),
         flushDebounceMs: 60_000,
@@ -57,10 +60,131 @@ async function fixture({ rows = [], client = fakeClient(), statuses, clock = () 
         client,
         topic: 'dev.skynolimit.TubeTrackUK.push-type.liveactivity',
         statuses: statuses ?? (async () => []),
+        railDepartures,
         clock
     });
     return { store, notifier, client };
 }
+
+const ABBEY_WOOD = '910GABWDXR';
+const HEATHROW = '910GHTRWTM4';
+function abbeyWoodBulk() {
+    // Observed 2026-09-30: outbound times equal feed generation time, not
+    // departure time. These occupy all four slots before genuine future rows.
+    return [0, 1, 2, 3].map((index) => ({
+        ...arrival({ id: `expired-${index}`, vehicleId: `v-${index}`, seconds: -120 }),
+        stopId: ABBEY_WOOD, stationName: 'Abbey Wood', lineId: 'elizabeth',
+        platformName: '4', direction: 'outbound', destinationStopId: HEATHROW,
+        destinationName: 'Heathrow Terminal 4 Rail Station'
+    })).concat({
+        ...arrival({ seconds: 300 }), stopId: ABBEY_WOOD, stationName: 'Abbey Wood',
+        lineId: 'elizabeth', destinationStopId: ABBEY_WOOD, destinationName: 'Abbey Wood'
+    });
+}
+
+function abbeyWoodDeparture(overrides = {}) {
+    return { naptanId: ABBEY_WOOD, stationName: 'Abbey Wood',
+        destinationNaptanId: HEATHROW, destinationName: 'Heathrow Terminal 4 Rail Station',
+        platformName: 'Platform 4', departureStatus: 'OnTime',
+        estimatedTimeOfDeparture: new Date(NOW_MS + 300_000).toISOString(),
+        scheduledTimeOfDeparture: new Date(NOW_MS + 300_000).toISOString(), ...overrides };
+}
+
+test('Abbey Wood pushes real departures instead of expired bulk rows or incoming terminators', async () => {
+    const calls = [];
+    const railDepartures = createRailDepartureSource({ clock: () => NOW_MS,
+        resourceCache: new ResourceCache({ clock: () => NOW_MS }),
+        client: { async fetchJSON(path, options) {
+            calls.push({ path, options });
+            return [abbeyWoodDeparture(),
+                abbeyWoodDeparture({ destinationNaptanId: ABBEY_WOOD, destinationName: 'Abbey Wood' }),
+                abbeyWoodDeparture({ estimatedTimeOfDeparture: null, scheduledTimeOfDeparture: null }),
+                abbeyWoodDeparture({ estimatedTimeOfDeparture: new Date(NOW_MS - 120_000).toISOString() })];
+        } }
+    });
+    const { notifier, client } = await fixture({ railDepartures, rows: ['any', 'westbound'].map((direction) =>
+        subscription({ id: direction, hubId: ABBEY_WOOD, stopIds: [ABBEY_WOOD], lineId: 'elizabeth', direction })) });
+    await notifier.notify(snapshotWith(abbeyWoodBulk()));
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].path, `/StopPoint/${ABBEY_WOOD}/ArrivalDepartures`);
+    assert.deepEqual(calls[0].options.query, { lineIds: 'elizabeth' });
+    assert.equal(client.sends.length, 2);
+    for (const sent of client.sends) {
+        const board = sent.payload.aps['content-state'].departures;
+        assert.equal(board.length, 1);
+        assert.equal(board[0].destination, 'Heathrow Terminal 4');
+        assert.equal(board[0].platform, 'Platform 4');
+        assert.equal(board[0].expectedAtEpoch, NOW_MS / 1000 + 300);
+    }
+});
+
+test('rail correction is also used when only expired outbound rows remain', async () => {
+    const { notifier, client } = await fixture({
+        rows: [subscription({ stopIds: [ABBEY_WOOD], lineId: 'elizabeth', direction: 'any' })],
+        railDepartures: { async departures() { return { data: [], meta: {
+            updatedAt: new Date(NOW_MS).toISOString(), stale: false
+        } }; } }
+    });
+    await notifier.notify(snapshotWith(abbeyWoodBulk().slice(0, 4)));
+    assert.deepEqual(client.sends[0].payload.aps['content-state'].departures, []);
+});
+
+test('unavailable, stale or malformed rail departure feeds never overwrite a tracked board', async () => {
+    for (const kind of ['failure', 'stale', 'old', 'malformed']) {
+        const railDepartures = kind === 'malformed'
+            ? createRailDepartureSource({ resourceCache: new ResourceCache(),
+                client: { async fetchJSON() { return { error: 'bad response' }; } } })
+            : { async departures() {
+                if (kind === 'failure') throw new Error('offline');
+                return { data: [], meta: { stale: kind === 'stale',
+                    updatedAt: new Date(NOW_MS - (kind === 'old' ? 120_000 : 0)).toISOString() } };
+            } };
+        const { notifier, client, store } = await fixture({ railDepartures,
+            rows: [subscription({ stopIds: [ABBEY_WOOD], lineId: 'elizabeth', direction: 'any' })] });
+        await notifier.notify(snapshotWith(abbeyWoodBulk()));
+        assert.equal(client.sends.length, 0, kind);
+        assert.equal(store.get('activity-1').sequence, undefined, kind);
+    }
+});
+
+test('ordinary future Elizabeth line predictions need no per-station request', async () => {
+    const { notifier, client } = await fixture({
+        rows: [subscription({ stopIds: [ABBEY_WOOD], lineId: 'elizabeth', direction: 'any' })],
+        railDepartures: { async departures() { assert.fail('unexpected departure request'); } }
+    });
+    const future = { ...abbeyWoodBulk()[0], expectedArrival: new Date(NOW_MS + 300_000).toISOString() };
+    await notifier.notify(snapshotWith([future]));
+    assert.equal(client.sends.length, 1);
+    assert.equal(client.sends[0].payload.aps['content-state'].departures[0].expectedAtEpoch, NOW_MS / 1000 + 300);
+});
+
+test('Abbey Wood interchange aliases cannot replace corrected departures in updates or scheduled starts', async () => {
+    const bulk = abbeyWoodBulk();
+    const alias = bulk.map((row) => ({ ...row, stopId: '910GABWD',
+        stationName: 'Abbey Wood (London) Rail Station', direction: null }));
+    const calls = [];
+    const railDepartures = createRailDepartureSource({ clock: () => NOW_MS,
+        resourceCache: new ResourceCache({ clock: () => NOW_MS }),
+        client: { async fetchJSON(path) { calls.push(path); return [abbeyWoodDeparture()]; } }
+    });
+    // The real subscription includes both stops; older ones may name only the alias.
+    for (const stopIds of [[ABBEY_WOOD, '910GABWD'], ['910GABWD']]) {
+        const board = { hubId: 'HUBABW', stopIds, lineId: 'elizabeth', direction: 'any' };
+        const { notifier, client } = await fixture({ railDepartures, rows: [subscription(board)] });
+        await notifier.notify(snapshotWith([...bulk, ...alias]));
+        const scheduler = new JourneyScheduler({ railDepartures, cache: { read: () => ({
+            staleModes: [], snapshot: { arrivals: [...bulk, ...alias],
+                modeUpdatedAt: { 'elizabeth-line': new Date(NOW_MS).toISOString() } }
+        }) } });
+        const started = await scheduler.initialState(board, NOW_MS);
+        const pushed = client.sends[0].payload.aps['content-state'];
+        assert.deepEqual(started.departures, pushed.departures);
+        assert.equal(pushed.departures.length, 1);
+        assert.equal(pushed.departures[0].expectedAtEpoch, NOW_MS / 1000 + 300);
+        assert.equal(pushed.departures[0].destination, 'Heathrow Terminal 4');
+    }
+    assert.deepEqual(calls, [`/StopPoint/${ABBEY_WOOD}/ArrivalDepartures`]);
+});
 
 function subscription(overrides = {}) {
     return {

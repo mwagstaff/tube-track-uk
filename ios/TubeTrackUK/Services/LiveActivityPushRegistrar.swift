@@ -83,6 +83,7 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
     private func request(path: String, method: String) -> URLRequest {
         var request = URLRequest(url: baseURL.appending(path: path))
         request.httpMethod = method
+        request.setValue(ScheduleCredentials.key, forHTTPHeaderField: "X-TubeTrack-Schedule-Key")
         request.setValue(installID, forHTTPHeaderField: "X-TubeTrack-Install")
         request.setValue("ios_app", forHTTPHeaderField: "X-TubeTrack-Surface")
         request.setValue(AppInstall.appVersion, forHTTPHeaderField: "X-TubeTrack-App-Version")

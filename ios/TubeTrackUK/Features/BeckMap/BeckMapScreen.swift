@@ -330,6 +330,16 @@ struct BeckMapScreen: View {
 
 }
 
+/// See `RealWorldMapScreen`'s conformance: only value inputs are compared, so
+/// map chrome updates in the parent do not rebuild the presentation snapshot.
+extension BeckMapScreen: @MainActor Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.resetToken == rhs.resetToken
+            && lhs.locationFocusRequest == rhs.locationFocusRequest
+            && lhs.contentVerticalBias == rhs.contentVerticalBias
+    }
+}
+
 struct BeckMapCanvas: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.colorScheme) private var colorScheme
@@ -1505,126 +1515,23 @@ struct BeckMapCanvas: View {
         if document.geometryStatus != .authored, cameraScale < max(0.48, minimumCameraScale) {
             return
         }
-        let viewportRect = presentation.highlightsJourney
-            ? CGRect(origin: .zero, size: viewport).insetBy(
-                dx: BeckMapArtworkCachePolicy.overscan + 8,
-                dy: BeckMapArtworkCachePolicy.overscan + 8
-            )
-            : BeckMapArtworkCachePolicy.labelViewport(in: viewport)
-        let selectedStationID = presentation.selectedStationID
-        let visibleLabels = renderedLabels.filter { renderedLabel in
-            let label = renderedLabel.label
-            if presentation.highlightsJourney && cameraScale < 0.65 { return isJourneyLabel(label) }
-            return label.represents(stationID: selectedStationID)
-                || isJourneyLabel(label)
-                || BeckMapLabelVisibilityPolicy.shows(
-                    label.effectiveVisibilityTier,
-                    at: cameraScale
-                )
-        }
-        guard !visibleLabels.isEmpty else { return }
-        let markerFrames = markerExclusionFrames(
-            cameraScale: cameraScale,
-            cameraOffset: cameraOffset
+        // Reuse the authoritative layout used by hit testing and river labels.
+        // Resolve text only for labels intersecting this render buffer.
+        let placements = stationLabelPlacements(
+            in: viewport, cameraScale: cameraScale, cameraOffset: cameraOffset
         )
-        let markerFramesByStationID = Dictionary(grouping: markerFrames, by: \.stationID)
-            .mapValues { blockers in
-                blockers.reduce(into: CGRect.null) { bounds, blocker in
-                    bounds = bounds.union(blocker.frame)
-                }
-            }
-        let lineBlockers = lineExclusionBlockers(
-            in: viewportRect,
-            cameraScale: cameraScale,
-            cameraOffset: cameraOffset
-        )
-        var resolvedTextByLabelID: [String: GraphicsContext.ResolvedText] = [:]
-        var layoutInputs: [StationLabelLayoutInput] = []
-
-        for renderedLabel in visibleLabels {
-            let label = renderedLabel.label
-            let selected = label.represents(stationID: selectedStationID) || isJourneyLabel(label)
-            let screenAnchor = screenPoint(
-                renderedLabel.artworkAnchor,
-                cameraScale: cameraScale,
-                cameraOffset: cameraOffset
-            )
+        let labelsByID = Dictionary(uniqueKeysWithValues: renderedLabels.map { ($0.label.id, $0.label) })
+        for placement in placements {
+            guard let label = labelsByID[placement.labelID] else { continue }
+            let selected = label.represents(stationID: presentation.selectedStationID) || isJourneyLabel(label)
             let tier = label.effectiveVisibilityTier
             let weight: AppFontWeight = selected || tier == .overview ? .semibold : .medium
-            let fontSize = BeckMapLabelVisibilityPolicy.fontSize(
-                for: tier,
-                at: cameraScale
-            ) * min(1.6, max(1, labelTypeScale))
-            var text = context.resolve(
-                Text(label.text).font(
-                    AppTypography.fixedBody(size: fontSize, weight: weight)
-                )
-            )
-            text.shading = .color(
-                selected ? .white : mobileCoverageLabelColor(for: label.stationID)
-            )
-            let measuredTextSize = text.measure(in: CGSize(
-                width: CGFloat.infinity,
-                height: CGFloat.infinity
+            let fontSize = BeckMapLabelVisibilityPolicy.fontSize(for: tier, at: cameraScale)
+                * min(1.6, max(1, labelTypeScale))
+            var text = context.resolve(Text(label.text).font(
+                AppTypography.fixedBody(size: fontSize, weight: weight)
             ))
-            let documentPadding = CGFloat(document.styles.labelPadding)
-            let horizontalPadding = selected
-                ? max(7, palette.labelHorizontalPadding)
-                : palette.labelHorizontalPadding
-            let verticalPadding = selected
-                ? max(4, palette.labelVerticalPadding)
-                : palette.labelVerticalPadding
-            let boundsByAlignment = Dictionary(uniqueKeysWithValues:
-                [BeckMapLabelAlignment.leading, .centre, .trailing].map { alignment in
-                    (alignment, BeckMapLabelBounds.backgroundBounds(
-                        textSize: measuredTextSize,
-                        alignment: alignment,
-                        horizontalPadding: documentPadding + horizontalPadding,
-                        verticalPadding: documentPadding + verticalPadding
-                    ))
-                }
-            )
-            let representedStationIDs = [label.stationID] + (label.associatedStationIDs ?? [])
-            let targetMarkerFrame = representedStationIDs.compactMap {
-                markerFramesByStationID[$0]
-            }.reduce(into: CGRect.null) { frame, markerFrame in
-                frame = frame.union(markerFrame)
-            }
-            resolvedTextByLabelID[label.id] = text
-            layoutInputs.append(StationLabelLayoutInput(
-                id: label.id,
-                priority: label.priority,
-                tier: tier,
-                selected: selected,
-                stationScreenPosition: screenAnchor,
-                markerFrame: targetMarkerFrame.isNull
-                    ? CGRect(x: screenAnchor.x - 6, y: screenAnchor.y - 6, width: 12, height: 12)
-                    : targetMarkerFrame,
-                preferredAlignment: label.alignment,
-                screenOffset: CGVector(
-                    dx: renderedLabel.artworkOffset.dx * cameraScale,
-                    dy: renderedLabel.artworkOffset.dy * cameraScale
-                ),
-                rotation: renderedLabel.rotation,
-                boundsByAlignment: boundsByAlignment
-            ))
-        }
-
-        let placements = StationLabelLayoutEngine.layout(
-            inputs: layoutInputs,
-            viewport: viewportRect,
-            markerBlockers: presentation.highlightsJourney
-                ? markerFrames.filter { presentation.affectedStationIDs.contains($0.stationID) } : markerFrames,
-            lineBlockers: presentation.highlightsJourney ? [] : lineBlockers
-        )
-        let selectedLabelIDs = Set(visibleLabels.compactMap { renderedLabel in
-            (renderedLabel.label.represents(stationID: selectedStationID) || isJourneyLabel(renderedLabel.label))
-                ? renderedLabel.label.id
-                : nil
-        })
-        for placement in placements {
-            guard let text = resolvedTextByLabelID[placement.labelID] else { continue }
-            let selected = selectedLabelIDs.contains(placement.labelID)
+            text.shading = .color(selected ? .white : mobileCoverageLabelColor(for: label.stationID))
 
             let anchor: UnitPoint
             switch placement.alignment {
@@ -2250,24 +2157,31 @@ struct BeckMapCanvas: View {
             return []
         }
 
+        // A pan translates labels; it must not choose new placements at each
+        // 192-point artwork rebase. Lay out the network in a camera-independent
+        // rectangle once per zoom/presentation, then cull and translate it.
+        // Journey maps retain their intentional viewport-constrained layout.
+        let layoutViewport = presentation.highlightsJourney
+            ? BeckMapLabelLayoutViewport(size: viewport, offset: cameraOffset)
+            : BeckMapLabelLayoutViewport.network(
+                bounds: artworkBounds, scale: cameraScale, typeScale: labelTypeScale
+            )
         let key = BeckMapLabelCacheKey(
             documentID: document.identifier,
             graphGeneratedAt: document.source.graphGeneratedAt,
             presentation: presentation,
             colorScheme: colorScheme,
             cameraScale: cameraScale,
-            cameraOffset: cameraOffset,
-            canvasSize: viewport,
+            cameraOffset: layoutViewport.offset,
+            canvasSize: layoutViewport.size,
             labelTypeScale: labelTypeScale
         )
-        // Hit testing and river-label exclusions use the same geometry layout.
-        // Touch/chrome updates must not repeat the collision solver, including
-        // while this retained map is hidden behind the geographic map.
-        return labelLayoutCache.placements(for: key) {
+        let placements = labelLayoutCache.placements(for: key) {
             makeStationLabelPlacements(
-                in: viewport, cameraScale: cameraScale, cameraOffset: cameraOffset
+                in: layoutViewport.size, cameraScale: cameraScale, cameraOffset: layoutViewport.offset
             )
         }
+        return layoutViewport.project(placements, into: viewport, at: cameraOffset)
     }
 
     private func makeStationLabelPlacements(
@@ -3563,6 +3477,39 @@ struct StationLabelPlacement {
     let collisionFrame: CGRect
 }
 
+struct BeckMapLabelLayoutViewport {
+    let size: CGSize
+    let offset: CGSize
+
+    static func network(bounds: CGRect, scale: CGFloat, typeScale: CGFloat) -> Self {
+        // Include space for labels anchored along the artwork's outside edges.
+        let padding = 512 * min(1.6, max(1, typeScale))
+        return Self(
+            size: CGSize(width: bounds.width * scale + 2 * padding,
+                         height: bounds.height * scale + 2 * padding),
+            offset: CGSize(width: padding - bounds.minX * scale,
+                           height: padding - bounds.minY * scale)
+        )
+    }
+
+    func project(_ placements: [StationLabelPlacement], into viewport: CGSize,
+                 at cameraOffset: CGSize) -> [StationLabelPlacement] {
+        let dx = cameraOffset.width - offset.width
+        let dy = cameraOffset.height - offset.height
+        let visible = CGRect(origin: .zero, size: viewport)
+        return placements.compactMap { placement in
+            let frame = placement.collisionFrame.offsetBy(dx: dx, dy: dy)
+            guard frame.intersects(visible) else { return nil }
+            return StationLabelPlacement(
+                labelID: placement.labelID,
+                position: CGPoint(x: placement.position.x + dx, y: placement.position.y + dy),
+                alignment: placement.alignment, rotation: placement.rotation,
+                backgroundBounds: placement.backgroundBounds, collisionFrame: frame
+            )
+        }
+    }
+}
+
 enum BeckMapLabelTextMeasurer {
     static func size(for text: String, font: UIFont) -> CGSize {
         let bounds = (text as NSString).boundingRect(
@@ -3986,9 +3933,13 @@ enum BeckMapMomentumPolicy {
         to nextVelocity: CGPoint,
         over frameDuration: TimeInterval
     ) -> CGSize {
-        CGSize(
-            width: (velocity.x + nextVelocity.x) * 0.5 * frameDuration,
-            height: (velocity.y + nextVelocity.y) * 0.5 * frameDuration
+        guard frameDuration > 0 else { return .zero }
+        // Integrate exponential deceleration exactly. A trapezoid approximation
+        // overshoots after a dropped frame and depends on the callback cadence.
+        let decayPerSecond = -1_000 * log(decelerationRate)
+        return CGSize(
+            width: (velocity.x - nextVelocity.x) / decayPerSecond,
+            height: (velocity.y - nextVelocity.y) / decayPerSecond
         )
     }
 
@@ -4019,8 +3970,8 @@ struct BeckMapLabelCacheKey: Equatable {
     let labelTypeScale: CGFloat
 }
 
-/// One retained layout per canvas; a camera rebase or presentation change
-/// replaces it. This is intentionally not observable: memoization is not UI state.
+/// One retained layout per canvas; scale or presentation changes replace it.
+/// Pan rebases project it unchanged. Memoization is deliberately not observable.
 @MainActor
 final class BeckMapLabelLayoutCache {
     private var key: BeckMapLabelCacheKey?

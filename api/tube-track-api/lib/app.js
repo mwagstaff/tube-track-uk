@@ -1,3 +1,4 @@
+import { createScheduledJourneyRoutes } from './scheduled-journeys.js';
 import compression from 'compression';
 import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
@@ -95,6 +96,7 @@ export function createApp({
     resourceCache,
     plannedTrackClosuresSource,
     pushTokenStore = null,
+    scheduledJourneyStore = null,
     usageStore = null,
     journeyPlanner = new JourneyPlanner({ client })
 }) {
@@ -274,10 +276,17 @@ export function createApp({
     if (pushTokenStore) {
         app.use('/api/v1/push', createPushRoutes({
             store: pushTokenStore,
+            scheduleStore: scheduledJourneyStore,
             isKnownStop: (id) => journeyPlanner.byId.has(id),
             riverNetwork: async () => (await createRiverDataSource({ client, resourceCache }).network()).data,
             logger,
             metrics
+        }));
+    }
+
+    if (scheduledJourneyStore) {
+        app.use('/api/v1/scheduled-journeys', createScheduledJourneyRoutes({
+            store: scheduledJourneyStore, stationById: journeyPlanner.byId
         }));
     }
 

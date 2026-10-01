@@ -102,6 +102,7 @@ struct BeckMapGestureSurface: UIViewRepresentable {
         private var deliveredTranslation = CGSize.zero
         private var releaseVelocity = CGPoint.zero
         private var decelerationElapsed: TimeInterval = 0
+        private var momentumClock: BeckMapMomentumClock?
         private var isTrackingPinch = false
         private var deliveredPinchScale: CGFloat = 1
         private var deliveredPinchLocation = CGPoint.zero
@@ -263,6 +264,7 @@ struct BeckMapGestureSurface: UIViewRepresentable {
             // Direct manipulation already arrives on UIKit's input cadence.
             // A second scheduler adds input latency; only inertia needs one.
             let link = CADisplayLink(target: self, selector: #selector(displayLinkDidFire(_:)))
+            momentumClock = BeckMapMomentumClock(startedAt: CACurrentMediaTime())
             let maximumFramesPerSecond = Float(screen?.maximumFramesPerSecond ?? 60)
             link.preferredFrameRateRange = CAFrameRateRange(
                 minimum: min(60, maximumFramesPerSecond),
@@ -275,7 +277,11 @@ struct BeckMapGestureSurface: UIViewRepresentable {
 
         @objc private func displayLinkDidFire(_ link: CADisplayLink) {
             guard link === displayLink, panMotion == .decelerating else { return }
-            let frameDuration = min(1.0 / 20.0, max(1.0 / 240.0, link.targetTimestamp - link.timestamp))
+            // timestamp -> targetTimestamp describes one refresh interval, not
+            // the time since we last delivered a frame. Include missed frames
+            // so a busy run loop cannot pause and prolong the coast.
+            guard let frameDuration = momentumClock?.advance(to: link.targetTimestamp),
+                  frameDuration > 0 else { return }
             let nextVelocity = BeckMapMomentumPolicy.attenuatedVelocity(releaseVelocity, over: frameDuration)
             parent.onPan(
                 BeckMapMomentumPolicy.translation(from: releaseVelocity, to: nextVelocity, over: frameDuration),
@@ -292,6 +298,7 @@ struct BeckMapGestureSurface: UIViewRepresentable {
             panMotion = .idle
             releaseVelocity = .zero
             decelerationElapsed = 0
+            momentumClock = nil
             displayLink?.invalidate()
             displayLink = nil
         }
@@ -320,5 +327,22 @@ struct BeckMapGestureSurface: UIViewRepresentable {
             isTrackingPinch = false
             notifyInteractionIfNeeded()
         }
+    }
+}
+
+struct BeckMapMomentumClock {
+    private var timestamp: TimeInterval
+    private(set) var elapsed: TimeInterval = 0
+
+    init(startedAt: TimeInterval) {
+        timestamp = startedAt
+    }
+
+    mutating func advance(to targetTimestamp: TimeInterval) -> TimeInterval {
+        guard targetTimestamp.isFinite, targetTimestamp > timestamp else { return 0 }
+        let duration = min(targetTimestamp - timestamp, max(0, BeckMapMomentumPolicy.maximumDuration - elapsed))
+        timestamp = targetTimestamp
+        elapsed += duration
+        return duration
     }
 }

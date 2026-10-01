@@ -14,9 +14,18 @@ struct RealWorldMapScreen: View {
     @State private var position: MapCameraPosition = .region(Self.centralLondon)
     @State private var mapSelection: String?
     @State private var renderData: RealWorldMapRenderData?
-    @State private var visibleRegion = Self.centralLondon
-    @State private var mapCameraHeading = 0.0
-    @State private var networkZoom = 0.0
+    /// Continuous camera state. Only leaf overlays observe it, so a camera
+    /// frame never re-evaluates the Map's content builder.
+    @State private var camera = GeographicCameraState(region: Self.centralLondon)
+    /// Annotation styling changes only when zoom settles. Keep the bounded
+    /// station set installed so crossing a culling boundary never rebuilds the
+    /// entire SwiftUI Map in the middle of a drag or coast.
+    @State private var annotationLevel = GeographicAnnotationLevel(zoom: 0, region: Self.centralLondon)
+    /// The Map content last shown while this renderer was active. Reused while
+    /// the network map is in front, so its selections and filters do not
+    /// update a Map nobody can see.
+    @State private var frozenContent: GeographicMapContent?
+    @Namespace private var mapScope
     @State private var acceptsCameraUpdates = false
     @State private var resetAvailable = false
     @State private var overviewOpacity = 1.0
@@ -38,67 +47,24 @@ struct RealWorldMapScreen: View {
                 GeometryReader { viewportProxy in
                     MapReader { proxy in
                         ZStack {
-                            Map(position: $position, selection: $mapSelection) {
-                                tubeOverlays(renderData: renderData)
-                                stationAnnotations(graph: graph)
-                                riverAnnotations()
-                                cableCarAnnotations(graph: graph)
-                                UserAnnotation {
-                                    GeographicMapUserLocationMarker(
-                                        mapHeading: mapCameraHeading,
-                                        reduceMotion: reduceMotion
-                                    )
-                                    .frame(width: 76, height: 76)
-                                    .allowsHitTesting(false)
-                                    .accessibilityLabel("Your location")
+                            GeographicMapView(
+                                content: mapContent(graph: graph, renderData: renderData),
+                                selectionValue: mapSelection,
+                                position: $position,
+                                selection: $mapSelection,
+                                scope: mapScope,
+                                graphID: graph.generatedAt,
+                                viewportSize: viewportProxy.size,
+                                camera: camera,
+                                reduceMotion: reduceMotion,
+                                onCameraChange: { context in
+                                    handleCameraChange(context, graph: graph, viewportSize: viewportProxy.size)
+                                },
+                                onCameraChangeEnd: { context in
+                                    commitAnnotationLevel(region: context.region)
                                 }
-                            }
-                            .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll, showsTraffic: false))
-                            .mapControls {
-                                MapCompass()
-                                    .opacity(screenFurnitureOpacity)
-                                MapScaleView()
-                                    .opacity(screenFurnitureOpacity)
-                            }
-                            .onChange(of: mapSelection) { _, stationID in
-                                if let id = stationID, id.hasPrefix("cable:"),
-                                   let terminal = appState.cableCar.network.terminals.first(where: { $0.id == String(id.dropFirst(6)) }) {
-                                    if appState.cableCar.selectedTerminalID != terminal.id { appState.selectCableCar(terminal: terminal) }
-                                    return
-                                }
-                                if let id = stationID, id.hasPrefix("pier:"),
-                                   let pier = appState.river.network.pier(String(id.dropFirst(5))) {
-                                    if appState.river.selectedPierId != pier.id { appState.select(pier: pier) }
-                                    return
-                                }
-                                guard let stationID = RealWorldMapSelectionPolicy.stationIDToSelect(
-                                    mapSelection: stationID,
-                                    selectedStationID: appState.selectedStationID,
-                                    presentationMode: appState.mapPresentationMode
-                                ),
-                                      let station = graph.stations.first(where: { $0.id == stationID }) else { return }
-                                withAnimation(.smooth(duration: 0.35)) {
-                                    appState.select(station: station)
-                                }
-                            }
-                            .onMapCameraChange(frequency: .continuous) { context in
-                                visibleRegion = context.region
-                                mapCameraHeading = context.camera.heading
-                                let viewport = SharedMapProjection.viewport(
-                                    from: context.rect,
-                                    graph: graph,
-                                    size: viewportProxy.size
-                                )
-                                networkZoom = viewport.zoom
-                                guard appState.mapPresentationMode == .realWorld else { return }
-                                let overviewZoom = calibratedOverviewZoom(
-                                    for: viewport.zoom
-                                )
-                                updateResetAvailability(at: overviewZoom)
-                                updateOverviewOpacity(at: overviewZoom)
-                                guard acceptsCameraUpdates else { return }
-                                appState.sharedMapViewport = viewport
-                            }
+                            )
+                            .equatable()
                             .simultaneousGesture(
                                 SpatialTapGesture()
                                     .onEnded { value in
@@ -127,20 +93,37 @@ struct RealWorldMapScreen: View {
                             if appState.river.isEnabled, appState.river.showsBoats,
                                !appState.isOffline, appState.selectedTab == .map,
                                appState.mapPresentationMode == .realWorld {
-                                GeographicRiverBoats(proxy: proxy)
+                                GeographicRiverBoats(proxy: proxy, camera: camera)
                             }
                             if appState.showLiveTrains, appState.selectedTab == .map,
                                appState.mapPresentationMode == .realWorld {
                                 RealWorldTrainCanvas(
                                     proxy: proxy,
                                     pathsBySegmentID: renderData.pathsBySegmentID,
-                                    visibleRegion: visibleRegion
+                                    camera: camera
                                 )
                             }
                         }
                     }
+                    .overlay(alignment: .topTrailing) {
+                        MapCompass(scope: mapScope)
+                            .opacity(screenFurnitureOpacity)
+                            .padding(8)
+                    }
+                    .overlay(alignment: .topLeading) {
+                        MapScaleView(scope: mapScope)
+                            .opacity(screenFurnitureOpacity)
+                            .padding(8)
+                    }
+                    .mapScope(mapScope)
+                    .onChange(of: mapSelection) { _, stationID in
+                        handleMapSelection(stationID, graph: graph)
+                    }
                     .onChange(of: appState.mapPresentationMode) { _, mode in
                         acceptsCameraUpdates = false
+                        frozenContent = mode == .realWorld
+                            ? nil
+                            : makeMapContent(graph: graph, renderData: renderData)
                         guard mode == .realWorld else { return }
                         mapSelection = appState.selectedStationID
                         calibrateOverviewZoomFromBeckMap()
@@ -209,7 +192,7 @@ struct RealWorldMapScreen: View {
         }
         .onChange(of: reduceMotion) { _, _ in
             guard appState.mapPresentationMode == .realWorld else { return }
-            updateOverviewOpacity(at: calibratedOverviewZoom(for: networkZoom))
+            updateOverviewOpacity(at: calibratedOverviewZoom(for: camera.networkZoom))
         }
         .onAppear(perform: handleAppearance)
         .task(id: appState.graph?.generatedAt) {
@@ -217,7 +200,11 @@ struct RealWorldMapScreen: View {
                 renderData = nil
                 return
             }
-            renderData = RealWorldMapRenderData(graph: graph)
+            let data = RealWorldMapRenderData(graph: graph)
+            renderData = data
+            frozenContent = appState.mapPresentationMode == .realWorld
+                ? nil
+                : makeMapContent(graph: graph, renderData: data)
         }
         .onDisappear {
             onInteractionChange(false)
@@ -243,8 +230,113 @@ struct RealWorldMapScreen: View {
         }
     }
 
-    @MapContentBuilder
-    private func tubeOverlays(renderData: RealWorldMapRenderData) -> some MapContent {
+    private func handleCameraChange(
+        _ context: MapCameraUpdateContext,
+        graph: TubeGraph,
+        viewportSize: CGSize
+    ) {
+        let viewport = SharedMapProjection.viewport(
+            from: context.rect,
+            graph: graph,
+            size: viewportSize
+        )
+        camera.update(
+            region: context.region,
+            heading: context.camera.heading,
+            networkZoom: viewport.zoom
+        )
+        guard appState.mapPresentationMode == .realWorld else { return }
+        let overviewZoom = calibratedOverviewZoom(
+            for: viewport.zoom
+        )
+        updateResetAvailability(at: overviewZoom)
+        updateOverviewOpacity(at: overviewZoom)
+        guard acceptsCameraUpdates else { return }
+        appState.sharedMapViewport = viewport
+    }
+
+    private func handleMapSelection(_ stationID: String?, graph: TubeGraph) {
+        if let id = stationID, id.hasPrefix("cable:"),
+           let terminal = appState.cableCar.network.terminals.first(where: { $0.id == String(id.dropFirst(6)) }) {
+            if appState.cableCar.selectedTerminalID != terminal.id { appState.selectCableCar(terminal: terminal) }
+            return
+        }
+        if let id = stationID, id.hasPrefix("pier:"),
+           let pier = appState.river.network.pier(String(id.dropFirst(5))) {
+            if appState.river.selectedPierId != pier.id { appState.select(pier: pier) }
+            return
+        }
+        guard let stationID = RealWorldMapSelectionPolicy.stationIDToSelect(
+            mapSelection: stationID,
+            selectedStationID: appState.selectedStationID,
+            presentationMode: appState.mapPresentationMode
+        ),
+              let station = graph.stationsByID[stationID] else { return }
+        withAnimation(.smooth(duration: 0.35)) {
+            appState.select(station: station)
+        }
+    }
+
+    /// While the network map is in front, the hidden geographic Map keeps the
+    /// content it last showed. Reading no other app state here means hidden
+    /// selection and filter changes do not re-evaluate this screen's Map.
+    private func mapContent(
+        graph: TubeGraph,
+        renderData: RealWorldMapRenderData
+    ) -> GeographicMapContent {
+        if appState.mapPresentationMode != .realWorld, let frozenContent {
+            return frozenContent
+        }
+        return makeMapContent(graph: graph, renderData: renderData)
+    }
+
+    private func makeMapContent(
+        graph: TubeGraph,
+        renderData: RealWorldMapRenderData
+    ) -> GeographicMapContent {
+        var content = GeographicMapContent()
+        content.routes = tubeRoutes(renderData: renderData)
+        content.stations = stationMarkers(graph: graph)
+        content.markerDiameter = annotationLevel.markerDiameter
+        content.expandedSymbols = annotationLevel.showsNames
+        if appState.river.isEnabled {
+            content.riverSegments = appState.river.geographicSegments.map {
+                GeographicMapContent.RiverSegment(id: $0.id, coordinates: $0.coordinates)
+            }
+            let selectedPierID = appState.river.selectedPierId
+            content.piers = visibleRiverPiers.map { pier in
+                GeographicMapContent.Pier(
+                    pier: pier,
+                    showsName: annotationLevel.showsFeatureNames || pier.id == selectedPierID,
+                    selected: pier.id == selectedPierID
+                )
+            }
+        }
+        if appState.cableCar.isEnabled {
+            let cable = appState.cableCar
+            let walkingConnection = cable.selectedTerminal.flatMap { terminal in
+                terminal.railStationID.flatMap { graph.stationsByID[$0] }.map { rail in
+                    GeographicMapContent.CableCar.WalkingConnection(
+                        terminalLatitude: terminal.latitude,
+                        terminalLongitude: terminal.longitude,
+                        stationLatitude: rail.coordinate.latitude,
+                        stationLongitude: rail.coordinate.longitude
+                    )
+                }
+            }
+            content.cableCar = GeographicMapContent.CableCar(
+                route: cable.network.coordinates.map(\.location),
+                terminals: cable.network.terminals,
+                selectedTerminalID: cable.selectedTerminalID,
+                showsTerminalNames: annotationLevel.showsFeatureNames || cable.hasSelection,
+                presentation: cable.presentation,
+                walkingConnection: walkingConnection
+            )
+        }
+        return content
+    }
+
+    private func tubeRoutes(renderData: RealWorldMapRenderData) -> [GeographicMapContent.Route] {
         let networkSummary = appState.mapNetworkStatusSummary
         let networkFilter = appState.selectedMapNetworkStat
         let featuredLineIDs = networkFilter.map(networkSummary.lineIDs(for:)) ?? []
@@ -269,35 +361,10 @@ struct RealWorldMapScreen: View {
         let affectedPolylines = renderData.polylines(covering: affectedSegmentIDs)
         let mobileCoverageMode = appState.mobileCoverageMode
         let mobileCoverage = appState.mobileCoverage
-        // TubeGraph's lookup is computed. Resolve it once, not once for every
-        // segment in each coverage pass during a camera or touch update.
-        let graphSegmentsByID = mobileCoverageMode.isActive ? appState.graph?.segmentsByID : nil
-        let availableCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
-            guard mobileCoverageMode.isActive,
-                  let graphSegment = graphSegmentsByID?[segment.id],
-                  mobileCoverage?.availability(
-                      for: graphSegment,
-                      mode: mobileCoverageMode
-                  ) == .available else { return nil }
-            return segment.id
-        })
-        let unknownCoverageSegmentIDs: Set<String> = Set(renderData.segments.compactMap { segment in
-            guard mobileCoverageMode.isActive,
-                  let graphSegment = graphSegmentsByID?[segment.id],
-                  mobileCoverage?.availability(
-                      for: graphSegment,
-                      mode: mobileCoverageMode
-                  ) == .unknown else { return nil }
-            return segment.id
-        })
-        let availableCoveragePolylines = renderData.polylines(
-            covering: availableCoverageSegmentIDs
-        )
-        let unknownCoveragePolylines = renderData.polylines(
-            covering: unknownCoverageSegmentIDs
-        )
+        let mutedColor = Color.secondary.opacity(0.24)
+        var routes: [GeographicMapContent.Route] = []
 
-        ForEach(unaffectedPolylines) { polyline in
+        for polyline in unaffectedPolylines {
             let muted = mobileCoverageMode.isActive || MapNetworkRouteStyling.mutesSegment(
                 lineID: polyline.lineID,
                 isAffected: false,
@@ -309,15 +376,13 @@ struct RealWorldMapScreen: View {
                 disruptionDisplayMode: displayMode
             )
                 || (selectedLineID != nil && selectedLineID != polyline.lineID)
-            MapPolyline(polyline.overlay)
-                .stroke(
-                    muted ? Color.secondary.opacity(0.24) : .tubeLine(polyline.lineID),
-                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-                )
-                .mapOverlayLevel(level: .aboveLabels)
+            routes.append(.init(
+                id: "route:\(polyline.id)", overlay: polyline.overlay,
+                color: muted ? mutedColor : .tubeLine(polyline.lineID), lineWidth: 4
+            ))
         }
 
-        ForEach(affectedPolylines) { polyline in
+        for polyline in affectedPolylines {
             let muted = MapNetworkRouteStyling.mutesSegment(
                 lineID: polyline.lineID,
                 isAffected: true,
@@ -328,125 +393,52 @@ struct RealWorldMapScreen: View {
                 closedLineIDs: networkSummary.closedLineIDs,
                 disruptionDisplayMode: displayMode
             )
-            MapPolyline(polyline.overlay)
-                .stroke(
-                    muted ? Color.secondary.opacity(0.24) : .tubeLine(polyline.lineID),
-                    style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-                )
-                .mapOverlayLevel(level: .aboveLabels)
+            routes.append(.init(
+                id: "affected:\(polyline.id)", overlay: polyline.overlay,
+                color: muted ? mutedColor : .tubeLine(polyline.lineID), lineWidth: 4
+            ))
         }
 
         if displayMode == .issues {
-            ForEach(affectedPolylines) { polyline in
-                MapPolyline(polyline.overlay)
-                    .stroke(
-                        Color.red.opacity(0.82),
-                        style: StrokeStyle(lineWidth: 8, lineCap: .round, lineJoin: .round)
-                    )
-                    .mapOverlayLevel(level: .aboveLabels)
+            routes += affectedPolylines.map {
+                .init(id: "issue-outer:\($0.id)", overlay: $0.overlay, color: .red.opacity(0.82), lineWidth: 8)
             }
-            ForEach(affectedPolylines) { polyline in
-                MapPolyline(polyline.overlay)
-                    .stroke(
-                        Color.white,
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round)
-                    )
-                    .mapOverlayLevel(level: .aboveLabels)
+            routes += affectedPolylines.map {
+                .init(id: "issue-knockout:\($0.id)", overlay: $0.overlay, color: .white, lineWidth: 6)
             }
-            ForEach(affectedPolylines) { polyline in
-                MapPolyline(polyline.overlay)
-                    .stroke(
-                        Color.tubeLine(polyline.lineID),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
-                    )
-                    .mapOverlayLevel(level: .aboveLabels)
+            routes += affectedPolylines.map {
+                .init(id: "issue-route:\($0.id)", overlay: $0.overlay, color: .tubeLine($0.lineID), lineWidth: 4)
             }
         }
 
         if mobileCoverageMode.isActive {
-            ForEach(availableCoveragePolylines) { polyline in
-                MapPolyline(polyline.overlay)
-                    .stroke(
-                        Color.tubeLine(polyline.lineID),
-                        style: StrokeStyle(
-                            lineWidth: 4,
-                            lineCap: .round,
-                            lineJoin: .round
-                        )
-                    )
-                    .mapOverlayLevel(level: .aboveLabels)
-            }
-            ForEach(unknownCoveragePolylines) { polyline in
-                MapPolyline(polyline.overlay)
-                    .stroke(
-                        Color.orange.opacity(0.72),
-                        style: StrokeStyle(
-                            lineWidth: 4,
-                            lineCap: .round,
-                            lineJoin: .round,
-                            dash: [8, 6]
-                        )
-                    )
-                    .mapOverlayLevel(level: .aboveLabels)
-            }
-        }
-    }
-
-    @MapContentBuilder
-    private func cableCarAnnotations(graph: TubeGraph) -> some MapContent {
-        if appState.cableCar.isEnabled {
-            let cable = appState.cableCar
-            MapPolyline(coordinates: cable.network.coordinates.map(\.location))
-                .stroke(Color(.systemBackground), style: StrokeStyle(lineWidth: 10, lineCap: .round))
-            MapPolyline(coordinates: cable.network.coordinates.map(\.location))
-                .stroke(cable.presentation.routeTint, style: StrokeStyle(lineWidth: 7, lineCap: .round))
-            MapPolyline(coordinates: cable.network.coordinates.map(\.location))
-                .stroke(Color(.systemBackground), style: StrokeStyle(lineWidth: 2, lineCap: .round))
-            ForEach(cable.network.terminals) { terminal in
-                Annotation(networkZoom >= 2 || cable.hasSelection ? terminal.name : "", coordinate: terminal.coordinate) {
-                    CableCarTerminalSymbol(selected: cable.selectedTerminalID == terminal.id, tint: .red,
-                        expanded: networkZoom >= RealWorldStationVisibilityPolicy.nameMinimumZoom,
-                        compactDiameter: max(5, min(11, 3 + CGFloat(networkZoom) * 2)))
-                        .accessibilityLabel("\(terminal.name), cable car, \(cable.presentation.headline)")
-                }.tag("cable:\(terminal.id)")
-            }
-            if cable.presentation.kind != .open {
-                Annotation("", coordinate: CLLocationCoordinate2D(latitude: 51.50365, longitude: 0.013)) {
-                    Button { appState.selectCableCar() } label: { CableCarMapBadge(presentation: cable.presentation) }.buttonStyle(.plain)
+            let graphSegmentsByID = appState.graph?.segmentsByID
+            var availableSegmentIDs: Set<String> = []
+            var unknownSegmentIDs: Set<String> = []
+            for segment in renderData.segments {
+                guard let graphSegment = graphSegmentsByID?[segment.id] else { continue }
+                switch mobileCoverage?.availability(for: graphSegment, mode: mobileCoverageMode) {
+                case .available: availableSegmentIDs.insert(segment.id)
+                case .unknown: unknownSegmentIDs.insert(segment.id)
+                default: break
                 }
             }
-            if let terminal = cable.selectedTerminal, let id = terminal.railStationID, let rail = graph.stationsByID[id] {
-                MapPolyline(coordinates: [terminal.coordinate, rail.coordinate])
-                    .stroke(.secondary, style: StrokeStyle(lineWidth: 2, dash: [3, 4]))
-                Annotation("Walking connection", coordinate: CLLocationCoordinate2D(latitude: (terminal.latitude + rail.coordinate.latitude) / 2,
-                    longitude: (terminal.longitude + rail.coordinate.longitude) / 2)) {
-                    Image(systemName: "figure.walk").padding(4).background(Color(.systemBackground), in: .circle)
-                }
+            routes += renderData.polylines(covering: availableSegmentIDs).map {
+                .init(id: "coverage:\($0.id)", overlay: $0.overlay, color: .tubeLine($0.lineID), lineWidth: 4)
+            }
+            routes += renderData.polylines(covering: unknownSegmentIDs).map {
+                .init(
+                    id: "coverage-unknown:\($0.id)", overlay: $0.overlay,
+                    color: .orange.opacity(0.72), lineWidth: 4, dash: [8, 6]
+                )
             }
         }
-    }
-
-    @MapContentBuilder
-    private func riverAnnotations() -> some MapContent {
-        if appState.river.isEnabled {
-            ForEach(appState.river.geographicSegments) { segment in
-                MapPolyline(coordinates: segment.coordinates).stroke(.blue.opacity(0.65), lineWidth: 3)
-            }
-            ForEach(visibleRiverPiers) { pier in
-                Annotation(networkZoom >= 2 || pier.id == appState.river.selectedPierId ? pier.name : "",
-                           coordinate: pier.coordinate, anchor: .center) {
-                    RiverPierSymbol(selected: appState.river.selectedPierId == pier.id,
-                        expanded: networkZoom >= RealWorldStationVisibilityPolicy.nameMinimumZoom,
-                        compactDiameter: max(5, min(11, 3 + CGFloat(networkZoom) * 2)))
-                        .accessibilityLabel("\(pier.name), River Bus departures")
-                }.tag("pier:\(pier.id)")
-            }
-        }
+        return routes
     }
 
     private var visibleRiverPiers: [RiverPier] {
         appState.river.filteredPiers.filter { pier in
-            pier.id == appState.river.selectedPierId || visibleRegion.span.longitudeDelta < 0.12
+            pier.id == appState.river.selectedPierId || annotationLevel.showsAllPiers
                 || appState.river.anchors.first(where: { $0.id == pier.id })?.major == true
         }
     }
@@ -462,75 +454,34 @@ struct RealWorldMapScreen: View {
         }
     }
 
-    @MapContentBuilder
-    private func stationAnnotations(graph: TubeGraph) -> some MapContent {
-        ForEach(displayStations(graph: graph).filter {
-            RealWorldStationVisibilityPolicy.showsRoundel(
-                at: networkZoom,
-                isSelected: $0.id == appState.selectedStationID
-            )
-        }) { station in
-            let selected = appState.selectedStationID == station.id
-            let coverageAvailability = appState.mobileCoverage?.availability(
-                for: station.id,
-                mode: appState.mobileCoverageMode
-            ) ?? .outOfScope
-            let stationOnlyCoverage = appState.mobileCoverageMode.isActive
-                && appState.mobileCoverage?.stationOnlyCoverageStationIDs.contains(station.id) == true
-            let showsName = RealWorldStationVisibilityPolicy.showsName(
-                at: networkZoom,
-                isSelected: selected
-            )
-            Annotation(
-                showsName ? station.name : "",
-                coordinate: station.coordinate,
-                anchor: .center
-            ) {
-                let markerDiameter = max(5, min(11, 3 + CGFloat(networkZoom) * 2))
-                ZStack {
-                    if selected {
-                        Circle()
-                            .fill(Color.blue.opacity(0.16))
-                            .stroke(Color.blue.opacity(0.9), lineWidth: 2.5)
-                            .frame(width: 32, height: 32)
-                            .shadow(color: Color.blue.opacity(0.35), radius: 6)
-                    }
-
-                    Circle()
-                        .fill(.background)
-                        .stroke(
-                            selected ? Color.blue : Color.primary,
-                            lineWidth: selected ? 3 : (markerDiameter < 8 ? 1.25 : 2)
-                        )
-                        .frame(
-                            width: selected ? 18 : markerDiameter,
-                            height: selected ? 18 : markerDiameter
-                        )
-
-                    if stationOnlyCoverage {
-                        Image(systemName: "cellularbars")
-                            .font(.system(size: 6, weight: .bold))
-                            .foregroundStyle(.white)
-                            .frame(width: 13, height: 13)
-                            .background(Color.green, in: .circle)
-                            .overlay {
-                                Circle().stroke(.white, lineWidth: 1)
-                            }
-                            .offset(x: 9, y: -9)
-                    }
-                }
-                    .opacity(stationMarkerOpacity(coverageAvailability, selected: selected))
-                    .animation(.smooth(duration: 0.3), value: selected)
-                    .accessibilityLabel(
-                        stationCoverageAccessibilityLabel(
-                            station: station,
-                            availability: coverageAvailability,
-                            stationOnly: stationOnlyCoverage
-                        )
+    private func stationMarkers(graph: TubeGraph) -> [GeographicMapContent.Station] {
+        let selectedStationID = appState.selectedStationID
+        guard annotationLevel.showsRoundels || selectedStationID != nil else { return [] }
+        let coverageMode = appState.mobileCoverageMode
+        let coverage = appState.mobileCoverage
+        return displayStations(graph: graph)
+            .filter { annotationLevel.showsRoundels || $0.id == selectedStationID }
+            .map { station in
+                let selected = selectedStationID == station.id
+                let availability = coverage?.availability(for: station.id, mode: coverageMode) ?? .outOfScope
+                let stationOnly = coverageMode.isActive
+                    && coverage?.stationOnlyCoverageStationIDs.contains(station.id) == true
+                return GeographicMapContent.Station(
+                    id: station.id,
+                    name: station.name,
+                    latitude: station.coordinate.latitude,
+                    longitude: station.coordinate.longitude,
+                    showsName: selected || annotationLevel.showsNames,
+                    selected: selected,
+                    opacity: stationMarkerOpacity(availability, selected: selected),
+                    stationOnlyCoverage: stationOnly,
+                    accessibilityLabel: stationCoverageAccessibilityLabel(
+                        station: station,
+                        availability: availability,
+                        stationOnly: stationOnly
                     )
+                )
             }
-            .tag(station.id)
-        }
     }
 
     private func stationMarkerOpacity(
@@ -565,14 +516,17 @@ struct RealWorldMapScreen: View {
     }
 
     private func displayStations(graph: TubeGraph) -> [TubeStation] {
-        RealWorldStationDisplay.stations(
-            in: graph,
-            selectedStationID: appState.selectedStationID
-        )
-        .filter {
-            $0.id == appState.selectedStationID
-                || visibleRegion.containsExpanded($0.coordinate)
-        }
+        let selectedStationID = appState.selectedStationID
+        return renderData?.displayStations(selectedStationID: selectedStationID)
+            ?? RealWorldStationDisplay.stations(in: graph, selectedStationID: selectedStationID)
+    }
+
+    /// Zoom styling (roundels, names, symbol sizes) changes once the camera
+    /// settles rather than repeatedly during a pinch or animated move.
+    private func commitAnnotationLevel(region: MKCoordinateRegion) {
+        guard appState.mapPresentationMode == .realWorld else { return }
+        let level = GeographicAnnotationLevel(zoom: camera.networkZoom, region: region)
+        if level != annotationLevel { annotationLevel = level }
     }
 
     private func handleLineTap(
@@ -811,7 +765,7 @@ struct RealWorldMapScreen: View {
               ) else { return }
         let region = TrainMapFocusPolicy.geographicRegion(
             centeredAt: coordinate,
-            currentSpan: visibleRegion.span
+            currentSpan: camera.region.span
         )
 
         if reduceMotion {
@@ -828,6 +782,18 @@ struct RealWorldMapScreen: View {
         setResetAvailable(true)
     }
 
+}
+
+/// The renderer's own state, environment and observed app state still drive
+/// its updates. Comparing only the value inputs lets SwiftUI skip it when the
+/// parent's chrome changes; the callbacks capture only the parent's stable
+/// state storage, so ignoring them cannot leave a stale handler behind.
+extension RealWorldMapScreen: @MainActor Equatable {
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.resetToken == rhs.resetToken
+            && lhs.locationFocusRequest == rhs.locationFocusRequest
+            && lhs.screenFurnitureOpacity == rhs.screenFurnitureOpacity
+    }
 }
 
 enum RealWorldMapOverviewVisibilityPolicy {
@@ -921,9 +887,11 @@ private struct RealWorldTrainCanvas: View {
 
     let proxy: MapProxy
     let pathsBySegmentID: [String: RealWorldRenderPath]
-    let visibleRegion: MKCoordinateRegion
+    let camera: GeographicCameraState
 
     var body: some View {
+        // Observing the camera here keeps per-frame motion inside this layer.
+        let visibleRegion = camera.region
         let trains = appState.liveTrains
         let stationsByID = appState.graph?.stationsByID ?? [:]
         let closedLineIDs = appState.currentlyClosedLineIDs
@@ -941,7 +909,8 @@ private struct RealWorldTrainCanvas: View {
                             guard let point = markerPoint(
                                 for: train,
                                 at: timeline.date,
-                                visibleBounds: visibleBounds, stationBoard: stationBoard
+                                visibleBounds: visibleBounds, stationBoard: stationBoard,
+                                visibleRegion: visibleRegion
                             ) else { continue }
 
                             let selected = train.id == appState.selectedTrainID
@@ -977,7 +946,8 @@ private struct RealWorldTrainCanvas: View {
                         if let point = markerPoint(
                             for: train,
                             at: timeline.date,
-                            visibleBounds: CGRect(origin: .zero, size: viewport.size), stationBoard: stationBoard
+                            visibleBounds: CGRect(origin: .zero, size: viewport.size), stationBoard: stationBoard,
+                            visibleRegion: visibleRegion
                         ) {
                             Button {
                                 withAnimation(.smooth(duration: 0.25)) {
@@ -999,7 +969,8 @@ private struct RealWorldTrainCanvas: View {
                        let markerPoint = markerPoint(
                            for: train,
                            at: timeline.date,
-                           visibleBounds: CGRect(origin: .zero, size: viewport.size), stationBoard: stationBoard
+                           visibleBounds: CGRect(origin: .zero, size: viewport.size), stationBoard: stationBoard,
+                           visibleRegion: visibleRegion
                        ),
                        let nextStopName = stationsByID[train.callingStationID]?.name {
                         TrainMapCalloutOverlay(
@@ -1027,7 +998,8 @@ private struct RealWorldTrainCanvas: View {
         for train: LiveTubeTrain,
         at date: Date,
         visibleBounds: CGRect,
-        stationBoard: LiveTrainStationBoardSnapshot?
+        stationBoard: LiveTrainStationBoardSnapshot?,
+        visibleRegion: MKCoordinateRegion
     ) -> CGPoint? {
         guard let path = pathsBySegmentID[train.segmentID],
               let progress = LiveTrainMarkerPolicy.projectedProgress(
@@ -1068,6 +1040,47 @@ private struct RealWorldTrainCanvas: View {
     }
 }
 
+/// Per-frame geographic camera values for overlays drawn with `MapProxy`.
+/// Kept out of `RealWorldMapScreen`'s own state so camera motion does not
+/// rebuild the Map content (overlays, annotations, map style) every frame.
+@MainActor
+@Observable
+final class GeographicCameraState {
+    private(set) var region: MKCoordinateRegion
+    private(set) var heading: Double = 0
+    @ObservationIgnored private(set) var networkZoom: Double = 0
+
+    init(region: MKCoordinateRegion) {
+        self.region = region
+    }
+
+    func update(region: MKCoordinateRegion, heading: Double, networkZoom: Double) {
+        self.region = region
+        if self.heading != heading { self.heading = heading }
+        self.networkZoom = networkZoom
+    }
+}
+
+/// Zoom-dependent annotation styling, quantised to the values that actually
+/// change what MapKit draws.
+struct GeographicAnnotationLevel: Equatable {
+    let showsRoundels: Bool
+    let showsNames: Bool
+    let showsFeatureNames: Bool
+    let showsAllPiers: Bool
+    let markerDiameter: CGFloat
+
+    init(zoom: Double, region: MKCoordinateRegion) {
+        showsRoundels = RealWorldStationVisibilityPolicy.showsRoundel(at: zoom)
+        showsNames = RealWorldStationVisibilityPolicy.showsName(at: zoom)
+        showsFeatureNames = zoom >= 2
+        showsAllPiers = region.span.longitudeDelta < 0.12
+        // 5, 7, 9 or 11 points: coarse steps keep camera jitter at a
+        // boundary from producing a whole Map content update.
+        markerDiameter = max(5, min(11, 3 + 2 * (CGFloat(zoom).rounded(.down))))
+    }
+}
+
 private extension MKCoordinateRegion {
     func containsExpanded(_ coordinate: CLLocationCoordinate2D) -> Bool {
         let latitudeRadius = span.latitudeDelta * 0.6
@@ -1085,6 +1098,8 @@ struct RealWorldMapRenderData {
     let segments: [RealWorldRenderedSegment]
     let polylines: [RealWorldRenderedPolyline]
     let pathsBySegmentID: [String: RealWorldRenderPath]
+    /// One representative per interchange hub, sorted by name.
+    private let displayStationGroups: [(representative: TubeStation, members: [TubeStation])]
     private let allSegmentIDs: Set<String>
     private let overlayCache = OverlayCache()
 
@@ -1110,6 +1125,24 @@ struct RealWorldMapRenderData {
         allSegmentIDs = Set(renderedSegments.map(\.id))
         polylines = RealWorldPolylineBuilder.polylines(from: renderedSegments)
         pathsBySegmentID = Dictionary(uniqueKeysWithValues: renderedSegments.map { ($0.id, $0.path) })
+        displayStationGroups = RealWorldStationDisplay.groups(in: graph)
+    }
+
+    /// Matches `RealWorldStationDisplay.stations` without regrouping and
+    /// sorting the whole graph on every Map content update.
+    func displayStations(selectedStationID: String?) -> [TubeStation] {
+        guard let selectedStationID,
+              let groupIndex = displayStationGroups.firstIndex(where: { group in
+                  group.representative.id != selectedStationID
+                      && group.members.contains { $0.id == selectedStationID }
+              }) else {
+            return displayStationGroups.map(\.representative)
+        }
+        var stations = displayStationGroups.map(\.representative)
+        stations[groupIndex] = displayStationGroups[groupIndex].members.first {
+            $0.id == selectedStationID
+        } ?? stations[groupIndex]
+        return stations.sorted { $0.name < $1.name }
     }
 
     func polylines(covering segmentIDs: Set<String>) -> [RealWorldRenderedPolyline] {
@@ -1387,18 +1420,37 @@ enum RealWorldStationDisplay {
         in graph: TubeGraph,
         selectedStationID: String?
     ) -> [TubeStation] {
-        Dictionary(grouping: graph.stations) { $0.hubID ?? $0.id }
-            .values
-            .compactMap { group in
-                group.first(where: { $0.id == selectedStationID })
-                    ?? group.sorted {
-                        if $0.lineIDs.count != $1.lineIDs.count {
-                            return $0.lineIDs.count > $1.lineIDs.count
-                        }
-                        return $0.id < $1.id
-                    }.first
-            }
+        hubGroups(in: graph)
+            .compactMap { representative(in: $0, selectedStationID: selectedStationID) }
             .sorted { $0.name < $1.name }
+    }
+
+    /// The unselected representatives with their hub members, sorted by name.
+    static func groups(
+        in graph: TubeGraph
+    ) -> [(representative: TubeStation, members: [TubeStation])] {
+        hubGroups(in: graph)
+            .compactMap { group in
+                representative(in: group, selectedStationID: nil).map { ($0, group) }
+            }
+            .sorted { $0.representative.name < $1.representative.name }
+    }
+
+    private static func hubGroups(in graph: TubeGraph) -> Dictionary<String, [TubeStation]>.Values {
+        Dictionary(grouping: graph.stations) { $0.hubID ?? $0.id }.values
+    }
+
+    private static func representative(
+        in group: [TubeStation],
+        selectedStationID: String?
+    ) -> TubeStation? {
+        group.first(where: { $0.id == selectedStationID })
+            ?? group.sorted {
+                if $0.lineIDs.count != $1.lineIDs.count {
+                    return $0.lineIDs.count > $1.lineIDs.count
+                }
+                return $0.id < $1.id
+            }.first
     }
 }
 

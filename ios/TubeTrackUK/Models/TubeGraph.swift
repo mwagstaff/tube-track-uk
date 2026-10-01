@@ -71,13 +71,47 @@ struct TubeGraph: Codable, Sendable {
     let stations: [TubeStation]
     let segments: [TubeSegment]
     let lines: [TubeGraphLine]
+    /// Built once per graph. These are read from map rendering, hit testing
+    /// and per-element filters, where rebuilding them on each access made
+    /// otherwise linear work quadratic.
+    let stationsByID: [String: TubeStation]
+    let segmentsByID: [String: TubeSegment]
 
-    var stationsByID: [String: TubeStation] {
-        Dictionary(uniqueKeysWithValues: stations.map { ($0.id, $0) })
+    private enum CodingKeys: String, CodingKey {
+        case schemaVersion, generatedAt, source, schematicSize, stations, segments, lines
     }
 
-    var segmentsByID: [String: TubeSegment] {
-        Dictionary(uniqueKeysWithValues: segments.map { ($0.id, $0) })
+    init(
+        schemaVersion: Int,
+        generatedAt: String,
+        source: TubeGraphSource,
+        schematicSize: TubeGraphSize,
+        stations: [TubeStation],
+        segments: [TubeSegment],
+        lines: [TubeGraphLine]
+    ) {
+        self.schemaVersion = schemaVersion
+        self.generatedAt = generatedAt
+        self.source = source
+        self.schematicSize = schematicSize
+        self.stations = stations
+        self.segments = segments
+        self.lines = lines
+        stationsByID = Dictionary(uniqueKeysWithValues: stations.map { ($0.id, $0) })
+        segmentsByID = Dictionary(uniqueKeysWithValues: segments.map { ($0.id, $0) })
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        try self.init(
+            schemaVersion: container.decode(Int.self, forKey: .schemaVersion),
+            generatedAt: container.decode(String.self, forKey: .generatedAt),
+            source: container.decode(TubeGraphSource.self, forKey: .source),
+            schematicSize: container.decode(TubeGraphSize.self, forKey: .schematicSize),
+            stations: container.decode([TubeStation].self, forKey: .stations),
+            segments: container.decode([TubeSegment].self, forKey: .segments),
+            lines: container.decode([TubeGraphLine].self, forKey: .lines)
+        )
     }
 
     func stations(inSamePlaceAs station: TubeStation) -> [TubeStation] {

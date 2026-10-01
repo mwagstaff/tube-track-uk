@@ -150,7 +150,7 @@ function expectedAtMs(arrival) {
     return Number.isFinite(parsed) ? parsed : null;
 }
 
-function isSelfReferential(arrival) {
+export function isSelfReferential(arrival) {
     const stopId = trimmed(arrival.stopId)?.toUpperCase();
     const destinationId = trimmed(arrival.destinationStopId)?.toUpperCase();
     if (stopId && destinationId === stopId) return true;

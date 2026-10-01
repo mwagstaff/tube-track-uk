@@ -2,6 +2,7 @@ import SwiftUI
 
 private enum ProfileDestination: Hashable {
     case about
+    case scheduledJourneys
     case preferences
 }
 
@@ -23,6 +24,9 @@ struct ProfileScreen: View {
             NavigationStack(path: $navigationPath) {
                 List {
                     Section {
+                        NavigationLink(value: ProfileDestination.scheduledJourneys) {
+                            Label("Scheduled journeys", systemImage: "calendar.badge.clock")
+                        }
                         NavigationLink(value: ProfileDestination.preferences) {
                             Label("Preferences", systemImage: "slider.horizontal.3")
                         }
@@ -72,6 +76,8 @@ struct ProfileScreen: View {
                     switch destination {
                     case .about:
                         AboutScreen()
+                    case .scheduledJourneys:
+                        ScheduledJourneysScreen()
                     case .preferences:
                         PreferencesScreen()
                     }

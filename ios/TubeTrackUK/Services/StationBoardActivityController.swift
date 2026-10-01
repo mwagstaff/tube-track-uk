@@ -21,6 +21,8 @@ final class StationBoardActivityController {
     @ObservationIgnored private var sequence = 0
     @ObservationIgnored private var lastUpdatedAt: Date?
     @ObservationIgnored private var tokenTask: Task<Void, Never>?
+    @ObservationIgnored private var activityTask: Task<Void, Never>?
+    @ObservationIgnored private var stateTask: Task<Void, Never>?
     @ObservationIgnored private var enablementTask: Task<Void, Never>?
     @ObservationIgnored private var registeredTokens: Set<String> = []
     @ObservationIgnored private let registrar: any LiveActivityPushRegistering
@@ -33,6 +35,11 @@ final class StationBoardActivityController {
         isFrequentPushesEnabled = DepartureActivityBridge.frequentPushesEnabled
         adoptExistingActivity()
         observeFrequentPushEnablement()
+        activityTask = Task { [weak self] in
+            for await id in DepartureActivityBridge.activityIDs() {
+                await self?.adoptRemoteActivity(id)
+            }
+        }
     }
 
     var areActivitiesEnabled: Bool {
@@ -161,7 +168,9 @@ final class StationBoardActivityController {
               updatedAt >= (lastUpdatedAt ?? .distantPast), !Task.isCancelled else { return }
         lastUpdatedAt = updatedAt
 
-        if let reason = DepartureActivityPolicy.endReason(
+        if attributes.scheduleID != nil {
+            if Date.now >= attributes.hardEndsAt { await end(reason: .cap); return }
+        } else if let reason = DepartureActivityPolicy.endReason(
             state: state,
             hardEndsAt: attributes.hardEndsAt,
             lastUpdatedAt: updatedAt,
@@ -190,7 +199,9 @@ final class StationBoardActivityController {
               let state = DepartureActivityBridge.state(for: trackedActivityID) else {
             return
         }
-        if let reason = DepartureActivityPolicy.endReason(
+        if attributes.scheduleID != nil {
+            if now >= attributes.hardEndsAt { await end(reason: .cap) }
+        } else if let reason = DepartureActivityPolicy.endReason(
             state: state,
             hardEndsAt: attributes.hardEndsAt,
             lastUpdatedAt: lastUpdatedAt ?? state.updatedAt,
@@ -246,6 +257,8 @@ final class StationBoardActivityController {
     }
 
     private func resetLocalState() {
+        stateTask?.cancel()
+        stateTask = nil
         trackedActivityID = nil
         lastUpdatedAt = nil
         registeredTokens.removeAll()
@@ -254,7 +267,9 @@ final class StationBoardActivityController {
 
     /// Reattaches to an activity that outlived the app process.
     private func adoptExistingActivity() {
-        guard let id = DepartureActivityBridge.trackedActivityIDs().first,
+        let ids = DepartureActivityBridge.trackedActivityIDs()
+        let preferred = ids.first { DepartureActivityBridge.attributes(for: $0)?.scheduleID == nil } ?? ids.first
+        guard let id = preferred,
               let attributes = DepartureActivityBridge.attributes(for: id) else {
             return
         }
@@ -263,10 +278,51 @@ final class StationBoardActivityController {
         sequence = DepartureActivityBridge.state(for: id)?.sequence ?? 0
         AppGroup.recordTrackedActivity(id: id)
         observePushToken(activityID: id, attributes: attributes)
+        for other in ids where other != id {
+            Task { [weak self] in await self?.adoptRemoteActivity(other) }
+        }
+    }
+
+    private func adoptRemoteActivity(_ id: String) async {
+        guard id != trackedActivityID, let attributes = DepartureActivityBridge.attributes(for: id),
+              attributes.scheduleID != nil else { return }
+        let manual = DepartureActivityBridge.trackedActivityIDs().contains {
+            guard let other = DepartureActivityBridge.attributes(for: $0) else { return false }
+            return other.scheduleID == nil && other.hardEndsAt > .now
+        }
+        if manual || attributes.hardEndsAt <= .now {
+            await DepartureActivityBridge.end(activityID: id, dismissAfter: 0)
+            await registrar.unregister(activityID: id)
+            return
+        }
+        for other in DepartureActivityBridge.trackedActivityIDs() where other != id {
+            guard let previous = DepartureActivityBridge.attributes(for: other),
+                  previous.scheduleID != nil || previous.hardEndsAt <= .now else { continue }
+            await DepartureActivityBridge.end(activityID: other, dismissAfter: 0)
+            await registrar.unregister(activityID: other)
+        }
+        tokenTask?.cancel()
+        registeredTokens.removeAll()
+        trackedActivityID = id
+        lastUpdatedAt = DepartureActivityBridge.state(for: id)?.updatedAt
+        sequence = DepartureActivityBridge.state(for: id)?.sequence ?? 1
+        AppGroup.recordTrackedActivity(id: id)
+        observePushToken(activityID: id, attributes: attributes)
     }
 
     private func observePushToken(activityID: String, attributes: DepartureActivityAttributes) {
         tokenTask?.cancel()
+        stateTask?.cancel()
+        stateTask = Task { [weak self] in
+            for await _ in DepartureActivityBridge.ended(for: activityID) {
+                guard let self else { return }
+                await self.registrar.unregister(activityID: activityID)
+                if self.trackedActivityID == activityID {
+                    self.tokenTask?.cancel()
+                    self.resetLocalState()
+                }
+            }
+        }
         tokenTask = Task { [weak self] in
             for await token in DepartureActivityBridge.pushTokens(for: activityID) {
                 await self?.register(token: token, attributes: attributes)
@@ -278,15 +334,25 @@ final class StationBoardActivityController {
         // Tokens are minted more than once and arrive from several places at
         // once; registering the same one twice is a wasted round trip.
         guard registeredTokens.insert(token).inserted else { return }
-        do {
-            try await registrar.register(
-                token: token,
-                attributes: attributes,
-                frequentPushesEnabled: isFrequentPushesEnabled
-            )
-        } catch {
-            Self.logger.warning("Could not register activity push token: \(error.localizedDescription, privacy: .public)")
+        for attempt in 0..<3 {
+            do {
+                try Task.checkCancellation()
+                try await registrar.register(
+                    token: token,
+                    attributes: attributes,
+                    frequentPushesEnabled: isFrequentPushesEnabled
+                )
+                if !DepartureActivityBridge.trackedActivityIDs().contains(attributes.activityID) {
+                    await registrar.unregister(activityID: attributes.activityID)
+                }
+                return
+            } catch {
+                if Task.isCancelled { break }
+                Self.logger.warning("Could not register activity push token: \(error.localizedDescription, privacy: .public)")
+                if attempt < 2 { try? await Task.sleep(for: .seconds(2 * (attempt + 1))) }
+            }
         }
+        registeredTokens.remove(token)
     }
 
     private func observeFrequentPushEnablement() {

@@ -1,3 +1,4 @@
+import { ScheduledJourneyStore, JourneyScheduler } from './lib/scheduled-journeys.js';
 import { createApp } from './lib/app.js';
 import { loadConfig, LIVE_MODES } from './lib/config.js';
 import { LiveCache } from './lib/live-cache.js';
@@ -7,6 +8,7 @@ import { createMetrics } from './lib/metrics.js';
 import { PlannedTrackClosuresSource } from './lib/planned-works.js';
 import { ApnsClient, ApnsTokenSigner } from './lib/push/apns.js';
 import { LiveActivityNotifier } from './lib/push/notifier.js';
+import { createRailDepartureSource } from './lib/push/rail-departures.js';
 import { PushTokenStore } from './lib/push/token-store.js';
 import { loadLineStatuses } from './lib/line-status.js';
 import { createRiverDataSource } from './lib/river.js';
@@ -22,7 +24,7 @@ import { UsageStore } from './lib/usage-store.js';
  * start because a key file moved would take live departures down with it, which
  * is a far worse outcome than Live Activities going quiet.
  */
-async function createPushStack({ config, logger, metrics, resourceCache, client }) {
+async function createPushStack({ config, logger, metrics, resourceCache, client, cache }) {
     if (!config.push.enabled) {
         logger.info('push_disabled', { reason: 'apns_not_configured' });
         return { store: null, notifier: null, apns: null };
@@ -60,6 +62,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client 
             topic: config.push.liveActivityTopic,
             river: createRiverDataSource({ client, resourceCache }),
             thameslink: createThameslinkDataSource({ client, resourceCache }),
+            railDepartures: createRailDepartureSource({ client, resourceCache }),
             logger,
             metrics,
             // Reuses the cache behind /api/v1/status, so a tracked board's
@@ -74,7 +77,21 @@ async function createPushStack({ config, logger, metrics, resourceCache, client 
             store: store.filePath,
             tokens: store.countByType()
         });
-        return { store, notifier, apns };
+        let schedules = null;
+        let scheduler = null;
+        try {
+            schedules = await new ScheduledJourneyStore({
+                ...(config.push.dataDir ? { dataDir: config.push.dataDir } : {})
+            }).load();
+            scheduler = new JourneyScheduler({ store: schedules, pushStore: store, apns,
+                topic: config.push.liveActivityTopic, cache, logger,
+                railDepartures: createRailDepartureSource({ client, resourceCache }),
+                thameslink: createThameslinkDataSource({ client, resourceCache }) });
+        } catch (error) {
+            // Preserve unreadable schedules for recovery without interrupting manual Track.
+            logger.error('journey_scheduler_setup_failed', { error: error.message });
+        }
+        return { store, notifier, apns, schedules, scheduler };
     } catch (error) {
         logger.error('push_setup_failed', { error });
         return { store: null, notifier: null, apns: null };
@@ -103,7 +120,7 @@ async function main() {
     });
     const resourceCache = new ResourceCache();
     const plannedTrackClosuresSource = new PlannedTrackClosuresSource();
-    const push = await createPushStack({ config, logger, metrics, resourceCache, client });
+    const push = await createPushStack({ config, logger, metrics, resourceCache, client, cache });
     const poller = new LivePoller({
         modes: LIVE_MODES,
         client,
@@ -124,6 +141,7 @@ async function main() {
         resourceCache,
         plannedTrackClosuresSource,
         pushTokenStore: push.store,
+        scheduledJourneyStore: push.schedules,
         usageStore
     });
 
@@ -138,6 +156,7 @@ async function main() {
             maxConcurrentRequests: config.maxConcurrentRequests
         });
         poller.start();
+        push.scheduler?.start();
     });
     server.keepAliveTimeout = 65_000;
     server.headersTimeout = 70_000;
@@ -154,6 +173,7 @@ async function main() {
         }, 10_000);
         forcedExit.unref();
 
+        await push.scheduler?.stop();
         await poller.stop();
         // Tokens registered since the last debounced write would otherwise be
         // lost, and a lost token is an activity that silently stops updating.

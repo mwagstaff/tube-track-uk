@@ -103,6 +103,7 @@ function readStopIds(value, isKnownStop) {
  */
 export function createPushRoutes({
     store,
+    scheduleStore = null,
     isKnownStop = () => true,
     riverNetwork = async () => ({ piers: [] }),
     logger,
@@ -184,6 +185,12 @@ export function createPushRoutes({
         // Namespaced by install, so one app cannot overwrite another's
         // subscription by guessing an activity id.
         const id = `${req.installId}:${activityId}`;
+        const occurrence = scheduleStore?.occurrence(req.installId, activityId);
+        if (String(activityId).startsWith('scheduled-') && (!occurrence
+            || !scheduleStore.authorised(req.installId, req.get('X-TubeTrack-Schedule-Key')))) {
+            return res.status(403).end();
+        }
+        const existing = store.get(id);
         store.upsert({
             id,
             type: 'liveActivity',
@@ -195,7 +202,15 @@ export function createPushRoutes({
             lineId: String(lineId),
             direction: String(direction ?? 'any'),
             frequentPushesEnabled: body.frequentPushesEnabled !== false,
-            startedAtMs: clock()
+            startedAtMs: occurrence?.startedAtMs ?? existing?.startedAtMs ?? clock(),
+            ...(occurrence ? {
+                scheduleId: occurrence.journeyId,
+                hardEndsAtMs: occurrence.hardEndsAtMs,
+                ...occurrence.board,
+                apnsEnvironment: scheduleStore.rows[req.installId]?.device?.environment,
+                lastBoard: existing?.lastBoard ?? occurrence.state?.departures ?? [],
+                sequence: existing?.sequence ?? 1
+            } : {})
         });
         logger?.info('push_subscription_registered', { id, lineId, direction });
         metrics?.setPushTokens?.(store.countByType());

@@ -34,7 +34,36 @@ enum DepartureActivityBridge {
 
     /// Every tracked board currently live, newest last.
     static func trackedActivityIDs() -> [String] {
-        Activity<DepartureActivityAttributes>.activities.map(\.attributes.activityID)
+        Activity<DepartureActivityAttributes>.activities
+            .filter { $0.activityState == .active || $0.activityState == .stale }
+            .map(\.attributes.activityID)
+    }
+
+    static func activityIDs() -> AsyncStream<String> {
+        AsyncStream { continuation in
+            let task = Task {
+                for await activity in Activity<DepartureActivityAttributes>.activityUpdates {
+                    continuation.yield(activity.attributes.activityID)
+                }
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
+    }
+
+    static func ended(for activityID: String) -> AsyncStream<Bool> {
+        AsyncStream { continuation in
+            let task = Task {
+                guard let activity = activity(for: activityID) else { continuation.finish(); return }
+                for await state in activity.activityStateUpdates {
+                    if state == .ended || state == .dismissed {
+                        continuation.yield(true)
+                        break
+                    }
+                }
+                continuation.finish()
+            }
+            continuation.onTermination = { _ in task.cancel() }
+        }
     }
 
     static func attributes(for activityID: String) -> DepartureActivityAttributes? {

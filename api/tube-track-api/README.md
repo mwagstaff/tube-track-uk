@@ -45,6 +45,22 @@ while stale, and `/metrics` exposes `tube_track_live_cache_stale` (0/1) and
 `app_check_ok{check="live_cache_fresh"}` alongside
 `tube_track_live_cache_age_seconds` for alerting.
 
+Tracked Elizabeth line and Overground boards containing terminating trains or
+only expired predictions use the per-station `ArrivalDepartures` feed for those
+stops. This mirrors the app's terminus correction: at Abbey Wood, the bulk feed
+was observed assigning already-expired times to outbound services, causing all
+four Live Activity rows to disappear even though departures were available.
+The correction shares the app endpoint's 30-second cache, excludes incoming
+terminators and departed services, and skips pushes when the departure source
+fails or is stale. Extra lookups are capped at 40 distinct station/line pairs
+per notification pass. The network vehicle feed remains unchanged.
+
+Abbey Wood's Elizabeth line board canonicalises the duplicate National Rail
+stop `910GABWD` to `910GABWDXR` before correcting and selecting departures.
+Otherwise expired alias rows can take all four slots ahead of the corrected
+trains. Scheduled activity starts use the same correction as update pushes;
+Thameslink continues to use its own `910GABWD` board.
+
 Completed refreshes explicitly detach cancellation listeners. Keep this cleanup:
 on the production Node 20 runtime, combining every attempt with the long-lived
 shutdown signal retained old arrival generations and exhausted the 192 MiB heap.
