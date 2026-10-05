@@ -356,10 +356,52 @@ struct StationDeparturesTests {
 
         #expect(StationDepartureMetadata.departureTime(for: dueByExpectedTime, now: now) == "Due")
         #expect(StationDepartureMetadata.departureTime(for: oneMinute, now: now) == "1 min")
-        #expect(StationDepartureMetadata.departureTime(for: twoMinutes, now: now) == "2 min")
+        #expect(StationDepartureMetadata.departureTime(for: twoMinutes, now: now) == "2 mins")
         #expect(StationDepartureMetadata.departureTime(for: dueByPrediction, now: now) == "Due")
-        #expect(StationDepartureMetadata.departureTime(for: flooredPrediction, now: now) == "2 min")
+        #expect(StationDepartureMetadata.departureTime(for: flooredPrediction, now: now) == "2 mins")
         #expect(StationDepartureMetadata.departureTime(for: missingTime, now: now) == "—")
+    }
+
+    @Test(arguments: [
+        ("ALL SAINTS", "All Saints"),
+        ("all saints dlr station", "All Saints"),
+        ("All Saints", "All Saints"),
+        ("  ALL SAINTS DLR STATION  ", "All Saints"),
+        ("KING'S CROSS ST. PANCRAS", "King's Cross St. Pancras"),
+        ("HEATHROW TERMINALS 2 & 3", "Heathrow Terminals 2 & 3"),
+        ("KENSINGTON (OLYMPIA)", "Kensington (Olympia)"),
+        ("All Saints via DLR", "All Saints via DLR"),
+        ("Unknown DLR destination", "Unknown DLR destination"),
+    ])
+    func destinationCasingIsValidatedAgainstTheStationCatalogue(raw: String, expected: String) {
+        for usesTowards in [false, true] {
+            let prediction = arrival(id: "casing", line: .dlr,
+                destinationName: usesTowards ? nil : raw,
+                towards: usesTowards ? raw : nil, seconds: 120)
+            #expect(StationDepartureMetadata.destinationLabel(for: prediction) == expected)
+        }
+    }
+
+    @Test func distantDeparturesShowLondonClockTime() throws {
+        let now = try #require(ISO8601DateFormatter().date(from: "2026-10-05T22:08:00Z"))
+        for seconds in [1200, 1201, 1380] {
+            for hasExpectedArrival in [true, false] {
+                let prediction = arrival(
+                    id: "distant", line: .thameslink,
+                    expectedArrival: hasExpectedArrival ? now.addingTimeInterval(Double(seconds)) : nil,
+                    seconds: hasExpectedArrival ? 999 : seconds
+                )
+                let expected = seconds == 1200 ? "20 mins"
+                    : seconds == 1201 ? "20 mins (23:28)" : "23 mins (23:31)"
+                #expect(StationDepartureMetadata.departureTime(for: prediction, now: now) == expected)
+            }
+        }
+        let midnight = arrival(id: "midnight", line: .northern,
+            expectedArrival: now.addingTimeInterval(3600), seconds: nil)
+        #expect(StationDepartureMetadata.departureTime(for: midnight, now: now) == "60 mins (00:08)")
+        let winter = try #require(ISO8601DateFormatter().date(from: "2026-12-05T23:08:00Z"))
+        let winterTrain = arrival(id: "winter", line: .northern, seconds: 1380)
+        #expect(StationDepartureMetadata.departureTime(for: winterTrain, now: winter) == "23 mins (23:31)")
     }
 
     private func arrival(

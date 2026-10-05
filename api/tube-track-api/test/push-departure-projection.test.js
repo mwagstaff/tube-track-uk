@@ -216,3 +216,20 @@ test('long names are truncated to the same limits the client encodes', () => {
     assert.equal(board[0].destination.length, 28);
     assert.equal(board[0].platform.length, 14);
 });
+
+test('destination names use catalogue casing without damaging route text', () => {
+    for (const [raw, expected] of [
+        ['ALL SAINTS', 'All Saints'],
+        ['all saints dlr station', 'All Saints'],
+        ['All Saints', 'All Saints'],
+        ['  ALL SAINTS DLR STATION  ', 'All Saints'],
+        ["KING'S CROSS ST. PANCRAS", "King's Cross St. Pancras"],
+        ['HEATHROW TERMINALS 2 & 3', 'Heathrow Terminals 2 & 3'],
+        ['KENSINGTON (OLYMPIA)', 'Kensington (Olympia)'],
+        ['All Saints via DLR', 'All Saints via DLR'],
+        ['Unknown DLR destination', 'Unknown DLR destination']
+    ]) {
+        assert.equal(destinationLabel(arrival({ destinationName: raw })), expected);
+        assert.equal(destinationLabel(arrival({ destinationName: null, towards: raw })), expected);
+    }
+});

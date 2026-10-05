@@ -5,7 +5,7 @@ import { ThameslinkTrainEstimator } from './thameslink-trains.js';
 export const THAMESLINK_LINE_ID = 'thameslink';
 const MAXIMUM_STOPS = 6;
 const DEPARTED_GRACE_MS = 60_000;
-const { directions: DIRECTIONS, stopIds: TFL_STOP_IDS } = JSON.parse(
+const { directions: DIRECTIONS, stopIds: TFL_STOP_IDS, coordinates: COORDINATES } = JSON.parse(
     readFileSync(new URL('../data/thameslink-directions.json', import.meta.url))
 );
 const catalogue = JSON.parse(readFileSync(new URL('../data/journey-stations.json', import.meta.url)));
@@ -28,6 +28,18 @@ export function stationDisplayName(value) {
     return name?.replace(/ (Rail|Underground) Station$/i, '')
         .replace(/ Station$/i, '')
         .replace(/ \((London|Kent|Surrey|Beds|Herts)\)$/i, '') ?? null;
+}
+
+// Blackfriars is a terminus for services arriving from either side of London.
+// Its destination-only label cannot distinguish those two directions.
+function departureDirection(stopId, destinationStopId) {
+    if (destinationStopId === '910GBLFR') {
+        const origin = COORDINATES[stopId];
+        const destination = COORDINATES[destinationStopId];
+        if (!origin || !destination || origin[0] === destination[0]) return null;
+        return origin[0] < destination[0] ? 'Northbound' : 'Southbound';
+    }
+    return DIRECTIONS[destinationStopId] ?? null;
 }
 
 /**
@@ -58,7 +70,7 @@ export function normaliseThameslinkDepartures(raw, stopId, now = Date.now()) {
             lineId: THAMESLINK_LINE_ID,
             lineName: 'Thameslink',
             platformName: text(row.platformName),
-            direction: DIRECTIONS[destinationStopId] ?? null,
+            direction: departureDirection(stopId, destinationStopId),
             destinationStopId,
             destinationName: stationDisplayName(row.destinationName) ?? 'Check front of train',
             scheduledDeparture: new Date(scheduled).toISOString(),

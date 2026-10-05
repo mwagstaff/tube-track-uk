@@ -71,7 +71,8 @@ public enum StationDepartureMetadata {
                Self.referencesStation(candidate, normalizedStationName: stationName) {
                 continue
             }
-            return passengerFacingStopName(candidate)
+            let name = passengerFacingStopName(candidate)
+            return canonicalStationNames[name.lowercased()] ?? name
         }
         return "Check front of train"
     }
@@ -87,11 +88,16 @@ public enum StationDepartureMetadata {
             return "Delayed · timetabled \(scheduled.formatted(londonClockTime))"
         }
         if arrival.serviceStatus == .delayed { return "Delayed" }
+        if arrival.isNationalRailOperator, arrival.serviceStatus == .unknown, let scheduled = arrival.scheduledDeparture {
+            return "Timetabled \(scheduled.formatted(londonClockTime)) · Awaiting update"
+        }
         return nil
     }
 
     private static var londonClockTime: Date.FormatStyle {
         var style = Date.FormatStyle(date: .omitted, time: .shortened)
+            .hour(.twoDigits(amPM: .omitted))
+            .minute(.twoDigits)
         style.timeZone = TimeZone(identifier: "Europe/London") ?? .current
         style.locale = Locale(identifier: "en_GB")
         return style
@@ -102,6 +108,9 @@ public enum StationDepartureMetadata {
         now: Date = .now
     ) -> String {
         if arrival.isCancelled { return "Cancelled" }
+        if arrival.isNationalRailOperator, arrival.expectedArrival == nil {
+            return arrival.serviceStatus == .delayed ? "Delayed" : "—"
+        }
         let seconds: Int?
         if let expectedArrival = arrival.expectedArrival {
             seconds = max(0, Int(expectedArrival.timeIntervalSince(now)))
@@ -110,8 +119,29 @@ public enum StationDepartureMetadata {
         }
         guard let seconds else { return "—" }
         if seconds < 45 { return "Due" }
-        return "\(max(1, seconds / 60)) min"
+        return departureTimeLabel(
+            expectedAt: arrival.expectedArrival ?? now.addingTimeInterval(TimeInterval(seconds)),
+            seconds: TimeInterval(seconds),
+            minutes: max(1, seconds / 60)
+        )
     }
+
+    /// Shared wording across departure surfaces, preserving each surface's rounding policy.
+    public static func departureTimeLabel(expectedAt: Date, seconds: TimeInterval, minutes: Int) -> String {
+        let countdown = "\(minutes) \(minutes == 1 ? "min" : "mins")"
+        guard seconds > 20 * 60 else { return countdown }
+        return "\(countdown) (\(expectedAt.formatted(londonClockTime)))"
+    }
+
+    // Validate API casing against known station names rather than title-casing
+    // arbitrary text, which can damage acronyms, punctuation and route notes.
+    private static let canonicalStationNames: [String: String] = Dictionary(
+        StationIndex.bundled.entries.map { entry in
+            let name = passengerFacingStopName(entry.name)
+            return (name.lowercased(), name)
+        },
+        uniquingKeysWith: { first, _ in first }
+    )
 
     private static func normalized(_ value: String?) -> String? {
         guard let value = value?.trimmingCharacters(in: .whitespacesAndNewlines),

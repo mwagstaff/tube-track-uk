@@ -144,7 +144,9 @@ final class TubeAppState {
     var highlightedDisruptionCategories = DisruptionCategory.defaultHighlighted
     private(set) var isGameActive = false
     private(set) var isOffline = false
-    var showLiveTrains = false
+    var showLiveTrains = false {
+        didSet { river.setLiveTrackingEnabled(showLiveTrains) }
+    }
     var isLoadingLiveTrains = false
     var trainLineFilter: Set<TubeLineID> = []
     var selectedTrainID: String?
@@ -199,12 +201,14 @@ final class TubeAppState {
     private(set) var stationArrivalsStale = false
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
+    var nationalRailDeparturesError: String?
     var nearbyArrivalsByStationID: [String: [TfLArrivalPrediction]] = [:]
     var nearbyArrivalsUpdatedAtByStationID: [String: Date] = [:]
     private(set) var nearbyArrivalsSourceUpdatedAt: [String: Date] = [:]
     private(set) var nearbyArrivalsStaleIDs: Set<String> = []
     var nearbyArrivalsLoadingStationIDs: Set<String> = []
     var nearbyArrivalsErrorsByStationID: [String: String] = [:]
+    var nearbyNationalRailErrors: [String: String] = [:]
     var statusUpdatedAt: Date?
     var worksUpdatedAt: Date?
     private(set) var worksCachedThrough: Date?
@@ -297,6 +301,7 @@ final class TubeAppState {
             showLiveTrains = false
         }
         #endif
+        river.setLiveTrackingEnabled(showLiveTrains)
     }
 
     var selectedStation: TubeStation? {
@@ -785,6 +790,7 @@ final class TubeAppState {
         stationArrivalsSourceUpdatedAt = nil
         stationArrivalsStale = false
         stationArrivalsError = nil
+        nationalRailDeparturesError = nil
         AppGroup.recordRecentStation(id: station.hubID ?? station.id)
         if selectedTab == .map {
             requestStationArrivals(for: station.id)
@@ -861,6 +867,7 @@ final class TubeAppState {
         stationArrivalsSourceUpdatedAt = nil
         stationArrivalsStale = false
         stationArrivalsError = nil
+        nationalRailDeparturesError = nil
     }
 
     func refreshTrains() async {
@@ -936,6 +943,7 @@ final class TubeAppState {
                             fetchedAt: snapshot.fetchedAt,
                             sourceUpdatedAt: snapshot.serverUpdatedAt ?? snapshot.fetchedAt,
                             isStale: snapshot.isStale,
+                            nationalRailErrorMessage: snapshot.nationalRailErrorMessage,
                             errorDescription: nil
                         )
                     } catch {
@@ -955,6 +963,7 @@ final class TubeAppState {
                       !isOffline,
                       !Task.isCancelled else { continue }
                 nearbyArrivalsLoadingStationIDs.remove(result.stationID)
+                nearbyNationalRailErrors[result.stationID] = result.nationalRailErrorMessage
                 if let errorDescription = result.errorDescription {
                     if let updatedAt = nearbyArrivalsUpdatedAtByStationID[result.stationID],
                        Date.now.timeIntervalSince(updatedAt) >= Self.nearbyArrivalsStaleLifetime {
@@ -1148,6 +1157,7 @@ final class TubeAppState {
         nearbyArrivalsUpdatedAtByStationID.removeAll(keepingCapacity: false)
         nearbyArrivalsLoadingStationIDs.removeAll(keepingCapacity: false)
         nearbyArrivalsErrorsByStationID.removeAll(keepingCapacity: false)
+        nearbyNationalRailErrors.removeAll(keepingCapacity: false)
         nearbyArrivalsGenerationByStationID.removeAll(keepingCapacity: false)
         updateSelectedStationArrivalsVisibility()
     }
@@ -1448,6 +1458,7 @@ final class TubeAppState {
             stationArrivalsSourceUpdatedAt = snapshot.serverUpdatedAt ?? snapshot.fetchedAt
             stationArrivalsStale = snapshot.isStale
             stationArrivalsError = nil
+            nationalRailDeparturesError = snapshot.nationalRailErrorMessage
         } catch {
             guard !Task.isCancelled,
                   generation == stationArrivalsGeneration,
@@ -1544,6 +1555,7 @@ private struct NearbyArrivalsResult: Sendable {
     let fetchedAt: Date?
     var sourceUpdatedAt: Date? = nil
     var isStale: Bool = false
+    var nationalRailErrorMessage: String? = nil
     let errorDescription: String?
 }
 

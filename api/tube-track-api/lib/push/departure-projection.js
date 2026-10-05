@@ -7,7 +7,8 @@
 // the app — so every rule here mirrors the Swift, and the fixtures in
 // test/push-departure-projection.test.js are shared with the Swift tests.
 //
-// Pure: no clock, no I/O. Callers pass a snapshot and get a board back.
+// Projection has no clock or request-time I/O; station names are loaded once.
+import { readFileSync } from 'node:fs';
 
 const CARDINAL_DIRECTIONS = ['northbound', 'southbound', 'eastbound', 'westbound'];
 const STOP_NAME_SUFFIXES = [
@@ -16,6 +17,14 @@ const STOP_NAME_SUFFIXES = [
     ' tram stop',
     ' rail station'
 ];
+
+// Match the app's catalogue validation without rewriting unknown route text.
+const canonicalStationNames = new Map(JSON.parse(
+    readFileSync(new URL('../../data/journey-stations.json', import.meta.url))
+).stations.map(({ name }) => {
+    const displayName = passengerFacingStopName(name);
+    return [displayName.toLowerCase(), displayName];
+}));
 
 export const DIRECTION_FILTERS = Object.freeze([
     'any',
@@ -135,7 +144,8 @@ export function destinationLabel(arrival) {
         const value = trimmed(candidate);
         if (value === null) continue;
         if (stationName !== null && referencesStation(value, stationName)) continue;
-        return passengerFacingStopName(value);
+        const name = passengerFacingStopName(value);
+        return canonicalStationNames.get(name.toLowerCase()) ?? name;
     }
     return 'Check front of train';
 }

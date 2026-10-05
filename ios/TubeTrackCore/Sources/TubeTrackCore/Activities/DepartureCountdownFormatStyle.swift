@@ -12,11 +12,12 @@ public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
 
     public func format(_ value: Date) -> String {
         let minutes = remainingMinutes(at: value)
-        switch minutes {
-        case 0: return "Due"
-        case 1: return "1 min"
-        default: return "\(minutes) mins"
-        }
+        guard minutes > 0 else { return "Due" }
+        return StationDepartureMetadata.departureTimeLabel(
+            expectedAt: expectedAt,
+            seconds: expectedAt.timeIntervalSince(value),
+            minutes: minutes
+        )
     }
 
     private func remainingMinutes(at date: Date) -> Int {

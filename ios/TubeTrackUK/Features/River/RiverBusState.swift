@@ -15,6 +15,10 @@ final class RiverBusState {
             if !showsBoats { clearFleet() }
         }
     }
+    // The remembered boat preference only applies while the map's shared
+    // live-vehicle switch is on. A new app session starts with that switch off.
+    private(set) var isLiveTrackingEnabled = false
+    var shouldShowBoats: Bool { isLiveTrackingEnabled && isEnabled && showsBoats }
     private(set) var network: RiverNetwork {
         didSet {
             cachedGeographicSegments = nil
@@ -61,11 +65,18 @@ final class RiverBusState {
     var selectedBoat: EstimatedRiverBoat? { boats.first { $0.id == selectedBoatId } }
     var selectedBoard: RiverBoardSnapshot? { selectedPierId.flatMap { boards[$0] } }
     var hasSelection: Bool { selectedPierId != nil || selectedBoatId != nil }
-    var filteredBoats: [EstimatedRiverBoat] { boats.filter { selectedLineId == nil || $0.lineId == selectedLineId } }
+    var filteredBoats: [EstimatedRiverBoat] {
+        guard shouldShowBoats else { return [] }
+        return boats.filter { selectedLineId == nil || $0.lineId == selectedLineId }
+    }
     var filteredPiers: [RiverPier] { network.piers.filter { selectedLineId == nil || $0.lineIds.contains(selectedLineId!) || $0.id == selectedPierId } }
     var issueCount: Int { statuses.filter { $0.entries.contains { $0.severity != 10 && $0.severity != 18 } }.count }
 
     func clearSelection() { selectedPierId = nil; selectedBoatId = nil; error = nil }
+    func setLiveTrackingEnabled(_ enabled: Bool) {
+        isLiveTrackingEnabled = enabled
+        if !enabled { clearFleet() }
+    }
     func select(_ pier: RiverPier) {
         isEnabled = true; selectedBoatId = nil; selectedPierId = pier.id
         if let selectedLineId, !pier.lineIds.contains(selectedLineId) { self.selectedLineId = nil }
@@ -148,13 +159,13 @@ final class RiverBusState {
     }
 
     private func refreshFleet() async {
-        guard showsBoats else { clearFleet(); return }
+        guard shouldShowBoats else { clearFleet(); return }
         do {
             if legacyFleetUntil.map({ $0 > .now }) != true {
                 do {
                     let response: TubeTrackAPIResponse<[EstimatedRiverBoat]> = try await client.getSnapshot("/api/v1/river/boats")
                     try Task.checkCancellation()
-                    guard showsBoats, isEnabled else { return }
+                    guard shouldShowBoats else { return }
                     let fresh = response.data.filter { boat in
                         boat.progress(at: .now) != nil && network.pier(boat.previousPierId) != nil
                             && network.pier(boat.nextPierId) != nil
@@ -174,13 +185,13 @@ final class RiverBusState {
             }
             let response: TubeTrackAPIResponse<[RiverPrediction]> = try await client.getSnapshot("/api/v1/river/live")
             try Task.checkCancellation()
-            guard showsBoats, isEnabled else { return }
+            guard shouldShowBoats else { return }
             let usable = !response.stale && Date.now.timeIntervalSince(response.updatedAt) <= 90
             boats = estimator.update(usable ? response.data : [], network: network, at: .now)
             fleetError = usable ? nil : "Boat estimates are temporarily delayed"
             reconcileBoatSelection()
         } catch {
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled, shouldShowBoats else { return }
             // A transport error must not restart observation history or reset
             // the age of positions that are still within their original window.
             boats = boats.filter { $0.progress(at: .now) != nil }

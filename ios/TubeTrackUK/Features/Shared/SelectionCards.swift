@@ -55,6 +55,7 @@ struct StationDetailCard: View {
                     isLoading: appState.isRefreshingStationArrivals,
                     isOffline: appState.isOffline,
                     errorMessage: appState.stationArrivalsError,
+                    nationalRailErrorMessage: appState.nationalRailDeparturesError,
                     warning: stationWarning,
                     maxDeparturesHeight: 280,
                     tracking: DepartureTrackingContext(
@@ -357,7 +358,7 @@ private struct TrainMapCallout: View {
     private var relativeETA: String {
         if remainingSeconds < 30 { return "Due" }
         let minutes = Int(ceil(Double(remainingSeconds) / 60))
-        return "\(minutes) min"
+        return "\(minutes) \(minutes == 1 ? "min" : "mins")"
     }
 
     private var informationalNote: String? {

@@ -6,7 +6,7 @@ import WidgetKit
 /// The Lock Screen and Dynamic Island presentation of a tracked departure board.
 ///
 /// The activity cannot fetch anything: it renders the last state it was handed
-/// with minute-only labels refreshed by app updates and server pushes. When iOS
+/// with departure labels refreshed by app updates and server pushes. When iOS
 /// marks the content stale, the countdowns are replaced by the
 /// clock times they were predicted for — a statement that stays true no matter
 /// how long the silence lasts.

@@ -750,9 +750,11 @@ struct BeckMapCanvas: View {
                             Button("\(pier.name), River Bus departures") { appState.select(pier: pier) }
                         }
                     }
-                    Section("Estimated boats, not GPS") {
-                        ForEach(appState.river.filteredBoats.filter { $0.progress(at: .now) != nil }) { boat in
-                            Button("\(boat.lineId.uppercased()), next pier \(appState.river.network.pier(boat.nextPierId)?.name ?? "Unknown")") { appState.select(boat: boat) }
+                    if appState.river.shouldShowBoats, !appState.isOffline {
+                        Section("Estimated boats, not GPS") {
+                            ForEach(appState.river.filteredBoats.filter { $0.progress(at: .now) != nil }) { boat in
+                                Button("\(boat.lineId.uppercased()), next pier \(appState.river.network.pier(boat.nextPierId)?.name ?? "Unknown")") { appState.select(boat: boat) }
+                            }
                         }
                     }
                 }
@@ -2068,7 +2070,7 @@ struct BeckMapCanvas: View {
             if distance(location, screenPoint(CableCarSchematic.midpoint)) < 32 { appState.selectCableCar(); return }
         }
         if appState.river.isEnabled, !presentation.highlightsJourney {
-            if appState.river.showsBoats, !appState.isOffline {
+            if appState.river.shouldShowBoats, !appState.isOffline {
                 let candidates = appState.river.filteredBoats.compactMap { boat -> (EstimatedRiverBoat, CGFloat)? in
                     guard let point = appState.river.schematicPoint(for: boat, document: document, at: .now) else { return nil }
                     return (boat, distance(location, screenPoint(point)))

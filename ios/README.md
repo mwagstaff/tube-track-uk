@@ -16,6 +16,22 @@ Live data is fetched from the Tube Track API at
 `https://api.skynolimit.dev/tube-track`. TfL credentials are held only by that
 server; the app does not store or send a TfL API key.
 
+National Rail departure boards additionally use TrainTrack UK's
+`https://api.skynolimit.dev/train-track/api/v2/departures/from/{CRS}` endpoint.
+The app merges these with TfL departures and presents other operators in neutral
+pills with the National Rail double-arrow mark. Thameslink, Elizabeth line and
+Overground retain their existing TfL boards. Replacement buses are excluded.
+Boards refresh with the existing 30-second station polling and retain up to five
+minutes of explicitly marked saved data during an outage. UK-local departure
+times are resolved against the source timestamp, including midnight and DST.
+
+`TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json` maps the existing map's stops
+and interchanges to 236 CRS codes, including mainline-only operators at Underground
+stops. Regenerate it with `python3 Tools/NationalRailStationsBuilder/build.py /path/to/train-track-uk` from this directory; the builder uses TrainTrack's station
+catalogue and reviewed interchanges, excluding walking links to separate stations.
+Operator departures currently support in-app boards; scheduled boards and Live
+Activities continue to use the existing TfL lines.
+
 ## MVP features
 
 - authored Underground map with pan, pinch zoom and map hit testing;
@@ -153,7 +169,9 @@ start a new tracked board.
 
 “Show live trains and boats” enables both live layers (including the River Bus
 layer if it was hidden); switching it off clears both. The independent estimated-boat
-preference remains available. Boat markers are estimates from pier predictions,
+preference remains available and applies only while the shared live-vehicle
+switch is on. Live vehicles start hidden each app session, even when the boat
+preference was previously enabled. Boat markers are estimates from pier predictions,
 not GPS. The shared `/api/v1/river/boats` endpoint learns travel times between
 calling piers and can position boats on first load when the preceding leg is
 unambiguous and the inferred departure is in the past. Observed pier transitions

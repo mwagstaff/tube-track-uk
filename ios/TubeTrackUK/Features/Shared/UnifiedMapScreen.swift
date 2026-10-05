@@ -98,7 +98,7 @@ struct UnifiedMapScreen: View {
                 .opacity(screenFurnitureOpacity)
                 .accessibilityHidden(mapNavigationActive)
         }
-        .task(id: "river:\(scenePhase == .active):\(appState.selectedTab == .map):\(appState.isOffline):\(appState.river.isEnabled):\(appState.river.showsBoats):\(appState.river.selectedPierId ?? "")") {
+        .task(id: "river:\(scenePhase == .active):\(appState.selectedTab == .map):\(appState.isOffline):\(appState.river.isEnabled):\(appState.river.shouldShowBoats):\(appState.river.selectedPierId ?? "")") {
             await appState.river.restore()
             guard scenePhase == .active, appState.selectedTab == .map, !appState.isOffline,
                   appState.river.isEnabled else { return }

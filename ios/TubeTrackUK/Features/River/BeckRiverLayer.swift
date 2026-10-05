@@ -150,7 +150,7 @@ struct BeckRiverLayer: View {
             }
         }
         .allowsHitTesting(false)
-        if river.showsBoats, !appState.isOffline,
+        if river.shouldShowBoats, !appState.isOffline,
            appState.selectedTab == .map, appState.mapPresentationMode == .beck {
             BeckRiverBoatLayer(document: document, camera: camera, scale: scale, offset: offset,
                                overscan: overscan, canvasSize: canvasSize)

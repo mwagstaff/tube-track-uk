@@ -206,12 +206,14 @@ public struct TfLArrivalPrediction: Codable, Sendable {
     public let serviceStatus: RailServiceStatus?
     /// TfL's published reason for a delay or cancellation.
     public let serviceCause: String?
+    public let operatorName: String?
+    public var isNationalRailOperator: Bool { lineId.hasPrefix("national-rail:") && operatorName != nil }
 
     private enum CodingKeys: String, CodingKey {
         case id, vehicleId, lineId, stationName, naptanId, stopId, platformName
         case direction, destinationName, destinationNaptanId, destinationStopId
         case towards, expectedArrival, expectedDeparture, timeToStation, currentLocation
-        case scheduledDeparture, status, cause
+        case scheduledDeparture, status, cause, operatorName
     }
 
     public init(
@@ -230,7 +232,8 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         currentLocation: String?,
         scheduledDeparture: Date? = nil,
         serviceStatus: RailServiceStatus? = nil,
-        serviceCause: String? = nil
+        serviceCause: String? = nil,
+        operatorName: String? = nil
     ) {
         self.id = id
         self.vehicleId = vehicleId
@@ -248,6 +251,7 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         self.scheduledDeparture = scheduledDeparture
         self.serviceStatus = serviceStatus
         self.serviceCause = serviceCause
+        self.operatorName = operatorName
     }
 
     public init(from decoder: Decoder) throws {
@@ -271,6 +275,7 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         scheduledDeparture = try container.decodeIfPresent(Date.self, forKey: .scheduledDeparture)
         serviceStatus = try container.decodeIfPresent(RailServiceStatus.self, forKey: .status)
         serviceCause = try container.decodeIfPresent(String.self, forKey: .cause)
+        operatorName = try container.decodeIfPresent(String.self, forKey: .operatorName)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -291,6 +296,7 @@ public struct TfLArrivalPrediction: Codable, Sendable {
         try container.encodeIfPresent(scheduledDeparture, forKey: .scheduledDeparture)
         try container.encodeIfPresent(serviceStatus, forKey: .status)
         try container.encodeIfPresent(serviceCause, forKey: .cause)
+        try container.encodeIfPresent(operatorName, forKey: .operatorName)
     }
 
     public var isCancelled: Bool { serviceStatus == .cancelled }

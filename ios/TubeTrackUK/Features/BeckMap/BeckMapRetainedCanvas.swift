@@ -126,6 +126,7 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
     private var renderedScale: CGFloat?
     private var renderedOffset: CGSize?
     private var renderedOverscan: CGFloat?
+    private var renderedColorScheme: ColorScheme?
     private weak var camera: BeckMapLayerCamera?
     private let surface = UIView()
 
@@ -153,8 +154,15 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
         }
         let rebasesCamera = renderedScale != renderScale || renderedOffset != renderOffset
             || renderedOverscan != overscan || surface.bounds.size != canvasSize
-        if renderedKey != key {
-            let content = BeckMapCanvasDrawing(colorScheme: colorScheme, renderer: renderer)
+        if renderedKey != key || rebasesCamera || renderedColorScheme != colorScheme {
+            // Layout and the camera transform must enter the same transaction.
+            // In particular, launch can replace a provisional canvas size while
+            // the map content itself is unchanged.
+            CATransaction.begin()
+            CATransaction.setDisableActions(true)
+            let content = BeckMapCanvasDrawing(
+                size: canvasSize, colorScheme: colorScheme, renderer: renderer
+            )
             if let hosting {
                 hosting.rootView = content
             } else {
@@ -179,6 +187,13 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
             renderedScale = renderScale
             renderedOffset = renderOffset
             renderedOverscan = overscan
+            renderedColorScheme = colorScheme
+            camera.attach(
+                layer: surface.layer, renderScale: renderScale,
+                renderOffset: renderOffset, overscan: overscan
+            )
+            CATransaction.commit()
+            return
         }
         camera.attach(
             layer: surface.layer, renderScale: renderScale,
@@ -193,6 +208,7 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
 }
 
 private struct BeckMapCanvasDrawing: View {
+    let size: CGSize
     let colorScheme: ColorScheme
     let renderer: (inout GraphicsContext, CGSize) -> Void
 
@@ -201,6 +217,9 @@ private struct BeckMapCanvasDrawing: View {
         // Asynchronous presentation can briefly pair the old pixels with the
         // new transform. Motion itself never invokes this renderer.
         Canvas(opaque: false, rendersAsynchronously: false, renderer: renderer)
+            // The cached drawing includes overscan beyond its parent's viewport.
+            // Give SwiftUI the actual raster size even during initial hosting layout.
+            .frame(width: size.width, height: size.height)
             .environment(\.colorScheme, colorScheme)
     }
 }

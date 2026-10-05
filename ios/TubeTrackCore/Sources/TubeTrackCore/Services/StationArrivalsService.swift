@@ -9,19 +9,22 @@ public struct StationArrivalsSnapshot: Sendable {
     public let serverUpdatedAt: Date?
     /// The server flagged its own data as stale (its TfL poller has fallen behind).
     public let isStale: Bool
+    public let nationalRailErrorMessage: String?
 
     public init(
         arrivals: [TfLArrivalPrediction],
         fetchedAt: Date,
         cached: Bool,
         serverUpdatedAt: Date? = nil,
-        isStale: Bool = false
+        isStale: Bool = false,
+        nationalRailErrorMessage: String? = nil
     ) {
         self.arrivals = arrivals
         self.fetchedAt = fetchedAt
         self.cached = cached
         self.serverUpdatedAt = serverUpdatedAt
         self.isStale = isStale
+        self.nationalRailErrorMessage = nationalRailErrorMessage
     }
 }
 
@@ -42,11 +45,15 @@ public actor StationArrivalsService {
     ]
 
     private let client: TubeTrackAPIClient
+    private let nationalRailService: NationalRailArrivalsService
     private var destinationsByLineAndStation: [DepartureDestinationKey: CachedDepartureDestination] = [:]
     private var arrivalsByStationSet: [String: CachedStationArrivals] = [:]
 
-    public init(client: TubeTrackAPIClient) {
+    public init(client: TubeTrackAPIClient, nationalRailClient: TubeTrackAPIClient? = nil) {
         self.client = client
+        self.nationalRailService = NationalRailArrivalsService(client: nationalRailClient ?? TubeTrackAPIClient(
+            configuration: TubeTrackAPIConfiguration(baseURL: URL(string: "https://api.skynolimit.dev/train-track")!)
+        ))
     }
 
     public func fetch(
@@ -74,13 +81,17 @@ public actor StationArrivalsService {
                 fetchedAt: cached.fetchedAt,
                 cached: true,
                 serverUpdatedAt: cached.serverUpdatedAt,
-                isStale: cached.isStale
+                isStale: cached.isStale,
+                nationalRailErrorMessage: cached.nationalRailErrorMessage
             )
         }
 
+        async let railSnapshot = nationalRailService.fetch(stationIDs: sortedStationIDs, forceRefresh: forceRefresh)
         var predictions: [TfLArrivalPrediction] = []
         var serverUpdatedAt: Date?
         var isStale = false
+        var tflFailure: (any Error)?
+        var receivedTfLBoard = false
         let nationalRailStationIDs = sortedStationIDs.filter(Self.servesNationalRail)
         do {
             if !nationalRailStationIDs.isEmpty {
@@ -98,30 +109,47 @@ public actor StationArrivalsService {
                     serverUpdatedAt = min(serverUpdatedAt ?? response.updatedAt, response.updatedAt)
                     isStale = isStale || response.stale
                     predictions.append(contentsOf: response.data)
+                    receivedTfLBoard = true
                 } catch {
                     try Task.checkCancellation()
                     isStale = true
                 }
             }
             for stationID in sortedStationIDs where !Self.servesOnlyNationalRail(stationID) {
-                let response: TubeTrackAPIResponse<[TfLArrivalPrediction]> = try await client.getSnapshot(
-                    "/api/v1/arrivals/\(stationID)",
-                    forceRefresh: forceRefresh
-                )
-                serverUpdatedAt = min(serverUpdatedAt ?? response.updatedAt, response.updatedAt)
-                isStale = isStale || response.stale
-                predictions.append(
-                    contentsOf: try await correctingSelfReferentialDestinations(
-                        in: response.data,
-                        requestedStationID: stationID,
+                do {
+                    let response: TubeTrackAPIResponse<[TfLArrivalPrediction]> = try await client.getSnapshot(
+                        "/api/v1/arrivals/\(stationID)",
                         forceRefresh: forceRefresh
                     )
-                )
+                    serverUpdatedAt = min(serverUpdatedAt ?? response.updatedAt, response.updatedAt)
+                    isStale = isStale || response.stale
+                    predictions.append(
+                        contentsOf: try await correctingSelfReferentialDestinations(
+                            in: response.data,
+                            requestedStationID: stationID,
+                            forceRefresh: forceRefresh
+                        )
+                    )
+                    receivedTfLBoard = true
+                } catch {
+                    try Task.checkCancellation()
+                    tflFailure = error
+                    isStale = true
+                    if let cached = arrivalsByStationSet[cacheKey],
+                       now.timeIntervalSince(cached.fetchedAt) < Self.arrivalsStaleLifetime {
+                        predictions += aged(cached, now: now).filter { $0.naptanId == stationID && !$0.isNationalRailOperator }
+                    }
+                }
             }
 
+            let rail = try await railSnapshot
+            if let tflFailure, !receivedTfLBoard, rail.arrivals.isEmpty { throw tflFailure }
+            predictions.append(contentsOf: rail.arrivals)
+            if let updated = rail.updatedAt { serverUpdatedAt = min(serverUpdatedAt ?? updated, updated) }
+            isStale = isStale || rail.isStale
             var seenPredictions = Set<TfLArrivalPrediction.DepartureIdentity>()
             let uniquePredictions = predictions.filter { prediction in
-                TubeLineID(rawValue: prediction.lineId) != nil
+                (TubeLineID(rawValue: prediction.lineId) != nil || prediction.isNationalRailOperator)
                     && seenPredictions.insert(prediction.departureIdentity).inserted
             }
 
@@ -131,7 +159,8 @@ public actor StationArrivalsService {
                 arrivals: result,
                 fetchedAt: now,
                 serverUpdatedAt: serverUpdatedAt,
-                isStale: isStale
+                isStale: isStale,
+                nationalRailErrorMessage: rail.errorMessage
             )
             pruneArrivalsCache(now: now)
             return StationArrivalsSnapshot(
@@ -139,10 +168,12 @@ public actor StationArrivalsService {
                 fetchedAt: now,
                 cached: false,
                 serverUpdatedAt: serverUpdatedAt,
-                isStale: isStale
+                isStale: isStale,
+                nationalRailErrorMessage: rail.errorMessage
             )
         } catch {
             try Task.checkCancellation()
+            let rail = try await railSnapshot
             if let cached = arrivalsByStationSet[cacheKey],
                now.timeIntervalSince(cached.fetchedAt) < Self.arrivalsStaleLifetime {
                 return StationArrivalsSnapshot(
@@ -150,7 +181,8 @@ public actor StationArrivalsService {
                     fetchedAt: cached.fetchedAt,
                     cached: true,
                     serverUpdatedAt: cached.serverUpdatedAt,
-                    isStale: true
+                    isStale: true,
+                    nationalRailErrorMessage: rail.errorMessage ?? cached.nationalRailErrorMessage
                 )
             }
             throw error
@@ -319,6 +351,10 @@ public actor StationArrivalsService {
     ) -> [TfLArrivalPrediction] {
         let elapsed = max(0, Int(now.timeIntervalSince(cached.fetchedAt)))
         return cached.arrivals.compactMap { prediction in
+            if prediction.isNationalRailOperator,
+               now.timeIntervalSince(cached.serverUpdatedAt ?? cached.fetchedAt) >= Self.arrivalsStaleLifetime {
+                return nil
+            }
             if let expectedArrival = prediction.expectedArrival,
                expectedArrival < now.addingTimeInterval(-30) {
                 return nil
@@ -529,6 +565,7 @@ private struct CachedStationArrivals: Sendable {
     let fetchedAt: Date
     var serverUpdatedAt: Date? = nil
     var isStale = false
+    var nationalRailErrorMessage: String? = nil
 }
 
 private struct DepartureDestination: Sendable {
@@ -769,7 +806,8 @@ private extension TfLArrivalPrediction {
             currentLocation: currentLocation,
             scheduledDeparture: scheduledDeparture,
             serviceStatus: serviceStatus,
-            serviceCause: serviceCause
+            serviceCause: serviceCause,
+            operatorName: operatorName
         )
     }
 
@@ -790,7 +828,8 @@ private extension TfLArrivalPrediction {
             currentLocation: currentLocation,
             scheduledDeparture: scheduledDeparture,
             serviceStatus: serviceStatus,
-            serviceCause: serviceCause
+            serviceCause: serviceCause,
+            operatorName: operatorName
         )
     }
 
@@ -811,7 +850,8 @@ private extension TfLArrivalPrediction {
             currentLocation: currentLocation,
             scheduledDeparture: scheduledDeparture,
             serviceStatus: serviceStatus,
-            serviceCause: serviceCause
+            serviceCause: serviceCause,
+            operatorName: operatorName
         )
     }
 }

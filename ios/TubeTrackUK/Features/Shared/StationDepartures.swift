@@ -18,6 +18,7 @@ struct StationDeparturesSection: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var requestedLineID: TubeLineID?
     @State private var presentedStatusLineID: TubeLineID?
+    @State private var selectedOperatorID: String?
 
     let lineIDs: [TubeLineID]
     let preferredLineID: TubeLineID?
@@ -27,6 +28,7 @@ struct StationDeparturesSection: View {
     let isLoading: Bool
     let isOffline: Bool
     let errorMessage: String?
+    let nationalRailErrorMessage: String?
     let warning: StationDepartureWarning?
     let maxDeparturesHeight: CGFloat?
     let tracking: DepartureTrackingContext?
@@ -42,6 +44,7 @@ struct StationDeparturesSection: View {
         isLoading: Bool = false,
         isOffline: Bool = false,
         errorMessage: String? = nil,
+        nationalRailErrorMessage: String? = nil,
         warning: StationDepartureWarning? = nil,
         maxDeparturesHeight: CGFloat? = nil,
         tracking: DepartureTrackingContext? = nil,
@@ -56,6 +59,7 @@ struct StationDeparturesSection: View {
         self.isLoading = isLoading
         self.isOffline = isOffline
         self.errorMessage = errorMessage
+        self.nationalRailErrorMessage = nationalRailErrorMessage
         self.warning = warning
         self.maxDeparturesHeight = maxDeparturesHeight
         self.tracking = tracking
@@ -77,6 +81,14 @@ struct StationDeparturesSection: View {
         )
     }
 
+    private var operatorGroups: [NationalRailDepartureGroup] {
+        NationalRailDepartureGroup.groups(from: arrivals)
+    }
+
+    private var selectedOperator: NationalRailDepartureGroup? {
+        operatorGroups.first { $0.id == selectedOperatorID }
+    }
+
     private var selectedGroups: [StationDepartureGroup] {
         StationDepartureGroup.groups(from: arrivals, for: selectedLineID)
     }
@@ -89,10 +101,13 @@ struct StationDeparturesSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            if !lineIDs.isEmpty {
+            if !lineIDs.isEmpty || !operatorGroups.isEmpty {
                 StationLinePicker(
                     lineIDs: lineIDs,
-                    selectedLineID: selectedLineID,
+                    selectedLineID: selectedOperatorID == nil ? selectedLineID : nil,
+                    operatorGroups: operatorGroups,
+                    selectedOperatorID: selectedOperatorID,
+                    onSelectOperator: { selectedOperatorID = $0 },
                     statuses: statuses,
                     isOffline: isOffline,
                     onSelect: select,
@@ -101,6 +116,14 @@ struct StationDeparturesSection: View {
                 .padding(.bottom, 10)
 
                 Divider()
+            }
+
+            if let nationalRailErrorMessage, !isOffline {
+                Label(nationalRailErrorMessage, systemImage: "exclamationmark.triangle")
+                    .font(.appCaption())
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 8)
             }
 
             if let warning {
@@ -129,6 +152,9 @@ struct StationDeparturesSection: View {
             reconcileSelection()
         }
         .onChange(of: selectionInputID) {
+            if let selectedOperatorID, !operatorGroups.contains(where: { $0.id == selectedOperatorID }) {
+                self.selectedOperatorID = nil
+            }
             reconcileSelection()
         }
         .onChange(of: preferredLineID) { _, preferredLineID in
@@ -149,7 +175,7 @@ struct StationDeparturesSection: View {
             }
             .scrollIndicators(.visible)
             .frame(maxHeight: maxDeparturesHeight)
-            .id(selectedLineID)
+            .id(selectedOperatorID ?? selectedLineID?.rawValue)
         } else {
             departuresContent(now: now)
         }
@@ -199,6 +225,8 @@ struct StationDeparturesSection: View {
             }
             .padding(.vertical, 3)
             .accessibilityElement(children: .combine)
+        } else if let selectedOperator {
+            NationalRailDepartureGroupView(group: selectedOperator, now: now)
         } else if selectedGroups.isEmpty {
             Text(emptyStateMessage)
                 .font(.appSubheadline())
@@ -216,7 +244,7 @@ struct StationDeparturesSection: View {
                     }
                 }
             }
-            .id(selectedLineID)
+            .id(selectedOperatorID ?? selectedLineID?.rawValue)
         }
     }
 
@@ -226,6 +254,7 @@ struct StationDeparturesSection: View {
     }
 
     private func select(_ lineID: TubeLineID) {
+        selectedOperatorID = nil
         guard lineID != selectedLineID else { return }
         if let onSelectLine {
             if reduceMotion {
@@ -267,6 +296,9 @@ struct StationDeparturesSection: View {
 private struct StationLinePicker: View {
     let lineIDs: [TubeLineID]
     let selectedLineID: TubeLineID?
+    let operatorGroups: [NationalRailDepartureGroup]
+    let selectedOperatorID: String?
+    let onSelectOperator: (String) -> Void
     let statuses: [TfLLineStatus]
     let isOffline: Bool
     let onSelect: (TubeLineID) -> Void
@@ -282,6 +314,10 @@ private struct StationLinePicker: View {
                             selected: selectedLineID == lineID,
                             action: { onSelect(lineID) }
                         )
+                    }
+                    ForEach(operatorGroups) { group in
+                        NationalRailOperatorPill(name: group.name, id: group.id,
+                            selected: selectedOperatorID == group.id) { onSelectOperator(group.id) }
                     }
                 }
             }
@@ -441,7 +477,7 @@ private struct StationDepartureGroupView: View {
 
             VStack(spacing: 8) {
                 ForEach(visibleArrivals, id: \.departureIdentity) { arrival in
-                    departureRow(arrival, now: now)
+                    StationDepartureRow(arrival: arrival, now: now)
                 }
             }
 
@@ -464,45 +500,6 @@ private struct StationDepartureGroupView: View {
         }
     }
 
-    private func departureRow(
-        _ arrival: TfLArrivalPrediction,
-        now: Date
-    ) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(StationDepartureMetadata.destinationLabel(for: arrival))
-                    .font(.appSubheadline(.medium))
-                    .lineLimit(2)
-                    .strikethrough(arrival.isCancelled)
-                    .foregroundStyle(arrival.isCancelled ? .secondary : .primary)
-                if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
-                    Text(platform)
-                        .font(.appCaption2())
-                        .foregroundStyle(.secondary)
-                }
-                if let note = StationDepartureMetadata.serviceNote(for: arrival) {
-                    Text(note)
-                        .font(.appCaption2(.semibold))
-                        .foregroundStyle(arrival.isCancelled ? Color.red : Color.orange)
-                        .lineLimit(2)
-                }
-            }
-            Spacer(minLength: 10)
-            Text(
-                StationDepartureMetadata.departureTime(
-                    for: arrival,
-                    now: now
-                )
-            )
-            .font(.appSubheadline(.bold))
-            .monospacedDigit()
-            .foregroundStyle(arrival.isCancelled ? Color.red : Color.departureAccent)
-            .lineLimit(1)
-            .fixedSize(horizontal: true, vertical: false)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
     private func toggleExpansion() {
         if reduceMotion {
             isExpanded.toggle()
@@ -511,6 +508,59 @@ private struct StationDepartureGroupView: View {
                 isExpanded.toggle()
             }
         }
+    }
+}
+
+struct StationDepartureRow: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    let arrival: TfLArrivalPrediction
+    let now: Date
+
+    var body: some View {
+        Group {
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    destination
+                    departureTime
+                }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    destination
+                    Spacer(minLength: 10)
+                    departureTime
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+    }
+
+    private var destination: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(StationDepartureMetadata.destinationLabel(for: arrival))
+                .font(.appSubheadline(.medium))
+                .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+                .strikethrough(arrival.isCancelled)
+                .foregroundStyle(arrival.isCancelled ? .secondary : .primary)
+            if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
+                Text(platform).font(.appCaption2()).foregroundStyle(.secondary)
+            }
+            if let note = StationDepartureMetadata.serviceNote(for: arrival),
+               note != StationDepartureMetadata.departureTime(for: arrival, now: now) {
+                Text(note)
+                    .font(.appCaption2(.semibold))
+                    .foregroundStyle(arrival.isCancelled ? Color.red : Color.orange)
+                    .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
+            }
+        }
+    }
+
+    private var departureTime: some View {
+        Text(StationDepartureMetadata.departureTime(for: arrival, now: now))
+            .font(.appSubheadline(.bold))
+            .monospacedDigit()
+            .foregroundStyle(arrival.isCancelled ? Color.red : Color.departureAccent)
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
     }
 }
 

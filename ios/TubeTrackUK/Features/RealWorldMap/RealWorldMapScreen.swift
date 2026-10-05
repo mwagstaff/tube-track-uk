@@ -90,7 +90,7 @@ struct RealWorldMapScreen: View {
                                     }
                             )
 
-                            if appState.river.isEnabled, appState.river.showsBoats,
+                            if appState.river.shouldShowBoats,
                                !appState.isOffline, appState.selectedTab == .map,
                                appState.mapPresentationMode == .realWorld {
                                 GeographicRiverBoats(proxy: proxy, camera: camera)
@@ -591,7 +591,7 @@ struct RealWorldMapScreen: View {
             }
         }
         if appState.river.isEnabled {
-            if appState.river.showsBoats, !appState.isOffline {
+            if appState.river.shouldShowBoats, !appState.isOffline {
                 for boat in appState.river.filteredBoats {
                     if let coordinate = appState.river.boatCoordinate(for: boat, at: .now),
                        let point = proxy.convert(coordinate, to: .local), hypot(point.x - location.x, point.y - location.y) < 22 {

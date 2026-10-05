@@ -81,3 +81,15 @@ test('reports other National Rail operators but never lines the app draws itself
         id: 0, statusSeverity: 9, statusSeverityDescription: 'Minor Delays', reason: 'Signal failure'
     });
 });
+
+test('Blackfriars direction depends on the departure station', () => {
+    const base = { ...fixture[0], destinationNaptanId: '910GBLFR',
+        destinationName: 'London Blackfriars Rail Station' };
+    for (const stop of ['910GBCKNHMH', '910GBELNGHM', '910GCATFORD']) {
+        assert.equal(normaliseThameslinkDepartures([base], stop, NOW)[0].direction, 'Northbound');
+    }
+    assert.equal(normaliseThameslinkDepartures([base], '910GWHMPSTM', NOW)[0].direction, 'Southbound');
+    assert.equal(normaliseThameslinkDepartures([base], 'unknown', NOW)[0].direction, null);
+    const sevenoaks = { ...base, destinationNaptanId: '910GSVNOAKS' };
+    assert.equal(normaliseThameslinkDepartures([sevenoaks], '910GBCKNHMH', NOW)[0].direction, 'Southbound');
+});

@@ -171,7 +171,10 @@ private struct RiverDepartureGroupView: View {
                         .font(.appSubheadline()).fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 6)
                     let seconds = departure.expectedArrival.timeIntervalSince(date)
-                    Text(seconds < 60 ? "Due" : "\(Int(ceil(seconds / 60))) min")
+                    Text(seconds < 60 ? "Due" : StationDepartureMetadata.departureTimeLabel(
+                        expectedAt: departure.expectedArrival, seconds: seconds,
+                        minutes: Int(ceil(seconds / 60))
+                    ))
                         .font(.appSubheadline(.semibold)).monospacedDigit().fixedSize()
                         .foregroundStyle(Color.departureAccent)
                 }

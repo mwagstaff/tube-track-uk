@@ -123,9 +123,61 @@ struct RiverBusTests {
         defer { state.setActive(false) }
         state.river.isEnabled = false; state.river.showsBoats = false
         state.setLiveTrains(true)
-        #expect(state.showLiveTrains && state.river.isEnabled && state.river.showsBoats)
+        #expect(state.showLiveTrains && state.river.shouldShowBoats)
         state.setLiveTrains(false)
-        #expect(!state.showLiveTrains && !state.river.showsBoats && state.river.isEnabled)
+        #expect(!state.showLiveTrains && !state.river.shouldShowBoats && state.river.isEnabled)
+    }
+
+    @Test(arguments: [nil, false, true] as [Bool?]) @MainActor
+    func stationDeparturesDoNotEnableBoats(savedBoatPreference: Bool?) throws {
+        let suite = "StationBoatVisibility.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        if let savedBoatPreference { defaults.set(savedBoatPreference, forKey: "riverBoatsEnabled") }
+        let state = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        defer { state.setActive(false) }
+        state.graph = try TubeGraph.bundled()
+        #expect(!state.showLiveTrains && !state.river.shouldShowBoats)
+        for stationID in ["910GWDGRNPK", "940GZZLUBNK"] {
+            let station = try #require(state.graph?.stationsByID[stationID])
+            state.select(station: station)
+            #expect(state.selectedStationID == stationID)
+            #expect(!state.river.shouldShowBoats)
+            state.clearStationSelection()
+            #expect(!state.showLiveTrains && !state.river.shouldShowBoats)
+            #expect(state.river.filteredBoats.isEmpty)
+        }
+        // Preferences cannot activate the fleet while the shared switch is off.
+        state.river.showsBoats = true
+        #expect(!state.river.shouldShowBoats)
+        let pier = try #require(state.river.network.pier("930GCAW"))
+        state.select(pier: pier)
+        #expect(state.river.isEnabled && !state.river.shouldShowBoats)
+        state.clearMapSelection()
+        #expect(!state.river.shouldShowBoats)
+    }
+
+    @Test @MainActor func liveBoatVisibilityFollowsSessionAndMemoryWarning() throws {
+        let suite = "LiveBoatSession.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let state = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        defer { state.setActive(false) }
+        state.setLiveTrains(true)
+        #expect(state.river.shouldShowBoats)
+        let station = try #require(TubeGraph.bundled().stationsByID["910GWDGRNPK"])
+        state.select(station: station)
+        state.clearStationSelection()
+        #expect(state.showLiveTrains && state.river.shouldShowBoats)
+        state.river.showsBoats = false
+        #expect(state.showLiveTrains && !state.river.shouldShowBoats)
+        state.river.showsBoats = true
+        #expect(state.river.shouldShowBoats)
+        let relaunched = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        #expect(relaunched.river.showsBoats)
+        #expect(!relaunched.showLiveTrains && !relaunched.river.shouldShowBoats)
+        state.handleMemoryWarning()
+        #expect(!state.showLiveTrains && !state.river.shouldShowBoats)
     }
 
     @Test func cachedSnapshotCanWitnessPierTransitionWithoutANewerSourceTimestamp() throws {
@@ -167,6 +219,7 @@ struct RiverBusTests {
         defer { defaults.removePersistentDomain(forName: suite) }
         let state = RiverBusState(client: client, defaults: defaults)
         state.isEnabled = true; state.showsBoats = true
+        state.setLiveTrackingEnabled(true)
         let instant = Date.now
         let boat = EstimatedRiverBoat(id: "shared", lineId: "rb1", previousPierId: "930GTMP", nextPierId: "930GCAW",
             destination: "Canary Wharf", segmentStartedAt: instant.addingTimeInterval(-300),
@@ -191,10 +244,25 @@ struct RiverBusTests {
         #expect(state.boats.isEmpty)
 
         let oldServer = RiverBusState(client: client, defaults: defaults)
+        oldServer.setLiveTrackingEnabled(true)
         RiverFleetURLProtocol.prepare([.init(status: 404, data: Data())])
         await oldServer.refresh(); await oldServer.refresh()
         #expect(RiverFleetURLProtocol.count("/api/v1/river/boats") == 1)
         #expect(RiverFleetURLProtocol.count("/api/v1/river/live") == 2)
+
+        RiverFleetURLProtocol.prepare([.init(status: 200, data: data)])
+        let hiddenFleet = RiverBusState(client: client, defaults: defaults)
+        await hiddenFleet.refresh()
+        #expect(RiverFleetURLProtocol.count("/api/v1/river/boats") == 0)
+        #expect(RiverFleetURLProtocol.count("/api/v1/river/live") == 0)
+        hiddenFleet.setLiveTrackingEnabled(true)
+        await hiddenFleet.refresh()
+        #expect(hiddenFleet.boats == [roundedBoat])
+        hiddenFleet.select(roundedBoat)
+        hiddenFleet.setLiveTrackingEnabled(false)
+        #expect(hiddenFleet.boats.isEmpty && hiddenFleet.filteredBoats.isEmpty && !hiddenFleet.hasSelection)
+        await hiddenFleet.refresh()
+        #expect(RiverFleetURLProtocol.count("/api/v1/river/boats") == 1)
     }
 
     @Test func noPositionFromOneSnapshotOrMissingIdentity() {

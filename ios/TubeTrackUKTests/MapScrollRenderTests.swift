@@ -7,6 +7,78 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct MapScrollRenderTests {
+    @Test func retainedCanvasResizesEvenWhenContentKeyDoesNotChange() {
+        let controller = BeckMapCanvasController<Int>()
+        let camera = BeckMapLayerCamera()
+        for size in [CGSize(width: 480, height: 480), CGSize(width: 920, height: 1436)] {
+            controller.update(
+                key: 0, camera: camera, renderScale: 1, renderOffset: .zero,
+                overscan: 240, canvasSize: size, colorScheme: .light,
+                renderer: { _, _ in }
+            )
+            #expect(controller.view.subviews.first?.bounds.size == size)
+            #expect(controller.children.first?.view.bounds.size == size)
+        }
+    }
+
+    @Test func retainedCanvasCoversViewportAfterLaunchAndCameraRebase() async throws {
+        let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        let window = UIWindow(windowScene: scene)
+        let controller = BeckMapCanvasController<Int>()
+        let camera = BeckMapLayerCamera()
+        // The first representable update can run before its window has laid out.
+        controller.update(
+            key: 0, camera: camera, renderScale: 0.35, renderOffset: .zero,
+            overscan: 240, canvasSize: CGSize(width: 480, height: 480),
+            colorScheme: .light, renderer: { context, size in
+                context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(red: 1, green: 0, blue: 0)))
+            }
+        )
+        window.rootViewController = controller
+        window.makeKeyAndVisible()
+        defer {
+            window.isHidden = true
+            window.rootViewController = nil
+            previousWindow?.makeKey()
+        }
+        window.layoutIfNeeded()
+        let viewport = controller.view.bounds.size
+        let canvasSize = CGSize(width: viewport.width + 480, height: viewport.height + 480)
+        for (index, scale) in [CGFloat(0.35), 1.4, 0.6].enumerated() {
+            camera.update(scale: scale, offset: CGSize(width: -100, height: -200))
+            controller.update(
+                key: index + 1, camera: camera, renderScale: scale,
+                renderOffset: camera.offset, overscan: 240, canvasSize: canvasSize,
+                colorScheme: .light, renderer: { context, size in
+                    context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(red: 1, green: 0, blue: 0)))
+                }
+            )
+            try await Task.sleep(for: .milliseconds(100))
+            #expect(controller.children.first?.view.bounds.size == canvasSize)
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            let image = UIGraphicsImageRenderer(size: viewport, format: format).image { _ in
+                controller.view.drawHierarchy(in: controller.view.bounds, afterScreenUpdates: true)
+            }
+            let cgImage = try #require(image.cgImage)
+            for x in [0.1, 0.5, 0.9] {
+                for y in [0.1, 0.5, 0.9] {
+                    var pixel = [UInt8](repeating: 0, count: 4)
+                    let context = try #require(CGContext(
+                        data: &pixel, width: 1, height: 1, bitsPerComponent: 8, bytesPerRow: 4,
+                        space: CGColorSpaceCreateDeviceRGB(),
+                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+                    ))
+                    context.translateBy(x: -viewport.width * x, y: -viewport.height * y)
+                    context.draw(cgImage, in: CGRect(origin: .zero, size: viewport))
+                    #expect(pixel[0] > 240 && pixel[1] < 20 && pixel[2] < 20,
+                            "Missing canvas at \(x), \(y), rebase \(index): \(pixel)")
+                }
+            }
+        }
+    }
+
     @Test func repeatedArtworkRebasesPreserveCameraAndRenderInBothAppearances() async throws {
         let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
         let previousWindow = scene.windows.first(where: \.isKeyWindow)

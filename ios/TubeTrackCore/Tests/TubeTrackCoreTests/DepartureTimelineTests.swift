@@ -47,7 +47,7 @@ struct DepartureTimelineTests {
 
     @Test func labelsTickAgainstEachEntryDate() {
         let arrivals = DepartureTimeline.anchored([arrival("a", expected: nil, seconds: 200)], producedAt: producedAt)
-        #expect(StationDepartureMetadata.departureTime(for: arrivals[0], now: producedAt) == "3 min")
+        #expect(StationDepartureMetadata.departureTime(for: arrivals[0], now: producedAt) == "3 mins")
         #expect(StationDepartureMetadata.departureTime(for: arrivals[0], now: producedAt.addingTimeInterval(120)) == "1 min")
         #expect(StationDepartureMetadata.departureTime(for: arrivals[0], now: producedAt.addingTimeInterval(170)) == "Due")
     }

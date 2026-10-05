@@ -4,6 +4,59 @@ import Testing
 
 @Suite(.serialized)
 struct StationArrivalsServiceTests {
+    @Test func nationalRailJoinsTfLAndRetainsOperatorNamesInTheCache() async throws {
+        let service = makeService(responses: [
+            "/api/v1/arrivals/940GZZLUVIC": fixture([prediction(id: "tube", line: .victoria,
+                stationID: "940GZZLUVIC", platform: "Platform 1", direction: "southbound",
+                destination: "Brixton", seconds: 120)]),
+            "/api/v2/departures/from/VIC": railFixture()
+        ])
+        let snapshot = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        #expect(snapshot.arrivals.count == 2)
+        #expect(snapshot.arrivals.contains { $0.operatorName == "Southern" })
+        #expect(!snapshot.isStale && snapshot.nationalRailErrorMessage == nil)
+        let cached = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        #expect(cached.arrivals.contains { $0.operatorName == "Southern" })
+        #expect(StationArrivalsURLProtocol.requestCount(for: "/api/v2/departures/from/VIC") == 1)
+    }
+
+    @Test func railOutageKeepsTubeDeparturesAndReportsTheMissingBoard() async throws {
+        let unavailable = try JSONSerialization.data(withJSONObject: ["departures": [], "dataStatus": "unavailable"])
+        let service = makeService(responses: [
+            "/api/v1/arrivals/940GZZLUVIC": fixture([prediction(id: "tube", line: .victoria,
+                stationID: "940GZZLUVIC", platform: "Platform 1", direction: "southbound",
+                destination: "Brixton", seconds: 120)]),
+            "/api/v2/departures/from/VIC": unavailable
+        ])
+        let result = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        #expect(result.arrivals.map(\.id) == ["tube"])
+        #expect(result.isStale && result.nationalRailErrorMessage != nil)
+    }
+
+    @Test func tubeOutageDoesNotHideNationalRailAndRailFailureUsesSavedBoard() async throws {
+        let service = makeService(responses: ["/api/v2/departures/from/VIC": railFixture()])
+        let first = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        #expect(first.arrivals.map(\.operatorName) == ["Southern"])
+        #expect(first.isStale)
+        StationArrivalsURLProtocol.prepare(responses: [:])
+        let fallback = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"], forceRefresh: true)
+        #expect(fallback.arrivals.map(\.operatorName) == ["Southern"])
+        #expect(fallback.nationalRailErrorMessage?.contains("saved") == true)
+    }
+
+    private func railFixture() -> Data {
+        let formatter = DateFormatter()
+        formatter.timeZone = TimeZone(identifier: "Europe/London")
+        formatter.dateFormat = "HH:mm"
+        let time = formatter.string(from: Date.now.addingTimeInterval(10 * 60))
+        return try! JSONSerialization.data(withJSONObject: [
+            "dataStatus": "live", "lastSuccessfulUpdate": Date.now.ISO8601Format(),
+            "departures": [["serviceID": "southern-1", "operator": "Southern", "operatorCode": "SN",
+                "departure_time": ["scheduled": time, "estimated": "On time"],
+                "destination": ["crs": "BTN", "locationName": "Brighton"], "platform": "12"]]
+        ])
+    }
+
     @Test func freshArrivalsAreReusedWithoutAnotherNetworkRequest() async throws {
         let path = "/api/v1/arrivals/940GZZLUVIC"
         let service = makeService(responses: [
@@ -1103,7 +1156,14 @@ struct StationArrivalsServiceTests {
     }
 
     private func makeService(responses: [String: Data]) -> StationArrivalsService {
-        StationArrivalsURLProtocol.prepare(responses: responses)
+        let emptyBoard = try! JSONSerialization.data(withJSONObject: [
+            "departures": [], "dataStatus": "live", "lastSuccessfulUpdate": Date.now.ISO8601Format()
+        ])
+        var allResponses = Dictionary(uniqueKeysWithValues: Set(NationalRailStations.codesByStopID.values.flatMap { $0 }).map {
+            ("/api/v2/departures/from/\($0)", emptyBoard)
+        })
+        allResponses.merge(responses) { _, supplied in supplied }
+        StationArrivalsURLProtocol.prepare(responses: allResponses)
         let configuration = URLSessionConfiguration.ephemeral
         configuration.protocolClasses = [StationArrivalsURLProtocol.self]
         let session = URLSession(configuration: configuration)
@@ -1113,7 +1173,7 @@ struct StationArrivalsServiceTests {
             ),
             session: session
         )
-        return StationArrivalsService(client: client)
+        return StationArrivalsService(client: client, nationalRailClient: client)
     }
 
     private func fixture(_ predictions: [[String: Any]]) -> Data {

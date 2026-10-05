@@ -389,7 +389,8 @@ private struct NearbyStationCard: View {
                     statuses: appState.statuses,
                     isLoading: appState.nearbyArrivalsLoadingStationIDs.contains(station.id),
                     isOffline: appState.isOffline,
-                    errorMessage: appState.nearbyArrivalsErrorsByStationID[station.id]
+                    errorMessage: appState.nearbyArrivalsErrorsByStationID[station.id],
+                    nationalRailErrorMessage: appState.nearbyNationalRailErrors[station.id]
                 )
                 .id(station.id)
                 .padding(.horizontal, 15)
