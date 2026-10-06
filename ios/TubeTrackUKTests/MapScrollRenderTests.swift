@@ -7,7 +7,178 @@ import UIKit
 @Suite(.serialized)
 @MainActor
 struct MapScrollRenderTests {
-    @Test func retainedCanvasResizesEvenWhenContentKeyDoesNotChange() {
+    @Test func completeRasterIsAvailableBeforeWindowAttachmentAndCameraMotionDoesNotRedraw() throws {
+        let controller = BeckMapCanvasController<Int>()
+        let camera = BeckMapLayerCamera()
+        let size = CGSize(width: 920, height: 1436)
+        var draws = 0
+        controller.update(
+            key: 0, camera: camera, renderScale: 1, renderOffset: .zero,
+            overscan: 240, canvasSize: size, colorScheme: .light, displayScale: 3,
+            renderer: { context, size in
+                draws += 1
+                context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.red))
+                context.fill(Path(CGRect(x: size.width / 2, y: size.height / 2,
+                                         width: size.width / 2, height: size.height / 2)),
+                             with: .color(.blue))
+            }
+        )
+        let layer = try #require(controller.view.subviews.first?.layer)
+        let raster = try #require(layer.contents) as! CGImage
+        #expect(raster.width == 2760)
+        #expect(raster.height == 4308)
+        #expect(layer.contentsScale == 3)
+        var pixels = [UInt8](repeating: 0, count: 16)
+        let context = try #require(CGContext(data: &pixels, width: 2, height: 2,
+            bitsPerComponent: 8, bytesPerRow: 8, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(raster, in: CGRect(x: 0, y: 0, width: 2, height: 2))
+        #expect(stride(from: 3, to: 16, by: 4).allSatisfy { pixels[$0] == 255 })
+        #expect(stride(from: 0, to: 16, by: 4).filter { pixels[$0 + 2] > 200 }.count == 1)
+        let completedDraws = draws
+        for step in 0..<120 {
+            camera.update(scale: 1 + CGFloat(step) / 120,
+                          offset: CGSize(width: -step * 10, height: -step * 20))
+        }
+        #expect(draws == completedDraws)
+        #expect((layer.contents as AnyObject?) === raster)
+
+        // A provisional zero-size layout must not discard the last complete
+        // buffer or mark the replacement key as rendered.
+        controller.update(
+            key: 1, camera: camera, renderScale: 1, renderOffset: .zero,
+            overscan: 240, canvasSize: .zero, colorScheme: .light,
+            renderer: { _, _ in Issue.record("Invalid layout should not render") }
+        )
+        #expect((layer.contents as AnyObject?) === raster)
+    }
+
+    @Test func retainedRasterRefreshesAppearanceAndDisplayScaleWithoutAContentChange() throws {
+        let controller = BeckMapCanvasController<Int>()
+        let camera = BeckMapLayerCamera()
+        let size = CGSize(width: 100, height: 100)
+        var previous: CGImage?
+        for (appearance, scale) in [(ColorScheme.light, CGFloat(2)), (.dark, 2), (.dark, 3)] {
+            controller.update(
+                key: 0, camera: camera, renderScale: 1, renderOffset: .zero,
+                overscan: 0, canvasSize: size, colorScheme: appearance, displayScale: scale,
+                renderer: { context, size in
+                    context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.primary))
+                }
+            )
+            let raster = try #require(controller.view.subviews.first?.layer.contents) as! CGImage
+            #expect(raster !== previous)
+            #expect(raster.width == Int(size.width * scale))
+            var pixel = [UInt8](repeating: 0, count: 4)
+            let context = try #require(CGContext(data: &pixel, width: 1, height: 1,
+                bitsPerComponent: 8, bytesPerRow: 4, space: CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+            context.draw(raster, in: CGRect(x: 0, y: 0, width: 1, height: 1))
+            #expect(appearance == .dark ? pixel[0] > 240 : pixel[0] < 20)
+            previous = raster
+        }
+    }
+
+    @Test func retainedCanvasKeepsOverscanPixelsWhenMovedWithoutRedrawing() async throws {
+        let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        let window = UIWindow(windowScene: scene)
+        let camera = BeckMapLayerCamera()
+        camera.update(scale: 1, offset: .zero)
+        let host = UIHostingController(rootView: GeometryReader { proxy in
+            BeckMapRetainedCanvas(
+                key: 0, camera: camera, renderScale: 1, renderOffset: .zero,
+                overscan: 240,
+                canvasSize: CGSize(width: proxy.size.width + 480, height: proxy.size.height + 480),
+                colorScheme: .light,
+                renderer: { context, size in
+                    context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(Color(red: 1, green: 0, blue: 0)))
+                }
+            ).clipped()
+        }.ignoresSafeArea())
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer {
+            window.isHidden = true
+            window.rootViewController = nil
+            previousWindow?.makeKey()
+        }
+        try await Task.sleep(for: .milliseconds(100))
+        for offset in [CGSize.zero, CGSize(width: -190, height: -190), CGSize(width: 190, height: 190)] {
+            camera.update(scale: 1, offset: offset)
+            try await Task.sleep(for: .milliseconds(50))
+            let viewport = host.view.bounds
+            let format = UIGraphicsImageRendererFormat()
+            format.scale = 1
+            let image = UIGraphicsImageRenderer(bounds: viewport, format: format).image { _ in
+                host.view.drawHierarchy(in: viewport, afterScreenUpdates: true)
+            }
+            let cgImage = try #require(image.cgImage)
+            for x in [0.05, 0.5, 0.95] {
+                for y in [0.05, 0.5, 0.95] {
+                    var pixel = [UInt8](repeating: 0, count: 4)
+                    let context = try #require(CGContext(data: &pixel, width: 1, height: 1,
+                        bitsPerComponent: 8, bytesPerRow: 4, space: CGColorSpaceCreateDeviceRGB(),
+                        bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+                    context.translateBy(x: -viewport.width * x, y: -viewport.height * y)
+                    context.draw(cgImage, in: viewport)
+                    #expect(pixel[0] > 240 && pixel[1] < 20 && pixel[2] < 20,
+                            "Missing overscan at \(x), \(y), offset \(offset): \(pixel)")
+                }
+            }
+        }
+    }
+
+    @Test func launchAtCityThameslinkRendersCompleteArtwork() async throws {
+        let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        let window = UIWindow(windowScene: scene)
+        let state = TubeAppState(monitorsConnectivity: false)
+        state.setNetworkAvailable(false)
+        state.graph = try TubeGraph.bundled()
+        let host = UIHostingController(rootView: BeckMapScreen(
+            resetToken: 0,
+            locationFocusRequest: MapLocationFocusRequest(id: 1, latitude: 51.5143, longitude: -0.1039, snappedStationID: nil),
+            contentVerticalBias: 0,
+            onUserZoomIn: {}, onInteractionChange: { _ in }, onBackgroundTap: {}
+        ).environment(state).environment(UserLocationProvider()))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer {
+            window.isHidden = true
+            window.rootViewController = nil
+            previousWindow?.makeKey()
+        }
+        try await Task.sleep(for: .seconds(3))
+        let image = UIGraphicsImageRenderer(bounds: host.view.bounds).image { _ in
+            host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+        }
+        let cgImage = try #require(image.cgImage)
+        // The reported failure leaves only the upper-left of this camera drawn.
+        // Require ink in every quadrant of the actual City Thameslink artwork.
+        var pixels = [UInt8](repeating: 0, count: 80 * 160 * 4)
+        let context = try #require(CGContext(data: &pixels, width: 80, height: 160,
+            bitsPerComponent: 8, bytesPerRow: 80 * 4, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue))
+        context.draw(cgImage, in: CGRect(x: 0, y: 0, width: 80, height: 160))
+        for column in 0..<2 {
+            for row in 0..<2 {
+                let ink = (row * 80..<(row + 1) * 80).reduce(0) { count, y in
+                    count + (column * 40..<(column + 1) * 40).filter { x in
+                        let index = (y * 80 + x) * 4
+                        return pixels[index..<index + 3].min()! < 180
+                    }.count
+                }
+                #expect(ink > 100, "Missing artwork in quadrant \(column), \(row)")
+            }
+        }
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("map-city-launch.png")
+        try #require(image.pngData()).write(to: url)
+        print("City launch render: \(url.path)")
+
+    }
+
+    @Test func retainedCanvasResizesEvenWhenContentKeyDoesNotChange() throws {
         let controller = BeckMapCanvasController<Int>()
         let camera = BeckMapLayerCamera()
         for size in [CGSize(width: 480, height: 480), CGSize(width: 920, height: 1436)] {
@@ -17,7 +188,9 @@ struct MapScrollRenderTests {
                 renderer: { _, _ in }
             )
             #expect(controller.view.subviews.first?.bounds.size == size)
-            #expect(controller.children.first?.view.bounds.size == size)
+            let image = try #require(controller.view.subviews.first?.layer.contents) as! CGImage
+            #expect(image.width == Int(size.width))
+            #expect(image.height == Int(size.height))
         }
     }
 
@@ -46,6 +219,10 @@ struct MapScrollRenderTests {
         let viewport = controller.view.bounds.size
         let canvasSize = CGSize(width: viewport.width + 480, height: viewport.height + 480)
         for (index, scale) in [CGFloat(0.35), 1.4, 0.6].enumerated() {
+            // Move the old render surface entirely away before replacing its
+            // camera, as a startup location focus can do in a single frame.
+            camera.update(scale: scale, offset: CGSize(width: -10_000, height: -20_000))
+            try await Task.sleep(for: .milliseconds(30))
             camera.update(scale: scale, offset: CGSize(width: -100, height: -200))
             controller.update(
                 key: index + 1, camera: camera, renderScale: scale,
@@ -55,7 +232,9 @@ struct MapScrollRenderTests {
                 }
             )
             try await Task.sleep(for: .milliseconds(100))
-            #expect(controller.children.first?.view.bounds.size == canvasSize)
+            let raster = try #require(controller.view.subviews.first?.layer.contents) as! CGImage
+            #expect(raster.width == Int(canvasSize.width))
+            #expect(raster.height == Int(canvasSize.height))
             let format = UIGraphicsImageRendererFormat()
             format.scale = 1
             let image = UIGraphicsImageRenderer(size: viewport, format: format).image { _ in

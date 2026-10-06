@@ -163,7 +163,7 @@ struct BeckMapScreen: View {
                 isLoadingDocument = false
                 return
             }
-            let requestedRegion = selectedRegion
+            let requestedRegion: BeckMapRegion = appState.showsNationalRail ? .londonRailAndTube : selectedRegion
             isLoadingDocument = true
             defer { isLoadingDocument = false }
             do {
@@ -199,7 +199,7 @@ struct BeckMapScreen: View {
     }
 
     private var documentTaskID: String {
-        "\(appState.graph?.generatedAt ?? "no-graph"):\(selectedRegion.rawValue)"
+        "\(appState.graph?.generatedAt ?? "no-graph"):\(selectedRegion.rawValue):\(appState.showsNationalRail)"
     }
 
     private static var initialRegion: BeckMapRegion {
@@ -653,6 +653,8 @@ struct BeckMapCanvas: View {
                     focus(on: locationFocusRequest, in: proxy.size)
                 } else if appState.river.hasSelection || appState.cableCar.hasSelection {
                     focusRiverSelection(in: proxy.size)
+                } else if document.referenceArtwork != nil, let selectedStationID = presentation.selectedStationID {
+                    focus(on: [selectedStationID], in: proxy.size)
                 } else if appState.sharedMapViewport != nil {
                     applySharedViewport(in: proxy.size)
                 } else if let selectedStationID = presentation.selectedStationID {
@@ -877,11 +879,15 @@ struct BeckMapCanvas: View {
             mapContext.opacity = document.debugReference.geometryOpacity
         }
 
+        if let reference = renderCache.referenceArtwork {
+            mapContext.clip(to: Path(CGRect(x: 0, y: 0, width: document.artworkSize.width, height: document.artworkSize.height)))
+            reference.draw(context: &mapContext, palette: palette, isDark: colorScheme == .dark)
+        }
         let issuesActive = !traceMode && presentation.emphasizesIssues
         // Context belongs below the transport network. The waterway geometry
         // is authored as straight octilinear sections; rounded stroke joins
         // soften corners without turning the route itself into a smooth curve.
-        for waterway in renderedWaterways {
+        for waterway in (document.referenceArtwork == nil ? renderedWaterways : []) {
             mapContext.stroke(
                 waterway.path,
                 with: .color(palette.waterwayOutline),
@@ -906,7 +912,7 @@ struct BeckMapCanvas: View {
         // rail line in two passes. Drawing every coloured outer before any
         // paper inset keeps branch joins open instead of allowing a later
         // segment's outer stroke to plug an earlier segment's paper centre.
-        for lineGroup in renderedLineGroups {
+        for lineGroup in (document.referenceArtwork == nil ? renderedLineGroups : []) {
             let uniformMuted = traceMode
                 ? false
                 : uniformMuting(for: lineGroup)
@@ -1083,7 +1089,7 @@ struct BeckMapCanvas: View {
             }
         }
 
-        if !traceMode {
+        if !traceMode, document.referenceArtwork == nil {
             drawBaseStationMarkers(context: &mapContext)
         }
     }
@@ -1526,6 +1532,7 @@ struct BeckMapCanvas: View {
         for placement in placements {
             guard let label = labelsByID[placement.labelID] else { continue }
             let selected = label.represents(stationID: presentation.selectedStationID) || isJourneyLabel(label)
+            if document.referenceArtwork != nil && !selected { continue }
             let tier = label.effectiveVisibilityTier
             let weight: AppFontWeight = selected || tier == .overview ? .semibold : .medium
             let fontSize = BeckMapLabelVisibilityPolicy.fontSize(for: tier, at: cameraScale)
@@ -1751,9 +1758,9 @@ struct BeckMapCanvas: View {
     private func focusRiverSelection(in size: CGSize) {
         let point: CGPoint?
         if appState.cableCar.hasSelection {
-            point = appState.cableCar.selectedTerminalID.flatMap { CableCarSchematic.anchors[$0] } ?? CableCarSchematic.midpoint
+            point = appState.cableCar.selectedTerminalID.flatMap { CableCarSchematic.anchors(in: document)[$0] } ?? CableCarSchematic.midpoint(in: document)
         } else if let pierId = appState.river.selectedPierId {
-            point = appState.river.anchors.first { $0.id == pierId }?.markerPoint
+            point = appState.river.anchors(in: document).first { $0.id == pierId }?.markerPoint
         } else if let boat = appState.river.selectedBoat {
             point = appState.river.schematicPoint(for: boat, document: document, at: .now)
         } else { point = nil }
@@ -2055,7 +2062,7 @@ struct BeckMapCanvas: View {
     private func selectMapFeature(at location: CGPoint, viewport: CGSize) {
         if appState.cableCar.isEnabled, !presentation.highlightsJourney {
             for terminal in appState.cableCar.network.terminals {
-                if let anchor = CableCarSchematic.anchors[terminal.id] {
+                if let anchor = CableCarSchematic.anchors(in: document)[terminal.id] {
                     let p = screenPoint(anchor)
                     let label = CGRect(x: terminal.id == "940GZZALGWP" ? p.x + 20 : p.x - 65, y: p.y + 18, width: 130, height: 45)
                     if distance(location, p) < 22 || ((cameraScale >= 0.9 || appState.cableCar.hasSelection) && label.contains(location)) {
@@ -2063,11 +2070,11 @@ struct BeckMapCanvas: View {
                     }
                 }
             }
-            let points = CableCarSchematic.points.map { screenPoint($0) }
+            let points = CableCarSchematic.points(in: document).map { screenPoint($0) }
             if let d = RealWorldLineHitTesting.distance(from: location, toPolyline: points), d < 16 {
                 appState.selectCableCar(); return
             }
-            if distance(location, screenPoint(CableCarSchematic.midpoint)) < 32 { appState.selectCableCar(); return }
+            if distance(location, screenPoint(CableCarSchematic.midpoint(in: document))) < 32 { appState.selectCableCar(); return }
         }
         if appState.river.isEnabled, !presentation.highlightsJourney {
             if appState.river.shouldShowBoats, !appState.isOffline {
@@ -2083,7 +2090,7 @@ struct BeckMapCanvas: View {
             let transform = BeckMapLayerTransform.transform(cameraScale: cameraScale, cameraOffset: cameraOffset,
                 renderScale: renderScale, renderOffset: renderOffset, overscan: overscan)
             let tap = location.applying(transform.inverted())
-            let placements = RiverSchematicLayout.placements(network: appState.river.network, anchors: appState.river.anchors,
+            let placements = RiverSchematicLayout.placements(network: appState.river.network, anchors: appState.river.anchors(in: document),
                 selected: appState.river.selectedPierId, lineId: appState.river.selectedLineId,
                 scale: renderScale, offset: canvasOffset, viewport: canvasSize, typeScale: labelTypeScale,
                 blocked: stationLabelPlacements(in: canvasSize, cameraScale: renderScale, cameraOffset: canvasOffset).map(\.collisionFrame))
@@ -2105,7 +2112,12 @@ struct BeckMapCanvas: View {
             return
         }
 
-        if let selection = BeckMapStationTapResolver.resolve(
+        if let stationID = document.referenceArtwork?.stationID(at: CGPoint(
+            x: (location.x - cameraOffset.width) / cameraScale,
+            y: (location.y - cameraOffset.height) / cameraScale
+        )) {
+            onStationTap(stationID, nil)
+        } else if let selection = BeckMapStationTapResolver.resolve(
             screenPoint: location,
             cameraScale: cameraScale,
             cameraOffset: cameraOffset,
@@ -2130,6 +2142,7 @@ struct BeckMapCanvas: View {
     }
 
     private func stationLabelID(at location: CGPoint, in viewport: CGSize) -> String? {
+        guard document.referenceArtwork == nil else { return nil }
         let overscan = BeckMapArtworkCachePolicy.overscan
         let transform = BeckMapLayerTransform.transform(
             cameraScale: cameraScale, cameraOffset: cameraOffset,
@@ -2500,6 +2513,9 @@ struct BeckMapCanvas: View {
         renderedSegments: [RenderedSegment],
         renderedWaterways: [RenderedWaterway]
     ) -> CGRect {
+        if document.referenceArtwork != nil {
+            return CGRect(x: 0, y: 0, width: document.artworkSize.width, height: document.artworkSize.height)
+        }
         var bounds = renderedSegments.reduce(into: CGRect.null) { partial, segment in
             partial = partial.union(segment.path.boundingRect)
         }
@@ -2602,6 +2618,7 @@ struct BeckMapCanvas: View {
     }
 
     struct RenderCache: Sendable {
+        let referenceArtwork: BeckMapReferenceRenderCache?
         let renderedSegments: [RenderedSegment]
         let renderedLineGroups: [RenderedLineGroup]
         let renderedWaterways: [RenderedWaterway]
@@ -2613,6 +2630,7 @@ struct BeckMapCanvas: View {
         let debugReferenceImage: UIImage?
 
         nonisolated init(document: BeckMapDocument, loadsDebugReference: Bool = false) {
+            referenceArtwork = document.referenceArtwork.map(BeckMapReferenceRenderCache.init)
             let paths = Dictionary(uniqueKeysWithValues: document.paths.map {
                 ($0.id, $0.commands)
             })

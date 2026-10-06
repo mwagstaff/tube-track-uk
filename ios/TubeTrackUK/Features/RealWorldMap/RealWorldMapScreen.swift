@@ -295,7 +295,8 @@ struct RealWorldMapScreen: View {
         renderData: RealWorldMapRenderData
     ) -> GeographicMapContent {
         var content = GeographicMapContent()
-        content.routes = tubeRoutes(renderData: renderData)
+        content.routes = appState.showsNationalRail ? NationalRailGeographicOverlays.shared.routes : []
+        content.routes += tubeRoutes(renderData: renderData)
         content.stations = stationMarkers(graph: graph)
         content.markerDiameter = annotationLevel.markerDiameter
         content.expandedSymbols = annotationLevel.showsNames
@@ -517,8 +518,9 @@ struct RealWorldMapScreen: View {
 
     private func displayStations(graph: TubeGraph) -> [TubeStation] {
         let selectedStationID = appState.selectedStationID
-        return renderData?.displayStations(selectedStationID: selectedStationID)
+        let stations = renderData?.displayStations(selectedStationID: selectedStationID)
             ?? RealWorldStationDisplay.stations(in: graph, selectedStationID: selectedStationID)
+        return stations.filter { appState.showsNationalRail || !NationalRailMap.isExclusiveStation($0.id) }
     }
 
     /// Zoom styling (roundels, names, symbol sizes) changes once the camera

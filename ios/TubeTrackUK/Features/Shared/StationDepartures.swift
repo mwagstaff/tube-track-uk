@@ -276,6 +276,9 @@ struct StationDeparturesSection: View {
     }
 
     private func reconcileSelection() {
+        if lineIDs.isEmpty, selectedOperatorID == nil {
+            selectedOperatorID = operatorGroups.first?.id
+        }
         guard onSelectLine == nil else { return }
         if let requestedLineID, lineIDs.contains(requestedLineID) {
             return

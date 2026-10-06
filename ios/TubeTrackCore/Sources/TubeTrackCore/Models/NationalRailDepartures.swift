@@ -19,11 +19,11 @@ struct NationalRailBoard: Decodable, Sendable {
     let dataStatus: String
     let lastSuccessfulUpdate: Date?
 
-    func predictions(crs: String, now: Date) -> [TfLArrivalPrediction] {
+    func predictions(crs: String, now: Date, includeThameslink: Bool = false) -> [TfLArrivalPrediction] {
         let reference = lastSuccessfulUpdate ?? now
         var seen = Set<String>()
         return departures.compactMap { row in
-            guard let prediction = row.prediction(crs: crs, reference: reference, now: now),
+            guard let prediction = row.prediction(crs: crs, reference: reference, now: now, includeThameslink: includeThameslink),
                   seen.insert(prediction.id).inserted else { return nil }
             return prediction
         }.sorted {
@@ -80,12 +80,15 @@ struct NationalRailDeparture: Decodable, Sendable {
         }
     }
 
-    func prediction(crs: String, reference: Date, now: Date) -> TfLArrivalPrediction? {
+    func prediction(crs: String, reference: Date, now: Date, includeThameslink: Bool = false) -> TfLArrivalPrediction? {
         let code = operatorCode?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() ?? ""
         let name = operatorName?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         // These services already have dedicated TfL boards and line pills.
-        guard !["TL", "LO", "XR"].contains(code),
-              !["thameslink", "london overground", "elizabeth line", "tfl rail"].contains(name.lowercased()),
+        let excludedCodes = includeThameslink ? ["LO", "XR"] : ["TL", "LO", "XR"]
+        let excludedNames = includeThameslink
+            ? ["london overground", "elizabeth line", "tfl rail"]
+            : ["thameslink", "london overground", "elizabeth line", "tfl rail"]
+        guard !excludedCodes.contains(code), !excludedNames.contains(name.lowercased()),
               serviceType == nil || serviceType?.lowercased() == "train",
               let scheduled = Self.clockDate(times.scheduled, near: reference),
               !(destinations.count == 1 && destinations.first?.crs == crs) else { return nil }

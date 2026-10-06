@@ -94,7 +94,12 @@ class RailwayGraph:
         sources = self.station_anchors(from_crs)
         if not targets or not sources:
             return None
-        goal = self.nodes[next(iter(targets))]
+        # A station can have anchors on several corridors. A heuristic to an
+        # arbitrary single anchor can overestimate the cost to another target
+        # and prematurely terminate the search (notably at interchanges).
+        def heuristic(node: int) -> float:
+            return min(distance_m(self.nodes[node], self.nodes[target]) + offset
+                       for target, offset in targets.items())
         costs: dict[int, float] = {}
         previous: dict[int, tuple[int, int] | None] = {}
         queue: list[tuple[float, float, int]] = []
@@ -103,13 +108,13 @@ class RailwayGraph:
             if cost < costs.get(node, math.inf):
                 costs[node] = cost
                 previous[node] = None
-                heapq.heappush(queue, (cost + distance_m(self.nodes[node], goal), cost, node))
+                heapq.heappush(queue, (cost + heuristic(node), cost, node))
         best_end: tuple[float, int] | None = None
         while queue:
-            _, cost, node = heapq.heappop(queue)
+            priority, cost, node = heapq.heappop(queue)
             if cost > costs.get(node, math.inf):
                 continue
-            if best_end is not None and cost >= best_end[0]:
+            if best_end is not None and priority >= best_end[0]:
                 break
             if node in targets:
                 total = cost + targets[node]
@@ -120,7 +125,7 @@ class RailwayGraph:
                 if candidate < costs.get(neighbour, math.inf):
                     costs[neighbour] = candidate
                     previous[neighbour] = (node, edge_index)
-                    heapq.heappush(queue, (candidate + distance_m(self.nodes[neighbour], goal), candidate, neighbour))
+                    heapq.heappush(queue, (candidate + heuristic(neighbour), candidate, neighbour))
         if best_end is None:
             return None
 

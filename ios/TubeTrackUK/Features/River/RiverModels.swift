@@ -109,7 +109,7 @@ struct RiverStatusSnapshot: Codable, Sendable {
     let updatedAt: Date
 }
 
-struct RiverSchematicAnchor: Codable, Identifiable, Sendable {
+struct RiverSchematicAnchor: Codable, Identifiable, Hashable, Sendable {
     let id: String
     let x: Double
     let y: Double

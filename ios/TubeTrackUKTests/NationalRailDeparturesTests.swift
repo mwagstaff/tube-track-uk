@@ -63,6 +63,15 @@ struct NationalRailDeparturesTests {
         #expect(board.predictions(crs: "KTH", now: now).map(\.operatorName) == ["Southern"])
     }
 
+    @Test func thameslinkBoardsAreIncludedAtNewStationsWithoutATfLBoard() throws {
+        let now = date("2026-10-05T22:50:00Z")
+        let board = try decode([["serviceID": "tl", "operator": "Thameslink", "operatorCode": "TL",
+                                "departure_time": ["scheduled": "23:55", "estimated": "On time"],
+                                "destination": ["crs": "BTN", "locationName": "Brighton"]]], at: now)
+        #expect(board.predictions(crs: "SAC", now: now).isEmpty)
+        #expect(board.predictions(crs: "SAC", now: now, includeThameslink: true).first?.operatorName == "Thameslink")
+    }
+
     @Test func delayedAndUnknownForecastsNeverBecomeDue() throws {
         let now = date("2026-10-05T22:50:00Z")
         for estimate in ["Delayed", "No report"] {

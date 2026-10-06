@@ -57,7 +57,7 @@ struct UnifiedMapScreen: View {
                 .opacity(realWorldRendererOpacity)
                 .allowsHitTesting(appState.mapPresentationMode == .realWorld)
 
-            if let graph = appState.graph,
+            if !appState.showsNationalRail, let graph = appState.graph,
                let morphGeometry,
                geometryGraphID == graph.generatedAt {
                 MapMorphTransitionLayer(

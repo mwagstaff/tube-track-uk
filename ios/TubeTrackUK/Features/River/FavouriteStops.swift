@@ -8,7 +8,8 @@ struct FavouriteStop: Codable, Identifiable, Hashable, Sendable {
     let kind: Kind
     var id: String { "\(kind.rawValue):\(stopId)" }
     static func station(_ station: TubeStation) -> Self {
-        .init(stopId: station.hubID ?? station.id, name: station.name, kind: .station)
+        .init(stopId: station.hubID ?? station.id,
+              name: station.id == "940GZZDLLEW" ? "Lewisham" : station.name, kind: .station)
     }
     var symbol: String {
         switch kind { case .station: "tram.fill"; case .pier: "ferry.fill"; case .cableCarTerminal: "cablecar.fill" }

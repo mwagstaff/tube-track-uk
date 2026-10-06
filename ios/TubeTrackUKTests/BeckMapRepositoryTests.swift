@@ -8,6 +8,7 @@ struct BeckMapRepositoryTests {
     @Test func publishedRegionsAreLimitedToTraceVerifiedArtwork() {
         #expect(Set(BeckMapRegion.allCases.map(\.rawValue)) == [
             "full-underground",
+            "london-rail-and-tube",
             "eastern-fan",
             "central-completion",
             "central-core-join",

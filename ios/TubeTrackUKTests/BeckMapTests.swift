@@ -1036,7 +1036,7 @@ struct BeckMapTests {
     }
 
     @Test func publishedAuthoredRegionsCoverEveryRailGraphSegment() throws {
-        let graph = try TubeGraph.bundled()
+        let graph = try TubeGraph.bundled().includingNationalRailStations()
         let repository = BeckMapRepository()
         let authoredSegmentIDs = try Set(BeckMapRegion.allCases.flatMap { region in
             try repository.load(region: region, graph: graph).segments.map(\.id)

@@ -13,7 +13,19 @@ enum CableCarSchematic {
                          CGPoint(x: 3431.2, y: 1792.0), CGPoint(x: 3490.3, y: 1792.0)]
     static let midpoint = CGPoint(x: 3349.2, y: 1870.6)
 
-    static func path(scale: CGFloat, offset: CGSize) -> Path {
+    static func anchors(in document: BeckMapDocument) -> [String: CGPoint] {
+        document.referenceArtwork?.cableCarAnchors?.mapValues { CGPoint(x: $0.x, y: $0.y) } ?? anchors
+    }
+
+    static func points(in document: BeckMapDocument) -> [CGPoint] {
+        document.referenceArtwork?.cableCarPoints?.map { CGPoint(x: $0.x, y: $0.y) } ?? points
+    }
+
+    static func midpoint(in document: BeckMapDocument) -> CGPoint {
+        RiverPolyline.point(on: points(in: document), progress: 0.5) ?? midpoint
+    }
+
+    static func path(scale: CGFloat, offset: CGSize, points: [CGPoint] = points) -> Path {
         func screen(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * scale + offset.width, y: p.y * scale + offset.height) }
         var path = Path(); path.move(to: screen(points[0]))
         for index in 1..<(points.count - 1) {
@@ -47,7 +59,7 @@ struct BeckCableCarLayer: View {
             overscan: overscan, canvasSize: canvasSize, colorScheme: colorScheme) { context, _ in
             let tint = cable.presentation.routeTint
             func screen(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * scale + canvasOffset.width, y: p.y * scale + canvasOffset.height) }
-            let path = CableCarSchematic.path(scale: scale, offset: canvasOffset)
+            let path = CableCarSchematic.path(scale: scale, offset: canvasOffset, points: CableCarSchematic.points(in: document))
             let strokeScale = min(1, scale)
             context.stroke(path, with: .color(Color(.systemBackground)), style: StrokeStyle(lineWidth: 10 * strokeScale, lineCap: .round, lineJoin: .round))
             context.stroke(path, with: .color(tint), style: StrokeStyle(lineWidth: (cable.hasSelection ? 7 : 6) * strokeScale, lineCap: .round, lineJoin: .round))
@@ -55,7 +67,7 @@ struct BeckCableCarLayer: View {
             let palette = BeckMapPalette.resolve(for: colorScheme)
             let walkWidth = CGFloat(BeckMapWalkingLink.width(in: document)) * scale
             for terminal in cable.network.terminals {
-                guard let anchor = CableCarSchematic.anchors[terminal.id] else { continue }
+                guard let anchor = CableCarSchematic.anchors(in: document)[terminal.id] else { continue }
                 let point = screen(anchor)
                 let selected = cable.selectedTerminalID == terminal.id
                 let showsIcon = selected || scale >= 1.1
@@ -92,7 +104,7 @@ struct BeckCableCarLayer: View {
                 }
             }
             if cable.presentation.kind != .open && !cable.presentation.isClosed {
-                let center = screen(CableCarSchematic.midpoint)
+                let center = screen(CableCarSchematic.midpoint(in: document))
                 let text = scale >= 0.9 || cable.hasSelection ? cable.presentation.headline : "Cable Car"
                 let label = context.resolve(Text(text).font(.system(size: 11 * min(typeScale, 1.5), weight: .semibold)).foregroundStyle(.primary))
                 let size = label.measure(in: CGSize(width: 200, height: 70))

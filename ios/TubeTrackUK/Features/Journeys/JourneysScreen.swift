@@ -113,7 +113,8 @@ struct JourneysScreen: View {
                         graph: graph,
                         selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
                         title: field == .from ? "Starting station" : "Destination",
-                        selectionHint: field == .from ? "Sets your starting station" : "Sets your destination"
+                        selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
+                        includesNationalRail: false
                     ) { station in
                         if field == .from { planner.from = station } else { planner.to = station }
                     }

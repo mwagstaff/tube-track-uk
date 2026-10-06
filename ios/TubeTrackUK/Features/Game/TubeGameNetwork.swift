@@ -182,7 +182,8 @@ struct TubeGameNetwork: Sendable {
 
         var builtNodes: [TubeGameNode] = []
         builtNodes.reserveCapacity(graph.stations.count)
-        for station in graph.stations {
+        // Optional National Rail map stops have no game tracks or train routes.
+        for station in graph.stations where !NationalRailMap.isExclusiveStation(station.id) {
             guard let marker = markersByID[station.id] else {
                 throw TubeGameNetworkError.missingStationMarker(station.id)
             }

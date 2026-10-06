@@ -18,6 +18,7 @@ actor NationalRailArrivalsService {
 
     func fetch(stationIDs: [String], forceRefresh: Bool) async throws -> Snapshot {
         let codes = NationalRailStations.codes(for: stationIDs)
+        let includesThameslink = stationIDs.contains { $0.hasPrefix("nr:") }
         var result = Snapshot()
         for crs in codes {
             try Task.checkCancellation()
@@ -35,7 +36,7 @@ actor NationalRailArrivalsService {
                     }
                     boards[crs] = Cached(board: board, fetchedAt: now)
                 }
-                result.arrivals += board.predictions(crs: crs, now: now)
+                result.arrivals += board.predictions(crs: crs, now: now, includeThameslink: includesThameslink)
                 if let updated = board.lastSuccessfulUpdate {
                     result.updatedAt = min(result.updatedAt ?? updated, updated)
                 }
@@ -49,7 +50,7 @@ actor NationalRailArrivalsService {
                 result.errorMessage = "National Rail departures are temporarily unavailable."
                 if let cached = boards[crs], let updated = cached.board.lastSuccessfulUpdate,
                    now.timeIntervalSince(updated) < 5 * 60 {
-                    result.arrivals += cached.board.predictions(crs: crs, now: now)
+                    result.arrivals += cached.board.predictions(crs: crs, now: now, includeThameslink: includesThameslink)
                     result.updatedAt = min(result.updatedAt ?? updated, updated)
                     result.errorMessage = "Showing saved National Rail departures. Live updates are temporarily unavailable."
                 }

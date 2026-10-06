@@ -4,6 +4,16 @@ import Testing
 
 @Suite(.serialized)
 struct StationArrivalsServiceTests {
+    @Test func nationalRailOnlyStationUsesTrainTrackWithoutAnInvalidTfLRequest() async throws {
+        let service = makeService(responses: ["/api/v2/departures/from/BMN": railFixture()])
+        let snapshot = try await service.fetchSnapshot(stationIDs: ["nr:BMN"])
+        #expect(snapshot.arrivals.count == 1)
+        #expect(!snapshot.isStale)
+        #expect(snapshot.nationalRailErrorMessage == nil)
+        #expect(StationArrivalsURLProtocol.requestCount(for: "/api/v1/arrivals/nr:BMN") == 0)
+        #expect(StationArrivalsURLProtocol.requestCount(for: "/api/v2/departures/from/BMN") == 1)
+    }
+
     @Test func nationalRailJoinsTfLAndRetainsOperatorNamesInTheCache() async throws {
         let service = makeService(responses: [
             "/api/v1/arrivals/940GZZLUVIC": fixture([prediction(id: "tube", line: .victoria,

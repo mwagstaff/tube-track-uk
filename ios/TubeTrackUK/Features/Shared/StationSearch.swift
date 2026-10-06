@@ -91,6 +91,7 @@ struct StationSearchSheet: View {
     let selectedStationID: String?
     var title: String = "Find a station"
     var selectionHint: String = "Selects and focuses this station on the map"
+    var includesNationalRail: Bool = true
     let onSelect: (TubeStation) -> Void
 
     private var suggestions: [TubeStation] {
@@ -99,7 +100,7 @@ struct StationSearchSheet: View {
             matching: query,
             selectedStationID: selectedStationID,
             limit: query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : 40
-        )
+        ).filter { includesNationalRail || !NationalRailMap.isExclusiveStation($0.id) }
     }
 
     private var searchPresentation: Binding<Bool> {
@@ -132,7 +133,12 @@ struct StationSearchSheet: View {
                                         .font(.appBody(.semibold))
                                         .foregroundStyle(.primary)
 
-                                    StationLineLegend(lineIDs: lineIDs)
+                                    if lineIDs.isEmpty, NationalRailMap.isExclusiveStation(station.id) {
+                                        Label { Text("National Rail") } icon: { NationalRailMark().frame(width: 18, height: 12) }
+                                            .font(.appCaption())
+                                    } else {
+                                        StationLineLegend(lineIDs: lineIDs)
+                                    }
                                 }
 
                                 Spacer(minLength: 8)
@@ -147,7 +153,7 @@ struct StationSearchSheet: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(station.name)
-                        .accessibilityValue(lineIDs.map(\.displayName).joined(separator: ", "))
+                        .accessibilityValue(lineIDs.isEmpty ? "National Rail" : lineIDs.map(\.displayName).joined(separator: ", "))
                         .accessibilityHint(selectionHint)
                     }
                     .listStyle(.plain)

@@ -2,6 +2,7 @@ import Foundation
 
 enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
     case fullUnderground = "full-underground"
+    case londonRailAndTube = "london-rail-and-tube"
     case easternFan = "eastern-fan"
     case centralCompletion = "central-completion"
     case centralCoreJoin = "central-core-join"
@@ -18,6 +19,7 @@ enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
+        case .londonRailAndTube: "Rail & Tube"
         case .fullUnderground: "Full"
         case .easternFan: "Eastern fan"
         case .centralCompletion: "Central completion"
@@ -35,6 +37,7 @@ enum BeckMapRegion: String, CaseIterable, Identifiable, Sendable {
 
     var accessibilityDescription: String {
         switch self {
+        case .londonRailAndTube: "Combined London Rail and Tube map"
         case .fullUnderground: "Complete Tube, DLR, Elizabeth, London Overground and London Trams map in one authored TfL design space"
         case .easternFan: "Eastern Underground branches traced from the official TfL vector map"
         case .centralCompletion: "Final central Underground joins traced from the official TfL vector map"
@@ -230,7 +233,7 @@ struct BeckMapRepository {
                     actual: marker.name
                 ))
             }
-            guard !marker.lineIDs.isEmpty,
+            guard (!marker.lineIDs.isEmpty || NationalRailMap.isExclusiveStation(marker.stationID)),
                   Set(marker.lineIDs).isSubset(of: Set(graphStation.lineIDs)) else {
                 throw invalid(.stationLinesMismatch(stationID: marker.stationID))
             }

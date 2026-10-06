@@ -123,6 +123,15 @@ final class TubeAppState {
             updateLiveTrainPollingVisibility()
         }
     }
+    var showsNationalRail: Bool {
+        didSet {
+            defaults.set(showsNationalRail, forKey: "showsNationalRail")
+            if !showsNationalRail, let selectedStationID,
+               NationalRailMap.isExclusiveStation(selectedStationID) {
+                clearStationSelection()
+            }
+        }
+    }
     var mapPresentationMode: MapPresentationMode = .beck
     var sharedMapViewport: SharedMapViewport?
     var beckMapCameraSnapshot: BeckMapCameraSnapshot?
@@ -262,6 +271,7 @@ final class TubeAppState {
         self.connectivityMonitor = monitorsConnectivity
             && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
             ? NetworkConnectivityMonitor() : nil
+        showsNationalRail = defaults.bool(forKey: "showsNationalRail")
         showsClosestStation = defaults.object(forKey: "showsClosestStation") as? Bool ?? true
         appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
             .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
@@ -471,7 +481,7 @@ final class TubeAppState {
             // Keep both off the main actor so the startup interstitial can draw
             // immediately and remain responsive while the map is prepared.
             let startupContent = try await Task.detached(priority: .userInitiated) {
-                let graph = try TubeGraph.bundled()
+                let graph = try TubeGraph.bundled().includingNationalRailStations()
                 let document = try BeckMapRepository().load(
                     region: .fullUnderground,
                     graph: graph
@@ -765,6 +775,7 @@ final class TubeAppState {
         station: TubeStation,
         preferredDepartureLineID: TubeLineID? = nil
     ) {
+        if NationalRailMap.isExclusiveStation(station.id) { showsNationalRail = true }
         cableCar.clearSelection()
         river.clearSelection()
         cancelStationArrivalsPolling()

@@ -91,9 +91,10 @@ final class BeckMapLayerCamera {
     }
 }
 
-/// Keeps the rasterized Canvas alive while its layer moves at display cadence.
-/// Updating the hosting view is reserved for actual content/cache changes.
+/// Retains a complete raster while its layer moves at display cadence.
+/// Only content/cache changes render; camera motion only transforms the layer.
 struct BeckMapRetainedCanvas<Key: Equatable>: UIViewControllerRepresentable {
+    @Environment(\.displayScale) private var displayScale
     let key: Key
     let camera: BeckMapLayerCamera
     let renderScale: CGFloat
@@ -111,7 +112,8 @@ struct BeckMapRetainedCanvas<Key: Equatable>: UIViewControllerRepresentable {
         controller.update(
             key: key, camera: camera, renderScale: renderScale,
             renderOffset: renderOffset, overscan: overscan,
-            canvasSize: canvasSize, colorScheme: colorScheme, renderer: renderer
+            canvasSize: canvasSize, colorScheme: colorScheme,
+            displayScale: displayScale, renderer: renderer
         )
     }
 
@@ -121,12 +123,12 @@ struct BeckMapRetainedCanvas<Key: Equatable>: UIViewControllerRepresentable {
 }
 
 final class BeckMapCanvasController<Key: Equatable>: UIViewController {
-    private var hosting: UIHostingController<BeckMapCanvasDrawing>?
     private var renderedKey: Key?
     private var renderedScale: CGFloat?
     private var renderedOffset: CGSize?
     private var renderedOverscan: CGFloat?
     private var renderedColorScheme: ColorScheme?
+    private var renderedDisplayScale: CGFloat?
     private weak var camera: BeckMapLayerCamera?
     private let surface = UIView()
 
@@ -144,7 +146,7 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
     func update(
         key: Key, camera: BeckMapLayerCamera, renderScale: CGFloat,
         renderOffset: CGSize, overscan: CGFloat, canvasSize: CGSize,
-        colorScheme: ColorScheme,
+        colorScheme: ColorScheme, displayScale: CGFloat = 1,
         renderer: @escaping (inout GraphicsContext, CGSize) -> Void
     ) {
         loadViewIfNeeded()
@@ -152,42 +154,34 @@ final class BeckMapCanvasController<Key: Equatable>: UIViewController {
             detachCamera()
             self.camera = camera
         }
+        guard canvasSize.width.isFinite, canvasSize.height.isFinite,
+              canvasSize.width > 0, canvasSize.height > 0,
+              displayScale.isFinite, displayScale > 0 else { return }
         let rebasesCamera = renderedScale != renderScale || renderedOffset != renderOffset
             || renderedOverscan != overscan || surface.bounds.size != canvasSize
-        if renderedKey != key || rebasesCamera || renderedColorScheme != colorScheme {
-            // Layout and the camera transform must enter the same transaction.
-            // In particular, launch can replace a provisional canvas size while
-            // the map content itself is unchanged.
+        if renderedKey != key || rebasesCamera || renderedColorScheme != colorScheme
+            || renderedDisplayScale != displayScale {
+            // Avoid depending on a live hosted Canvas's layout and scheduled
+            // presentation. Render the whole buffer independently of
+            // window visibility, then publish pixels and their camera together.
+            let raster = ImageRenderer(content: BeckMapCanvasDrawing(
+                size: canvasSize, colorScheme: colorScheme, renderer: renderer
+            ).environment(\.displayScale, displayScale))
+            raster.proposedSize = ProposedViewSize(canvasSize)
+            raster.scale = displayScale
+            guard let image = raster.cgImage else { return }
+
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            let content = BeckMapCanvasDrawing(
-                size: canvasSize, colorScheme: colorScheme, renderer: renderer
-            )
-            if let hosting {
-                hosting.rootView = content
-            } else {
-                let hosting = UIHostingController(rootView: content)
-                hosting.safeAreaRegions = []
-                hosting.view.backgroundColor = .clear
-                addChild(hosting)
-                surface.addSubview(hosting.view)
-                hosting.didMove(toParent: self)
-                self.hosting = hosting
-            }
             surface.bounds = CGRect(origin: .zero, size: canvasSize)
-            hosting?.view.frame = surface.bounds
-            // Commit camera rebases synchronously to keep pixels and transform
-            // aligned. Time-only vehicle updates can use the normal scheduled
-            // layout pass instead of blocking input with a forced subtree layout.
-            if rebasesCamera {
-                hosting?.view.setNeedsLayout()
-                hosting?.view.layoutIfNeeded()
-            }
+            surface.layer.contentsScale = displayScale
+            surface.layer.contents = image
             renderedKey = key
             renderedScale = renderScale
             renderedOffset = renderOffset
             renderedOverscan = overscan
             renderedColorScheme = colorScheme
+            renderedDisplayScale = displayScale
             camera.attach(
                 layer: surface.layer, renderScale: renderScale,
                 renderOffset: renderOffset, overscan: overscan
@@ -213,12 +207,7 @@ private struct BeckMapCanvasDrawing: View {
     let renderer: (inout GraphicsContext, CGSize) -> Void
 
     var body: some View {
-        // A rebase changes pixels and their camera transform in one commit.
-        // Asynchronous presentation can briefly pair the old pixels with the
-        // new transform. Motion itself never invokes this renderer.
         Canvas(opaque: false, rendersAsynchronously: false, renderer: renderer)
-            // The cached drawing includes overscan beyond its parent's viewport.
-            // Give SwiftUI the actual raster size even during initial hosting layout.
             .frame(width: size.width, height: size.height)
             .environment(\.colorScheme, colorScheme)
     }

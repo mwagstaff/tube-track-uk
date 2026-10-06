@@ -1156,5 +1156,518 @@
   ],
   "HUBZWL": [
     "ZLW"
+  ],
+  "nr:AAP": [
+    "AAP"
+  ],
+  "nr:AYP": [
+    "AYP"
+  ],
+  "nr:BAD": [
+    "BAD"
+  ],
+  "nr:BAK": [
+    "BAK"
+  ],
+  "nr:BAY": [
+    "BAY"
+  ],
+  "nr:BFD": [
+    "BFD"
+  ],
+  "nr:BKH": [
+    "BKH"
+  ],
+  "nr:BLM": [
+    "BLM"
+  ],
+  "nr:BMD": [
+    "BMD"
+  ],
+  "nr:BMN": [
+    "BMN"
+  ],
+  "nr:BNH": [
+    "BNH"
+  ],
+  "nr:BNI": [
+    "BNI"
+  ],
+  "nr:BNS": [
+    "BNS"
+  ],
+  "nr:BOP": [
+    "BOP"
+  ],
+  "nr:BPK": [
+    "BPK"
+  ],
+  "nr:BRS": [
+    "BRS"
+  ],
+  "nr:BVD": [
+    "BVD"
+  ],
+  "nr:BXB": [
+    "BXB"
+  ],
+  "nr:BXH": [
+    "BXH"
+  ],
+  "nr:BXY": [
+    "BXY"
+  ],
+  "nr:CAT": [
+    "CAT"
+  ],
+  "nr:CBP": [
+    "CBP"
+  ],
+  "nr:CDN": [
+    "CDN"
+  ],
+  "nr:CFB": [
+    "CFB"
+  ],
+  "nr:CFH": [
+    "CFH"
+  ],
+  "nr:CHE": [
+    "CHE"
+  ],
+  "nr:CHK": [
+    "CHK"
+  ],
+  "nr:CHP": [
+    "CHP"
+  ],
+  "nr:CIT": [
+    "CIT"
+  ],
+  "nr:CLD": [
+    "CLD"
+  ],
+  "nr:CLK": [
+    "CLK"
+  ],
+  "nr:CRY": [
+    "CRY"
+  ],
+  "nr:CSB": [
+    "CSB"
+  ],
+  "nr:CSN": [
+    "CSN"
+  ],
+  "nr:CSS": [
+    "CSS"
+  ],
+  "nr:CUF": [
+    "CUF"
+  ],
+  "nr:CWH": [
+    "CWH"
+  ],
+  "nr:DDK": [
+    "DDK"
+  ],
+  "nr:DRG": [
+    "DRG"
+  ],
+  "nr:DYP": [
+    "DYP"
+  ],
+  "nr:EAD": [
+    "EAD"
+  ],
+  "nr:EDN": [
+    "EDN"
+  ],
+  "nr:EDW": [
+    "EDW"
+  ],
+  "nr:ELD": [
+    "ELD"
+  ],
+  "nr:ELW": [
+    "ELW"
+  ],
+  "nr:ENC": [
+    "ENC"
+  ],
+  "nr:ENL": [
+    "ENL"
+  ],
+  "nr:EPD": [
+    "EPD"
+  ],
+  "nr:EPS": [
+    "EPS"
+  ],
+  "nr:ERH": [
+    "ERH"
+  ],
+  "nr:ESD": [
+    "ESD"
+  ],
+  "nr:EWE": [
+    "EWE"
+  ],
+  "nr:EWW": [
+    "EWW"
+  ],
+  "nr:EXR": [
+    "EXR"
+  ],
+  "nr:FCN": [
+    "FCN"
+  ],
+  "nr:FEL": [
+    "FEL"
+  ],
+  "nr:FLW": [
+    "FLW"
+  ],
+  "nr:FST": [
+    "FST"
+  ],
+  "nr:GDH": [
+    "GDH"
+  ],
+  "nr:GIP": [
+    "GIP"
+  ],
+  "nr:GPK": [
+    "GPK"
+  ],
+  "nr:GRP": [
+    "GRP"
+  ],
+  "nr:GRY": [
+    "GRY"
+  ],
+  "nr:GTW": [
+    "GTW"
+  ],
+  "nr:HAT": [
+    "HAT"
+  ],
+  "nr:HDW": [
+    "HDW"
+  ],
+  "nr:HFE": [
+    "HFE"
+  ],
+  "nr:HFN": [
+    "HFN"
+  ],
+  "nr:HGR": [
+    "HGR"
+  ],
+  "nr:HGY": [
+    "HGY"
+  ],
+  "nr:HMC": [
+    "HMC"
+  ],
+  "nr:HMP": [
+    "HMP"
+  ],
+  "nr:HMW": [
+    "HMW"
+  ],
+  "nr:HOR": [
+    "HOR"
+  ],
+  "nr:HOU": [
+    "HOU"
+  ],
+  "nr:HPD": [
+    "HPD"
+  ],
+  "nr:HRN": [
+    "HRN"
+  ],
+  "nr:HYS": [
+    "HYS"
+  ],
+  "nr:ISL": [
+    "ISL"
+  ],
+  "nr:KCK": [
+    "KCK"
+  ],
+  "nr:KDB": [
+    "KDB"
+  ],
+  "nr:KLY": [
+    "KLY"
+  ],
+  "nr:KND": [
+    "KND"
+  ],
+  "nr:KNG": [
+    "KNG"
+  ],
+  "nr:KTH": [
+    "KTH"
+  ],
+  "nr:KWB": [
+    "KWB"
+  ],
+  "nr:LAD": [
+    "LAD"
+  ],
+  "nr:LEB": [
+    "LEB"
+  ],
+  "nr:LEE": [
+    "LEE"
+  ],
+  "nr:LSY": [
+    "LSY"
+  ],
+  "nr:LTN": [
+    "LTN"
+  ],
+  "nr:MAL": [
+    "MAL"
+  ],
+  "nr:MHM": [
+    "MHM"
+  ],
+  "nr:MOT": [
+    "MOT"
+  ],
+  "nr:MRW": [
+    "MRW"
+  ],
+  "nr:MTG": [
+    "MTG"
+  ],
+  "nr:MTL": [
+    "MTL"
+  ],
+  "nr:NBC": [
+    "NBC"
+  ],
+  "nr:NBT": [
+    "NBT"
+  ],
+  "nr:NDL": [
+    "NDL"
+  ],
+  "nr:NEH": [
+    "NEH"
+  ],
+  "nr:NEM": [
+    "NEM"
+  ],
+  "nr:NLT": [
+    "NLT"
+  ],
+  "nr:NRB": [
+    "NRB"
+  ],
+  "nr:NSH": [
+    "NSH"
+  ],
+  "nr:NUM": [
+    "NUM"
+  ],
+  "nr:OCK": [
+    "OCK"
+  ],
+  "nr:PAL": [
+    "PAL"
+  ],
+  "nr:PBR": [
+    "PBR"
+  ],
+  "nr:PFL": [
+    "PFL"
+  ],
+  "nr:PNE": [
+    "PNE"
+  ],
+  "nr:PON": [
+    "PON"
+  ],
+  "nr:PUO": [
+    "PUO"
+  ],
+  "nr:PUT": [
+    "PUT"
+  ],
+  "nr:QRB": [
+    "QRB"
+  ],
+  "nr:RAY": [
+    "RAY"
+  ],
+  "nr:RDD": [
+    "RDD"
+  ],
+  "nr:RDH": [
+    "RDH"
+  ],
+  "nr:RDT": [
+    "RDT"
+  ],
+  "nr:RHM": [
+    "RHM"
+  ],
+  "nr:RNM": [
+    "RNM"
+  ],
+  "nr:RYH": [
+    "RYH"
+  ],
+  "nr:SAC": [
+    "SAC"
+  ],
+  "nr:SAF": [
+    "SAF"
+  ],
+  "nr:SAJ": [
+    "SAJ"
+  ],
+  "nr:SBM": [
+    "SBM"
+  ],
+  "nr:SDH": [
+    "SDH"
+  ],
+  "nr:SGN": [
+    "SGN"
+  ],
+  "nr:SID": [
+    "SID"
+  ],
+  "nr:SMG": [
+    "SMG"
+  ],
+  "nr:SMT": [
+    "SMT"
+  ],
+  "nr:SNL": [
+    "SNL"
+  ],
+  "nr:SNR": [
+    "SNR"
+  ],
+  "nr:SRC": [
+    "SRC"
+  ],
+  "nr:SRH": [
+    "SRH"
+  ],
+  "nr:SRS": [
+    "SRS"
+  ],
+  "nr:STW": [
+    "STW"
+  ],
+  "nr:SUD": [
+    "SUD"
+  ],
+  "nr:SUP": [
+    "SUP"
+  ],
+  "nr:SUR": [
+    "SUR"
+  ],
+  "nr:SYH": [
+    "SYH"
+  ],
+  "nr:SYL": [
+    "SYL"
+  ],
+  "nr:TAD": [
+    "TAD"
+  ],
+  "nr:TAT": [
+    "TAT"
+  ],
+  "nr:TED": [
+    "TED"
+  ],
+  "nr:THD": [
+    "THD"
+  ],
+  "nr:TOL": [
+    "TOL"
+  ],
+  "nr:TTH": [
+    "TTH"
+  ],
+  "nr:TWI": [
+    "TWI"
+  ],
+  "nr:UWL": [
+    "UWL"
+  ],
+  "nr:WAE": [
+    "WAE"
+  ],
+  "nr:WAR": [
+    "WAR"
+  ],
+  "nr:WCP": [
+    "WCP"
+  ],
+  "nr:WCX": [
+    "WCX"
+  ],
+  "nr:WDO": [
+    "WDO"
+  ],
+  "nr:WDU": [
+    "WDU"
+  ],
+  "nr:WGC": [
+    "WGC"
+  ],
+  "nr:WHS": [
+    "WHS"
+  ],
+  "nr:WHY": [
+    "WHY"
+  ],
+  "nr:WIH": [
+    "WIH"
+  ],
+  "nr:WLC": [
+    "WLC"
+  ],
+  "nr:WLI": [
+    "WLI"
+  ],
+  "nr:WLT": [
+    "WLT"
+  ],
+  "nr:WME": [
+    "WME"
+  ],
+  "nr:WMG": [
+    "WMG"
+  ],
+  "nr:WNT": [
+    "WNT"
+  ],
+  "nr:WNW": [
+    "WNW"
+  ],
+  "nr:WSW": [
+    "WSW"
+  ],
+  "nr:WTN": [
+    "WTN"
+  ],
+  "nr:WWD": [
+    "WWD"
+  ],
+  "nr:WWI": [
+    "WWI"
   ]
 }

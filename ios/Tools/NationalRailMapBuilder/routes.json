@@ -1,0 +1,81 @@
+{
+  "chiltern-railways": [
+    "Marylebone|Harrow-on-the-Hill|Rickmansworth|Chorleywood|Chalfont & Latimer|Amersham",
+    "Marylebone|Wembley Stadium|Sudbury & Harrow Road|Sudbury Hill Harrow|Northolt Park|South Ruislip|West Ruislip"
+  ],
+  "c2c": [
+    "Fenchurch Street|Limehouse|West Ham|Barking|Upminster|Ockendon|Chafford Hundred|Grays",
+    "Barking|Dagenham Dock|Rainham (Essex)|Purfleet|Grays",
+    "Liverpool Street|Stratford|Barking"
+  ],
+  "east-midlands-railway": [
+    "St Pancras International|Luton Airport Parkway"
+  ],
+  "gatwick-express": [
+    "Victoria|Gatwick Airport"
+  ],
+  "great-northern": [
+    "Moorgate|Old Street|Essex Road|Highbury & Islington|Drayton Park|Finsbury Park|Harringay|Hornsey|Alexandra Palace|New Southgate|Oakleigh Park|New Barnet|Hadley Wood|Potters Bar|Brookmans Park|Welham Green|Hatfield (Herts)|Welwyn Garden City",
+    "Alexandra Palace|Bowes Park|Palmers Green|Winchmore Hill|Grange Park|Enfield Chase|Gordon Hill|Crews Hill|Cuffley|Bayford|Hertford North",
+    "Kings Cross|Finsbury Park"
+  ],
+  "great-western-railway": [
+    "Paddington|Ealing Broadway|Southall|Hayes & Harlington|West Drayton|Iver|Langley (Berks)|Slough|Burnham (Bucks)|Taplow|Maidenhead|Twyford|Reading",
+    "West Ealing|Drayton Green|Castle Bar Park|South Greenford|Greenford"
+  ],
+  "greater-anglia": [
+    "Liverpool Street|Hackney Downs|Tottenham Hale|Northumberland Park|Meridian Water|Ponders End|Brimsdown|Enfield Lock|Waltham Cross|Cheshunt|Broxbourne|Rye House|St Margarets (Herts)|Ware (Herts)|Hertford East",
+    "Stratford|Lea Bridge|Tottenham Hale",
+    "Liverpool Street|Stratford|Romford|Shenfield"
+  ],
+  "heathrow-express": [
+    "Paddington|Heathrow Terminals 2 & 3|Heathrow Terminal 5"
+  ],
+  "london-northwestern-railway": [
+    "Euston|Wembley Central|Harrow & Wealdstone|Bushey|Watford Junction"
+  ],
+  "south-western-railway": [
+    "Waterloo|Vauxhall|Queenstown Road (Battersea)|Clapham Junction|Earlsfield|Wimbledon|Raynes Park|New Malden|Berrylands|Surbiton|Thames Ditton|Hampton Court",
+    "Raynes Park|Motspur Park|Worcester Park|Stoneleigh|Ewell West|Epsom (Surrey)",
+    "Motspur Park|Malden Manor|Tolworth|Chessington North|Chessington South",
+    "New Malden|Norbiton|Kingston|Hampton Wick|Teddington|Strawberry Hill|Twickenham",
+    "Teddington|Fulwell|Hampton (London)",
+    "Clapham Junction|Wandsworth Town|Putney|Barnes|Mortlake|North Sheen|Richmond (London)|St Margarets (London)|Twickenham|Whitton (London)|Feltham",
+    "Barnes|Barnes Bridge|Chiswick|Kew Bridge|Brentford|Syon Lane|Isleworth|Hounslow|Feltham",
+    "Strawberry Hill|Fulwell"
+  ],
+  "southeastern": [
+    "Charing Cross|Waterloo East|London Bridge|New Cross|St Johns (London)|Lewisham|Hither Green|Lee (London)|Mottingham|New Eltham|Sidcup|Albany Park|Bexley|Crayford|Dartford",
+    "Cannon Street|London Bridge",
+    "Hither Green|Grove Park|Elmstead Woods|Chislehurst|Petts Wood|Orpington|Chelsfield|Knockholt",
+    "Grove Park|Sundridge Park|Bromley North",
+    "Lewisham|Blackheath|Charlton|Woolwich Dockyard|Woolwich Arsenal|Plumstead|Abbey Wood|Belvedere|Erith|Slade Green|Dartford",
+    "London Bridge|Deptford|Greenwich|Maze Hill|Westcombe Park|Charlton",
+    "Blackheath|Kidbrooke|Eltham|Falconwood|Welling|Bexleyheath|Barnehurst|Slade Green",
+    "Lewisham|Ladywell|Catford Bridge|Lower Sydenham|New Beckenham|Clock House|Elmers End|Eden Park|West Wickham|Hayes (Kent)",
+    "Victoria|Brixton|Herne Hill|West Dulwich|Sydenham Hill|Penge East|Kent House|Beckenham Junction|Shortlands|Bromley South|Bickley|St Mary Cray|Swanley",
+    "Bickley|Petts Wood"
+  ],
+  "southeastern-high-speed": [
+    "St Pancras International|Stratford International"
+  ],
+  "southern": [
+    "Victoria|Battersea Park|Clapham Junction|Wandsworth Common|Balham|Streatham Common|Norbury|Thornton Heath|Selhurst|East Croydon|South Croydon|Purley Oaks|Purley|Coulsdon South|Merstham|Redhill|Earlswood (Surrey)|Salfords (Surrey)|Horley|Gatwick Airport",
+    "London Bridge|South Bermondsey|Queens Road Peckham|Peckham Rye|East Dulwich|North Dulwich|Tulse Hill|Streatham|Streatham Common",
+    "London Bridge|New Cross Gate|Brockley|Honor Oak Park|Forest Hill|Sydenham (London)|Penge West|Anerley|Norwood Junction|East Croydon",
+    "Norwood Junction|Selhurst",
+    "Sydenham (London)|Crystal Palace|Gipsy Hill|West Norwood|Streatham Hill|Balham",
+    "Crystal Palace|Norwood Junction",
+    "Crystal Palace|Birkbeck|Beckenham Junction",
+    "Norwood Junction|West Croydon|Waddon|Wallington|Carshalton Beeches|Sutton (London)|Cheam|Ewell East|Epsom (Surrey)",
+    "Balham|Mitcham Eastfields|Mitcham Junction|Hackbridge|Carshalton|Sutton (London)|Belmont|Banstead|Epsom Downs",
+    "Purley|Reedham (London)|Coulsdon Town|Woodmansterne|Chipstead|Kingswood|Tadworth|Tattenham Corner",
+    "Purley|Kenley|Whyteleafe|Whyteleafe South|Caterham",
+    "South Croydon|Sanderstead|Riddlesdown|Upper Warlingham",
+    "Clapham Junction|Imperial Wharf|West Brompton|Kensington (Olympia)|Shepherds Bush|Wembley Central|Harrow & Wealdstone|Watford Junction"
+  ],
+  "thameslink-extension": [
+    "Elstree & Borehamwood|Radlett|St Albans City|Harpenden|Luton Airport Parkway",
+    "Coulsdon South|Merstham|Redhill|Earlswood (Surrey)|Salfords (Surrey)|Horley|Gatwick Airport"
+  ]
+}

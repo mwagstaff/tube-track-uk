@@ -379,6 +379,7 @@ public actor StationArrivalsService {
     }
 
     private static func servesOnlyNationalRail(_ stationID: String) -> Bool {
+        if stationID.hasPrefix("nr:"), !NationalRailStations.codes(for: [stationID]).isEmpty { return true }
         guard let lineIDs = StationIndex.bundled.entry(id: stationID)?.lineIDs, !lineIDs.isEmpty else {
             return false
         }

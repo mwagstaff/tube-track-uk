@@ -88,7 +88,8 @@ struct BeckRiverLayer: View {
     var body: some View {
         let river = appState.river
         let canvasOffset = CGSize(width: offset.width + overscan, height: offset.height + overscan)
-        let placements = RiverSchematicLayout.placements(network: river.network, anchors: river.anchors,
+        let anchors = river.anchors(in: document)
+        let placements = RiverSchematicLayout.placements(network: river.network, anchors: anchors,
             selected: river.selectedPierId, lineId: river.selectedLineId, scale: scale, offset: canvasOffset,
             viewport: canvasSize, typeScale: typeScale, blocked: blocked)
         let key = "\(scale):\(offset):\(canvasSize):\(typeScale):\(colorScheme):\(river.selectedPierId ?? ""):\(river.selectedLineId ?? ""):\(placements.map { $0.pier.name }.joined())"
@@ -100,8 +101,8 @@ struct BeckRiverLayer: View {
                     for (a, b) in zip(route.stopIds, route.stopIds.dropFirst()) {
                         let id = [a, b].sorted().joined(separator: ":")
                         guard seen.insert(id).inserted,
-                              let from = river.anchors.first(where: { $0.id == a }),
-                              let to = river.anchors.first(where: { $0.id == b }) else { continue }
+                              let from = anchors.first(where: { $0.id == a }),
+                              let to = anchors.first(where: { $0.id == b }) else { continue }
                         let points = RiverMapGeometry.schematicPath(from: from, to: to, document: document)
                             .map { CGPoint(x: $0.x * scale + canvasOffset.width, y: $0.y * scale + canvasOffset.height) }
                         guard let first = points.first else { continue }
@@ -189,7 +190,12 @@ private struct BeckRiverBoatLayer: View {
 }
 
 extension RiverBusState {
+    func anchors(in document: BeckMapDocument) -> [RiverSchematicAnchor] {
+        document.referenceArtwork?.riverAnchors ?? anchors
+    }
+
     func schematicPoint(for boat: EstimatedRiverBoat, document: BeckMapDocument, at date: Date) -> CGPoint? {
+        let anchors = anchors(in: document)
         guard let progress = boat.progress(at: date),
               let from = anchors.first(where: { $0.id == boat.previousPierId }),
               let to = anchors.first(where: { $0.id == boat.nextPierId }) else { return nil }

@@ -26,6 +26,7 @@ struct BeckMapDocument: Codable, Hashable, Sendable {
     /// as TfL draws National Rail leaving the map.
     var lineExtensions: [BeckMapLineExtensionRecord]? = nil
     var supportedLineIDs: [TubeLineID]? = nil
+    var referenceArtwork: BeckMapReferenceArtwork? = nil
 
     var lineCoverage: Set<TubeLineID> {
         Set(supportedLineIDs ?? segments.map(\.lineID))

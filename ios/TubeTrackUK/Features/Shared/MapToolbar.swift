@@ -380,6 +380,7 @@ struct MapActionButtons: View {
 }
 
 struct MapControlDock: View {
+    @Environment(TubeAppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showsActions = false
 
@@ -407,6 +408,27 @@ struct MapControlDock: View {
                             interactionGeneration: interactionGeneration,
                             onFocus: onFocusUserLocation
                         )
+
+                        Button {
+                            appState.showsNationalRail.toggle()
+                        } label: {
+                            NationalRailMark()
+                                .foregroundStyle(appState.showsNationalRail ? Color.accentColor : Color.primary)
+                                .frame(width: 24, height: 24)
+                                .frame(width: MapDockMetrics.controlSize, height: MapDockMetrics.controlSize)
+                                .glassEffect(.regular.interactive(), in: .circle)
+                                .overlay {
+                                    if appState.showsNationalRail {
+                                        Circle().stroke(Color.accentColor, lineWidth: 2)
+                                    }
+                                }
+                                .frame(width: 60, height: 60)
+                                .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(appState.showsNationalRail ? "Hide National Rail" : "Show National Rail")
+                        .accessibilityValue(appState.showsNationalRail ? "Shown" : "Hidden")
+                        .accessibilityHint("Toggles National Rail routes in both map views")
 
                         Button {
                             setActionsVisible(true)

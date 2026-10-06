@@ -29,6 +29,13 @@ struct RiverMapGeometry: Sendable {
     }
 
     static func schematicPath(from: RiverSchematicAnchor, to: RiverSchematicAnchor, document: BeckMapDocument) -> [CGPoint] {
+        if let reference = document.referenceArtwork?.riverPath {
+            let points = reference.map { CGPoint(x: $0.x, y: $0.y) }
+            guard let a = RiverPolyline.project(from.riverPoint, onto: points),
+                  let b = RiverPolyline.project(to.riverPoint, onto: points) else { return [] }
+            if hypot(from.x - to.x, from.y - to.y) < 1 { return [from.markerPoint, to.markerPoint] }
+            return RiverPolyline.slice(points, from: a, to: b)
+        }
         guard let waterway = document.waterways?.first(where: { $0.id == "river-thames" }),
               let path = document.paths.first(where: { $0.id == waterway.pathID }) else { return [] }
         let points: [CGPoint] = path.commands.compactMap {

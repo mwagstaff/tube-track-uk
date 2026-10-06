@@ -133,6 +133,13 @@ struct TubeGraph: Codable, Sendable {
         lines.first { $0.id == id }
     }
 
+    func includingNationalRailStations() -> TubeGraph {
+        let additional = NationalRailMap.bundled.stations.filter { stationsByID[$0.id] == nil }
+        return TubeGraph(schemaVersion: schemaVersion, generatedAt: generatedAt,
+                         source: source, schematicSize: schematicSize,
+                         stations: stations + additional, segments: segments, lines: lines)
+    }
+
     static func bundled() throws -> TubeGraph {
         guard let url = Bundle.main.url(forResource: "TubeGraph", withExtension: "json") else {
             throw TubeGraphError.missingBundledGraph
