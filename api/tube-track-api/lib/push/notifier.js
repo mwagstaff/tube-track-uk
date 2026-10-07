@@ -11,6 +11,7 @@ import { projectRiverBoard, riverCondition } from './river-departure-projection.
 import { LINE_COLOURS } from '../line-colours.js';
 import { THAMESLINK_LINE_ID, THAMESLINK_STOP_IDS } from '../thameslink.js';
 import { correctRailBoard } from './rail-departures.js';
+import { isNationalRailOperator, projectNationalRailBoard, nationalRailCondition } from './national-rail-departures.js';
 
 const ACTIVITY_MAX_DURATION_MS = 90 * 60 * 1_000;
 // Each distinct Thameslink stop costs one TfL request per 30 seconds; beyond
@@ -39,6 +40,7 @@ export class LiveActivityNotifier {
         river = null,
         thameslink = null,
         railDepartures = null,
+        nationalRail = null,
         clock = Date.now,
         maxDurationMs = ACTIVITY_MAX_DURATION_MS
     }) {
@@ -51,6 +53,7 @@ export class LiveActivityNotifier {
         this.river = river;
         this.thameslink = thameslink;
         this.railDepartures = railDepartures;
+        this.nationalRail = nationalRail;
         this.clock = clock;
         this.maxDurationMs = maxDurationMs;
     }
@@ -79,7 +82,7 @@ export class LiveActivityNotifier {
 
         const conditions = conditionsByLine(await this.#safeStatuses());
         const nowMs = this.clock();
-        const pass = { thameslinkBoards: new Map(), thameslinkStops: new Set(), railBoards: new Map() };
+        const pass = { thameslinkBoards: new Map(), thameslinkStops: new Set(), railBoards: new Map(), nationalRailBoards: new Map() };
         let sent = 0;
 
         for (const row of rows) {
@@ -131,6 +134,7 @@ export class LiveActivityNotifier {
         }
 
         const isRiver = isRiverBusLine(row.lineId);
+        const isNationalRail = isNationalRailOperator(row.lineId);
         let board;
         let condition;
         let sourceUpdatedAtMs = nowMs;
@@ -159,6 +163,32 @@ export class LiveActivityNotifier {
                 condition = riverCondition(status?.meta?.stale ? null : status?.data?.find((item) => item.id === row.lineId));
             } catch (error) {
                 this.logger?.warn('push_river_unavailable', { error: error.message });
+                return 'unavailable';
+            }
+        } else if (isNationalRail) {
+            if (!this.nationalRail) return 'unavailable';
+            try {
+                const arrivals = [];
+                for (const crs of row.stopIds ?? []) {
+                    const includeThameslink = row.hubId?.startsWith('nr:') === true;
+                    const key = `${crs}:${includeThameslink}`;
+                    if (!pass.nationalRailBoards.has(key)) {
+                        if (pass.nationalRailBoards.size >= 40) return 'deferred';
+                        pass.nationalRailBoards.set(key, this.nationalRail.departures(crs, { includeThameslink }));
+                    }
+                    const result = await pass.nationalRailBoards.get(key);
+                    const fetchedAt = Date.parse(result?.meta?.updatedAt);
+                    if (!result || result.meta.stale || !Number.isFinite(fetchedAt)
+                        || nowMs - fetchedAt > 90_000 || fetchedAt < (row.lastSourceUpdatedAtMs ?? 0)) return 'stale';
+                    sourceUpdatedAtMs = Math.min(sourceUpdatedAtMs, fetchedAt);
+                    arrivals.push(...result.data);
+                }
+                board = projectNationalRailBoard({ arrivals, lineId: row.lineId, direction: row.direction });
+                if (!board.length && row.direction !== 'any'
+                    && arrivals.some((arrival) => arrival.lineId === row.lineId && !arrival.direction)) return 'unavailable';
+                condition = nationalRailCondition(arrivals, row.lineId, row.direction);
+            } catch (error) {
+                this.logger?.warn('push_national_rail_unavailable', { error: error.message });
                 return 'unavailable';
             }
         } else if (row.lineId === THAMESLINK_LINE_ID) {
@@ -225,10 +255,10 @@ export class LiveActivityNotifier {
         }
 
         this.metrics?.recordChangeDetected?.({ reason: verdict.reason });
-        return this.#send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver });
+        return this.#send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver, isNationalRail });
     }
 
-    async #send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver }) {
+    async #send({ row, board, condition, verdict, nowMs, sourceUpdatedAtMs, isRiver, isNationalRail }) {
         const frequent = row.frequentPushesEnabled !== false;
         const updatedAtSeconds = Math.floor(nowMs / 1_000);
         const sequence = (row.sequence ?? 0) + 1;
@@ -245,7 +275,7 @@ export class LiveActivityNotifier {
             event: 'update',
             contentState,
             timestampSeconds: updatedAtSeconds,
-            staleDateSeconds: row.scheduleId ? Math.min(Math.floor(row.hardEndsAtMs / 1000), updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1000)) : isRiver ? Math.floor(sourceUpdatedAtMs / 1_000) + 90
+            staleDateSeconds: row.scheduleId ? Math.min(Math.floor(row.hardEndsAtMs / 1000), updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1000)) : isRiver || isNationalRail ? Math.floor(sourceUpdatedAtMs / 1_000) + 90
                 : updatedAtSeconds + Math.floor(staleWindowMs(frequent) / 1_000),
             relevanceScore: relevanceScore(board, nowMs)
         });

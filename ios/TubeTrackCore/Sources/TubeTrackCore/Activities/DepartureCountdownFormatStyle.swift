@@ -6,6 +6,12 @@ import Foundation
 public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
     public let expectedAt: Date
 
+    public static let clockTime = Date.VerbatimFormatStyle(
+        format: "\(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits)",
+        timeZone: TimeZone(identifier: "Europe/London")!,
+        calendar: Calendar(identifier: .gregorian)
+    )
+
     public init(expectedAt: Date) {
         self.expectedAt = expectedAt
     }
@@ -13,11 +19,10 @@ public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
     public func format(_ value: Date) -> String {
         let minutes = remainingMinutes(at: value)
         guard minutes > 0 else { return "Due" }
-        return StationDepartureMetadata.departureTimeLabel(
-            expectedAt: expectedAt,
-            seconds: expectedAt.timeIntervalSince(value),
-            minutes: minutes
-        )
+        if expectedAt.timeIntervalSince(value) > 20 * 60 {
+            return expectedAt.formatted(Self.clockTime)
+        }
+        return "\(minutes) \(minutes == 1 ? "min" : "mins")"
     }
 
     private func remainingMinutes(at date: Date) -> Int {

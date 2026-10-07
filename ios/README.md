@@ -128,6 +128,25 @@ departures board Live Activity:
 - **Departures board Live Activity** — shows departures for a station on the
   Lock Screen and in the Dynamic Island while tracking is active.
 
+National Rail operator departure boards also have **Track** / **Tracking**
+controls on separate **Northbound**, **Southbound**, **Eastbound** and
+**Westbound** boards. They track the selected operator and direction at that station, including rail-only
+stations, using the same Lock Screen, Dynamic Island and Watch presentation.
+The activity retains operator names, cancellations and delays; a delayed train
+without a forecast says “Delayed” rather than counting down to its booked time.
+Only fresh, live boards can start tracking, and stale or partial source updates
+leave the last activity snapshot to expire. Tracking another board replaces the
+current one, with the existing 90-minute cap. Deploy the accompanying API
+changes before releasing this app version to enable background updates.
+Destination station coordinates determine compass direction without extra
+service-detail requests. Diagonal bearings join north/south; east/west cover
+bearings within 22.5° of those compass points. This gives Kent House–Victoria
+and Ladywell–Charing Cross Northbound, and Kent House–Orpington and
+Ladywell–Hayes (Kent) Southbound. Unconfirmed directions remain visible under **Other departures**
+without a directional Track button. The app and API share the same direction
+data; regenerate it with
+`python3 Tools/NationalRailStationsBuilder/build_directions.py /path/to/train-track-uk`.
+
 The Line Status widget has a refresh button (medium and large), opens the app
 in context via `tubetrack://` links (`status`, `line/<id>`), and drops line
 colours for short codes in tinted and Lock Screen rendering so status is never
@@ -361,6 +380,20 @@ That pass finishes with the TfL reference alignment, which draws the stations'
 roundels, ticks and interchange bars from the reference.
 
 ## Auditing authored map fidelity
+
+Station taps are checked independently of the generated station IDs. The
+combined map's `Tools/NationalRailMapBuilder/reviewed-station-targets.csv`
+records the printed name, service and position of all 374 circles and 570
+ticks in the April 2026 source. The compiler binds ticks directly to these
+reviewed symbols and rejects new, missing or changed assignments. Update this
+list against the source artwork when adopting a new map edition.
+
+`StationMarkerAuditTests` checks departure-board identity at four zoom levels,
+every native map region, geographic station representatives, piers and cable
+terminals. Exact symbols take priority over neighbouring labels and larger
+touch areas. Source checks live in `NationalRailMapBuilder/test_station_targets.py`
+and `BeckMapBuilder/tests/test_station_marker_identity.py`; run both builder
+test directories with Python's unittest discovery.
 
 The structural fidelity audit checks every route command, roundel, ordinary
 station tick and interchange connector against the locked April 2026 TfL

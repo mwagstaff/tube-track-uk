@@ -23,7 +23,8 @@ struct NationalRailBoard: Decodable, Sendable {
         let reference = lastSuccessfulUpdate ?? now
         var seen = Set<String>()
         return departures.compactMap { row in
-            guard let prediction = row.prediction(crs: crs, reference: reference, now: now, includeThameslink: includeThameslink),
+            guard let prediction = row.prediction(crs: crs, reference: reference, now: now,
+                includeThameslink: includeThameslink),
                   seen.insert(prediction.id).inserted else { return nil }
             return prediction
         }.sorted {
@@ -111,7 +112,8 @@ struct NationalRailDeparture: Decodable, Sendable {
             id: "national-rail:\(crs):\(serviceID)", vehicleId: nil,
             lineId: "national-rail:\(operatorID)", stationName: nil, naptanId: crs,
             platformName: visiblePlatform.flatMap { $0.isEmpty ? nil : "Platform \($0)" } ?? "Platform to be confirmed",
-            direction: nil, destinationName: destination.isEmpty ? "Check station screens" : destination,
+            direction: NationalRailDirection.resolve(station: crs, destinations: destinations.map { $0.crs ?? "" })?.rawValue,
+            destinationName: destination.isEmpty ? "Check station screens" : destination,
             destinationNaptanId: nil, towards: nil, expectedArrival: expected,
             timeToStation: expected.map { max(0, Int($0.timeIntervalSince(now))) }, currentLocation: nil,
             scheduledDeparture: scheduled, serviceStatus: status,
@@ -139,13 +141,33 @@ struct NationalRailDeparture: Decodable, Sendable {
 }
 
 public struct NationalRailDepartureGroup: Identifiable, Sendable {
-    public let id: String
+    public let operatorID: String
     public let name: String
     public let arrivals: [TfLArrivalPrediction]
+    public var direction: DepartureDirectionFilter = .any
+    public var id: String { direction == .any ? operatorID : "\(operatorID):\(direction.rawValue)" }
+    public var directionLabel: String { direction == .any ? "Other departures" : direction.displayName }
+
+    public var directionGroups: [Self] {
+        let rows = Dictionary(grouping: arrivals) { arrival in
+            switch arrival.direction?.lowercased() {
+            case "northbound": DepartureDirectionFilter.northbound
+            case "southbound": DepartureDirectionFilter.southbound
+            case "eastbound": DepartureDirectionFilter.eastbound
+            case "westbound": DepartureDirectionFilter.westbound
+            default: DepartureDirectionFilter.any
+            }
+        }
+        let directions: [DepartureDirectionFilter] = [.northbound, .southbound, .eastbound, .westbound, .any]
+        return directions.compactMap { direction in
+            guard let arrivals = rows[direction] else { return nil }
+            return Self(operatorID: operatorID, name: name, arrivals: arrivals, direction: direction)
+        }
+    }
 
     public static func groups(from arrivals: [TfLArrivalPrediction]) -> [Self] {
         Dictionary(grouping: arrivals.filter(\.isNationalRailOperator), by: \.lineId).map { id, rows in
-            Self(id: id, name: rows.first?.operatorName ?? "National Rail", arrivals: rows.sorted {
+            Self(operatorID: id, name: rows.first?.operatorName ?? "National Rail", arrivals: rows.sorted {
                 ($0.expectedArrival ?? $0.scheduledDeparture ?? .distantFuture)
                     < ($1.expectedArrival ?? $1.scheduledDeparture ?? .distantFuture)
             })

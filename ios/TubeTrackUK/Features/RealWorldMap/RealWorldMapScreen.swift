@@ -581,6 +581,29 @@ struct RealWorldMapScreen: View {
         graph: TubeGraph,
         renderData: RealWorldMapRenderData
     ) {
+        let content = mapContent(graph: graph, renderData: renderData)
+        var symbols = content.stations.compactMap { station -> MapSymbolHitTesting.Target? in
+            guard let point = proxy.convert(station.coordinate, to: .local) else { return nil }
+            return .init(id: station.id, point: point,
+                radius: station.selected ? 10.5 : content.markerDiameter / 2 + 1)
+        }
+        symbols += content.piers.compactMap { item -> MapSymbolHitTesting.Target? in
+            guard let point = proxy.convert(item.pier.coordinate, to: .local) else { return nil }
+            return .init(id: "pier:\(item.pier.id)", point: point,
+                radius: content.expandedSymbols || item.selected ? (item.selected ? 18 : 14) : content.markerDiameter / 2)
+        }
+        if let cable = content.cableCar {
+            symbols += cable.terminals.compactMap { terminal -> MapSymbolHitTesting.Target? in
+                guard let point = proxy.convert(terminal.coordinate, to: .local) else { return nil }
+                return .init(id: "cable:\(terminal.id)", point: point,
+                    radius: cable.selectedTerminalID == terminal.id ? 18 : content.expandedSymbols ? 14 : content.markerDiameter / 2)
+            }
+        }
+        if let id = MapSymbolHitTesting.nearestID(at: location, targets: symbols) {
+            mapSelection = id
+            handleMapSelection(id, graph: graph)
+            return
+        }
         if appState.cableCar.isEnabled {
             for terminal in appState.cableCar.network.terminals {
                 if let point = proxy.convert(terminal.coordinate, to: .local), hypot(point.x - location.x, point.y - location.y) < 22 {

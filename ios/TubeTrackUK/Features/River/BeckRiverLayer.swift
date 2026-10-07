@@ -10,9 +10,28 @@ struct RiverPierPlacement {
 }
 
 enum RiverSchematicLayout {
+    private static func walkIntersects(_ frame: CGRect, points: [CGPoint]) -> Bool {
+        zip(points, points.dropFirst()).contains { start, end in
+            var entry: CGFloat = 0, exit: CGFloat = 1
+            for (origin, delta, lower, upper) in [
+                (start.x, end.x - start.x, frame.minX, frame.maxX),
+                (start.y, end.y - start.y, frame.minY, frame.maxY)
+            ] {
+                if abs(delta) < 0.001 {
+                    if origin < lower || origin > upper { return false }
+                } else {
+                    let a = (lower - origin) / delta, b = (upper - origin) / delta
+                    entry = max(entry, min(a, b)); exit = min(exit, max(a, b))
+                    if entry > exit { return false }
+                }
+            }
+            return true
+        }
+    }
+
     static func placements(network: RiverNetwork, anchors: [RiverSchematicAnchor], selected: String?, lineId: String?,
                            scale: CGFloat, offset: CGSize, viewport: CGSize, typeScale: CGFloat,
-                           blocked: [CGRect]) -> [RiverPierPlacement] {
+                           blocked: [CGRect], document: BeckMapDocument? = nil) -> [RiverPierPlacement] {
         let bounds = CGRect(origin: .zero, size: viewport)
         var occupied = blocked
         var markers: [CGRect] = []
@@ -28,33 +47,54 @@ enum RiverSchematicLayout {
             return $0.id < $1.id
         }
         func screen(_ p: CGPoint) -> CGPoint { CGPoint(x: p.x * scale + offset.width, y: p.y * scale + offset.height) }
+        // Include later piers too; an earlier label must not cover their discs.
+        let labelMarkerFrames: [(String, CGRect)] = anchors.compactMap { anchor in
+            guard let pier = network.pier(anchor.id),
+                  lineId == nil || pier.lineIds.contains(lineId!) || pier.id == selected,
+                  prominent(anchor) || scale >= 0.55 || pier.id == selected else { return nil }
+            let point = screen(anchor.markerPoint)
+            let radius = BeckRiverLayer.markerRadius(selected: pier.id == selected, scale: scale, document: document) + 1
+            return (anchor.id, CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2))
+        }
         for anchor in ordered {
             guard let pier = network.pier(anchor.id),
                   lineId == nil || pier.lineIds.contains(lineId!) || pier.id == selected,
                   prominent(anchor) || scale >= 0.55 || pier.id == selected else { continue }
             let point = screen(anchor.markerPoint)
             // Piers only give way to piers they would actually overlap.
-            let radius = BeckRiverLayer.markerRadius(selected: pier.id == selected, scale: scale) + 1
+            let radius = BeckRiverLayer.markerRadius(selected: pier.id == selected, scale: scale, document: document) + 1
             let hit = CGRect(x: point.x - radius, y: point.y - radius, width: radius * 2, height: radius * 2)
             guard bounds.intersects(hit),
                   !markers.contains(where: { $0.intersects(hit) }) || pier.id == selected || prominent(anchor)
             else { continue }
             markers.append(hit)
             var labelFrame: CGRect?
-            if scale >= 1.1 || pier.id == selected {
+            let walks: [[CGPoint]] = (anchor.walkingLinkVia ?? []).isEmpty ? [] : (anchor.walkingLinkStationIDs ?? []).compactMap { id in
+                guard let document,
+                      let roundel = BeckMapWalkingLink.roundel(of: id, nearest: anchor.markerPoint, in: document) else { return nil }
+                return [point] + (anchor.walkingLinkVia ?? []).map { screen(CGPoint(x: $0.x, y: $0.y)) } + [screen(roundel.centre)]
+            }
+            // Keep ordinary station-focused views clear; reveal pier names
+            // at a closer zoom, or when the pier itself is selected.
+            if scale >= 2.0 || pier.id == selected {
                 let font = UIFont.systemFont(ofSize: 12 * min(1.6, typeScale), weight: .semibold)
                 let rect = (pier.name as NSString).boundingRect(with: CGSize(width: 190, height: 80), options: [.usesLineFragmentOrigin, .usesFontLeading], attributes: [.font: font], context: nil)
                 let width = ceil(rect.width) + 12, height = ceil(rect.height) + 8
+                let gap = radius + 5
                 let candidates = [
-                    CGRect(x: point.x + 19, y: point.y - height / 2, width: width, height: height),
-                    CGRect(x: point.x - width - 19, y: point.y - height / 2, width: width, height: height),
-                    CGRect(x: point.x - width / 2, y: point.y + 20, width: width, height: height),
-                    CGRect(x: point.x - width / 2, y: point.y - height - 20, width: width, height: height)
+                    CGRect(x: point.x + gap, y: point.y - height / 2, width: width, height: height),
+                    CGRect(x: point.x - width - gap, y: point.y - height / 2, width: width, height: height),
+                    CGRect(x: point.x - width / 2, y: point.y + gap, width: width, height: height),
+                    CGRect(x: point.x - width / 2, y: point.y - height - gap, width: width, height: height),
+                    CGRect(x: point.x + gap, y: point.y + 4 * scale, width: width, height: height),
+                    CGRect(x: point.x - width - gap, y: point.y + 4 * scale, width: width, height: height)
                 ]
-                let preferred = anchor.labelSide < 0 ? [candidates[1], candidates[3], candidates[0], candidates[2]] : candidates
+                let preferred = anchor.labelSide < 0
+                    ? [candidates[1], candidates[3], candidates[0], candidates[2], candidates[5], candidates[4]] : candidates
                 labelFrame = preferred.first { frame in
                     bounds.contains(frame) && !occupied.contains(where: { $0.intersects(frame) })
-                        && !markers.dropLast().contains(where: { $0.intersects(frame) })
+                        && !labelMarkerFrames.contains { $0.0 != anchor.id && $0.1.intersects(frame) }
+                        && !walks.contains { walkIntersects(frame.insetBy(dx: -2 * scale, dy: -2 * scale), points: $0) }
                 }
                 if let labelFrame { occupied.append(labelFrame.insetBy(dx: -4, dy: -4)) }
             }
@@ -78,11 +118,29 @@ struct BeckRiverLayer: View {
     let typeScale: CGFloat
     let blocked: [CGRect]
 
-    /// Pier discs match a TfL roundel's outer size, with a legible minimum
-    /// once they show their boat icon.
-    static func markerRadius(selected: Bool, scale: CGFloat) -> CGFloat {
-        let tflRadius = 11.4 * scale
-        return selected ? max(16, tflRadius + 2) : scale >= 1.1 ? max(12, tflRadius) : tflRadius
+    /// Match the station roundels in each document, including at overview zoom.
+    /// The separate tap target stays large; the visible disc has no size floor.
+    static func markerRadius(selected: Bool, scale: CGFloat, document: BeckMapDocument? = nil) -> CGFloat {
+        let artworkRadius: CGFloat = document?.referenceArtwork == nil ? 12.43 : 7.1
+        return artworkRadius * scale * (selected ? 1.15 : 1)
+    }
+
+    private static func drawPier(at point: CGPoint, selected: Bool, scale: CGFloat,
+                                 document: BeckMapDocument, context: inout GraphicsContext) {
+        let radius = markerRadius(selected: selected, scale: scale, document: document)
+        let outline = (selected ? 2.0 : 1.2) * scale
+        let discRadius = max(0, radius - outline / 2)
+        let circle = Path(ellipseIn: CGRect(x: point.x - discRadius, y: point.y - discRadius,
+                                           width: discRadius * 2, height: discRadius * 2))
+        context.fill(circle, with: .color(selected ? .blue : Color(.systemBackground)))
+        context.stroke(circle, with: .color(.blue), lineWidth: outline)
+        if selected || radius >= 5 {
+            var icon = context.resolve(Image(systemName: "ferry.fill"))
+            icon.shading = .color(selected ? .white : .blue)
+            let iconSize = radius * 1.35
+            context.draw(icon, in: CGRect(x: point.x - iconSize / 2, y: point.y - iconSize / 2,
+                                         width: iconSize, height: iconSize))
+        }
     }
 
     var body: some View {
@@ -91,7 +149,10 @@ struct BeckRiverLayer: View {
         let anchors = river.anchors(in: document)
         let placements = RiverSchematicLayout.placements(network: river.network, anchors: anchors,
             selected: river.selectedPierId, lineId: river.selectedLineId, scale: scale, offset: canvasOffset,
-            viewport: canvasSize, typeScale: typeScale, blocked: blocked)
+            viewport: canvasSize, typeScale: typeScale, blocked: blocked, document: document)
+        let sourceWalkingLinks = (document.referenceArtwork?.riverWalkingLinks ?? []).map {
+            (pierID: $0.pierID, cache: BeckMapReferenceRenderCache(.init(shapes: $0.shapes, texts: [])))
+        }
         let key = "\(scale):\(offset):\(canvasSize):\(typeScale):\(colorScheme):\(river.selectedPierId ?? ""):\(river.selectedLineId ?? ""):\(placements.map { $0.pier.name }.joined())"
         BeckMapRetainedCanvas(key: key, camera: camera, renderScale: scale, renderOffset: offset,
             overscan: overscan, canvasSize: canvasSize, colorScheme: colorScheme) { context, _ in
@@ -113,16 +174,30 @@ struct BeckRiverLayer: View {
             }
             // TfL joins piers to nearby stations with dotted walking links.
             let palette = BeckMapPalette.resolve(for: colorScheme)
+            let visiblePiers = Set(placements.map { $0.pier.id })
+                .union((document.referenceArtwork?.additionalRiverPiers ?? []).map(\.id))
+            var walkingContext = context
+            walkingContext.translateBy(x: canvasOffset.width, y: canvasOffset.height)
+            walkingContext.scaleBy(x: scale, y: scale)
+            for link in sourceWalkingLinks where visiblePiers.contains(link.pierID) {
+                for (path, style) in link.cache.shapes {
+                    walkingContext.fill(path, with: .color(palette.stationOutline), style: FillStyle(eoFill: style.evenOdd))
+                }
+            }
             let walkWidth = CGFloat(BeckMapWalkingLink.width(in: document)) * scale
             for item in placements {
+                guard item.anchor.walkingLinksInArtwork != true else { continue }
                 for stationID in item.anchor.walkingLinkStationIDs ?? [] {
                     guard let roundel = BeckMapWalkingLink.roundel(
                         of: stationID, nearest: item.anchor.markerPoint, in: document
                     ) else { continue }
                     BeckMapWalkingLink.draw(
-                        from: item.point, startRadius: Self.markerRadius(selected: item.pier.id == river.selectedPierId, scale: scale),
+                        from: item.point, startRadius: Self.markerRadius(selected: item.pier.id == river.selectedPierId, scale: scale, document: document),
                         to: CGPoint(x: roundel.centre.x * scale + canvasOffset.width, y: roundel.centre.y * scale + canvasOffset.height),
                         endRadius: roundel.outerRadius * scale,
+                        via: (item.anchor.walkingLinkVia ?? []).map {
+                            CGPoint(x: $0.x * scale + canvasOffset.width, y: $0.y * scale + canvasOffset.height)
+                        },
                         width: walkWidth, color: palette.stationOutline, in: &context
                     )
                 }
@@ -131,23 +206,17 @@ struct BeckRiverLayer: View {
                 // As on the TfL map, each pier is centred on its river bank
                 // edge (RiverSchematic.json), so no leader to the river is drawn.
                 let selected = item.pier.id == river.selectedPierId
-                let showsIcon = selected || scale >= 1.1
-                let r = Self.markerRadius(selected: selected, scale: scale)
-                let circle = Path(ellipseIn: CGRect(x: item.point.x - r, y: item.point.y - r, width: r * 2, height: r * 2))
-                context.fill(circle, with: .color(selected ? .blue : Color(.systemBackground)))
-                context.stroke(circle, with: .color(.blue), lineWidth: selected ? 2.5 : showsIcon ? 1.5 : max(1, 2 * scale))
-                if showsIcon {
-                    var icon = context.resolve(Image(systemName: "ferry.fill"))
-                    icon.shading = .color(selected ? .white : .blue)
-                    let iconSize = r * 1.35
-                    context.draw(icon, in: CGRect(x: item.point.x - iconSize / 2, y: item.point.y - iconSize / 2,
-                                                  width: iconSize, height: iconSize))
-                }
+                Self.drawPier(at: item.point, selected: selected, scale: scale, document: document, context: &context)
                 if let frame = item.labelFrame {
                     context.fill(Path(roundedRect: frame, cornerRadius: 4), with: .color(Color(.systemBackground).opacity(0.94)))
                     let label = context.resolve(Text(item.pier.name).font(.system(size: 12 * min(1.6, typeScale), weight: .semibold)).foregroundStyle(.primary))
                     context.draw(label, in: frame.insetBy(dx: 6, dy: 4))
                 }
+            }
+            for pier in document.referenceArtwork?.additionalRiverPiers ?? [] {
+                let point = CGPoint(x: pier.centre.x * scale + canvasOffset.width,
+                                    y: pier.centre.y * scale + canvasOffset.height)
+                Self.drawPier(at: point, selected: false, scale: scale, document: document, context: &context)
             }
         }
         .allowsHitTesting(false)

@@ -184,7 +184,7 @@
       "id": "label.940GZZLURSG",
       "position": {
         "x": 353.0,
-        "y": 209.86
+        "y": 249.86
       },
       "priority": 5,
       "rotationDegrees": 0,
@@ -1306,7 +1306,7 @@
           "op": "line",
           "to": {
             "x": 368.0,
-            "y": 209.86
+            "y": 249.86
           }
         }
       ],
@@ -1318,7 +1318,7 @@
           "op": "move",
           "to": {
             "x": 368.0,
-            "y": 209.86
+            "y": 249.86
           }
         },
         {
@@ -4414,7 +4414,7 @@
       "pathID": "beck.v1.path.central.west-ruislip-branch.western-fan.v1.0",
       "toPort": {
         "x": 368.0,
-        "y": 209.86
+        "y": 249.86
       },
       "toStationID": "940GZZLURSG",
       "translation": {
@@ -4425,7 +4425,7 @@
     {
       "fromPort": {
         "x": 368.0,
-        "y": 209.86
+        "y": 249.86
       },
       "fromStationID": "940GZZLURSG",
       "id": "central:940GZZLURSG:940GZZLUSRP",
@@ -6674,7 +6674,7 @@
     {
       "anchor": {
         "x": 368.0,
-        "y": 209.86
+        "y": 249.86
       },
       "hitRadius": 24,
       "lineIDs": [
@@ -6687,12 +6687,12 @@
           "tick": {
             "end": {
               "x": 361.0,
-              "y": 209.86
+              "y": 249.86
             },
             "lineID": "central",
             "start": {
               "x": 375.0,
-              "y": 209.86
+              "y": 249.86
             },
             "width": 3.2
           }

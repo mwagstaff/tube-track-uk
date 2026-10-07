@@ -10,6 +10,8 @@ public struct StationArrivalsSnapshot: Sendable {
     /// The server flagged its own data as stale (its TfL poller has fallen behind).
     public let isStale: Bool
     public let nationalRailErrorMessage: String?
+    /// The railway provider's timestamp, independent of TfL's poller.
+    public let nationalRailUpdatedAt: Date?
 
     public init(
         arrivals: [TfLArrivalPrediction],
@@ -17,7 +19,8 @@ public struct StationArrivalsSnapshot: Sendable {
         cached: Bool,
         serverUpdatedAt: Date? = nil,
         isStale: Bool = false,
-        nationalRailErrorMessage: String? = nil
+        nationalRailErrorMessage: String? = nil,
+        nationalRailUpdatedAt: Date? = nil
     ) {
         self.arrivals = arrivals
         self.fetchedAt = fetchedAt
@@ -25,6 +28,7 @@ public struct StationArrivalsSnapshot: Sendable {
         self.serverUpdatedAt = serverUpdatedAt
         self.isStale = isStale
         self.nationalRailErrorMessage = nationalRailErrorMessage
+        self.nationalRailUpdatedAt = nationalRailUpdatedAt
     }
 }
 
@@ -82,7 +86,8 @@ public actor StationArrivalsService {
                 cached: true,
                 serverUpdatedAt: cached.serverUpdatedAt,
                 isStale: cached.isStale,
-                nationalRailErrorMessage: cached.nationalRailErrorMessage
+                nationalRailErrorMessage: cached.nationalRailErrorMessage,
+                nationalRailUpdatedAt: cached.nationalRailUpdatedAt
             )
         }
 
@@ -160,7 +165,8 @@ public actor StationArrivalsService {
                 fetchedAt: now,
                 serverUpdatedAt: serverUpdatedAt,
                 isStale: isStale,
-                nationalRailErrorMessage: rail.errorMessage
+                nationalRailErrorMessage: rail.errorMessage,
+                nationalRailUpdatedAt: rail.updatedAt
             )
             pruneArrivalsCache(now: now)
             return StationArrivalsSnapshot(
@@ -169,7 +175,8 @@ public actor StationArrivalsService {
                 cached: false,
                 serverUpdatedAt: serverUpdatedAt,
                 isStale: isStale,
-                nationalRailErrorMessage: rail.errorMessage
+                nationalRailErrorMessage: rail.errorMessage,
+                nationalRailUpdatedAt: rail.updatedAt
             )
         } catch {
             try Task.checkCancellation()
@@ -182,7 +189,8 @@ public actor StationArrivalsService {
                     cached: true,
                     serverUpdatedAt: cached.serverUpdatedAt,
                     isStale: true,
-                    nationalRailErrorMessage: rail.errorMessage ?? cached.nationalRailErrorMessage
+                    nationalRailErrorMessage: rail.errorMessage ?? cached.nationalRailErrorMessage,
+                    nationalRailUpdatedAt: cached.nationalRailUpdatedAt
                 )
             }
             throw error
@@ -567,6 +575,7 @@ private struct CachedStationArrivals: Sendable {
     var serverUpdatedAt: Date? = nil
     var isStale = false
     var nationalRailErrorMessage: String? = nil
+    var nationalRailUpdatedAt: Date? = nil
 }
 
 private struct DepartureDestination: Sendable {

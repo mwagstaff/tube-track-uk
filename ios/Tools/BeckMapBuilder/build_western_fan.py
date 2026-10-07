@@ -39,7 +39,8 @@ ROUTES = (
     vector.RouteSpec(
         "central.west-ruislip-branch.western-fan.v1", "central", "87.979126%", 5,
         tuple((name, p(x, y)) for name, (x, y) in (
-            ("West Ruislip", (234, 364)), ("Ruislip Gardens", (234, 405)),
+            # Keep the Gardens tick below Ruislip's separate Piccadilly ring.
+            ("West Ruislip", (234, 364)), ("Ruislip Gardens", (234, 425)),
             ("South Ruislip", (234, 455)), ("Northolt", (234, 510)),
             ("Greenford", (260, 623)), ("Perivale", (300, 675)),
             ("Hanger Lane", (353, 716)), ("North Acton", (499, 842)),

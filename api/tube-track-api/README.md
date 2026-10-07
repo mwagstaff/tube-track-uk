@@ -208,6 +208,27 @@ v1 and are unaffected.
 
 ### Live Activity refreshes
 
+National Rail operator subscriptions use `lineId: national-rail:{operatorCode}`,
+`direction: northbound`, `southbound`, `eastbound` or `westbound`, the app's
+station/hub ID and CRS codes in `stopIds`.
+Older `any` subscriptions continue to receive the full operator board.
+`data/national-rail-stations.json` validates those codes against the selected
+station; both iOS National Rail builders regenerate this file alongside the
+app's index. Push updates fetch TrainTrack's cached
+`/train-track/api/v2/departures/from/{CRS}` boards on demand, sharing station
+lookups across subscriptions and limiting each pass to 40 distinct boards.
+Only `live` boards with provider timestamps at most 90 seconds old are pushed;
+partial, stale, failed and regressed updates preserve the previous activity.
+The activity's stale date uses the provider timestamp plus 90 seconds.
+Direction comes from the bearing to each destination, using the same
+`national-rail-directions.json` station coordinates and rules bundled in the
+app. Diagonal bearings join north/south; east/west cover bearings within 22.5°
+of those points. All destinations of a dividing service must agree. Missing
+coordinates remain unclassified and cannot end a previously populated
+activity as if there were no trains. No service-detail request is needed.
+No extra upstream credentials are required. Deploy this API change before the
+app release so National Rail Track registrations receive background updates.
+
 Each successful live-data poll considers active departure boards for a push.
 Routine snapshots target 30 seconds, or 60 seconds if the user disables frequent
 updates, even when the predictions are unchanged. A two-second scheduling

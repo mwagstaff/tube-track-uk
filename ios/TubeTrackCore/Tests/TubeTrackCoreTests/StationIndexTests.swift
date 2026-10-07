@@ -56,6 +56,14 @@ struct StationIndexTests {
         #expect(plain.displayName == "Battersea Power Station")
     }
 
+    @Test func newCrossUsesItsPublicNameAndRetainsItsTfLAlias() throws {
+        let station = try #require(index.entry(id: "910GNWCRELL"))
+        #expect(station.name == "New Cross")
+        #expect(index.search("New Cross").first?.id == "HUBNWX")
+        #expect(index.search("New Cross ELL").first?.id == "HUBNWX")
+        #expect(index.hub(containing: "910GNEWXGTE")?.name == "New Cross Gate")
+    }
+
     private struct GraphFile: Decodable {
         struct Station: Decodable {
             let id: String

@@ -219,7 +219,9 @@ struct RootTabView: View {
                     hubID: station.hubID ?? station.id,
                     arrivals: appState.stationArrivals,
                     statuses: appState.statuses,
-                    updatedAt: updatedAt
+                    updatedAt: appState.stationArrivalsSourceUpdatedAt ?? updatedAt,
+                    nationalRailIsFresh: !appState.isOffline && appState.nationalRailDeparturesError == nil,
+                    nationalRailUpdatedAt: appState.nationalRailArrivalsUpdatedAt
                 )
             }
         }

@@ -49,6 +49,7 @@ struct StationDetailCard: View {
                 StationDeparturesSection(
                     lineIDs: lineIDs,
                     preferredLineID: appState.selectedStationDepartureLineID,
+                    preferredOperatorID: appState.selectedStationDepartureOperatorID,
                     controlledLineID: appState.selectedStationDepartureLineID,
                     arrivals: appState.stationArrivals,
                     statuses: appState.statuses,
@@ -61,7 +62,8 @@ struct StationDetailCard: View {
                     tracking: DepartureTrackingContext(
                         hubID: station.hubID ?? station.id,
                         stationName: station.name,
-                        updatedAt: appState.stationArrivalsUpdatedAt
+                        updatedAt: appState.stationArrivalsSourceUpdatedAt ?? appState.stationArrivalsUpdatedAt,
+                        nationalRailUpdatedAt: appState.nationalRailArrivalsUpdatedAt
                     ),
                     onShowWarning: showStationIssue,
                     onSelectLine: appState.selectDepartureLine

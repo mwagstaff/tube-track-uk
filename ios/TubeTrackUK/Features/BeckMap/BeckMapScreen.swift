@@ -33,6 +33,11 @@ struct BeckMapPresentationSnapshot: Equatable, Sendable {
     let stationOnlyCoverageStationIDs: Set<String>
     var mapResetGeneration = 0
     var highlightsJourney = false
+    var selectedStationHubIDs: Set<String> = []
+
+    var selectedStationIDs: Set<String> {
+        selectedStationHubIDs.union(selectedStationID.map { [$0] } ?? [])
+    }
 
     var emphasizesIssues: Bool {
         disruptionDisplayMode == .issues
@@ -110,12 +115,13 @@ struct BeckMapScreen: View {
                     onUserZoomIn: onUserZoomIn,
                     onInteractionChange: onInteractionChange,
                     stationSelectionGeneration: appState.stationSelectionGeneration,
-                    onStationTap: { stationID, preferredLineID in
+                    onStationTap: { stationID, preferredLineID, preferredOperatorID in
                         guard let station = graph.stationsByID[stationID] else { return }
                         withAnimation(.smooth(duration: 0.35)) {
                             appState.select(
                                 station: station,
-                                preferredDepartureLineID: preferredLineID
+                                preferredDepartureLineID: preferredLineID,
+                                preferredDepartureOperatorID: preferredOperatorID
                             )
                         }
                     },
@@ -281,7 +287,10 @@ struct BeckMapScreen: View {
             stationOnlyCoverageStationIDs: appState.mobileCoverageMode.isActive
                 ? appState.mobileCoverage?.stationOnlyCoverageStationIDs ?? []
                 : [],
-            mapResetGeneration: appState.mapResetGeneration
+            mapResetGeneration: appState.mapResetGeneration,
+            selectedStationHubIDs: BeckMapStationSelection.stationIDs(
+                for: appState.selectedStationID, in: graph
+            )
         )
     }
 
@@ -358,7 +367,7 @@ struct BeckMapCanvas: View {
     let onUserZoomIn: () -> Void
     let onInteractionChange: (Bool) -> Void
     let stationSelectionGeneration: Int
-    let onStationTap: (String, TubeLineID?) -> Void
+    let onStationTap: (String, TubeLineID?, String?) -> Void
     let onDisruptionTap: (String) -> Void
     let onBackgroundTap: () -> Void
 
@@ -403,7 +412,7 @@ struct BeckMapCanvas: View {
         onUserZoomIn: @escaping () -> Void,
         onInteractionChange: @escaping (Bool) -> Void,
         stationSelectionGeneration: Int,
-        onStationTap: @escaping (String, TubeLineID?) -> Void,
+        onStationTap: @escaping (String, TubeLineID?, String?) -> Void,
         onDisruptionTap: @escaping (String) -> Void,
         onBackgroundTap: @escaping () -> Void
     ) {
@@ -771,19 +780,38 @@ struct BeckMapCanvas: View {
                 ForEach(document.stationMarkers.filter { !presentation.highlightsJourney || presentation.affectedStationIDs.contains($0.stationID) }) { marker in
                     if marker.lineIDs.isEmpty {
                         Button(stationAccessibilityLabel(marker: marker, lineID: nil)) {
-                            onStationTap(marker.stationID, nil)
+                            onStationTap(marker.stationID, nil, nil)
                         }
                     } else {
                         ForEach(marker.lineIDs) { lineID in
                             Button(stationAccessibilityLabel(marker: marker, lineID: lineID)) {
-                                onStationTap(marker.stationID, lineID)
+                                onStationTap(marker.stationID, lineID, nil)
                             }
                         }
+                    }
+                    ForEach(operatorRoundels(for: marker.stationID), id: \.operatorID) { roundel in
+                        Button("\(marker.name), \(roundel.operatorName ?? "National Rail") departures") {
+                            onStationTap(roundel.stationID, nil, roundel.operatorID)
+                        }
+                        .accessibilityHint("Opens this station’s departure board for the operator")
                     }
                 }
             }
         }
         .accessibilityLabel("Interactive London rail map")
+    }
+
+    private func operatorRoundels(for stationID: String) -> [BeckMapReferenceArtwork.StationRoundel] {
+        var seen: Set<String> = []
+        let tickServices = (document.referenceArtwork?.stationTicks ?? []).map {
+            BeckMapReferenceArtwork.StationRoundel(stationID: $0.stationID, centre: $0.centre, radius: 0,
+                sourceShapeIndex: $0.sourceShapeIndex, lineID: $0.lineID,
+                operatorID: $0.operatorID, operatorName: $0.operatorName)
+        }
+        return ((document.referenceArtwork?.stationRoundels ?? []) + tickServices).filter {
+            guard $0.stationID == stationID, let operatorID = $0.operatorID else { return false }
+            return seen.insert(operatorID).inserted
+        }
     }
 
     private func stationAccessibilityLabel(
@@ -1391,18 +1419,24 @@ struct BeckMapCanvas: View {
         cameraScale: CGFloat
     ) {
         let issuesActive = presentation.emphasizesIssues && (!presentation.affectedSegmentIDs.isEmpty || presentation.highlightsJourney)
+        let selectedStationIDs = presentation.selectedStationIDs
+        let selection = BeckMapStationSelection(document: document, stationIDs: selectedStationIDs)
+        selection.draw(context: &context, cameraScale: cameraScale)
 
         for marker in renderedStationMarkers {
             let affected = issuesActive && presentation.affectedStationIDs.contains(marker.stationID)
-            let selected = presentation.selectedStationID == marker.stationID
+            // The reference map's semantic primitives are approximate. Its
+            // physical roundels above own the selection highlight instead.
+            let selected = selectedStationIDs.contains(marker.stationID)
+                && !selection.usesReferenceRoundels
             let stationOnly = presentation.showsMobileCoverage
                 && presentation.stationOnlyCoverageStationIDs.contains(marker.stationID)
             guard affected || selected || stationOnly else { continue }
             let highlightColor: Color = presentation.highlightsJourney ? .blue : .red
             let outline = affected ? highlightColor : selected ? Color.blue : palette.stationOutline
 
-            if selected || (affected && presentation.highlightsJourney) {
-                let haloRadius = (presentation.highlightsJourney ? 7.0 : 19.0) / max(cameraScale, 0.01)
+            if affected && presentation.highlightsJourney {
+                let haloRadius = 7.0 / max(cameraScale, 0.01)
                 let haloRect = CGRect(
                     x: marker.anchor.x - haloRadius,
                     y: marker.anchor.y - haloRadius,
@@ -2060,6 +2094,47 @@ struct BeckMapCanvas: View {
     }
 
     private func selectMapFeature(at location: CGPoint, viewport: CGSize) {
+        // Larger pier, cable and train touch areas must not intercept a tap on
+        // a station symbol. Only the actual glyph wins here, not its padding.
+        if let selection = BeckMapStationTapResolver.resolve(screenPoint: location,
+            cameraScale: cameraScale, cameraOffset: cameraOffset, document: document,
+            renderedSegments: renderedSegments, graph: appState.graph, exactOnly: true) {
+            onStationTap(selection.stationID, selection.preferredLineID, selection.preferredOperatorID)
+            return
+        }
+        let overscan = BeckMapArtworkCachePolicy.overscan
+        let canvasSize = CGSize(width: viewport.width + overscan * 2, height: viewport.height + overscan * 2)
+        let canvasOffset = CGSize(width: renderOffset.width + overscan, height: renderOffset.height + overscan)
+        let transform = BeckMapLayerTransform.transform(cameraScale: cameraScale, cameraOffset: cameraOffset,
+            renderScale: renderScale, renderOffset: renderOffset, overscan: overscan)
+        let pierPlacements = appState.river.isEnabled && !presentation.highlightsJourney
+            ? RiverSchematicLayout.placements(network: appState.river.network, anchors: appState.river.anchors(in: document),
+                selected: appState.river.selectedPierId, lineId: appState.river.selectedLineId,
+                scale: renderScale, offset: canvasOffset, viewport: canvasSize, typeScale: labelTypeScale,
+                blocked: stationLabelPlacements(in: canvasSize, cameraScale: renderScale, cameraOffset: canvasOffset).map(\.collisionFrame),
+                document: document) : []
+        var symbols = pierPlacements.map {
+            MapSymbolHitTesting.Target(id: "pier:\($0.pier.id)", point: $0.point.applying(transform),
+                radius: BeckRiverLayer.markerRadius(selected: $0.pier.id == appState.river.selectedPierId,
+                    scale: cameraScale, document: document))
+        }
+        if appState.cableCar.isEnabled, !presentation.highlightsJourney {
+            symbols += appState.cableCar.network.terminals.compactMap { terminal in
+                guard let anchor = CableCarSchematic.anchors(in: document)[terminal.id] else { return nil }
+                let selected = appState.cableCar.selectedTerminalID == terminal.id
+                let radius: CGFloat = selected ? 17 : renderScale >= 1.1 ? 13 : 8.5 * renderScale
+                return MapSymbolHitTesting.Target(id: "cable:\(terminal.id)", point: screenPoint(anchor),
+                    radius: radius * cameraScale / renderScale)
+            }
+        }
+        if let id = MapSymbolHitTesting.nearestID(at: location, targets: symbols) {
+            if id.hasPrefix("pier:"), let pier = appState.river.network.pier(String(id.dropFirst(5))) {
+                appState.select(pier: pier); return
+            }
+            if id.hasPrefix("cable:"), let terminal = appState.cableCar.network.terminals.first(where: { $0.id == String(id.dropFirst(6)) }) {
+                appState.selectCableCar(terminal: terminal); return
+            }
+        }
         if appState.cableCar.isEnabled, !presentation.highlightsJourney {
             for terminal in appState.cableCar.network.terminals {
                 if let anchor = CableCarSchematic.anchors(in: document)[terminal.id] {
@@ -2084,18 +2159,9 @@ struct BeckMapCanvas: View {
                 }
                 if let hit = candidates.min(by: { $0.1 < $1.1 }), hit.1 < 22 { appState.select(boat: hit.0); return }
             }
-            let overscan = BeckMapArtworkCachePolicy.overscan
-            let canvasSize = CGSize(width: viewport.width + overscan * 2, height: viewport.height + overscan * 2)
-            let canvasOffset = CGSize(width: renderOffset.width + overscan, height: renderOffset.height + overscan)
-            let transform = BeckMapLayerTransform.transform(cameraScale: cameraScale, cameraOffset: cameraOffset,
-                renderScale: renderScale, renderOffset: renderOffset, overscan: overscan)
             let tap = location.applying(transform.inverted())
-            let placements = RiverSchematicLayout.placements(network: appState.river.network, anchors: appState.river.anchors(in: document),
-                selected: appState.river.selectedPierId, lineId: appState.river.selectedLineId,
-                scale: renderScale, offset: canvasOffset, viewport: canvasSize, typeScale: labelTypeScale,
-                blocked: stationLabelPlacements(in: canvasSize, cameraScale: renderScale, cameraOffset: canvasOffset).map(\.collisionFrame))
-            if let hit = placements.filter({ distance($0.point, tap) < 22 || $0.labelFrame?.contains(tap) == true })
-                .min(by: { distance($0.point, tap) < distance($1.point, tap) }) {
+            if let hit = pierPlacements.filter({ distance($0.point.applying(transform), location) < 22 || $0.labelFrame?.contains(tap) == true })
+                .min(by: { distance($0.point.applying(transform), location) < distance($1.point.applying(transform), location) }) {
                 appState.select(pier: hit.pier); return
             }
         }
@@ -2112,12 +2178,7 @@ struct BeckMapCanvas: View {
             return
         }
 
-        if let stationID = document.referenceArtwork?.stationID(at: CGPoint(
-            x: (location.x - cameraOffset.width) / cameraScale,
-            y: (location.y - cameraOffset.height) / cameraScale
-        )) {
-            onStationTap(stationID, nil)
-        } else if let selection = BeckMapStationTapResolver.resolve(
+        if let selection = BeckMapStationTapResolver.resolve(
             screenPoint: location,
             cameraScale: cameraScale,
             cameraOffset: cameraOffset,
@@ -2127,13 +2188,14 @@ struct BeckMapCanvas: View {
         ) {
             onStationTap(
                 selection.stationID,
-                selection.preferredLineID
+                selection.preferredLineID,
+                selection.preferredOperatorID
             )
         } else if let labelID = stationLabelID(at: location, in: viewport),
                   let stationID = renderedLabels.first(where: {
             $0.label.id == labelID
         })?.label.stationID {
-            onStationTap(stationID, nil)
+            onStationTap(stationID, nil, nil)
         } else if let disruptionID = disruptionID(at: location) {
             onDisruptionTap(disruptionID)
         } else {
@@ -3068,6 +3130,27 @@ struct BeckMapLineHitTarget: Equatable {
 struct BeckMapStationTapSelection: Equatable {
     let stationID: String
     let preferredLineID: TubeLineID?
+    var preferredOperatorID: String? = nil
+}
+
+enum StationMarkerGeometry {
+    static func distance(from point: CGPoint, to start: CGPoint, end: CGPoint) -> CGFloat {
+        let dx = end.x - start.x, dy = end.y - start.y
+        let length = dx * dx + dy * dy
+        let progress = length > 0.000_001
+            ? min(1, max(0, ((point.x-start.x)*dx + (point.y-start.y)*dy) / length)) : 0
+        return hypot(point.x-start.x-dx*progress, point.y-start.y-dy*progress)
+    }
+
+    static func distance(to marker: BeckMapStationMarkerRecord, from point: CGPoint) -> CGFloat {
+        marker.primitives.compactMap { primitive -> CGFloat? in
+            switch primitive {
+            case let .circle(circle): return hypot(circle.centre.x-point.x, circle.centre.y-point.y)
+            case let .tick(tick): return distance(from: point, to: CGPoint(tick.start), end: CGPoint(tick.end))
+            default: return nil
+            }
+        }.min() ?? hypot(marker.anchor.x-point.x, marker.anchor.y-point.y)
+    }
 }
 
 enum BeckMapStationTapResolver {
@@ -3078,47 +3161,87 @@ enum BeckMapStationTapResolver {
         document: BeckMapDocument,
         renderedSegments: [BeckMapCanvas.RenderedSegment],
         graph: TubeGraph?,
-        minimumScreenHitRadius: CGFloat = 24
+        minimumScreenHitRadius: CGFloat = 24,
+        exactOnly: Bool = false
     ) -> BeckMapStationTapSelection? {
-        guard cameraScale.isFinite,
-              cameraScale > 0,
-              cameraOffset.width.isFinite,
-              cameraOffset.height.isFinite,
-              screenPoint.x.isFinite,
-              screenPoint.y.isFinite,
-              minimumScreenHitRadius.isFinite,
-              minimumScreenHitRadius >= 0 else {
-            return nil
-        }
-
-        let artworkPoint = CGPoint(
-            x: (screenPoint.x - cameraOffset.width) / cameraScale,
-            y: (screenPoint.y - cameraOffset.height) / cameraScale
-        )
-        guard let marker = BeckMapStationMarkerHitTester.nearestMarker(
-            to: artworkPoint,
-            among: document.stationMarkers,
-            minimumHitRadius: minimumScreenHitRadius / cameraScale
-        ) else {
-            return nil
-        }
-
-        let colocatedStationIDs: Set<String>
-        if let graph,
-           let station = graph.stationsByID[marker.stationID] {
-            colocatedStationIDs = Set(graph.stations(inSamePlaceAs: station).map(\.id))
+        guard cameraScale.isFinite, cameraScale > 0,
+              cameraOffset.width.isFinite, cameraOffset.height.isFinite,
+              screenPoint.x.isFinite, screenPoint.y.isFinite,
+              minimumScreenHitRadius.isFinite, minimumScreenHitRadius >= 0 else { return nil }
+        let point = CGPoint(x: (screenPoint.x-cameraOffset.width)/cameraScale,
+                            y: (screenPoint.y-cameraOffset.height)/cameraScale)
+        let radius = minimumScreenHitRadius / cameraScale
+        var expandedRoundel: BeckMapReferenceArtwork.StationRoundel?
+        if let artwork = document.referenceArtwork {
+            // Printed symbols take priority over labels and larger touch areas.
+            if let roundel = artwork.roundel(at: point) { return selection(for: roundel) }
+            if let tick = artwork.tick(at: point) {
+                return BeckMapStationTapSelection(stationID: tick.stationID,
+                    preferredLineID: tick.lineID, preferredOperatorID: tick.operatorID)
+            }
+            if exactOnly { return nil }
+            if let stationID = artwork.stationID(at: point) {
+                return BeckMapStationTapSelection(stationID: stationID, preferredLineID: nil)
+            }
+            expandedRoundel = artwork.roundel(at: point, minimumHitRadius: radius)
+            if artwork.stationTicks != nil {
+                let tick = artwork.tick(at: point, minimumHitRadius: radius)
+                if let tick, tick.distance(to: point) < expandedRoundel.map({
+                    hypot($0.centre.x-point.x, $0.centre.y-point.y)
+                }) ?? .infinity {
+                    return BeckMapStationTapSelection(stationID: tick.stationID,
+                        preferredLineID: tick.lineID, preferredOperatorID: tick.operatorID)
+                }
+                return expandedRoundel.map { selection(for: $0) }
+            }
         } else {
-            colocatedStationIDs = [marker.stationID]
+            let circleMarker = document.stationMarkers.filter { marker in
+                marker.primitives.contains { primitive in
+                    guard case let .circle(circle) = primitive else { return false }
+                    return hypot(circle.centre.x-point.x, circle.centre.y-point.y)
+                        <= circle.radius + circle.outlineWidth / 2 + 0.001
+                }
+            }.min { StationMarkerGeometry.distance(to: $0, from: point)
+                < StationMarkerGeometry.distance(to: $1, from: point) }
+            if let circleMarker {
+                return selection(for: circleMarker, point: point, segments: renderedSegments, graph: graph)
+            }
+            let ticks = document.stationMarkers.flatMap { marker in
+                marker.primitives.compactMap { primitive -> (BeckMapStationMarkerRecord, BeckMapTickPrimitive, CGFloat)? in
+                    guard case let .tick(tick) = primitive else { return nil }
+                    let distance = StationMarkerGeometry.distance(from: point, to: CGPoint(tick.start), end: CGPoint(tick.end))
+                    guard distance <= tick.width / 2 + 0.001 else { return nil }
+                    return (marker, tick, distance)
+                }
+            }
+            if let hit = ticks.min(by: { $0.2 < $1.2 }) {
+                return BeckMapStationTapSelection(stationID: hit.0.stationID, preferredLineID: hit.1.lineID)
+            }
+            if exactOnly { return nil }
         }
-        return BeckMapStationTapSelection(
-            stationID: marker.stationID,
-            preferredLineID: BeckMapStationLineResolver.preferredLineID(
-                for: marker,
-                tappedAt: artworkPoint,
-                colocatedStationIDs: colocatedStationIDs,
-                segments: renderedSegments
-            )
-        )
+        let marker = BeckMapStationMarkerHitTester.nearestMarker(to: point,
+            among: document.stationMarkers, minimumHitRadius: radius)
+        if let expandedRoundel, hypot(expandedRoundel.centre.x-point.x, expandedRoundel.centre.y-point.y)
+            <= marker.map({ StationMarkerGeometry.distance(to: $0, from: point) }) ?? .infinity {
+            return selection(for: expandedRoundel)
+        }
+        return marker.map { selection(for: $0, point: point, segments: renderedSegments, graph: graph) }
+    }
+
+    private static func selection(for marker: BeckMapStationMarkerRecord, point: CGPoint,
+                                  segments: [BeckMapCanvas.RenderedSegment], graph: TubeGraph?) -> BeckMapStationTapSelection {
+        let station = graph?.stationsByID[marker.stationID]
+        let ids = station.flatMap { station in graph.map { Set($0.stations(inSamePlaceAs: station).map(\.id)) } }
+            ?? [marker.stationID]
+        let lines = station.flatMap { station in graph?.lineIDs(at: station) } ?? marker.lineIDs
+        return BeckMapStationTapSelection(stationID: marker.stationID,
+            preferredLineID: BeckMapStationLineResolver.preferredLineID(for: marker, tappedAt: point,
+                colocatedStationIDs: ids, segments: segments, lineIDs: lines))
+    }
+
+    private static func selection(for roundel: BeckMapReferenceArtwork.StationRoundel) -> BeckMapStationTapSelection {
+        BeckMapStationTapSelection(stationID: roundel.stationID, preferredLineID: roundel.lineID,
+                                   preferredOperatorID: roundel.operatorID)
     }
 }
 
@@ -3131,17 +3254,8 @@ enum BeckMapStationMarkerHitTester {
         guard minimumHitRadius >= 0, minimumHitRadius.isFinite else { return nil }
 
         return markers.compactMap { marker -> Candidate? in
-            let circleCentres = marker.primitives.compactMap { primitive -> CGPoint? in
-                guard case let .circle(circle) = primitive else { return nil }
-                return CGPoint(circle.centre)
-            }
-            let hitPoints = circleCentres.isEmpty
-                ? [CGPoint(marker.anchor)]
-                : circleCentres
-            guard let distance = hitPoints.map({ hypot($0.x - point.x, $0.y - point.y) }).min(),
-                  distance <= max(minimumHitRadius, marker.hitRadius) else {
-                return nil
-            }
+            let distance = StationMarkerGeometry.distance(to: marker, from: point)
+            guard distance <= max(minimumHitRadius, marker.hitRadius) else { return nil }
             let anchor = CGPoint(marker.anchor)
             return Candidate(
                 marker: marker,
@@ -3173,10 +3287,12 @@ enum BeckMapStationLineResolver {
         for marker: BeckMapStationMarkerRecord,
         tappedAt point: CGPoint,
         colocatedStationIDs: Set<String>,
-        segments: [BeckMapCanvas.RenderedSegment]
+        segments: [BeckMapCanvas.RenderedSegment],
+        lineIDs: [TubeLineID]? = nil
     ) -> TubeLineID? {
-        guard marker.lineIDs.count > 1 else { return marker.lineIDs.first }
-        let markerLineIDs = Set(marker.lineIDs)
+        let lineIDs = lineIDs ?? marker.lineIDs
+        guard lineIDs.count > 1 else { return lineIDs.first }
+        let markerLineIDs = Set(lineIDs)
         let circleCentres = marker.primitives.compactMap { primitive -> CGPoint? in
             guard case let .circle(circle) = primitive else { return nil }
             return CGPoint(circle.centre)
@@ -3194,7 +3310,7 @@ enum BeckMapStationLineResolver {
 
         var nearestLineID: TubeLineID?
         var nearestSquaredDistance = CGFloat.greatestFiniteMagnitude
-        for lineID in marker.lineIDs {
+        for lineID in lineIDs {
             for segment in connectedSegments where segment.lineID == lineID {
                 for edge in segment.collisionEdges {
                     let candidateDistance = squaredDistance(from: roundelPoint, to: edge)
@@ -3205,7 +3321,7 @@ enum BeckMapStationLineResolver {
                 }
             }
         }
-        return nearestLineID ?? marker.lineIDs.first
+        return nearestLineID ?? lineIDs.first
     }
 
     private static func squaredDistance(from start: CGPoint, to end: CGPoint) -> CGFloat {

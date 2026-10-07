@@ -1288,7 +1288,7 @@
       "priority": 5,
       "rotationDegrees": 0,
       "stationID": "910GNWCRELL",
-      "text": "New Cross ELL",
+      "text": "New Cross",
       "visibilityTier": "minor"
     },
     {
@@ -55066,7 +55066,7 @@
       "lineIDs": [
         "windrush"
       ],
-      "name": "New Cross ELL",
+      "name": "New Cross",
       "primitives": [
         {
           "circle": {

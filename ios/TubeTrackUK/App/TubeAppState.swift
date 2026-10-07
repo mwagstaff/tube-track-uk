@@ -163,6 +163,7 @@ final class TubeAppState {
     var selectedLineID: TubeLineID?
     var selectedStationID: String?
     private(set) var selectedStationDepartureLineID: TubeLineID?
+    private(set) var selectedStationDepartureOperatorID: String?
     private(set) var stationSelectionGeneration = 0
     private(set) var nearMeFocusedStationID: String?
     private(set) var nearMeFocusGeneration = 0
@@ -207,6 +208,7 @@ final class TubeAppState {
     var stationArrivals: [TfLArrivalPrediction] = []
     private(set) var stationArrivalsUpdatedAt: Date?
     private(set) var stationArrivalsSourceUpdatedAt: Date?
+    private(set) var nationalRailArrivalsUpdatedAt: Date?
     private(set) var stationArrivalsStale = false
     var isRefreshingStationArrivals = false
     var stationArrivalsError: String?
@@ -773,7 +775,8 @@ final class TubeAppState {
 
     func select(
         station: TubeStation,
-        preferredDepartureLineID: TubeLineID? = nil
+        preferredDepartureLineID: TubeLineID? = nil,
+        preferredDepartureOperatorID: String? = nil
     ) {
         if NationalRailMap.isExclusiveStation(station.id) { showsNationalRail = true }
         cableCar.clearSelection()
@@ -781,6 +784,7 @@ final class TubeAppState {
         cancelStationArrivalsPolling()
         cancelStationArrivalsRefresh()
         selectedTrainID = nil
+        selectedStationDepartureOperatorID = preferredDepartureOperatorID
         let stationLineIDs = Set(graph?.lineIDs(at: station) ?? station.lineIDs)
         if let preferredDepartureLineID {
             selectedStationDepartureLineID = stationLineIDs.contains(preferredDepartureLineID)
@@ -799,6 +803,7 @@ final class TubeAppState {
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
         stationArrivalsSourceUpdatedAt = nil
+        nationalRailArrivalsUpdatedAt = nil
         stationArrivalsStale = false
         stationArrivalsError = nil
         nationalRailDeparturesError = nil
@@ -861,6 +866,7 @@ final class TubeAppState {
         let stationLineIDs = Set(graph?.lineIDs(at: station) ?? station.lineIDs)
         guard stationLineIDs.contains(lineID) else { return }
         selectedStationDepartureLineID = lineID
+        selectedStationDepartureOperatorID = nil
     }
 
     func consumeNearMeFocus(generation: Int) {
@@ -873,9 +879,11 @@ final class TubeAppState {
         cancelStationArrivalsRefresh()
         selectedStationID = nil
         selectedStationDepartureLineID = nil
+        selectedStationDepartureOperatorID = nil
         stationArrivals = []
         stationArrivalsUpdatedAt = nil
         stationArrivalsSourceUpdatedAt = nil
+        nationalRailArrivalsUpdatedAt = nil
         stationArrivalsStale = false
         stationArrivalsError = nil
         nationalRailDeparturesError = nil
@@ -1467,6 +1475,7 @@ final class TubeAppState {
             stationArrivals = snapshot.arrivals
             stationArrivalsUpdatedAt = .now
             stationArrivalsSourceUpdatedAt = snapshot.serverUpdatedAt ?? snapshot.fetchedAt
+            nationalRailArrivalsUpdatedAt = snapshot.nationalRailUpdatedAt
             stationArrivalsStale = snapshot.isStale
             stationArrivalsError = nil
             nationalRailDeparturesError = snapshot.nationalRailErrorMessage

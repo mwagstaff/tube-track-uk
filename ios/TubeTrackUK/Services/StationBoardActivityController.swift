@@ -125,23 +125,53 @@ final class StationBoardActivityController {
         }
     }
 
+    func start(hubID: String, stationName: String, group: NationalRailDepartureGroup,
+               updatedAt: Date) async {
+        let now = Date.now
+        guard now.timeIntervalSince(updatedAt) <= 90,
+              !NationalRailStations.codes(for: [hubID]).isEmpty else { return }
+        let state = DepartureActivityBoard.nationalRailContentState(
+            from: group.arrivals, operatorID: group.operatorID, updatedAt: updatedAt, sequence: 1,
+            direction: group.direction)
+        guard !state.departures.isEmpty else { return }
+        let attributes = DepartureActivityAttributes(
+            activityID: UUID().uuidString, stationHubID: hubID, stationName: stationName,
+            lineIDRaw: group.operatorID, direction: group.direction.displayName, directionFilter: group.direction,
+            startedAt: now, hardEndsAt: now.addingTimeInterval(DepartureActivityPolicy.maximumDuration),
+            operatorName: group.name)
+        await begin(attributes: attributes, state: state)
+    }
+
     /// Feeds the activity from an in-app refresh. Cheap and unbudgeted — this
     /// is why the tracked station's board stays exact while the app is open.
     func update(
         hubID: String,
         arrivals: [TfLArrivalPrediction],
         statuses: [TfLLineStatus],
-        updatedAt: Date
+        updatedAt: Date,
+        nationalRailIsFresh: Bool = true,
+        nationalRailUpdatedAt: Date? = nil
     ) async {
         guard let trackedActivityID,
               let attributes = DepartureActivityBridge.attributes(for: trackedActivityID),
-              let lineID = attributes.lineID,
               // The app may have moved on to another station; feeding its
               // arrivals to this activity would silently show the wrong trains.
               attributes.stationHubID == hubID else {
             return
         }
         sequence += 1
+        if attributes.isNationalRailOperator {
+            let railUpdatedAt = nationalRailUpdatedAt ?? updatedAt
+            guard nationalRailIsFresh, Date.now.timeIntervalSince(railUpdatedAt) <= 90 else { return }
+            let state = DepartureActivityBoard.nationalRailContentState(
+                from: arrivals, operatorID: attributes.lineIDRaw, updatedAt: railUpdatedAt, sequence: sequence,
+                direction: attributes.directionFilter)
+            if state.departures.isEmpty, attributes.directionFilter != .any,
+               arrivals.contains(where: { $0.lineId == attributes.lineIDRaw && $0.direction == nil }) { return }
+            await publish(state, attributes: attributes)
+            return
+        }
+        guard let lineID = attributes.lineID else { return }
         let state = DepartureActivityBoard.contentState(
             from: arrivals, lineID: lineID, direction: attributes.directionFilter,
             condition: Self.condition(for: lineID, in: statuses),
@@ -229,7 +259,7 @@ final class StationBoardActivityController {
     ) -> ActivityContent<DepartureActivityAttributes.ContentState> {
         ActivityContent(
             state: state,
-            staleDate: attributes.isRiver
+            staleDate: attributes.isRiver || attributes.isNationalRailOperator
                 ? min(state.updatedAt.addingTimeInterval(90), attributes.hardEndsAt)
                 : DepartureActivityPolicy.staleDate(
                 updatedAt: state.updatedAt,

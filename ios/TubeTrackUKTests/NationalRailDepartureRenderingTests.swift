@@ -18,13 +18,17 @@ final class NationalRailDepartureRenderingTests: XCTestCase {
                 Text("Beckenham Junction").font(.appHeadline())
                 NationalRailOperatorPill(name: group.name, id: group.id, selected: true) {}
                 Divider()
-                NationalRailDepartureGroupView(group: group, now: now)
+                ForEach(group.directionGroups) { directionGroup in
+                    NationalRailDepartureGroupView(group: directionGroup, now: now,
+                        tracking: .init(hubID: "HUBBEK", stationName: "Beckenham Junction", updatedAt: now))
+                }
             }
             .padding(20)
             .frame(width: 390)
             .background(Color(uiColor: .systemBackground))
             .environment(\.colorScheme, scheme)
             .environment(\.dynamicTypeSize, size)
+            .environment(StationBoardActivityController())
             let renderer = ImageRenderer(content: view)
             renderer.scale = 2
             let image = try XCTUnwrap(renderer.uiImage)
@@ -39,7 +43,7 @@ final class NationalRailDepartureRenderingTests: XCTestCase {
     private func departure(_ id: String, destination: String, minutes: Int,
                            status: RailServiceStatus, now: Date) -> TfLArrivalPrediction {
         TfLArrivalPrediction(id: id, vehicleId: nil, lineId: "national-rail:SE", stationName: nil,
-            naptanId: "BKJ", platformName: "Platform 2", direction: nil,
+            naptanId: "BKJ", platformName: "Platform 2", direction: destination == "London Victoria" ? "northbound" : "southbound",
             destinationName: destination, destinationNaptanId: nil, towards: nil,
             expectedArrival: now.addingTimeInterval(Double(minutes * 60)), timeToStation: minutes * 60,
             currentLocation: nil, scheduledDeparture: now.addingTimeInterval(Double((minutes - (status == .delayed ? 2 : 0)) * 60)),

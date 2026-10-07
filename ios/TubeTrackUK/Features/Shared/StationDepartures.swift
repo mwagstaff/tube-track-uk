@@ -12,16 +12,39 @@ struct DepartureTrackingContext: Equatable {
     let hubID: String
     let stationName: String
     let updatedAt: Date?
+    var nationalRailUpdatedAt: Date? = nil
+}
+
+/// Retain a map preference while rail departures arrive after the TfL board,
+/// but let a passenger's explicit choice take precedence over later refreshes.
+struct StationDepartureOperatorSelection {
+    let preferredID: String?
+    private var requestedID: String?
+    private var hasUserSelection = false
+
+    init(preferredID: String? = nil) { self.preferredID = preferredID }
+
+    mutating func select(_ operatorID: String?) {
+        requestedID = operatorID
+        hasUserSelection = true
+    }
+
+    func resolved(availableIDs: [String], hasTfLLines: Bool) -> String? {
+        if let requestedID, availableIDs.contains(requestedID) { return requestedID }
+        if !hasUserSelection, let preferredID, availableIDs.contains(preferredID) { return preferredID }
+        return hasTfLLines ? nil : availableIDs.first
+    }
 }
 
 struct StationDeparturesSection: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var requestedLineID: TubeLineID?
     @State private var presentedStatusLineID: TubeLineID?
-    @State private var selectedOperatorID: String?
+    @State private var operatorSelection: StationDepartureOperatorSelection
 
     let lineIDs: [TubeLineID]
     let preferredLineID: TubeLineID?
+    let preferredOperatorID: String?
     let controlledLineID: TubeLineID?
     let arrivals: [TfLArrivalPrediction]
     let statuses: [TfLLineStatus]
@@ -38,6 +61,7 @@ struct StationDeparturesSection: View {
     init(
         lineIDs: [TubeLineID],
         preferredLineID: TubeLineID? = nil,
+        preferredOperatorID: String? = nil,
         controlledLineID: TubeLineID? = nil,
         arrivals: [TfLArrivalPrediction],
         statuses: [TfLLineStatus],
@@ -53,6 +77,8 @@ struct StationDeparturesSection: View {
     ) {
         self.lineIDs = lineIDs
         self.preferredLineID = preferredLineID
+        self.preferredOperatorID = preferredOperatorID
+        _operatorSelection = State(initialValue: StationDepartureOperatorSelection(preferredID: preferredOperatorID))
         self.controlledLineID = controlledLineID
         self.arrivals = arrivals
         self.statuses = statuses
@@ -89,6 +115,10 @@ struct StationDeparturesSection: View {
         operatorGroups.first { $0.id == selectedOperatorID }
     }
 
+    private var selectedOperatorID: String? {
+        operatorSelection.resolved(availableIDs: operatorGroups.map(\.id), hasTfLLines: !lineIDs.isEmpty)
+    }
+
     private var selectedGroups: [StationDepartureGroup] {
         StationDepartureGroup.groups(from: arrivals, for: selectedLineID)
     }
@@ -107,7 +137,7 @@ struct StationDeparturesSection: View {
                     selectedLineID: selectedOperatorID == nil ? selectedLineID : nil,
                     operatorGroups: operatorGroups,
                     selectedOperatorID: selectedOperatorID,
-                    onSelectOperator: { selectedOperatorID = $0 },
+                    onSelectOperator: { operatorSelection.select($0) },
                     statuses: statuses,
                     isOffline: isOffline,
                     onSelect: select,
@@ -152,10 +182,10 @@ struct StationDeparturesSection: View {
             reconcileSelection()
         }
         .onChange(of: selectionInputID) {
-            if let selectedOperatorID, !operatorGroups.contains(where: { $0.id == selectedOperatorID }) {
-                self.selectedOperatorID = nil
-            }
             reconcileSelection()
+        }
+        .onChange(of: preferredOperatorID) { _, preferredOperatorID in
+            operatorSelection = StationDepartureOperatorSelection(preferredID: preferredOperatorID)
         }
         .onChange(of: preferredLineID) { _, preferredLineID in
             guard onSelectLine == nil else { return }
@@ -226,7 +256,14 @@ struct StationDeparturesSection: View {
             .padding(.vertical, 3)
             .accessibilityElement(children: .combine)
         } else if let selectedOperator {
-            NationalRailDepartureGroupView(group: selectedOperator, now: now)
+            VStack(spacing: 13) {
+                ForEach(Array(selectedOperator.directionGroups.enumerated()), id: \.element.id) { index, group in
+                    NationalRailDepartureGroupView(group: group, now: now, tracking: tracking,
+                        isFresh: nationalRailErrorMessage == nil)
+                    if index < selectedOperator.directionGroups.count - 1 { Divider() }
+                }
+            }
+            .id(selectedOperatorID)
         } else if selectedGroups.isEmpty {
             Text(emptyStateMessage)
                 .font(.appSubheadline())
@@ -254,8 +291,8 @@ struct StationDeparturesSection: View {
     }
 
     private func select(_ lineID: TubeLineID) {
-        selectedOperatorID = nil
-        guard lineID != selectedLineID else { return }
+        operatorSelection.select(nil)
+        guard lineID != selectedLineID || preferredOperatorID != nil else { return }
         if let onSelectLine {
             if reduceMotion {
                 onSelectLine(lineID)
@@ -276,9 +313,6 @@ struct StationDeparturesSection: View {
     }
 
     private func reconcileSelection() {
-        if lineIDs.isEmpty, selectedOperatorID == nil {
-            selectedOperatorID = operatorGroups.first?.id
-        }
         guard onSelectLine == nil else { return }
         if let requestedLineID, lineIDs.contains(requestedLineID) {
             return
@@ -603,16 +637,30 @@ struct StationDepartureBoardHeader: View {
     }
 
     private var boardHeading: some View {
-        HStack(spacing: 7) {
-            TubeLineDot(lineID: group.lineID, size: 9)
-            Text(group.lineID.displayName)
-                .font(.appSubheadline(.bold))
-            Text(group.direction)
-                .font(.appSubheadline())
-                .foregroundStyle(.secondary)
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 7) {
+                lineHeading
+                directionHeading
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            VStack(alignment: .leading, spacing: 4) {
+                lineHeading
+                directionHeading
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
+    }
+
+    private var lineHeading: some View {
+        HStack(spacing: 7) {
+            TubeLineDot(lineID: group.lineID, size: 9)
+            Text(group.lineID.displayName).font(.appSubheadline(.bold))
+        }
+    }
+
+    private var directionHeading: some View {
+        Text(group.direction).font(.appSubheadline()).foregroundStyle(.secondary)
     }
 
     @ViewBuilder private var boardActions: some View {

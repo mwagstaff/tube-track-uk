@@ -45,9 +45,14 @@ PDF_NAMES = {
     'Harrow-on-the-Hill': 'Harrow- on-the-Hill',
     "King's Cross St. Pancras": 'King’s Cross',
     'London Paddington': 'Paddington',
+    'London Euston': 'Euston',
+    'London Liverpool Street': 'Liverpool Street',
     'Paddington (H&C Line)-Underground': 'Paddington',
+    'Kensington (Olympia)': 'Kensington Olympia',
     'New Cross ELL': 'New Cross',
     'Queens Park (London)': 'Queen’s Park',
+    'Queenstown Road': 'Queenstown Road Battersea',
+    'Queenstown Road (Battersea)': 'Queenstown Road Battersea',
     "St. James's Park": 'St James’s Park',
     "St. John’s Wood": 'St John’s Wood',
     "St. John's Wood": 'St John’s Wood',
@@ -70,6 +75,13 @@ ANCHORS = {
     "King's Cross St. Pancras": (544.25,262.5),
     'Euston': (514.116,263.466),
     'New Cross Gate': (631.465,423.489),
+    # The wrapped New Cross Gate label also matches "New Cross"; its nearby
+    # walking-link dots must not become New Cross's interactive roundel.
+    'New Cross': (638.660,416.254),
+    # The boxed, wrapped label reaches Maze Hill's tick. Use Cutty Sark's
+    # visible roundel for selection, route ports and the Greenwich Pier link.
+    'Cutty Sark (for Maritime Greenwich)': (673.324,392.303),
+    'Kingston': (347.624,474.126),
     'Northolt': (282.287,221.459),
     'Woolwich': (749.157,386.899),
 }
@@ -115,34 +127,110 @@ def commands(drawing):
 def rgb(value):
     return [round(c, 5) for c in value] if value else None
 
-def label_boxes(page, name):
+def is_station_label_outline(drawing):
+    """Identify thin black borders enclosing reference station names."""
+    return (drawing['type'] == 's' and drawing['color']
+            and max(drawing['color']) < .2 and 0 < (drawing['width'] or 0) < .2
+            and any(drawing['rect'].contains(pymupdf.Rect(span['bbox']))
+                    for span in SPANS
+                    if span['color'] == 2301728 and 2 < span['size'] < 2.8))
+
+def _raw_label_boxes(page, name):
     name = PDF_NAMES.get(name, re.sub(r'\s*\([^)]*\)', '', name))
     name = re.sub(r' (DLR|Rail|Underground) Station$', '', name).strip()
-    options = [name, name.replace(' & ', ' and '), name.replace("'", '’')]
+    def label_key(text):
+        return re.sub(r'[^a-z0-9]', '', text.lower().replace('&', 'and'))
+    wanted = label_key(name)
+    # Match complete text spans rather than PDF substring search rectangles.
+    # A wrapped "New Cross Gate" must never match "New Cross", and unrelated
+    # "Luton Airport" text must not be joined to the Parkway label.
+    spans = [(label_key(s['text']), pymupdf.Rect(s['bbox'])) for s in SPANS
+             if 2 < s['size'] < 2.8 and s['color'] == 2301728
+             and CROP.contains(pymupdf.Rect(s['bbox'])) and label_key(s['text'])]
     found = []
-    for option in options:
-        hits = page.search_for(option, textpage=TEXT_PAGE)
-        # search_for emits one rectangle per line of a wrapped label.
-        groups = []
-        for r in hits:
-            if not CROP.contains(r):
+
+    def extend(text, box, last, used):
+        if text == wanted:
+            if not any(max(abs(a-b) for a,b in zip(box,existing)) < .01 for existing in found):
+                found.append(box)
+            return
+        for i, (part, rect) in enumerate(spans):
+            if i in used or not wanted.startswith(text + part):
                 continue
-            if groups and norm(page.get_textbox(groups[-1], textpage=TEXT_PAGE)) != norm(option) and -1 < r.y0-groups[-1].y1 < .6 and abs(r.x0-groups[-1].x0) < 20:
-                groups[-1] |= r
-            else:
-                groups.append(pymupdf.Rect(r))
-        for r in groups:
-            spans = [s for s in SPANS if (r+(-.2,-.2,.2,.2)).intersects(pymupdf.Rect(s['bbox'])) and pymupdf.Rect(s['bbox']).get_area() > 0]
-            # Reject substring hits such as Kenton inside South Kenton.
-            if any((pymupdf.Rect(s['bbox']) & r).get_area() > r.get_area()*.6 and norm(option) in norm(s['text']) and norm(option)!=norm(s['text'])
-                   and len(norm(s['text']))>len(norm(option))+1 for s in spans):
-                continue
-            # Exclude continuation destinations and fare-zone prose.
-            if spans and any(2<s['size']<2.8 and s['color']==2301728 for s in spans):
-                found.append(r)
-        if found:
-            break
+            aligned = min(abs(rect.x0-last.x0), abs(rect.x1-last.x1),
+                          abs((rect.x0+rect.x1-last.x0-last.x1)/2)) < 3
+            wrapped = -1 < rect.y0 - last.y1 < .8 and aligned
+            same_line = abs(rect.y0 - last.y0) < .1 and -.1 < rect.x0 - last.x1 < 1
+            if wrapped or same_line:
+                extend(text + part, box | rect, rect, used | {i})
+
+    for i, (text, rect) in enumerate(spans):
+        if wanted.startswith(text):
+            extend(text, rect, rect, {i})
     return found
+
+
+def configure_label_names(page, names):
+    """Reject a complete span that is only one line of a longer station name."""
+    global LABEL_BOXES
+    raw = {name: _raw_label_boxes(page, name) for name in set(names)}
+    LABEL_BOXES = {}
+    for name, boxes in raw.items():
+        LABEL_BOXES[name] = [box for box in boxes if not any(
+            other != name and len(norm(other)) > len(norm(name))
+            and bigger.get_area() > box.get_area()*1.1
+            and (bigger & box).get_area() > box.get_area()*.99
+            for other, others in raw.items() for bigger in others
+        )]
+
+
+def label_boxes(page, name):
+    cached = globals().get('LABEL_BOXES', {})
+    return cached[name] if name in cached else _raw_label_boxes(page, name)
+
+
+def add_roundel_targets(document, stations, rail_routes, page, drawings, crs_index=None):
+    from roundel_targets import build_roundel_targets
+    colors = {}
+    line_names = {entry['id']:entry['name'] for entry in
+                  json.loads((ROOT/'TubeTrackUK/Resources/TubeGraph.json').read_text())['lines']}
+    for line in document['supportedLineIDs']:
+        name = {'tram':'London Trams'}.get(line, line_names[line])
+        label = next(r for r in page.search_for(name) if 85 < r.x0 < 120 and 170 < r.y0 < 435)
+        y = (label.y0 + label.y1)/2
+        colors[line] = min((d for d in drawings if d['color'] and d['rect'].x0 < 75
+                           and d['rect'].x1 > 85 and abs(d['rect'].y0-y)<3),
+                          key=lambda d:abs(d['rect'].y0-y))['color']
+    for service,y in LEGEND_Y.items():
+        colors[service] = next(d['color'] for d in drawings if d['color'] and d['rect'].x0 < 75
+                              and d['rect'].x1 > 85 and abs(d['rect'].y0-y)<.2)
+    by_id = {s['id']:s for s in stations}
+    operator_stations = {}
+    for route in rail_routes:
+        operator_stations.setdefault(route['operatorID'],set()).update(
+            [route['fromStationID'],route['toStationID']])
+    operators = json.loads((ROOT/'TubeTrackUK/Resources/NationalRailOperators.json').read_text())['operators']
+    for operator in operators:
+        ids = operator_stations.setdefault(operator['id'],set())
+        ids.update(operator['stationIDs'])
+        hubs = {by_id[sid].get('hubID') or sid for sid in ids if sid in by_id}
+        ids.update(sid for sid,s in by_id.items() if (s.get('hubID') or sid) in hubs)
+    # Beyond the native Thameslink graph, the reference includes limited rail
+    # services. GWR's Reading–Gatwick corridor is clipped by this map edition.
+    if crs_index is None:
+        crs_index = json.loads((ROOT/'TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json').read_text())
+    operator_stations['thameslink-extension'] = set(crs_index)
+    operator_stations['great-western-railway'].update(sid for sid,s in by_id.items()
+                                                    if s['name'] in {'Redhill','Gatwick Airport'})
+    boxes = {s['id']:[[round(v,6) for v in (point(r.tl)['x'],point(r.tl)['y'],
+                                          point(r.br)['x'],point(r.br)['y'])]
+                     for r in label_boxes(page,s['name'])] for s in stations}
+    boxes = {sid:rectangles for sid,rectangles in boxes.items() if rectangles}
+    targets,audit = build_roundel_targets(document,stations,boxes,colors,operator_stations)
+    document['referenceArtwork']['stationRoundels'] = targets
+    from station_targets import bind_reviewed_targets
+    bind_reviewed_targets(document, stations, colors)
+    return audit
 
 def box_distance(p, r):
     return math.hypot(max(r.x0-p[0],0,p[0]-r.x1), max(r.y0-p[1],0,p[1]-r.y1))
@@ -180,6 +268,7 @@ def main():
         for name in branch.split('|'):
             entry=station(name)
             rail[entry['crs']]=(name,entry)
+    configure_label_names(page, [s['name'] for s in base['stations']] + [name for name,_ in rail.values()])
     # Station glyphs: small filled tick rectangles and circular interchange rings.
     glyphs=[]
     for d in drawings:
@@ -203,6 +292,9 @@ def main():
         if name == 'St Margarets (London)': box=max(boxes,key=lambda r:r.y0)
         near=sorted(glyphs,key=lambda p:box_distance(p,box))
         anchor=near[0]
+        if name in ANCHORS:
+            anchor=ANCHORS[name]
+            box=min(boxes,key=lambda r:box_distance(anchor,r))
         # Reuse existing stop identity, favouring an actual CRS match over names.
         existing=[s for s in base['stations'] if crs in crs_index.get(s['id'],[]) and norm(s['name'])==norm(name)]
         if not existing and crs in {'KGX','NWX'}:
@@ -245,14 +337,26 @@ def main():
                            and d['rect'].height>100 and .87<d['fill'][0]<.89
                            and .92<d['fill'][1]<.94 and .82<d['fill'][2]<.84)
     tram_zone_rects = [d['rect'] for d in drawings if d['fill']==tram_zone_color]
+    oyster_zone_rects = [d['rect'] for d in drawings
+                        if rgb(d['fill']) == [0.83087, 0.89332, 0.96072]
+                        and d['rect'].get_area() > 1000]
+    # Contactless symbols sit immediately after the panel's "valid" text.
+    contactless_boxes = [pymupdf.Rect(s['bbox'][2], s['bbox'][1]-.2,
+                                    s['bbox'][2]+3.5, s['bbox'][3]+.2)
+                        for s in SPANS if s['color'] == 2765709
+                        and s['text'].strip() in {'valid', 'Contactless valid'}]
     shapes=[]
     for d in drawings:
         if not CROP.intersects(d['rect']+(-.01,-.01,.01,.01)): continue
         if d['rect'].x0>645 and d['rect'].y0>600: continue # reference publisher logos
+        if is_station_label_outline(d): continue
         # Remove both the tram fare-zone fill and its separate white border.
         if any(all(abs(a-b)<.01 for a,b in zip(d['rect'],r)) for r in tram_zone_rects): continue
-        # Remove unlabelled fare-zone bands; route styling is retained exactly.
-        if d['fill'] and min(d['fill'])>.84 and max(d['fill'])-min(d['fill'])<.03 and d['rect'].get_area()>1000: continue
+        # Oyster panels have separate white borders with slightly inset bounds.
+        if any(all(abs(a-b)<.5 for a,b in zip(d['rect'],r)) for r in oyster_zone_rects): continue
+        if rgb(d['fill']) == [0.16548, 0.20073, 0.55415] and any(r.contains(d['rect']) for r in contactless_boxes): continue
+        # Include small grey fare-zone dividers left behind by the large bands.
+        if d['fill'] and min(d['fill'])>.84 and max(d['fill'])-min(d['fill'])<.03 and (max(d['fill'])<.98 or d['rect'].get_area()>1000): continue
         # Remove the reference's map grid and outer frame.
         if d['type']=='s' and d['width'] and d['width']<.2 and d['color'] and d['color'][2]>.9: continue
         dash=re.search(r'\[([^]]*)\]',d.get('dashes') or '')
@@ -266,6 +370,11 @@ def main():
                 if s['text'].strip() in 'ABCDEFGH123456789': continue
                 if s['origin'][1]>570 and s['origin'][0]<372: continue # fares information panel
                 if s['color']==7716163 and s['text'].strip() in {'London','Trams','fare zone'}: continue
+                if s['color'] in {2765709, 11645878} and s['text'].strip() in {
+                    'Outside', 'Oyster', 'Contactless', 'valid', 'fare zones,',
+                    'Outside fare zones', 'fare', 'zones', 'fare zones',
+                    'Outside Oyster fare zones,', 'Contactless valid',
+                }: continue
                 c=s['color']; color=[((c>>16)&255)/255,((c>>8)&255)/255,(c&255)/255]
                 texts.append(dict(text=s['text'],position=point((s['bbox'][0],s['bbox'][1])),size=round(s['size']*SCALE,3),color=rgb(color)))
     # Remove the fares-panel shapes too; the app already has its own chrome.
@@ -277,8 +386,10 @@ def main():
     document['referenceArtwork']['stationLabels']=label_targets
     for key in document['styles']:
         document['styles'][key]=round(document['styles'][key]*.55,3)
-    from landmarks import add_landmarks
+    from landmarks import add_landmarks, normalize_river_piers, normalize_cable_car
     add_landmarks(document['referenceArtwork'], ROOT, point)
+    normalize_river_piers(document, point)
+    normalize_cable_car(document, point)
     from paper_routes import add_semantic_routes
     paper_failures=add_semantic_routes(document,base,page,drawings,CROP,SCALE)
     Path('/tmp/tubetrack-paper-failures.json').write_text(json.dumps(paper_failures,indent=2))
@@ -311,12 +422,14 @@ def main():
         print(line,len(pairs),'segments',flush=True)
     if errors:
         print('\n'.join(errors));return 1
+    add_roundel_targets(document,all_stations,routes,page,drawings,crs_index)
     metadata=dict(schemaVersion=1,referenceURL='https://content.tfl.gov.uk/london-rail-and-tube-services-map.pdf',referenceSHA256=hashlib.sha256(args.pdf.read_bytes()).hexdigest(),referenceRevision='April 2026',attribution='Transport for London and Rail Delivery Group; © OpenStreetMap contributors, ODbL 1.0',stations=[s for s in all_stations if s['id'] in new_ids],stationRecords=station_records,routes=routes)
     metadata['routingSHA256']=hashlib.sha256((args.train_track/ROUTING_ASSET).read_bytes()).hexdigest()
     metadata['catalogueSHA256']=hashlib.sha256((args.train_track/'api/train-track-api/resources/stations.json').read_bytes()).hexdigest()
     (ROOT/'TubeTrackUK/Resources/NationalRailMap.json').write_text(json.dumps(metadata,separators=(',',':'))+'\n')
     (ROOT/'TubeTrackUK/Resources/BeckMap/v1/london-rail-and-tube.json').write_text(json.dumps(document,separators=(',',':'))+'\n')
     (ROOT/'TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json').write_text(json.dumps(dict(sorted(crs_index.items())),indent=2)+'\n')
+    (ROOT.parent/'api/tube-track-api/data/national-rail-stations.json').write_text(json.dumps(dict(sorted(crs_index.items())),indent=2)+'\n')
     print(f'Wrote {len(new_ids)} new stations, {len(routes)} routes, {len(markers)} interactive markers, {len(shapes)} vector shapes.')
     return 0
 

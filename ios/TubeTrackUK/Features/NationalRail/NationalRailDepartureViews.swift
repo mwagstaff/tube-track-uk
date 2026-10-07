@@ -72,17 +72,26 @@ struct NationalRailOperatorPill: View {
 }
 
 struct NationalRailDepartureGroupView: View {
+    @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
     @State private var expanded = false
     let group: NationalRailDepartureGroup
     let now: Date
+    var tracking: DepartureTrackingContext?
+    var isFresh = true
 
     var body: some View {
         VStack(alignment: .leading, spacing: 9) {
-            HStack(spacing: 7) {
-                NationalRailMark()
-                Text(group.name).font(.appSubheadline(.bold))
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 7) {
+                    heading
+                    Spacer(minLength: 6)
+                    trackButton
+                }
+                VStack(alignment: .leading, spacing: 4) {
+                    heading
+                    trackButton
+                }
             }
-            .accessibilityAddTraits(.isHeader)
             ForEach(expanded ? group.arrivals[...] : group.arrivals.prefix(3), id: \.departureIdentity) { arrival in
                 StationDepartureRow(arrival: arrival, now: now)
             }
@@ -98,6 +107,65 @@ struct NationalRailDepartureGroupView: View {
                 .foregroundStyle(Color.departureAccent)
                 .accessibilityValue(expanded ? "Expanded" : "Collapsed")
             }
+        }
+    }
+
+    private var heading: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 7) {
+                NationalRailMark()
+                operatorName
+                directionLabel
+            }.fixedSize(horizontal: true, vertical: false)
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 7) {
+                    NationalRailMark()
+                    operatorName
+                }.fixedSize(horizontal: true, vertical: false)
+                directionLabel
+            }
+            VStack(alignment: .leading, spacing: 4) {
+                operatorName
+                HStack(spacing: 7) {
+                    NationalRailMark()
+                    directionLabel
+                }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+    }
+
+    private var operatorName: some View {
+        Text(group.name).font(.appSubheadline(.bold))
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private var directionLabel: some View {
+        Text(group.directionLabel).font(.appSubheadline())
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    @ViewBuilder private var trackButton: some View {
+        if group.direction != .any, let tracking, let controller = boardActivity, controller.areActivitiesEnabled {
+            let updatedAt = tracking.nationalRailUpdatedAt ?? tracking.updatedAt
+            let isTracking = controller.isTracking(hubID: tracking.hubID, lineIDRaw: group.operatorID,
+                direction: group.direction.displayName)
+            DepartureTrackButton(isTracking: isTracking,
+                boardName: "\(group.name) \(group.direction.displayName) at \(tracking.stationName)") {
+                Task {
+                    if isTracking { await controller.end(reason: .userEnded) }
+                    else if isFresh, let updatedAt {
+                        await controller.start(hubID: tracking.hubID, stationName: tracking.stationName,
+                            group: group, updatedAt: updatedAt)
+                    }
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .disabled(!isTracking && (!isFresh || updatedAt == nil
+                || now.timeIntervalSince(updatedAt ?? .distantPast) > 90))
+            .accessibilityIdentifier("departures-track-\(group.id)")
         }
     }
 }

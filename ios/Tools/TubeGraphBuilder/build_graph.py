@@ -83,12 +83,17 @@ CURATED_LINE_RUNS: dict[str, tuple[tuple[str, ...], ...]] = {
 CURATED_STOP_ALIASES: dict[str, str] = {"910GSTPX": "910GSTPXBOX"}
 
 CURATED_STATION_NAMES: dict[str, str] = {
+    "910GNWCRELL": "New Cross",
     "910GSTPXBOX": "St Pancras International",
     "910GBLFR": "Blackfriars",
     "910GSUTTON": "Sutton",
     "910GSHLIER": "St Helier",
     "910GABWD": "Abbey Wood",
     "910GBRENTX": "Brent Cross West",
+}
+
+CURATED_STATION_SEARCH_ALIASES: dict[str, list[str]] = {
+    "910GNWCRELL": ["new cross ell"],
 }
 
 OUTPUT = Path(__file__).resolve().parents[2] / "TubeTrackUK" / "Resources" / "TubeGraph.json"
@@ -663,7 +668,9 @@ def main() -> int:
                     continue
                 station_records[station_id] = {
                     "id": station_id,
-                    "name": clean_station_name(point.get("name", station_id)),
+                    "name": CURATED_STATION_NAMES.get(
+                        station_id, clean_station_name(point.get("name", station_id))
+                    ),
                     "latitude": latitude,
                     "longitude": longitude,
                     "hubID": point.get("topMostParentId") or point.get("parentId"),
@@ -709,6 +716,7 @@ def main() -> int:
                 "searchAliases": [
                     station["name"].lower(),
                     station["name"].lower().replace("&", "and"),
+                    *CURATED_STATION_SEARCH_ALIASES.get(station_id, []),
                 ],
             }
         )

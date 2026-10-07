@@ -119,6 +119,10 @@ struct RiverSchematicAnchor: Codable, Identifiable, Hashable, Sendable {
     let major: Bool
     /// Stations the TfL map joins to this pier with a dotted walking link.
     var walkingLinkStationIDs: [String]? = nil
+    /// Reviewed walking dots are retained with the combined map's artwork.
+    var walkingLinksInArtwork: Bool? = nil
+    /// Optional bends that keep native walking links clear of tracks and labels.
+    var walkingLinkVia: [BeckMapPoint]? = nil
     var riverPoint: CGPoint { CGPoint(x: x, y: y) }
     var markerPoint: CGPoint { CGPoint(x: x + offsetX, y: y + offsetY) }
 }

@@ -15,10 +15,12 @@ struct DepartureCountdownFormatStyleTests {
         #expect(style.format(expectedAt.addingTimeInterval(-seconds)) == label)
     }
 
-    @Test func distantDepartureIncludesClockTime() throws {
+    @Test func distantDepartureUsesOnlyLondonClockTime() throws {
         let departure = try #require(ISO8601DateFormatter().date(from: "2026-10-05T22:31:00Z"))
         let style = DepartureCountdownFormatStyle(expectedAt: departure)
-        #expect(style.format(departure.addingTimeInterval(-1380)) == "23 mins (23:31)")
+        #expect(style.format(departure.addingTimeInterval(-1380)) == "23:31")
+        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins")
+        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "23:31")
     }
 
     @Test func aNewSnapshotAdvancesFromMinutesToDue() {

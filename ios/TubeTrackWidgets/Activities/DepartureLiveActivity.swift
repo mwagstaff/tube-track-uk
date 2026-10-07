@@ -25,11 +25,16 @@ struct DepartureLiveActivity: Widget {
                         .lineLimit(1)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    DepartureCountdown(
-                        departure: context.nextDeparture,
-                        isStale: context.isStale,
-                        font: .title3.weight(.semibold)
-                    )
+                    HStack(spacing: 4) {
+                        if context.attributes.showsPlatforms, let departure = context.nextDeparture {
+                            DeparturePlatformPill(departure: departure)
+                        }
+                        DepartureCountdown(
+                            departure: context.nextDeparture,
+                            isStale: context.isStale,
+                            font: .title3.weight(.semibold)
+                        )
+                    }
                 }
                 DynamicIslandExpandedRegion(.center) {
                     Text(context.attributes.stationName)
@@ -43,7 +48,8 @@ struct DepartureLiveActivity: Widget {
                         ForEach(Array(context.followingDepartures.enumerated()), id: \.offset) { index, departure in
                             DepartureActivityRow(
                                 departure: departure, position: index + 2,
-                                isStale: context.isStale, font: .system(.caption, design: .monospaced)
+                                isStale: context.isStale, showsPlatforms: context.attributes.showsPlatforms,
+                                font: .system(.caption, design: .monospaced)
                             )
                         }
                         DepartureActivityFooter(context: context)
@@ -96,6 +102,7 @@ private struct DepartureActivityWatchView: View {
             condition: context.condition,
             departures: Array(context.visibleDepartures.prefix(2)),
             isStale: context.isStale,
+            showsPlatforms: context.attributes.showsPlatforms,
             deepLink: context.deepLink
         )
     }
@@ -110,6 +117,7 @@ private struct DepartureActivityWatchCard: View {
     let condition: LineServiceCondition
     let departures: [DepartureActivityAttributes.ContentState.Departure]
     let isStale: Bool
+    var showsPlatforms = false
     let deepLink: URL
 
     var body: some View {
@@ -155,6 +163,9 @@ private struct DepartureActivityWatchCard: View {
                                 .lineLimit(1)
                                 .minimumScaleFactor(0.7)
                                 .frame(maxWidth: .infinity, alignment: .leading)
+                            if showsPlatforms {
+                                DeparturePlatformPill(departure: departure, font: .caption2.weight(.semibold))
+                            }
                             DepartureCountdown(
                                 departure: departure, isStale: isStale,
                                 font: .subheadline.weight(.bold)
@@ -199,10 +210,15 @@ private struct DepartureActivityWatchCard: View {
         guard !departures.isEmpty else { return heading + ", no departures due" + staleDescription }
         let trains = departures.enumerated().map { index, departure in
             let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+            let platform = showsPlatforms ? departure.platformPillLabel.map { ", platform \($0.dropFirst())" } ?? "" : ""
+            let destination = departure.destination + platform
             if departure.isCancelled {
-                return "\(index == 0 ? "Next" : "Then") \(departure.destination), cancelled"
+                return "\(index == 0 ? "Next" : "Then") \(destination), cancelled"
             }
-            return "\(index == 0 ? "Next" : "Then") \(departure.destination), "
+            if !departure.hasExpectedTime {
+                return "\(index == 0 ? "Next" : "Then") \(destination), \(departure.isDelayed ? "delayed" : "check station screens"), departure time unconfirmed"
+            }
+            return "\(index == 0 ? "Next" : "Then") \(destination), "
                 + "\(isStale ? "last predicted" : "due") \(prediction)"
         }
         return heading + ", " + trains.joined(separator: "; ")
@@ -229,7 +245,8 @@ private struct DepartureActivityLockScreenView: View {
                 VStack(spacing: 4) {
                     ForEach(Array(context.visibleDepartures.enumerated()), id: \.offset) { index, departure in
                         DepartureActivityRow(
-                            departure: departure, position: index + 1, isStale: context.isStale
+                            departure: departure, position: index + 1, isStale: context.isStale,
+                            showsPlatforms: context.attributes.showsPlatforms
                         )
                     }
                 }
@@ -253,11 +270,7 @@ private enum DepartureBoardStyle {
     static let timeBackground = Color(white: 0.22)
 
     // Always use a 24-hour London clock, regardless of the phone's locale.
-    static let updateTime = Date.VerbatimFormatStyle(
-        format: "\(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits)",
-        timeZone: TimeZone(identifier: "Europe/London")!,
-        calendar: Calendar(identifier: .gregorian)
-    )
+    static let updateTime = DepartureCountdownFormatStyle.clockTime
 }
 
 private struct DepartureActivityStatus: View {
@@ -308,6 +321,7 @@ private struct DepartureActivityRow: View {
     let departure: DepartureActivityAttributes.ContentState.Departure
     let position: Int
     let isStale: Bool
+    var showsPlatforms = false
     var font: Font = .system(.subheadline, design: .monospaced)
 
     var body: some View {
@@ -320,6 +334,9 @@ private struct DepartureActivityRow: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
             Spacer(minLength: 6)
+            if showsPlatforms {
+                DeparturePlatformPill(departure: departure)
+            }
             DepartureCountdown(
                 departure: departure, isStale: isStale,
                 font: .system(.caption, design: .monospaced).weight(.semibold)
@@ -336,11 +353,35 @@ private struct DepartureActivityRow: View {
 
     private var accessibilityLabel: String {
         let time = departure.expectedAt.formatted(date: .omitted, time: .shortened)
-        if departure.isCancelled { return "\(position), \(departure.destination), cancelled" }
-        if departure.isDelayed { return "\(position), \(departure.destination), delayed, expected \(time)" }
+        let platform = showsPlatforms ? departure.platformPillLabel.map { ", platform \($0.dropFirst())" } ?? "" : ""
+        let destination = departure.destination + platform
+        if departure.isCancelled { return "\(position), \(destination), cancelled" }
+        if !departure.hasExpectedTime { return "\(position), \(destination), \(departure.isDelayed ? "delayed" : "check station screens"), departure time unconfirmed" }
+        if departure.isDelayed { return "\(position), \(destination), delayed, expected \(time)" }
         return isStale
-            ? "\(position), \(departure.destination), predicted \(time), live updates paused"
-            : "\(position), \(departure.destination), \(time)"
+            ? "\(position), \(destination), predicted \(time), live updates paused"
+            : "\(position), \(destination), \(time)"
+    }
+}
+
+private struct DeparturePlatformPill: View {
+    let departure: DepartureActivityAttributes.ContentState.Departure
+    var font: Font = .system(.caption, design: .monospaced).weight(.semibold)
+
+    var body: some View {
+        if let platform = departure.platformPillLabel {
+            Text(platform)
+                .font(font)
+                .monospacedDigit()
+                .lineLimit(1)
+                .padding(.horizontal, 5)
+                .frame(minWidth: 28)
+                .padding(.vertical, 3)
+                .background(DepartureBoardStyle.timeBackground, in: .rect(cornerRadius: 4))
+                .foregroundStyle(DepartureBoardStyle.yellow)
+                .fixedSize(horizontal: true, vertical: false)
+                .accessibilityLabel("Platform \(platform.dropFirst())")
+        }
     }
 }
 
@@ -356,8 +397,10 @@ private struct DepartureCountdown: View {
             if let departure {
                 if departure.isCancelled {
                     Text("Cancelled")
+                } else if !departure.hasExpectedTime {
+                    Text(departure.isDelayed ? "Delayed" : "Check screens")
                 } else if isStale {
-                    Text(departure.expectedAt, style: .time)
+                    Text(departure.expectedAt, format: DepartureCountdownFormatStyle.clockTime)
                 } else {
                     Text(DepartureCountdownFormatStyle(expectedAt: departure.expectedAt).format(.now))
                 }
@@ -455,6 +498,18 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
     .environment(\.colorScheme, .dark)
 }
 
+#Preview("National Rail Lock Screen", as: .content, using: DepartureActivityAttributes.previewNationalRail) {
+    DepartureLiveActivity()
+} contentStates: {
+    DepartureActivityAttributes.ContentState.previewRail
+}
+
+#Preview("Thameslink Lock Screen", as: .content, using: DepartureActivityAttributes.previewThameslink) {
+    DepartureLiveActivity()
+} contentStates: {
+    DepartureActivityAttributes.ContentState.previewRail
+}
+
 #Preview("Island expanded", as: .dynamicIsland(.expanded), using: DepartureActivityAttributes.preview) {
     DepartureLiveActivity()
 } contentStates: {
@@ -469,6 +524,18 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
 }
 
 extension DepartureActivityAttributes {
+    static var previewNationalRail: Self {
+        .init(activityID: "rail-preview", stationHubID: "HUBBEK", stationName: "Kent House",
+            lineIDRaw: "national-rail:SE", direction: "All departures", directionFilter: .any,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400), operatorName: "Southeastern")
+    }
+
+    static var previewThameslink: Self {
+        .init(activityID: "thameslink-preview", stationHubID: "HUBZFD", stationName: "Farringdon",
+            lineID: .thameslink, direction: "Northbound", directionFilter: .northbound,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400))
+    }
+
     static var preview: DepartureActivityAttributes {
         DepartureActivityAttributes(
             activityID: "preview",
@@ -497,6 +564,13 @@ extension DepartureActivityAttributes {
 }
 
 extension DepartureActivityAttributes.ContentState {
+    static var previewRail: Self {
+        .init(departures: [
+            departure("1", "London Victoria", 2), departure("2", "Orpington", 12),
+            departure("3", "London Victoria", 15), departure("4", "London Victoria", 22)
+        ], updatedAt: .now, conditionRank: 1, conditionHeadline: "Delays", sequence: 1)
+    }
+
     private static func departure(_ id: String, _ destination: String, _ minutes: Double) -> Departure {
         Departure(
             id: id, destination: destination, platform: "Platform 2",

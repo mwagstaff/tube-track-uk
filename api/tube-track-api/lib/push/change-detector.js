@@ -151,7 +151,8 @@ function decideOnMerit({
             return verdict(REASONS.destination);
         }
         // A National Rail train that is cancelled or delayed changes the plan.
-        if ((next[index].status ?? null) !== (previous[index]?.status ?? null)) {
+        if ((next[index].status ?? null) !== (previous[index]?.status ?? null)
+            || (next[index].hasExpectedTime ?? true) !== (previous[index]?.hasExpectedTime ?? true)) {
             return verdict(REASONS.serviceStatus);
         }
     }

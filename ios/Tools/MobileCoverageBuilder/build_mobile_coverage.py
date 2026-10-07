@@ -59,7 +59,7 @@ BELOW_GROUND_RANGES = [
     ("elizabeth", "Whitechapel", "Stratford (London)", 7),
     ("elizabeth", "Heathrow Terminals 2 & 3", "Heathrow Terminal 4", 0),
     ("elizabeth", "Heathrow Terminals 2 & 3", "Heathrow Terminal 5", 1),
-    ("windrush", "Highbury & Islington", "New Cross ELL", 0),
+    ("windrush", "Highbury & Islington", "New Cross", 0),
     ("windrush", "Highbury & Islington", "New Cross Gate", 1),
 ]
 

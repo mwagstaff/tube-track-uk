@@ -45,7 +45,9 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         let lineStopIDs = attributes.lineID?.isNationalRail == true
             ? hubStopIDs.filter { StationIndex.bundled.entry(id: $0)?.lineIDs.contains(attributes.lineID!) == true }
             : hubStopIDs
-        let stopIDs = attributes.isRiver ? [attributes.stationHubID]
+        let stopIDs = attributes.isNationalRailOperator
+            ? NationalRailStations.codes(for: [attributes.stationHubID] + hubStopIDs)
+            : attributes.isRiver ? [attributes.stationHubID]
             : lineStopIDs.isEmpty ? hubStopIDs : lineStopIDs
         let body = RegistrationBody(
             activityId: attributes.activityID,

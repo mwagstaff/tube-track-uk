@@ -4,6 +4,32 @@ import Testing
 
 @Suite(.serialized)
 struct StationArrivalsServiceTests {
+    @Test func nationalRailTrackingRetainsItsProviderTimestampWhenTfLIsOld() async throws {
+        let old = Date.now.addingTimeInterval(-180)
+        let tfl = try JSONSerialization.data(withJSONObject: ["data": [],
+            "meta": ["updatedAt": old.ISO8601Format(), "stale": true]])
+        let service = makeService(responses: ["/api/v1/arrivals/940GZZLUVIC": tfl,
+            "/api/v2/departures/from/VIC": railFixture()])
+        let snapshot = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        let railwayTimestamp = try #require(snapshot.nationalRailUpdatedAt)
+        #expect(Date.now.timeIntervalSince(railwayTimestamp) < 90)
+        #expect(snapshot.serverUpdatedAt?.ISO8601Format() == old.ISO8601Format())
+        #expect(snapshot.isStale && snapshot.nationalRailErrorMessage == nil)
+        let cached = try await service.fetchSnapshot(stationIDs: ["940GZZLUVIC"])
+        #expect(cached.nationalRailUpdatedAt == railwayTimestamp)
+    }
+    @Test func nationalRailCompassDirectionNeedsOnlyTheCachedDepartureBoard() async throws {
+        let path = "/api/v2/departures/from/SAC"
+        let service = makeService(responses: [path: railFixture()])
+        let snapshot = try await service.fetchSnapshot(stationIDs: ["nr:SAC"])
+        #expect(snapshot.arrivals.count == 1)
+        #expect(!snapshot.isStale && snapshot.nationalRailErrorMessage == nil)
+        #expect(snapshot.arrivals.first?.direction == "southbound")
+        let cached = try await service.fetchSnapshot(stationIDs: ["nr:SAC"])
+        #expect(cached.arrivals.first?.direction == "southbound")
+        #expect(StationArrivalsURLProtocol.requestCount(for: "/api/v2/service_details/southern-1") == 0)
+        #expect(StationArrivalsURLProtocol.requestCount(for: path) == 1)
+    }
     @Test func nationalRailOnlyStationUsesTrainTrackWithoutAnInvalidTfLRequest() async throws {
         let service = makeService(responses: ["/api/v2/departures/from/BMN": railFixture()])
         let snapshot = try await service.fetchSnapshot(stationIDs: ["nr:BMN"])

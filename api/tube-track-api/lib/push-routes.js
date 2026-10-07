@@ -2,6 +2,7 @@ import express from 'express';
 import { DIRECTION_FILTERS } from './push/departure-projection.js';
 import { isRiverBusLine } from './river.js';
 import { LINE_COLOURS } from './line-colours.js';
+import { isNationalRailOperator, NATIONAL_RAIL_CODES_BY_STATION } from './push/national-rail-departures.js';
 
 const LINE_IDS = new Set(LINE_COLOURS.map((line) => line.id));
 
@@ -155,13 +156,20 @@ export function createPushRoutes({
             return badRequest(res, 'INVALID_TOKEN', 'token must be a hex APNs token');
         }
         const isRiver = isRiverBusLine(lineId);
-        if (!LINE_IDS.has(String(lineId)) && !isRiver) {
+        const isNationalRail = isNationalRailOperator(lineId);
+        if (!LINE_IDS.has(String(lineId)) && !isRiver && !isNationalRail) {
             return badRequest(res, 'INVALID_LINE', 'lineId must be a line TubeTrack serves');
         }
         if (!DIRECTION_FILTERS.includes(String(direction ?? 'any'))) {
             return badRequest(res, 'INVALID_DIRECTION', 'direction must be a known filter');
         }
         let pier = null;
+        if (isNationalRail && !Object.hasOwn(NATIONAL_RAIL_CODES_BY_STATION, hubId)) {
+            return badRequest(res, 'INVALID_RAIL_STATION', 'National Rail tracking requires a known station');
+        }
+        if (isNationalRail && !['any', 'northbound', 'southbound', 'eastbound', 'westbound'].includes(direction ?? 'any')) {
+            return badRequest(res, 'INVALID_DIRECTION', 'National Rail tracking requires a compass direction');
+        }
         if (isRiver) {
             let network;
             try { network = await riverNetwork(); }
@@ -177,6 +185,7 @@ export function createPushRoutes({
         // resolved server-side, so callers cannot subscribe to unrelated stops.
         const stopIds = isRiver
             ? (Array.isArray(body.stopIds) && body.stopIds.length === 1 && body.stopIds[0] === pier.id ? [pier.id] : null)
+            : isNationalRail ? readStopIds(body.stopIds, (id) => NATIONAL_RAIL_CODES_BY_STATION[hubId].includes(id))
             : readStopIds(body.stopIds, isKnownStop);
         if (!stopIds) {
             return badRequest(res, 'INVALID_STOP_IDS', 'stopIds must name stops TubeTrack knows');

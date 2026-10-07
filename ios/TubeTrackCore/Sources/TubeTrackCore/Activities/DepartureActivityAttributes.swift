@@ -18,6 +18,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     public let stationHubID: String
     public let stationName: String
     public let lineIDRaw: String
+    public let operatorName: String?
     /// What the passenger sees — the station's own platform wording.
     public let direction: String
     /// The canonical filter that label resolved to when tracking started. The
@@ -30,7 +31,9 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     public let hardEndsAtEpoch: Int
 
     public var isRiver: Bool { lineIDRaw.hasPrefix("rb") }
-    public var lineName: String { lineID?.displayName ?? lineIDRaw.uppercased() }
+    public var isNationalRailOperator: Bool { lineIDRaw.hasPrefix("national-rail:") }
+    public var showsPlatforms: Bool { isNationalRailOperator || lineID?.isNationalRail == true }
+    public var lineName: String { operatorName ?? lineID?.displayName ?? (isNationalRailOperator ? "National Rail" : lineIDRaw.uppercased()) }
     public var deepLink: DeepLink {
         isRiver ? .pier(id: stationHubID, line: lineIDRaw) : .station(id: stationHubID, line: lineID)
     }
@@ -59,13 +62,14 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     public init(
         activityID: String, stationHubID: String, stationName: String,
         lineIDRaw: String, direction: String, directionFilter: DepartureDirectionFilter,
-        startedAt: Date, hardEndsAt: Date
+        startedAt: Date, hardEndsAt: Date, operatorName: String? = nil
     ) {
         scheduleID = nil
         self.activityID = activityID
         self.stationHubID = stationHubID
         self.stationName = String(stationName.prefix(40))
         self.lineIDRaw = lineIDRaw
+        self.operatorName = operatorName.map { String($0.prefix(40)) }
         self.direction = direction
         directionFilterRaw = directionFilter.rawValue
         startedAtEpoch = startedAt.epochSeconds
@@ -79,6 +83,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         stationHubID = try container.decodeIfPresent(String.self, forKey: .stationHubID) ?? ""
         stationName = try container.decodeIfPresent(String.self, forKey: .stationName) ?? ""
         lineIDRaw = try container.decodeIfPresent(String.self, forKey: .lineIDRaw) ?? ""
+        operatorName = try container.decodeIfPresent(String.self, forKey: .operatorName)
         direction = try container.decodeIfPresent(String.self, forKey: .direction) ?? ""
         directionFilterRaw = try container.decodeIfPresent(String.self, forKey: .directionFilterRaw)
             ?? DepartureDirectionFilter.resolve(label: direction).rawValue
@@ -98,20 +103,36 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
             /// "delayed" or "cancelled" for a National Rail train; absent when
             /// it is running normally, and always absent for the Underground.
             public let status: String?
+            /// False when the railway has no forecast. The scheduled time is
+            /// retained for ordering, but must never become a live countdown.
+            public let hasExpectedTime: Bool
 
             public var expectedAt: Date { Date(epochSeconds: expectedAtEpoch) }
             public var isCancelled: Bool { status == RailServiceStatus.cancelled.rawValue }
             public var isDelayed: Bool { status == RailServiceStatus.delayed.rawValue }
 
+            /// Only known platform identifiers become pills. Missing, hidden
+            /// and truncated "to be confirmed" labels must not imply a platform.
+            public var platformPillLabel: String? {
+                guard var code = platform?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(),
+                      !code.isEmpty else { return nil }
+                if code.hasPrefix("PLATFORM") { code.removeFirst("PLATFORM".count) }
+                else if code.hasPrefix("P"), code.count > 1 { code.removeFirst() }
+                code = code.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard code.range(of: #"^(?:[0-9]{1,3}[A-Z]?|[A-Z])$"#, options: .regularExpression) != nil else { return nil }
+                return "P\(code)"
+            }
+
             public init(
                 id: String, destination: String, platform: String?, expectedAt: Date,
-                status: RailServiceStatus? = nil
+                status: RailServiceStatus? = nil, hasExpectedTime: Bool = true
             ) {
                 self.id = id
                 self.destination = String(destination.prefix(28))
                 self.platform = platform.map { String($0.prefix(14)) }
                 expectedAtEpoch = expectedAt.epochSeconds
                 self.status = status.flatMap { [.delayed, .cancelled].contains($0) ? $0.rawValue : nil }
+                self.hasExpectedTime = hasExpectedTime
             }
 
             public init(from decoder: any Decoder) throws {
@@ -121,6 +142,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
                 platform = try container.decodeIfPresent(String.self, forKey: .platform)
                 expectedAtEpoch = try container.decodeIfPresent(Int.self, forKey: .expectedAtEpoch) ?? 0
                 status = try container.decodeIfPresent(String.self, forKey: .status)
+                hasExpectedTime = try container.decodeIfPresent(Bool.self, forKey: .hasExpectedTime) ?? true
             }
         }
 
@@ -161,7 +183,8 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         /// The departures still worth showing at `date`, using the same grace
         /// period as the in-app board.
         public func upcoming(at date: Date) -> [Departure] {
-            departures.filter { $0.expectedAt.timeIntervalSince(date) > -DepartureTimeline.departedGrace }
+            departures.filter { (!$0.hasExpectedTime && !$0.isCancelled)
+                || $0.expectedAt.timeIntervalSince(date) > -DepartureTimeline.departedGrace }
         }
     }
 }

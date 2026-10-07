@@ -9,6 +9,7 @@ import { PlannedTrackClosuresSource } from './lib/planned-works.js';
 import { ApnsClient, ApnsTokenSigner } from './lib/push/apns.js';
 import { LiveActivityNotifier } from './lib/push/notifier.js';
 import { createRailDepartureSource } from './lib/push/rail-departures.js';
+import { createNationalRailDepartureSource } from './lib/push/national-rail-departures.js';
 import { PushTokenStore } from './lib/push/token-store.js';
 import { loadLineStatuses } from './lib/line-status.js';
 import { createRiverDataSource } from './lib/river.js';
@@ -63,6 +64,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client,
             river: createRiverDataSource({ client, resourceCache }),
             thameslink: createThameslinkDataSource({ client, resourceCache }),
             railDepartures: createRailDepartureSource({ client, resourceCache }),
+            nationalRail: createNationalRailDepartureSource({ resourceCache }),
             logger,
             metrics,
             // Reuses the cache behind /api/v1/status, so a tracked board's

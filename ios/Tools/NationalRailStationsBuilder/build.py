@@ -37,4 +37,5 @@ for station in tube:
 
 output = root / "ios/TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json"
 output.write_text(json.dumps(dict(sorted(result.items())), indent=2) + "\n")
+(root / "api/tube-track-api/data/national-rail-stations.json").write_text(output.read_text())
 print(f"Wrote {len(result)} stop/hub mappings covering {len(set(sum(result.values(), [])))} CRS codes")

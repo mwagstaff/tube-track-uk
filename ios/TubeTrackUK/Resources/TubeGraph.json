@@ -5817,7 +5817,7 @@
     },
     {
       "id": "910GNWCRELL",
-      "name": "New Cross ELL",
+      "name": "New Cross",
       "latitude": 51.476344,
       "longitude": -0.032441,
       "hubID": "HUBNWX",
@@ -5828,7 +5828,7 @@
       ],
       "interchange": false,
       "searchAliases": [
-        "new cross ell",
+        "new cross",
         "new cross ell"
       ]
     },

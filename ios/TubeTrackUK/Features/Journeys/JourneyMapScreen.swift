@@ -21,7 +21,7 @@ struct JourneyMapScreen: View {
                     disruptionIDsBySegmentID: [:], liveTrains: [], referenceOverlayVisible: false,
                     resetToken: 0, locationFocusRequest: nil, contentVerticalBias: 0,
                     onUserZoomIn: {}, onInteractionChange: { _ in }, stationSelectionGeneration: 0,
-                    onStationTap: { id, _ in
+                    onStationTap: { id, _, _ in
                         selectedStationName = document.stationMarkers.first { $0.stationID == id }?.name
                     },
                     onDisruptionTap: { _ in }, onBackgroundTap: { selectedStationName = nil }

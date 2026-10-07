@@ -138,6 +138,26 @@ struct LiveActivityPushRegistrarTests {
         }
     }
 
+    @Test func nationalRailRegistrationUsesCRSCodesForInterchangesAndRailOnlyStations() async throws {
+        for (hubID, stationName, direction) in [("HUBVIC", "Victoria", DepartureDirectionFilter.southbound),
+                                               ("nr:AYP", "Albany Park", .westbound)] {
+            RegistrationURLProtocol.prepare(statusCode: 201)
+            let attributes = DepartureActivityAttributes(activityID: "RAIL-12345678",
+                stationHubID: hubID, stationName: stationName, lineIDRaw: "national-rail:SE",
+                direction: direction.displayName, directionFilter: direction, startedAt: .now,
+                hardEndsAt: .now.addingTimeInterval(5400), operatorName: "Southeastern")
+            try await registrar().register(token: String(repeating: "ab", count: 32),
+                attributes: attributes, frequentPushesEnabled: true)
+            let body = try #require(RegistrationURLProtocol.lastBody)
+            let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+            #expect(json["lineId"] as? String == "national-rail:SE")
+            #expect(json["direction"] as? String == direction.rawValue)
+            #expect(json["hubId"] as? String == hubID)
+            #expect(json["stopIds"] as? [String] == NationalRailStations.codes(for: [hubID]))
+            #expect(!(json["stopIds"] as? [String] ?? []).isEmpty)
+        }
+    }
+
     @Test func unregisteringAddressesTheActivityAndNeverThrows() async {
         RegistrationURLProtocol.prepare(statusCode: 204)
         await registrar().unregister(activityID: "DEADBEEF-1234-5678")

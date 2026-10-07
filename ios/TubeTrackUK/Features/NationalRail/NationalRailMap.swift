@@ -81,10 +81,52 @@ struct BeckMapReferenceArtwork: Codable, Hashable, Sendable {
         let centre: BeckMapPoint
         let size: BeckMapSize
     }
+    /// One target for each visible circle, including separate rail platforms
+    /// and circles joined into a single compound interchange outline.
+    struct StationRoundel: Codable, Hashable, Sendable {
+        let stationID: String
+        let centre: BeckMapPoint
+        let radius: Double
+        let sourceShapeIndex: Int
+        var lineID: TubeLineID? = nil
+        var operatorID: String? = nil
+        var operatorName: String? = nil
+    }
+    /// The centre line and width of a visible source tick. Keeping its drawn
+    /// service avoids selecting a neighbouring track at shared stations.
+    struct StationTick: Codable, Hashable, Sendable {
+        let stationID: String
+        let centre: BeckMapPoint
+        let start: BeckMapPoint
+        let end: BeckMapPoint
+        let width: Double
+        let sourceShapeIndex: Int
+        var lineID: TubeLineID? = nil
+        var operatorID: String? = nil
+        var operatorName: String? = nil
+
+        func distance(to point: CGPoint) -> CGFloat {
+            StationMarkerGeometry.distance(from: point, to: CGPoint(x: start.x, y: start.y), end: CGPoint(x: end.x, y: end.y))
+        }
+    }
+    /// Sightseeing piers retained as map landmarks alongside live River Bus stops.
+    struct PierSymbol: Codable, Hashable, Sendable {
+        let id: String
+        let name: String
+        let centre: BeckMapPoint
+    }
+    struct PierWalkingLink: Codable, Hashable, Sendable {
+        let pierID: String
+        let shapes: [Shape]
+    }
     let shapes: [Shape]
     let texts: [Label]
     var stationLabels: [StationLabel]? = nil
+    var stationRoundels: [StationRoundel]? = nil
+    var stationTicks: [StationTick]? = nil
     var riverAnchors: [RiverSchematicAnchor]? = nil
+    var additionalRiverPiers: [PierSymbol]? = nil
+    var riverWalkingLinks: [PierWalkingLink]? = nil
     var riverPath: [BeckMapPoint]? = nil
     var cableCarPoints: [BeckMapPoint]? = nil
     var cableCarAnchors: [String: BeckMapPoint]? = nil
@@ -94,6 +136,21 @@ struct BeckMapReferenceArtwork: Codable, Hashable, Sendable {
             CGRect(x: label.centre.x - label.size.width / 2, y: label.centre.y - label.size.height / 2,
                    width: label.size.width, height: label.size.height).insetBy(dx: -2, dy: -2).contains(point)
         }?.stationID
+    }
+
+    func roundel(at point: CGPoint, minimumHitRadius: CGFloat = 0) -> StationRoundel? {
+        stationRoundels?.filter {
+            hypot($0.centre.x - point.x, $0.centre.y - point.y) <= max($0.radius, minimumHitRadius)
+        }.min {
+            hypot($0.centre.x - point.x, $0.centre.y - point.y)
+                < hypot($1.centre.x - point.x, $1.centre.y - point.y)
+        }
+    }
+
+    func tick(at point: CGPoint, minimumHitRadius: CGFloat = 0) -> StationTick? {
+        stationTicks?.filter {
+            $0.distance(to: point) <= max($0.width / 2, minimumHitRadius) + 0.001
+        }.min { $0.distance(to: point) < $1.distance(to: point) }
     }
 }
 

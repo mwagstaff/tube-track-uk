@@ -47,7 +47,7 @@ function fakeClient({ responses = [] } = {}) {
     };
 }
 
-async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS, railDepartures } = {}) {
+async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS, railDepartures, nationalRail } = {}) {
     const store = new PushTokenStore({
         filePath: path.join(os.tmpdir(), `tube-track-notifier-${process.hrtime.bigint()}.json`),
         flushDebounceMs: 60_000,
@@ -61,6 +61,7 @@ async function fixture({ rows = [], client = fakeClient(), statuses, clock = () 
         topic: 'dev.skynolimit.TubeTrackUK.push-type.liveactivity',
         statuses: statuses ?? (async () => []),
         railDepartures,
+        nationalRail,
         clock
     });
     return { store, notifier, client };
@@ -206,6 +207,77 @@ test('nothing is sent when nobody is tracking a board', async () => {
     const result = await notifier.notify(snapshotWith([arrival()]));
     assert.deepEqual(result, { sent: 0, considered: 0 });
     assert.equal(client.sends.length, 0);
+});
+
+test('National Rail pushes fetch by CRS once per pass and preserve operator scope and freshness', async () => {
+    const calls = [];
+    const nationalRail = { async departures(crs, options) {
+        calls.push({ crs, options });
+        return { data: [{ id: 'national-rail:BKJ:1', lineId: 'national-rail:SE', stopId: 'BKJ',
+            destinationName: 'London Victoria', platformName: 'Platform 2', hasExpectedTime: false,
+            expectedArrival: null, scheduledDeparture: new Date(NOW_MS - 600_000).toISOString(), status: 'delayed' },
+        { id: 'national-rail:BKJ:2', lineId: 'national-rail:SN', stopId: 'BKJ', destinationName: 'London Bridge',
+            platformName: 'Platform 3', hasExpectedTime: true, expectedArrival: new Date(NOW_MS + 300_000).toISOString() }],
+        meta: { updatedAt: new Date(NOW_MS - 10_000).toISOString(), stale: false } };
+    } };
+    const { store, notifier, client } = await fixture({ nationalRail, rows: ['one', 'two'].map((id) =>
+        subscription({ id, hubId: 'nr:BKJ', stopIds: ['BKJ'], lineId: 'national-rail:SE', direction: 'any' })) });
+    try {
+        await notifier.notify(snapshotWith([]));
+        assert.equal(calls.length, 1);
+        assert.deepEqual(calls[0], { crs: 'BKJ', options: { includeThameslink: true } });
+        assert.equal(client.sends.length, 2);
+        const aps = client.sends[0].payload.aps;
+        assert.equal(aps['content-state'].departures.length, 1);
+        assert.equal(aps['content-state'].departures[0].status, 'delayed');
+        assert.equal(aps['content-state'].departures[0].hasExpectedTime, false);
+        assert.equal(aps['content-state'].updatedAtEpoch, (NOW_MS - 10_000) / 1000);
+        assert.equal(aps['stale-date'], (NOW_MS - 10_000) / 1000 + 90);
+        assert.equal(aps['content-state'].conditionHeadline, 'Delays');
+    } finally { store.stop(); }
+});
+
+test('failed, stale or regressed National Rail boards preserve the last board while Tube pushes continue', async () => {
+    for (const result of [new Error('offline'), { data: [], meta: { updatedAt: new Date(NOW_MS).toISOString(), stale: true } },
+        { data: [], meta: { updatedAt: new Date(NOW_MS - 91_000).toISOString() } },
+        { data: [], meta: { updatedAt: new Date(NOW_MS - 10_000).toISOString() } }]) {
+        const previous = [{ id: 'kept', destination: 'Victoria', expectedAtEpoch: NOW_MS / 1000 + 300 }];
+        const nationalRail = { async departures() { if (result instanceof Error) throw result; return result; } };
+        const { store, notifier, client } = await fixture({ nationalRail, rows: [subscription({ id: 'rail',
+            hubId: 'nr:BKJ', stopIds: ['BKJ'], lineId: 'national-rail:SE', direction: 'any',
+            lastSourceUpdatedAtMs: NOW_MS, lastBoard: previous }), subscription({ id: 'tube' })] });
+        try {
+            await notifier.notify(snapshotWith([arrival()]));
+            assert.equal(client.sends.length, 1);
+            assert.equal(client.sends[0].payload.aps['content-state'].departures[0].destination, 'Hainault');
+            assert.deepEqual(store.get('rail').lastBoard, previous);
+        } finally { store.stop(); }
+    }
+});
+
+test('National Rail pushes preserve direction and keep the last board when destination coordinates are unavailable', async () => {
+    const arrivals = [
+        { id: 'in', lineId: 'national-rail:SE', direction: 'northbound', destinationName: 'Victoria',
+            expectedArrival: new Date(NOW_MS + 300_000).toISOString(), hasExpectedTime: true },
+        { id: 'out', lineId: 'national-rail:SE', direction: 'southbound', destinationName: 'Orpington', status: 'cancelled',
+            expectedArrival: new Date(NOW_MS + 600_000).toISOString(), hasExpectedTime: true }
+    ];
+    const nationalRail = { async departures() {
+        return { data: arrivals, meta: { updatedAt: new Date(NOW_MS).toISOString(), stale: false } };
+    } };
+    const { notifier, client, store } = await fixture({ nationalRail, rows: ['northbound', 'southbound'].map((direction) =>
+        subscription({ id: direction, hubId: 'HUBBEK', stopIds: ['BKJ'], lineId: 'national-rail:SE', direction })) });
+    try {
+        await notifier.notify(snapshotWith([]));
+        assert.equal(client.sends.length, 2);
+        assert.deepEqual(client.sends.map((send) => send.payload.aps['content-state'].departures.map((item) => item.id)), [['in'], ['out']]);
+        assert.deepEqual(client.sends.map((send) => send.payload.aps['content-state'].conditionHeadline), ['Departures on time', 'Cancellations']);
+        for (const arrival of arrivals) arrival.direction = null;
+        await notifier.notify(snapshotWith([]));
+        assert.equal(client.sends.length, 2);
+        assert.deepEqual(store.get('northbound').lastBoard.map((item) => item.id), ['in']);
+        assert.deepEqual(store.get('southbound').lastBoard.map((item) => item.id), ['out']);
+    } finally { store.stop(); }
 });
 
 test('does not push an old board for a stale mode while healthy modes update', async () => {

@@ -5,6 +5,48 @@ import Testing
 struct NationalRailDeparturesTests {
     private func date(_ value: String) -> Date { ISO8601DateFormatter().date(from: value)! }
 
+    @Test func compassDirectionsMatchDestinationsIncludingDiagonalLondonRoutes() {
+        let cases: [(String, [String], DepartureDirectionFilter?)] = [
+            ("KTH", ["VIC"], .northbound), ("KTH", ["ORP"], .southbound),
+            ("LAD", ["CHX"], .northbound), ("LAD", ["HYS"], .southbound),
+            ("MZH", ["CST"], .northbound), ("MZH", ["DFD"], .eastbound),
+            ("DFD", ["MZH"], .westbound),
+            ("GRP", ["CHX"], .northbound), ("GRP", ["SEV"], .southbound),
+            ("GRP", ["BMN"], .southbound),
+            ("SAC", ["BTN"], .southbound), ("ECR", ["BDM"], .northbound),
+            (" kth ", [" vic "], .northbound),
+            ("KTH", ["VIC", "CHX"], .northbound),
+            ("KTH", ["VIC", "ORP"], nil), ("KTH", ["VIC", "XXX"], nil),
+            ("KTH", ["VIC", ""], nil), ("XXX", ["VIC"], nil),
+            ("KTH", [], nil), ("KTH", ["KTH"], nil)
+        ]
+        for (station, destinations, expected) in cases {
+            #expect(NationalRailDirection.resolve(station: station, destinations: destinations) == expected,
+                "\(station) to \(destinations)")
+        }
+    }
+
+    @Test func bundledCoordinatesCoverEveryMappedStation() {
+        for code in Set(NationalRailStations.codesByStopID.values.flatMap { $0 }) where code != "VIC" {
+            #expect(NationalRailDirection.resolve(station: code, destinations: ["VIC"]) != nil,
+                "Missing coordinates for \(code)")
+        }
+    }
+
+    @Test func liveFeedObjectDestinationsProduceTrackableBoardsWithoutServiceDetails() throws {
+        let now = date("2026-10-05T22:50:00Z")
+        for (station, north, south) in [("KTH", "VIC", "ORP"), ("LAD", "CHX", "HYS")] {
+            let board = try decode([north, south].enumerated().map { index, destination in
+                ["serviceID": "staff_202610058087168_\(station)_\(index)",
+                 "operator": "Southeastern", "operatorCode": "SE",
+                 "departure_time": ["scheduled": "23:55", "estimated": "23:55"],
+                 "destination": ["crs": destination]]
+            }, at: now)
+            let groups = NationalRailDepartureGroup.groups(from: board.predictions(crs: station, now: now))
+            #expect(groups.first?.directionGroups.map(\.direction) == [.northbound, .southbound])
+        }
+    }
+
     @Test func railStationsCoverEveryMappedRailStopAndMainlineInterchanges() {
         for station in StationIndex.bundled.entries where station.id.hasPrefix("910G") {
             #expect(!NationalRailStations.codes(for: [station.id]).isEmpty, "Missing \(station.name)")

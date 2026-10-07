@@ -1,0 +1,945 @@
+kind,x,y,stationID,lineID,operatorID,name
+circle,2337.089,571.503,910GUPMNSTR,,national-rail:CC,Upminster
+circle,1936.163,655.544,910GSTFD,,national-rail:CC,Stratford (London)
+circle,2175.09,733.352,910GBARKING,,national-rail:CC,Barking
+circle,2002.656,833.654,940GZZDLWHM,,national-rail:CC,West Ham DLR Station
+circle,1558.53,949.062,nr:FST,,national-rail:CC,Fenchurch Street
+circle,141.562,100.26,940GZZLUAMS,,national-rail:CH,Amersham
+circle,197.144,155.842,940GZZLUCAL,,national-rail:CH,Chalfont & Latimer
+circle,272.358,290.698,940GZZLUWRP,,national-rail:CH,West Ruislip
+circle,515.327,439.521,940GZZLUHOH,,national-rail:CH,Harrow-on-the-Hill
+circle,272.358,443.825,940GZZLUSRP,,national-rail:CH,South Ruislip
+circle,452.998,483.978,nr:SDH,,national-rail:CH,Sudbury Hill Harrow
+circle,976.404,727.128,940GZZLUMYB,,national-rail:CH,Marylebone
+circle,909.626,58.266,nr:LTN,,national-rail:EM,Luton Airport Parkway
+circle,1268.87,690.722,910GSTPXBOX,,national-rail:EM,St Pancras International
+circle,1495.531,291.113,nr:BOP,,national-rail:GN,Bowes Park
+circle,1459.212,402.831,nr:HGY,,national-rail:GN,Harringay
+circle,1458.999,494.425,910GFNPK,,national-rail:GN,Finsbury Park
+circle,1509.727,639.749,910GHGHI,,national-rail:GN,Highbury & Islington
+circle,1319.092,704.228,940GZZLUKSX,,national-rail:GN,King's Cross St. Pancras
+circle,291.626,708.419,940GZZLUGFD,,national-rail:GW,Greenford
+circle,819.256,803.916,910GPADTLL,,national-rail:GW,Paddington
+circle,353.83,900.103,910GWEALING,,national-rail:GW,West Ealing
+circle,206.375,923.52,910GHAYESAH,,national-rail:GW,Hayes & Harlington
+circle,401.524,923.53,910GEALINGB,,national-rail:GW,Ealing Broadway
+circle,1378.275,2052.782,nr:RDH,,national-rail:GW,Redhill
+circle,1378.481,2153.928,nr:GTW,,national-rail:GW,Gatwick Airport
+circle,1003.668,1090.78,940GZZLUVIC,,national-rail:GX,Victoria
+circle,1391.148,2153.804,nr:GTW,,national-rail:GX,Gatwick Airport
+circle,819.255,792.447,910GPADTLL,,national-rail:HX,Paddington
+circle,148.408,1249.494,910GHTRWAPT,,national-rail:HX,Heathrow Terminals 2 & 3
+circle,95.849,1312.875,910GHTRWTM5,,national-rail:HX,Heathrow Terminal 5
+circle,1818.694,161.359,910GCHESHNT,,national-rail:LE,Cheshunt
+circle,2368.671,255.974,910GSHENFLD,,national-rail:LE,Shenfield
+circle,2217.435,407.21,910GROMFORD,,national-rail:LE,Romford
+circle,1705.626,459.071,910GSEVNSIS,,national-rail:LE,Seven Sisters
+circle,1769.191,469.765,940GZZLUTMH,,national-rail:LE,Tottenham Hale
+circle,1483.754,818.521,910GLIVST,,national-rail:LE,London Liverpool Street
+circle,1491.944,842.004,910GLIVST,,national-rail:LE,London Liverpool Street
+circle,671.583,63.911,910GWATFJDC,,national-rail:LM,Watford Junction
+circle,671.714,151.286,910GBUSHYDC,,national-rail:LM,Bushey
+circle,683.353,317.769,910GHROW,,national-rail:LM,Harrow & Wealdstone
+circle,1164.336,737.866,910GEUSTON,,national-rail:LM,London Euston
+circle,1834.251,584.174,940GZZDLSIT,,national-rail:SE,Stratford International DLR Station
+circle,1184.026,1035.867,940GZZLUCHX,,national-rail:SE,Charing Cross
+circle,1366.307,1068.737,910GBLFR,,national-rail:SE,Blackfriars
+circle,1036.912,1090.78,940GZZLUVIC,,national-rail:SE,Victoria
+circle,1245.782,1130.089,nr:WAE,,national-rail:SE,Waterloo East
+circle,1399.616,1175.582,910GLNDNBDC,,national-rail:SE,London Bridge
+circle,1297.681,1279.92,910GELPHNAC,,national-rail:SE,Elephant & Castle
+circle,2079.665,1281.514,910GWOLWCHA,,national-rail:SE,Woolwich Arsenal
+circle,2166.995,1281.514,910GPLMS,,national-rail:SE,Plumstead
+circle,1791.233,1413.123,940GZZDLLEW,,national-rail:SE,Lewisham DLR Station
+circle,1330.069,1413.125,910GDENMRKH,,national-rail:SE,Denmark Hill
+circle,1436.006,1413.181,910GPCKHMRY,,national-rail:SE,Peckham Rye
+circle,1202.744,1476.163,940GZZLUBXN,,national-rail:SE,Brixton
+circle,1826.807,1503.902,nr:CFB,,national-rail:SE,Catford Bridge
+circle,1265.935,1508.7,910GHERNEH,,national-rail:SE,Herne Hill
+circle,2302.344,1512.318,910GDARTFD,,national-rail:SE,Dartford
+circle,1963.229,1540.612,nr:GRP,,national-rail:SE,Grove Park
+circle,1953.81,1550.034,nr:GRP,,national-rail:SE,Grove Park
+circle,1623.054,1616.486,nr:PNE,,national-rail:SE,Penge East
+circle,1866.98,1641.529,940GZZCRBEK,,national-rail:SE,Beckenham Junction
+circle,1790.379,1641.554,nr:KTH,,national-rail:SE,Kent House
+circle,2115.116,1692.332,910GORPNGTN,,national-rail:SE,Orpington
+circle,2098.646,1708.801,910GORPNGTN,,national-rail:SE,Orpington
+circle,1802.64,1712.215,nr:CLK,,national-rail:SE,Clock House
+circle,1802.686,1734.128,940GZZCRELM,,national-rail:SE,Elmers End
+circle,683.193,63.911,910GWATFJDC,,national-rail:SN,Watford Junction
+circle,671.706,317.769,910GHROW,,national-rail:SN,Harrow & Wealdstone
+circle,671.706,496.622,910GWMBY,,national-rail:SN,Wembley Central
+circle,754.571,968.276,910GSHPDSB,,national-rail:SN,Shepherds Bush
+circle,786.882,1019.27,910GKENOLYM,,national-rail:SN,Kensington (Olympia)
+circle,1020.29,1090.78,940GZZLUVIC,,national-rail:SN,Victoria
+circle,786.882,1142.515,910GWBRMPTN,,national-rail:SN,West Brompton
+circle,1399.616,1188.175,910GLNDNBDC,,national-rail:SN,London Bridge
+circle,836.283,1280.946,910GCSEAH,,national-rail:SN,Imperial Wharf
+circle,1490.062,1336.466,910GPCKHMQD,,national-rail:SN,Queens Road Peckham
+circle,906.85,1352.442,910GCLPHMJ1,,national-rail:SN,Clapham Junction
+circle,1638.713,1389.107,910GNEWXGTE,,national-rail:SN,New Cross Gate
+circle,1025.801,1471.088,940GZZLUBLM,,national-rail:SN,Balham
+circle,1638.452,1504.911,910GSYDENHM,,national-rail:SN,Sydenham
+circle,1266.433,1559.445,910GTULSEH,,national-rail:SN,Tulse Hill
+circle,1418.552,1597.94,910GCRYSTLP,,national-rail:SN,Crystal Palace
+circle,1866.794,1654.757,940GZZCRBEK,,national-rail:SN,Beckenham Junction
+circle,1672.911,1654.957,940GZZCRBIR,,national-rail:SN,Birkbeck
+circle,1494.445,1715.953,910GNORWDJ,,national-rail:SN,Norwood Junction
+circle,1274.892,1744.151,910GWCROYDN,,national-rail:SN,West Croydon
+circle,1295.481,1755.794,910GWCROYDN,,national-rail:SN,West Croydon
+circle,1028.163,1787.058,910GMITCHMJ,,national-rail:SN,Mitcham Junction
+circle,1494.361,1847.81,910GECROYDN,,national-rail:SN,East Croydon
+circle,1006.632,1927.441,910GSUTTON,,national-rail:SN,Sutton
+circle,1493.292,2047.537,nr:WHY,,national-rail:SN,Whyteleafe
+circle,1538.18,2047.537,nr:UWL,,national-rail:SN,Upper Warlingham
+circle,1353.712,2052.782,nr:RDH,,national-rail:SN,Redhill
+circle,842.708,2090.986,nr:EPS,,national-rail:SN,Epsom
+circle,1353.146,2153.557,nr:GTW,,national-rail:SN,Gatwick Airport
+circle,1067.122,1259.55,940GZZLUVXL,,national-rail:SW,Vauxhall
+circle,518.835,1387.316,910GRICHMND,,national-rail:SW,Richmond (London)
+circle,775.861,1387.49,nr:PUT,,national-rail:SW,Putney
+circle,810.786,1472.376,910GWIMBLDN,,national-rail:SW,Wimbledon
+circle,514.498,1580.508,nr:KNG,,national-rail:SW,Kingston
+circle,450.772,1707.029,nr:HMC,,national-rail:SW,Hampton Court
+circle,830.041,2090.862,nr:EPS,,national-rail:SW,Epsom
+circle,921.27,58.266,nr:LTN,,national-rail:TL,Luton Airport Parkway
+circle,932.917,58.266,nr:LTN,,national-rail:TL,Luton Airport Parkway
+circle,1550.57,2047.537,nr:UWL,,national-rail:TL,Upper Warlingham
+circle,1365.993,2052.782,nr:RDH,,national-rail:TL,Redhill
+circle,1365.813,2153.681,nr:GTW,,national-rail:TL,Gatwick Airport
+circle,648.416,317.769,940GZZLUHAW,bakerloo,,Harrow & Wealdstone
+circle,648.879,390.802,940GZZLUKEN,bakerloo,,Kenton
+circle,648.416,496.622,940GZZLUWYC,bakerloo,,Wembley Central
+circle,648.917,563.615,940GZZLUWJN,bakerloo,,Willesden Junction
+circle,648.692,647.863,940GZZLUQPS,bakerloo,,Queen's Park
+circle,960.962,742.57,940GZZLUMYB,bakerloo,,Marylebone
+circle,789.465,742.896,940GZZLUPAC,bakerloo,,Paddington
+circle,1196.529,1023.361,940GZZLUCHX,bakerloo,,Charing Cross
+circle,1213.255,1075.288,940GZZLUEMB,bakerloo,,Embankment
+circle,1213.447,1130.09,940GZZLUWLO,bakerloo,,Waterloo
+circle,1252.311,1279.885,940GZZLUEAC,bakerloo,,Elephant & Castle
+circle,256.188,290.698,940GZZLUWRP,central,,West Ruislip
+circle,256.188,443.825,940GZZLUSRP,central,,South Ruislip
+circle,1935.253,504.188,940GZZLULYS,central,,Leytonstone
+circle,1920.384,655.544,940GZZLUSTD,central,,Stratford
+circle,302.983,697.061,940GZZLUGFD,central,,Greenford
+circle,1772.092,783.408,940GZZLUMED,central,,Mile End
+circle,425.106,818.628,940GZZLUHGR,central,,Hanger Lane
+circle,1179.268,886.621,940GZZLUTCR,central,,Tottenham Court Road
+circle,1049.963,886.63,940GZZLUBND,central,,Bond Street
+circle,1089.052,887.002,940GZZLUOXC,central,,Oxford Circus
+circle,1378.987,934.969,940GZZLUSPU,central,,St. Paul's
+circle,837.346,948.023,940GZZLUNHG,central,,Notting Hill Gate
+circle,401.524,948.091,940GZZLUEBY,central,,Ealing Broadway
+circle,774.542,948.135,940GZZLUSBC,central,,Shepherd's Bush (Central)
+circle,671.238,948.522,940GZZLUWCY,central,,White City
+circle,880.508,758.898,940GZZLUERC,circle,,Edgware Road (Circle Line)
+circle,1029.624,760.907,940GZZLUBST,circle,,Baker Street
+circle,1173.78,760.946,940GZZLUESQ,circle,,Euston Square
+circle,1300.955,760.994,940GZZLUKSX,circle,,King's Cross St. Pancras
+circle,819.256,772.688,940GZZLUPAC,circle,,Paddington
+circle,1346.07,786.994,940GZZLUFCN,circle,,Farringdon
+circle,1491.945,866.744,940GZZLULVT,circle,,Liverpool Street
+circle,1435.099,866.78,940GZZLUMGT,circle,,Moorgate
+circle,1476.748,968.614,940GZZLUMMT,circle,,Monument
+circle,1538.958,968.634,940GZZLUTWH,circle,,Tower Hill
+circle,697.128,974.545,940GZZLUWLA,circle,,Wood Lane
+circle,697.192,1033.9,940GZZLUHSC,circle,,Hammersmith (H&C Line)
+circle,1329.797,1042.117,940GZZLUBKF,circle,,Blackfriars
+circle,913.573,1075.315,940GZZLUSKS,circle,,South Kensington
+circle,2325.334,559.591,940GZZLUUPM,district,,Upminster
+circle,2161.521,719.625,940GZZLUBKG,district,,Barking
+circle,880.512,773.104,940GZZLUERC,district,,Edgware Road (Circle Line)
+circle,837.304,790.735,940GZZLUPAC,district,,Paddington
+circle,1772.09,800.618,940GZZLUMED,district,,Mile End
+circle,1623.771,879.366,940GZZLUADE,district,,Aldgate East
+circle,401.524,960.374,940GZZLUEBY,district,,Ealing Broadway
+circle,1395.261,977.227,940GZZLUCST,district,,Cannon Street
+circle,428.812,1012.214,940GZZLUECM,district,,Ealing Common
+circle,799.379,1019.271,940GZZLUKOY,district,,Kensington (Olympia)
+circle,448.662,1073.175,940GZZLUACT,district,,Acton Town
+circle,817.334,1076.489,940GZZLUECT,district,,Earl's Court
+circle,539.628,1078.014,940GZZLUTNG,district,,Turnham Green
+circle,697.065,1078.014,940GZZLUHSD,district,,Hammersmith (Dist&Picc Line)
+circle,733.548,1078.014,940GZZLUBSC,district,,Barons Court
+circle,799.379,1142.515,940GZZLUWBN,district,,West Brompton
+circle,506.775,1167.522,940GZZLUGBY,district,,Gunnersbury
+circle,506.775,1283.376,940GZZLUKWG,district,,Kew Gardens
+circle,798.776,1293.158,940GZZLUPYB,district,,Putney Bridge
+circle,506.775,1374.759,940GZZLURMD,district,,Richmond
+circle,798.776,1410.4,940GZZLUEPY,district,,East Putney
+circle,798.777,1460.366,940GZZLUWIM,district,,Wimbledon
+circle,1854.106,604.03,940GZZDLSIT,dlr,,Stratford International DLR Station
+circle,1967.064,655.544,940GZZDLSTD,dlr,,Stratford DLR Station
+circle,1870.4,780.54,940GZZDLBOW,dlr,,Bow Church DLR Station
+circle,1987.898,818.896,940GZZDLWHM,dlr,,West Ham DLR Station
+circle,1446.11,937.976,940GZZDLBNK,dlr,,Bank DLR Station
+circle,1987.796,970.046,940GZZDLCGT,dlr,,Canning Town DLR Station
+circle,1732.836,988.074,940GZZDLLIM,dlr,,Limehouse DLR Station
+circle,1558.529,988.205,940GZZDLTWG,dlr,,Tower Gateway DLR Station
+circle,1839.157,988.208,940GZZDLPOP,dlr,,Poplar DLR Station
+circle,1758.476,988.228,940GZZDLWFE,dlr,,Westferry DLR Station
+circle,1670.184,988.235,940GZZDLSHA,dlr,,Shadwell DLR Station
+circle,2065.355,988.313,940GZZDLRVC,dlr,,Royal Victoria DLR Station
+circle,2139.151,1018.55,940GZZDLCUS,dlr,,Custom House (for ExCel) DLR Station
+circle,1817.276,1024.169,940GZZDLWIQ,dlr,,West India Quay DLR Station
+circle,1817.276,1064.357,940GZZDLCAN,dlr,,Canary Wharf DLR Station
+circle,2079.5,1144.46,940GZZDLLCA,dlr,,London City Airport DLR Station
+circle,2079.665,1231.594,940GZZDLWLA,dlr,,Woolwich Arsenal DLR Station
+circle,1817.297,1253.211,940GZZDLCUT,dlr,,Cutty Sark (for Maritime Greenwich) DLR Station
+circle,1817.296,1281.471,940GZZDLGRE,dlr,,Greenwich DLR Station
+circle,1791.233,1393.762,940GZZDLLEW,dlr,,Lewisham DLR Station
+circle,2360.388,247.516,910GSHENFLD,elizabeth,,Shenfield
+circle,2209.152,398.752,910GROMFORD,elizabeth,,Romford
+circle,2041.999,565.539,910GFRSTGT,elizabeth,,Forest Gate
+circle,1951.573,655.544,910GSTFD,elizabeth,,Stratford (London)
+circle,819.255,815.384,910GPADTLL,elizabeth,,Paddington
+circle,1457.449,844.827,910GLIVST,elizabeth,,London Liverpool Street
+circle,1159.726,867.045,910GTOTCTRD,elizabeth,,Tottenham Court Road
+circle,1069.276,867.296,910GBONDST,elizabeth,,Bond Street
+circle,401.524,934.987,910GEALINGB,elizabeth,,Ealing Broadway
+circle,353.831,935.816,910GWEALING,elizabeth,,West Ealing
+circle,206.38,936.717,910GHAYESAH,elizabeth,,Hayes & Harlington
+circle,1837.473,1044.16,910GCANWHRF,elizabeth,,Canary Wharf
+circle,2104.803,1052.892,910GCUSTMHS,elizabeth,,Custom House
+circle,2120.63,1231.594,910GWOLWXR,elizabeth,,Woolwich
+circle,171.736,1249.494,910GHTRWAPT,elizabeth,,Heathrow Terminals 2 & 3
+circle,2166.995,1258.112,910GABWDXR,elizabeth,,Abbey Wood
+circle,171.924,1318.822,910GHTRWTM4,elizabeth,,Heathrow Terminal 4
+circle,105.978,1323.004,910GHTRWTM5,elizabeth,,Heathrow Terminal 5
+circle,1850.461,800.444,940GZZLUBWR,hammersmith-city,,Bow Road
+circle,767.411,429.481,940GZZLUWYP,jubilee,,Wembley Park
+circle,935.554,598.237,940GZZLUWHP,jubilee,,West Hampstead
+circle,956.896,618.964,940GZZLUFYR,jubilee,,Finchley Road
+circle,1009.425,707.65,940GZZLUSWC,jubilee,,Swiss Cottage
+circle,1009.409,781.122,940GZZLUBST,jubilee,,Baker Street
+circle,1969.64,800.642,940GZZLUWHM,jubilee,,West Ham
+circle,1010.79,925.784,940GZZLUBND,jubilee,,Bond Street
+circle,1969.629,988.208,940GZZLUCGT,jubilee,,Canning Town
+circle,1158.489,1075.395,940GZZLUWSM,jubilee,,Westminster
+circle,1907.988,1083.773,940GZZLUNGW,jubilee,,North Greenwich
+circle,1638.695,1083.774,940GZZLUCWR,jubilee,,Canada Water
+circle,1797.172,1083.782,940GZZLUCYF,jubilee,,Canary Wharf
+circle,1389.108,1122.991,940GZZLULNB,jubilee,,London Bridge
+circle,1177.899,1130.09,940GZZLUWLO,jubilee,,Waterloo
+circle,1245.735,1162.58,940GZZLUSWK,jubilee,,Southwark
+circle,2225.763,415.538,910GROMFORD,liberty,,Romford
+circle,2325.334,547.814,910GUPMNSTR,liberty,,Upminster
+circle,659.971,63.911,910GWATFJDC,lioness,,Watford Junction
+circle,660.05,151.286,910GBUSHYDC,lioness,,Bushey
+circle,660.062,317.769,910GHROW,lioness,,Harrow & Wealdstone
+circle,660.307,379.374,910GKTON,lioness,,Kenton
+circle,660.062,496.622,910GWMBY,lioness,,Wembley Central
+circle,660.338,647.863,910GQPRK,lioness,,Queens Park (London)
+circle,1041.021,676.049,910GSHMPSTD,lioness,,South Hampstead
+circle,1180.464,737.866,910GEUSTON,lioness,,London Euston
+circle,150.607,91.39,940GZZLUAMS,metropolitan,,Amersham
+circle,206.189,146.972,940GZZLUCAL,metropolitan,,Chalfont & Latimer
+circle,616.879,422.803,940GZZLUNKP,metropolitan,,Northwick Park
+circle,515.306,422.987,940GZZLUHOH,metropolitan,,Harrow-on-the-Hill
+circle,754.792,442.102,940GZZLUWYP,metropolitan,,Wembley Park
+circle,944.274,631.585,940GZZLUFYR,metropolitan,,Finchley Road
+circle,1144.071,526.209,910GGOSPLOK,mildmay,,Gospel Oak
+circle,660.23,574.928,910GWLSDJHL,mildmay,,Willesden Junction
+circle,1000.832,575.027,910GFNCHLYR,mildmay,,Finchley Road & Frognal
+circle,958.407,575.383,910GWHMDSTD,mildmay,,West Hampstead
+circle,1230.687,612.836,910GCMDNRD,mildmay,,Camden Road
+circle,1466.021,624.062,910GCLDNNRB,mildmay,,Caledonian Road & Barnsbury
+circle,1523.477,624.655,910GHGHI,mildmay,,Highbury & Islington
+circle,1564.994,624.655,910GCNNB,mildmay,,Canonbury
+circle,1904.604,655.544,910GSTFD,mildmay,,Stratford (London)
+circle,1734.64,655.955,910GHACKNYC,mildmay,,Hackney Central
+circle,745.243,977.604,910GSHPDSB,mildmay,,Shepherds Bush
+circle,774.45,1019.271,910GKENOLYM,mildmay,,Kensington (Olympia)
+circle,774.45,1142.515,910GWBRMPTN,mildmay,,West Brompton
+circle,494.107,1167.398,910GGNRSBRY,mildmay,,Gunnersbury
+circle,494.107,1283.252,910GKEWGRDN,mildmay,,Kew Gardens
+circle,826.956,1290.281,910GCSEAH,mildmay,,Imperial Wharf
+circle,890.387,1352.441,910GCLPHMJC,mildmay,,Clapham Junction
+circle,494.107,1374.635,910GRICHMND,mildmay,,Richmond (London)
+circle,1268.667,434.323,940GZZLUACY,northern,,Archway
+circle,1269.115,542.963,940GZZLUKSH,northern,,Kentish Town
+circle,1209.653,633.872,940GZZLUCTN,northern,,Camden Town
+circle,1196.859,737.866,940GZZLUEUS,northern,,Euston
+circle,1237.19,737.866,940GZZLUEUS,northern,,Euston
+circle,1300.96,738.122,940GZZLUKSX,northern,,King's Cross St. Pancras
+circle,1196.727,779.017,940GZZLUWRR,northern,,Warren Street
+circle,1437.669,793.833,940GZZLUODS,northern,,Old Street
+circle,1196.769,904.088,940GZZLUTCR,northern,,Tottenham Court Road
+circle,1435.29,926.956,940GZZLUBNK,northern,,Bank
+circle,1196.769,935.004,940GZZLULSQ,northern,,Leicester Square
+circle,1197.156,1059.194,940GZZLUEMB,northern,,Embankment
+circle,1197.109,1130.089,940GZZLUWLO,northern,,Waterloo
+circle,1399.616,1133.499,940GZZLULNB,northern,,London Bridge
+circle,973.85,1228.324,940GZZBPSUST,northern,,Battersea Power Station
+circle,1193.319,1302.434,940GZZLUKNG,northern,,Kennington
+circle,1211.848,1320.954,940GZZLUKNG,northern,,Kennington
+circle,1094.698,1419.414,940GZZLUCPN,northern,,Clapham North
+circle,1025.987,1488.194,940GZZLUBLM,northern,,Balham
+circle,920.198,1593.975,940GZZLUSWN,northern,,South Wimbledon
+circle,1475.653,271.284,940GZZLUBDS,piccadilly,,Bounds Green
+circle,334.458,407.646,940GZZLURYL,piccadilly,,Rayners Lane
+circle,1510.435,454.37,940GZZLUMRH,piccadilly,,Manor House
+circle,1480.721,494.425,940GZZLUFPK,piccadilly,,Finsbury Park
+circle,430.275,506.704,940GZZLUSUH,piccadilly,,Sudbury Hill
+circle,1466.021,596.115,940GZZLUCAR,piccadilly,,Caledonian Road
+circle,444.78,798.941,940GZZLUPKR,piccadilly,,Park Royal
+circle,1243.3,887.178,940GZZLUHBN,piccadilly,,Holborn
+circle,1142.736,968.87,940GZZLUPCC,piccadilly,,Piccadilly Circus
+circle,1051.884,969.237,940GZZLUGPK,piccadilly,,Green Park
+circle,444.683,1012.338,940GZZLUECM,piccadilly,,Ealing Common
+circle,539.628,1061.956,940GZZLUTNG,piccadilly,,Turnham Green
+circle,697.065,1061.956,940GZZLUHSD,piccadilly,,Hammersmith (Dist&Picc Line)
+circle,733.548,1061.956,940GZZLUBSC,piccadilly,,Barons Court
+circle,459.971,1062.04,940GZZLUACT,piccadilly,,Acton Town
+circle,913.569,1062.088,940GZZLUSKS,piccadilly,,South Kensington
+circle,817.33,1062.118,940GZZLUECT,piccadilly,,Earl's Court
+circle,185.834,1263.593,940GZZLUHRC,piccadilly,,Heathrow Terminals 2 & 3
+circle,183.188,1330.087,940GZZLUHR4,piccadilly,,Heathrow Terminal 4
+circle,116.109,1333.135,940GZZLUHR5,piccadilly,,Heathrow Terminal 5
+circle,1487.617,431.553,910GHRGYGL,suffragette,,Harringay Green Lanes
+circle,1732.916,431.81,910GSTOTNHM,suffragette,,South Tottenham
+circle,1826.566,444.129,910GBLCHSRD,suffragette,,Blackhorse Road
+circle,1288.523,454.179,910GUPRHLWY,suffragette,,Upper Holloway
+circle,1876.682,494.945,910GWLTHQRD,suffragette,,Walthamstow Queens Road
+circle,1154.242,516.038,910GGOSPLOK,suffragette,,Gospel Oak
+circle,1967.211,536.193,910GLYTNSHR,suffragette,,Leytonstone High Road
+circle,2009.12,565.504,910GWNSTDPK,suffragette,,Wanstead Park
+circle,2175.09,755.035,910GBARKING,suffragette,,Barking
+circle,2253.456,776.396,910GBARKRIV,suffragette,,Barking Riverside
+circle,1435.55,494.425,910GFNPK,thameslink,,Finsbury Park
+circle,995.837,537.954,910GWHMPSTM,thameslink,,West Hampstead Thameslink
+circle,1282.385,704.237,910GSTPXBOX,thameslink,,St Pancras International
+circle,1326.015,807.111,910GFRNDNLT,thameslink,,Farringdon
+circle,1356.174,912.184,910GCTMSLNK,thameslink,,City Thameslink
+circle,1356.096,1068.737,910GBLFR,thameslink,,Blackfriars
+circle,1399.616,1155.155,910GLNDNBDC,thameslink,,London Bridge
+circle,2079.665,1269.815,910GWOLWCHA,thameslink,,Woolwich Arsenal
+circle,2166.995,1269.815,910GABWD,thameslink,,Abbey Wood
+circle,1805.678,1269.853,910GGNWH,thameslink,,Greenwich
+circle,1280.358,1279.92,910GELPHNAC,thameslink,,Elephant & Castle
+circle,1329.884,1400.282,910GDENMRKH,thameslink,,Denmark Hill
+circle,1424.51,1401.423,910GPCKHMRY,thameslink,,Peckham Rye
+circle,822.796,1484.386,910GWIMBLDN,thameslink,,Wimbledon
+circle,2302.344,1500.254,910GDARTFD,thameslink,,Dartford
+circle,1785.748,1503.903,910GCATFORD,thameslink,,Catford
+circle,1252.294,1522.342,910GHERNEH,thameslink,,Herne Hill
+circle,1252.864,1545.876,910GTULSEH,thameslink,,Tulse Hill
+circle,2106.881,1700.566,910GORPNGTN,thameslink,,Orpington
+circle,1506.088,1715.953,910GNORWDJ,thameslink,,Norwood Junction
+circle,1040.104,1787.181,910GMITCHMJ,thameslink,,Mitcham Junction
+circle,1505.703,1859.153,910GECROYDN,thameslink,,East Croydon
+circle,1006.632,1939.723,910GSUTTON,thameslink,,Sutton
+circle,834.806,1496.396,940GZZCRWMB,tram,,Wimbledon
+circle,920.255,1644.756,940GZZCRMDN,tram,,Morden Road
+circle,1672.725,1668.689,940GZZCRBIR,tram,,Birkbeck
+circle,1790.38,1668.863,940GZZCRBRD,tram,,Beckenham Road
+circle,1866.794,1670.314,940GZZCRBEK,tram,,Beckenham Junction
+circle,1769.156,1734.097,940GZZCRELM,tram,,Elmers End
+circle,1051.19,1776.117,940GZZCRMJT,tram,,Mitcham Junction
+circle,1318.171,1779.148,940GZZCRWCR,tram,,West Croydon
+circle,1483.115,1836.692,940GZZCRECR,tram,,East Croydon
+circle,1914.46,457.266,940GZZLUWWL,victoria,,Walthamstow Central
+circle,1813.321,457.374,940GZZLUBLR,victoria,,Blackhorse Road
+circle,1684.24,480.457,940GZZLUSVS,victoria,,Seven Sisters
+circle,1758.498,480.457,940GZZLUTMH,victoria,,Tottenham Hale
+circle,1496.094,509.772,940GZZLUFPK,victoria,,Finsbury Park
+circle,1495.978,639.749,940GZZLUHAI,victoria,,Highbury & Islington
+circle,1300.96,722.614,940GZZLUKSX,victoria,,King's Cross St. Pancras
+circle,1052.33,1075.419,940GZZLUVIC,victoria,,Victoria
+circle,1051.845,1244.272,940GZZLUVXL,victoria,,Vauxhall
+circle,1139.537,1373.877,940GZZLUSKW,victoria,,Stockwell
+circle,1222.447,1456.377,940GZZLUBXN,victoria,,Brixton
+circle,1806.856,161.235,910GCHESHNT,weaver,,Cheshunt
+circle,1694.932,469.765,910GSEVNSIS,weaver,,Seven Sisters
+circle,1896.238,475.488,910GWLTWCEN,weaver,,Walthamstow Central
+circle,1716.442,637.756,910GHAKNYNM,weaver,,Hackney Downs
+circle,1694.868,637.757,910GHAKNYNM,weaver,,Hackney Downs
+circle,1491.944,826.711,910GLIVST,weaver,,London Liverpool Street
+circle,1523.477,639.787,910GHGHI,windrush,,Highbury & Islington
+circle,1564.994,639.787,910GCNNB,windrush,,Canonbury
+circle,1650.054,853.76,910GWCHAPEL,windrush,,Whitechapel
+circle,1650.312,968.363,910GSHADWEL,windrush,,Shadwell
+circle,1650.236,1095.315,910GCNDAW,windrush,,Canada Water
+circle,1480.85,1327.516,910GPCKHMQD,windrush,,Queens Road Peckham
+circle,1678.642,1349.018,910GNWCRELL,windrush,,New Cross
+circle,906.85,1376.53,910GCLPHMJ1,windrush,,Clapham Junction
+circle,1649.86,1377.959,910GNEWXGTE,windrush,,New Cross Gate
+circle,1094.698,1387.113,910GCLPHHS,windrush,,Clapham High Street
+circle,1415.298,1392.473,910GPCKHMRY,windrush,,Peckham Rye
+circle,1329.884,1425.968,910GDENMRKH,windrush,,Denmark Hill
+circle,1650.257,1516.453,910GSYDENHM,windrush,,Sydenham
+circle,1429.684,1586.806,910GCRYSTLP,windrush,,Crystal Palace
+circle,1569.257,1616.486,910GPENEW,windrush,,Penge West
+circle,1482.797,1715.953,910GNORWDJ,windrush,,Norwood Junction
+circle,1295.481,1744.149,910GWCROYDN,windrush,,West Croydon
+tick,2356.878,641.318,nr:OCK,,national-rail:CC,Ockendon
+tick,2356.878,691.526,nr:CFH,,national-rail:CC,Chafford Hundred
+tick,2241.07,720.642,nr:DDK,,national-rail:CC,Dagenham Dock
+tick,2335.43,720.642,nr:PFL,,national-rail:CC,Purfleet
+tick,2381.706,720.642,nr:GRY,,national-rail:CC,Grays
+tick,2297.138,726.51,nr:RNM,,national-rail:CC,Rainham
+tick,234.34,197.21,940GZZLUCYD,,national-rail:CH,Chorleywood
+tick,263.316,226.206,940GZZLURKW,,national-rail:CH,Rickmansworth
+tick,716.288,480.066,nr:WCX,,national-rail:CH,Wembley Stadium
+tick,309.228,487.806,nr:NLT,,national-rail:CH,Northolt Park
+tick,513.54,487.806,nr:SUD,,national-rail:CH,Sudbury & Harrow Road
+tick,1385.142,50.184,nr:WGC,,national-rail:GN,Welwyn Garden City
+tick,1519.686,50.632,nr:HFN,,national-rail:GN,Hertford North
+tick,1385.142,64.084,nr:HAT,,national-rail:GN,Hatfield
+tick,1519.686,72.592,nr:BAY,,national-rail:GN,Bayford
+tick,1391.76,77.986,nr:WMG,,national-rail:GN,Welham Green
+tick,1391.76,91.89,nr:BPK,,national-rail:GN,Brookmans Park
+tick,1519.686,94.552,nr:CUF,,national-rail:GN,Cuffley
+tick,1385.126,104.74,nr:PBR,,national-rail:GN,Potters Bar
+tick,1391.76,119.108,nr:HDW,,national-rail:GN,Hadley Wood
+tick,1519.686,119.108,nr:CWH,,national-rail:GN,Crews Hill
+tick,1519.686,138.472,nr:GDH,,national-rail:GN,Gordon Hill
+tick,1385.094,153.908,910GNBARNET,,national-rail:GN,New Barnet
+tick,1519.686,160.432,nr:ENC,,national-rail:GN,Enfield Chase
+tick,1519.686,182.392,nr:GPK,,national-rail:GN,Grange Park
+tick,1385.094,198.36,910GOKLGHPK,,national-rail:GN,Oakleigh Park
+tick,1519.686,215.364,nr:WIH,,national-rail:GN,Winchmore Hill
+tick,1385.094,243.168,910GNEWSGAT,,national-rail:GN,New Southgate
+tick,1519.686,248.64,nr:PAL,,national-rail:GN,Palmers Green
+tick,1461.814,344.196,nr:AAP,,national-rail:GN,Alexandra Palace
+tick,1461.814,370.804,nr:HRN,,national-rail:GN,Hornsey
+tick,1512.726,570.104,nr:DYP,,national-rail:GN,Drayton Park
+tick,1512.726,696.332,nr:EXR,,national-rail:GN,Essex Road
+tick,88.578,560.314,910GRDNGSTN,,national-rail:GW,Reading
+tick,91.506,574.722,910GRDNGSTN,,national-rail:GW,Reading
+tick,91.43,633.27,910GTWYFORD,,national-rail:GW,Twyford
+tick,91.43,691.814,910GMDNHEAD,,national-rail:GW,Maidenhead
+tick,91.43,724.906,910GTAPLOW,,national-rail:GW,Taplow
+tick,288.388,746.096,nr:SGN,,national-rail:GW,South Greenford
+tick,91.43,757.882,910GBNHAM,,national-rail:GW,Burnham (Berks)
+tick,288.388,783.128,nr:CBP,,national-rail:GW,Castle Bar Park
+tick,91.43,816.426,910GSLOUGH,,national-rail:GW,Slough
+tick,288.388,820.008,nr:DRG,,national-rail:GW,Drayton Green
+tick,91.43,849.518,910GLANGLEY,,national-rail:GW,Langley (Berks)
+tick,91.43,882.982,910GIVER,,national-rail:GW,Iver
+tick,128.082,921.817,910GWDRYTON,,national-rail:GW,West Drayton
+tick,257.186,927.129,910GSTHALL,,national-rail:GW,Southall
+tick,1764.612,58.976,nr:SMT,,national-rail:LE,St Margarets
+tick,1656.57,61.936,nr:HFE,,national-rail:LE,Hertford East
+tick,1713.288,64.84,nr:WAR,,national-rail:LE,Ware
+tick,1816.044,96.684,nr:RYH,,national-rail:LE,Rye House
+tick,1821.86,125.428,nr:BXB,,national-rail:LE,Broxbourne
+tick,1821.912,197.756,nr:WLC,,national-rail:LE,Waltham Cross
+tick,1794.686,236.915,nr:ENL,,national-rail:LE,Enfield Lock
+tick,1772.112,273.764,nr:BMD,,national-rail:LE,Brimsdown
+tick,1772.112,298.12,nr:PON,,national-rail:LE,Ponders End
+tick,1772.112,337.696,nr:MRW,,national-rail:LE,Meridian Water
+tick,1772.112,398.204,nr:NUM,,national-rail:LE,Northumberland Park
+tick,1838.043,549.005,nr:LEB,,national-rail:LE,Lea Bridge
+tick,1749.84,1278.608,910GDEPTFD,,national-rail:SE,Deptford
+tick,1957.772,1278.61,910GWCOMBEP,,national-rail:SE,Westcombe Park
+tick,2014.48,1278.61,910GCRLN,,national-rail:SE,Charlton
+tick,1920.192,1284.424,910GMAZEH,,national-rail:SE,Maze Hill
+tick,2025.332,1284.424,nr:WWD,,national-rail:SE,Woolwich Dockyard
+tick,2133.492,1284.424,910GPLMS,,national-rail:SE,Plumstead
+tick,2232.44,1333.682,nr:BVD,,national-rail:SE,Belvedere
+tick,1262.868,1367.252,910GLBGHJN,,national-rail:SE,Loughborough Junction
+tick,2246.156,1372.984,nr:ERH,,national-rail:SE,Erith
+tick,1708.468,1375.267,nr:SAJ,,national-rail:SE,St Johns
+tick,2251.968,1392.288,910GSLADEGN,,national-rail:SE,Slade Green
+tick,1526.548,1410.216,910GNUNHEAD,,national-rail:SE,Nunhead
+tick,1841.652,1410.216,nr:BKH,,national-rail:SE,Blackheath
+tick,1996.944,1410.216,nr:ELW,,national-rail:SE,Eltham
+tick,2072.456,1410.216,nr:WLI,,national-rail:SE,Welling
+tick,2213.8,1410.216,nr:BNH,,national-rail:SE,Barnehurst
+tick,1922.116,1416.032,nr:KDB,,national-rail:SE,Kidbrooke
+tick,2034.82,1416.032,nr:FCN,,national-rail:SE,Falconwood
+tick,2128.844,1416.032,nr:BXH,,national-rail:SE,Bexleyheath
+tick,1838.04,1475.832,nr:LAD,,national-rail:SE,Ladywell
+tick,1909.503,1482.278,nr:HGR,,national-rail:SE,Hither Green
+tick,1754.357,1492.405,910GCFPK,,national-rail:SE,Crofton Park
+tick,1954.136,1509.508,nr:LEE,,national-rail:SE,Lee
+tick,2010.62,1509.508,nr:MTG,,national-rail:SE,Mottingham
+tick,2114.144,1509.508,nr:SID,,national-rail:SE,Sidcup
+tick,2189.424,1509.508,nr:BXY,,national-rail:SE,Bexley
+tick,2060.108,1515.32,nr:NEH,,national-rail:SE,New Eltham
+tick,2151.896,1515.32,nr:AYP,,national-rail:SE,Albany Park
+tick,2217.896,1515.32,nr:CRY,,national-rail:SE,Crayford
+tick,1381.844,1532.672,nr:WDU,,national-rail:SE,West Dulwich
+tick,1513.692,1532.672,nr:SYH,,national-rail:SE,Sydenham Hill
+tick,1812.732,1542.48,910GBELNGHM,,national-rail:SE,Bellingham
+tick,1799.74,1558.24,nr:LSY,,national-rail:SE,Lower Sydenham
+tick,1965.365,1566.343,nr:SUP,,national-rail:SE,Sundridge Park
+tick,2009.501,1582.276,nr:ESD,,national-rail:SE,Elmstead Woods
+tick,1799.74,1590.816,nr:NBC,,national-rail:SE,New Beckenham
+tick,1976.634,1596.96,nr:BMN,,national-rail:SE,Bromley North
+tick,2035.904,1608.679,nr:CIT,,national-rail:SE,Chislehurst
+tick,2182.668,1637.072,910GSTMRYC,,national-rail:SE,St Mary Cray
+tick,2011.316,1637.136,910GBICKLEY,,national-rail:SE,Bickley
+tick,1934.548,1643.916,910GSHRTLND,,national-rail:SE,Shortlands
+tick,1989.056,1643.916,910GBROMLYS,,national-rail:SE,Bromley South
+tick,2303.108,1644.964,910GSWLY,,national-rail:SE,Swanley
+tick,2076.19,1657.194,910GPETSWD,,national-rail:SE,Petts Wood
+tick,2059.526,1673.858,910GPETSWD,,national-rail:SE,Petts Wood
+tick,2145.094,1726.099,nr:CLD,,national-rail:SE,Chelsfield
+tick,2169.554,1750.559,nr:KCK,,national-rail:SE,Knockholt
+tick,1805.593,1762.231,nr:EDN,,national-rail:SE,Eden Park
+tick,1805.593,1785.327,nr:WWI,,national-rail:SE,West Wickham
+tick,1799.779,1808.423,nr:HYS,,national-rail:SE,Hayes
+tick,1805.593,1808.423,nr:HYS,,national-rail:SE,Hayes
+tick,1510.364,1253.696,nr:SBM,,national-rail:SN,South Bermondsey
+tick,897.87,1297.786,nr:BAK,,national-rail:SN,Battersea Park
+tick,992.662,1441.794,nr:WSW,,national-rail:SN,Wandsworth Common
+tick,1641.628,1444.58,910GBROCKLY,,national-rail:SN,Brockley
+tick,1383.567,1446.372,nr:EDW,,national-rail:SN,East Dulwich
+tick,1641.628,1467.152,910GHONROPK,,national-rail:SN,Honor Oak Park
+tick,1349.564,1480.374,nr:NDL,,national-rail:SN,North Dulwich
+tick,1641.628,1489.068,910GFORESTH,,national-rail:SN,Forest Hill
+tick,1196.456,1595.38,nr:SRH,,national-rail:SN,Streatham Hill
+tick,1348.052,1595.38,nr:GIP,,national-rail:SN,Gipsy Hill
+tick,1308.396,1601.192,nr:WNW,,national-rail:SN,West Norwood
+tick,1215.905,1614.058,910GSTRETHM,,national-rail:SN,Streatham
+tick,1212.785,1661.52,nr:SRC,,national-rail:SN,Streatham Common
+tick,1080.115,1670.423,910GESTFLDS,,national-rail:SN,Mitcham Eastfields
+tick,1230.484,1679.219,nr:NRB,,national-rail:SN,Norbury
+tick,1247.433,1696.168,nr:TTH,,national-rail:SN,Thornton Heath
+tick,1264.879,1713.614,nr:SRS,,national-rail:SN,Selhurst
+tick,1031.452,1854.464,910GHKBG,,national-rail:SN,Hackbridge
+tick,1157.231,1881.516,nr:WDO,,national-rail:SN,Waddon
+tick,1488.072,1882.389,910GSCROYDN,,national-rail:SN,South Croydon
+tick,1031.452,1892.056,910GCRSHLTN,,national-rail:SN,Carshalton
+tick,1465.865,1904.596,nr:PUO,,national-rail:SN,Purley Oaks
+tick,1130.575,1908.172,nr:WLT,,national-rail:SN,Wallington
+tick,1445.546,1924.915,910GPURLEY,,national-rail:SN,Purley
+tick,1080.48,1931.704,nr:CSB,,national-rail:SN,Carshalton Beeches
+tick,1257.836,1936.2,nr:WME,,national-rail:SN,Woodmansterne
+tick,1333.196,1936.2,nr:CDN,,national-rail:SN,Coulsdon Town
+tick,1389.488,1936.2,nr:RHM,,national-rail:SN,Reedham
+tick,1515.667,1951.934,nr:SNR,,national-rail:SN,Sanderstead
+tick,891.45,1963.799,nr:CHE,,national-rail:SN,Cheam
+tick,1182.832,1965.817,nr:CHP,,national-rail:SN,Chipstead
+tick,941.424,1973.916,nr:BLM,,national-rail:SN,Belmont
+tick,1541.152,1992.0,nr:RDD,,national-rail:SN,Riddlesdown
+tick,1156.199,1992.451,nr:KND,,national-rail:SN,Kingswood
+tick,1373.729,1996.73,910GCOLSDNS,,national-rail:SN,Coulsdon South
+tick,851.177,2004.071,nr:EWE,,national-rail:SN,Ewell East
+tick,941.424,2010.932,nr:BAD,,national-rail:SN,Banstead
+tick,1464.674,2014.725,nr:KLY,,national-rail:SN,Kenley
+tick,1129.489,2019.16,nr:TAD,,national-rail:SN,Tadworth
+tick,1350.908,2031.884,nr:MHM,,national-rail:SN,Merstham
+tick,1097.885,2046.653,nr:TAT,,national-rail:SN,Tattenham Corner
+tick,938.518,2052.5,nr:EPD,,national-rail:SN,Epsom Downs
+tick,1503.292,2087.92,nr:WHS,,national-rail:SN,Whyteleafe South
+tick,1350.908,2096.572,nr:ELD,,national-rail:SN,Earlswood
+tick,1350.908,2115.608,nr:SAF,,national-rail:SN,Salfords
+tick,1506.194,2117.316,nr:CAT,,national-rail:SN,Caterham
+tick,1350.908,2134.64,nr:HOR,,national-rail:SN,Horley
+tick,458.9,1218.32,nr:KWB,,national-rail:SW,Kew Bridge
+tick,545.693,1227.681,nr:CHK,,national-rail:SW,Chiswick
+tick,397.352,1253.259,nr:BFD,,national-rail:SW,Brentford
+tick,357.59,1293.02,nr:SYL,,national-rail:SW,Syon Lane
+tick,968.802,1318.035,nr:QRB,,national-rail:SW,Queenstown Road
+tick,632.273,1322.484,nr:BNI,,national-rail:SW,Barnes Bridge
+tick,317.829,1332.781,nr:ISL,,national-rail:SW,Isleworth
+tick,271.218,1379.393,nr:HOU,,national-rail:SW,Hounslow
+tick,633.256,1384.408,nr:NSH,,national-rail:SW,North Sheen
+tick,726.936,1384.408,nr:BNS,,national-rail:SW,Barnes
+tick,679.996,1390.224,nr:MTL,,national-rail:SW,Mortlake
+tick,842.92,1390.224,nr:WNT,,national-rail:SW,Wandsworth Town
+tick,445.5,1413.164,nr:SMG,,national-rail:SW,St Margarets
+tick,843.306,1443.531,nr:EAD,,national-rail:SW,Earlsfield
+tick,398.874,1459.79,nr:TWI,,national-rail:SW,Twickenham
+tick,159.12,1469.484,nr:FEL,,national-rail:SW,Feltham
+tick,328.12,1475.3,nr:WTN,,national-rail:SW,Whitton
+tick,363.38,1503.508,nr:STW,,national-rail:SW,Strawberry Hill
+tick,735.338,1543.276,nr:RAY,,national-rail:SW,Raynes Park
+tick,711.022,1567.593,nr:NEM,,national-rail:SW,New Malden
+tick,184.624,1583.412,nr:HMP,,national-rail:SW,Hampton
+tick,258.976,1583.412,nr:FLW,,national-rail:SW,Fulwell
+tick,360.152,1583.412,nr:TED,,national-rail:SW,Teddington
+tick,433.956,1583.412,nr:HMW,,national-rail:SW,Hampton Wick
+tick,591.0,1583.412,nr:NBT,,national-rail:SW,Norbiton
+tick,646.648,1631.966,nr:BRS,,national-rail:SW,Berrylands
+tick,719.228,1641.06,nr:MOT,,national-rail:SW,Motspur Park
+tick,600.447,1678.168,nr:SUR,,national-rail:SW,Surbiton
+tick,513.644,1709.936,nr:THD,,national-rail:SW,Thames Ditton
+tick,719.228,1724.964,nr:MAL,,national-rail:SW,Malden Manor
+tick,719.228,1790.34,nr:TOL,,national-rail:SW,Tolworth
+tick,827.104,1830.26,nr:WCP,,national-rail:SW,Worcester Park
+tick,719.228,1866.1,nr:CSN,,national-rail:SW,Chessington North
+tick,722.134,1902.964,nr:CSS,,national-rail:SW,Chessington South
+tick,832.918,1905.84,nr:SNL,,national-rail:SW,Stoneleigh
+tick,827.104,1980.296,nr:EWW,,national-rail:SW,Ewell West
+tick,1373.814,50.184,nr:WGC,,national-rail:TL,Welwyn Garden City
+tick,1373.67,64.084,nr:HAT,,national-rail:TL,Hatfield
+tick,925.222,90.302,nr:HPD,,national-rail:TL,Harpenden
+tick,1373.706,104.74,nr:PBR,,national-rail:TL,Potters Bar
+tick,925.222,107.474,nr:SAC,,national-rail:TL,St Albans City
+tick,925.222,124.418,nr:RDT,,national-rail:TL,Radlett
+tick,1524.837,1942.763,nr:SNR,,national-rail:TL,Sanderstead
+tick,1553.316,1992.0,nr:RDD,,national-rail:TL,Riddlesdown
+tick,1362.062,2031.884,nr:MHM,,national-rail:TL,Merstham
+tick,1362.062,2096.572,nr:ELD,,national-rail:TL,Earlswood
+tick,1362.062,2115.608,nr:SAF,,national-rail:TL,Salfords
+tick,1362.062,2134.64,nr:HOR,,national-rail:TL,Horley
+tick,645.444,449.06,940GZZLUSKT,bakerloo,,South Kenton
+tick,645.444,471.284,940GZZLUNWY,bakerloo,,North Wembley
+tick,645.444,519.956,940GZZLUSGP,bakerloo,,Stonebridge Park
+tick,645.444,541.52,940GZZLUHSN,bakerloo,,Harlesden
+tick,651.708,630.428,940GZZLUKSL,bakerloo,,Kensal Green
+tick,679.605,696.12,940GZZLUKPK,bakerloo,,Kilburn Park
+tick,701.344,717.859,940GZZLUMVL,bakerloo,,Maida Vale
+tick,716.39,732.904,940GZZLUWKA,bakerloo,,Warwick Avenue
+tick,859.224,739.652,940GZZLUERB,bakerloo,,Edgware Road (Bakerloo)
+tick,1051.772,818.956,940GZZLURGP,bakerloo,,Regent's Park
+tick,1216.572,1213.204,940GZZLULBN,bakerloo,,Lambeth North
+tick,1980.4,154.648,940GZZLUEPG,central,,Epping
+tick,1963.545,175.652,940GZZLUTHB,central,,Theydon Bois
+tick,1944.887,194.31,940GZZLUDBN,central,,Debden
+tick,1938.07,220.098,940GZZLULGN,central,,Loughton
+tick,1938.07,248.882,940GZZLUBKH,central,,Buckhurst Hill
+tick,1961.626,301.254,940GZZLURVY,central,,Roding Valley
+tick,2029.922,301.254,940GZZLUGGH,central,,Grange Hill
+tick,1994.738,307.13,940GZZLUCWL,central,,Chigwell
+tick,2054.598,324.038,940GZZLUHLT,central,,Hainault
+tick,1938.102,343.322,940GZZLUWOF,central,,Woodford
+tick,2054.598,351.59,940GZZLUFLP,central,,Fairlop
+tick,1938.102,370.858,940GZZLUSWF,central,,South Woodford
+tick,2054.598,378.554,940GZZLUBKE,central,,Barkingside
+tick,1938.102,398.242,940GZZLUSNB,central,,Snaresbrook
+tick,253.142,403.438,940GZZLURSG,central,,Ruislip Gardens
+tick,2054.598,411.198,940GZZLUNBP,central,,Newbury Park
+tick,2000.778,433.65,940GZZLURBG,central,,Redbridge
+tick,1967.718,439.498,940GZZLUWSD,central,,Wanstead
+tick,2036.98,439.498,940GZZLUGTH,central,,Gants Hill
+tick,253.15,569.834,940GZZLUNHT,central,,Northolt
+tick,1932.226,574.542,940GZZLULYN,central,,Leyton
+tick,361.168,758.781,940GZZLUPVL,central,,Perivale
+tick,1698.004,780.626,940GZZLUBLG,central,,Bethnal Green
+tick,954.897,904.605,940GZZLUMBA,central,,Marble Arch
+tick,935.183,932.531,940GZZLULGT,central,,Lancaster Gate
+tick,1325.218,938.046,940GZZLUCHL,central,,Chancery Lane
+tick,619.724,945.194,940GZZLUEAN,central,,East Acton
+tick,807.598,951.002,940GZZLUHPK,central,,Holland Park
+tick,506.77,951.03,940GZZLUWTA,central,,West Acton
+tick,567.694,951.03,940GZZLUNAN,central,,North Acton
+tick,888.042,951.066,940GZZLUQWY,central,,Queensway
+tick,1103.75,763.922,940GZZLUGPS,circle,,Great Portland Street
+tick,758.85,840.841,940GZZLURYO,circle,,Royal Oak
+tick,1406.935,852.195,940GZZLUBBN,circle,,Barbican
+tick,736.542,854.559,940GZZLUWSP,circle,,Westbourne Park
+tick,842.778,866.458,940GZZLUBWT,circle,,Bayswater
+tick,725.112,874.457,940GZZLULAD,circle,,Ladbroke Grove
+tick,707.243,892.326,940GZZLULRD,circle,,Latimer Road
+tick,1566.973,916.969,940GZZLUALD,circle,,Aldgate
+tick,842.782,992.102,940GZZLUHSK,circle,,High Street Kensington
+tick,696.622,998.518,940GZZLUSBM,circle,,Shepherd's Bush Market
+tick,1368.159,1004.583,940GZZLUMSH,circle,,Mansion House
+tick,696.622,1017.158,940GZZLUGHK,circle,,Goldhawk Road
+tick,1307.735,1056.759,940GZZLUTMP,circle,,Temple
+tick,876.726,1069.91,940GZZLUGTR,circle,,Gloucester Road
+tick,1083.57,1069.966,940GZZLUSJP,circle,,St. James's Park
+tick,968.762,1075.874,940GZZLUSSQ,circle,,Sloane Square
+tick,2304.212,576.371,940GZZLUUPB,district,,Upminster Bridge
+tick,2281.982,598.607,940GZZLUHCH,district,,Hornchurch
+tick,2258.633,621.943,940GZZLUEPK,district,,Elm Park
+tick,2236.373,644.203,940GZZLUDGE,district,,Dagenham East
+tick,2215.903,664.672,940GZZLUDGY,district,,Dagenham Heathway
+tick,2194.482,686.081,940GZZLUBEC,district,,Becontree
+tick,2173.825,706.738,940GZZLUUPY,district,,Upney
+tick,2115.453,765.055,940GZZLUEHM,district,,East Ham
+tick,1940.55,800.085,940GZZLUBBB,district,,Bromley-by-Bow
+tick,2027.039,800.085,940GZZLUPLW,district,,Plaistow
+tick,2069.285,800.085,940GZZLUUPK,district,,Upton Park
+tick,1735.109,805.891,940GZZLUSGN,district,,Stepney Green
+tick,837.822,866.458,940GZZLUBWT,district,,Bayswater
+tick,837.826,992.102,940GZZLUHSK,district,,High Street Kensington
+tick,1371.706,1008.128,940GZZLUMSH,district,,Mansion House
+tick,1311.245,1060.269,940GZZLUTMP,district,,Temple
+tick,876.722,1074.978,940GZZLUGTR,district,,Gloucester Road
+tick,1083.57,1074.986,940GZZLUSJP,district,,St. James's Park
+tick,968.762,1080.838,940GZZLUSSQ,district,,Sloane Square
+tick,767.226,1080.858,940GZZLUWKN,district,,West Kensington
+tick,485.366,1080.922,940GZZLUCWP,district,,Chiswick Park
+tick,592.826,1080.922,940GZZLUSFB,district,,Stamford Brook
+tick,655.994,1080.97,940GZZLURVP,district,,Ravenscourt Park
+tick,801.798,1190.75,940GZZLUFBY,district,,Fulham Broadway
+tick,795.926,1275.29,940GZZLUPSG,district,,Parsons Green
+tick,795.93,1432.722,940GZZLUSFS,district,,Southfields
+tick,795.93,1445.858,940GZZLUWIP,district,,Wimbledon Park
+tick,1990.772,694.251,940GZZDLSHS,dlr,,Stratford High Street DLR Station
+tick,1916.02,726.402,940GZZDLPUD,dlr,,Pudding Mill Lane DLR Station
+tick,1990.772,731.431,940GZZDLABR,dlr,,Abbey Road DLR Station
+tick,1867.524,839.148,940GZZDLDEV,dlr,,Devons Road DLR Station
+tick,1990.772,888.447,940GZZDLSTL,dlr,,Star Lane DLR Station
+tick,1867.524,920.286,940GZZDLLDP,dlr,,Langdon Park DLR Station
+tick,1867.524,949.211,940GZZDLALL,dlr,,All Saints DLR Station
+tick,1870.114,991.194,940GZZDLBLA,dlr,,Blackwall DLR Station
+tick,1932.087,991.195,940GZZDLEIN,dlr,,East India DLR Station
+tick,2154.168,1049.877,940GZZDLPRE,dlr,,Prince Regent DLR Station
+tick,2154.168,1073.899,940GZZDLRAL,dlr,,Royal Albert DLR Station
+tick,2076.568,1081.73,940GZZDLWSV,dlr,,West Silvertown DLR Station
+tick,2154.168,1098.132,940GZZDLBPK,dlr,,Beckton Park DLR Station
+tick,1814.339,1103.152,940GZZDLHEQ,dlr,,Heron Quays DLR Station
+tick,2076.568,1110.748,940GZZDLPDK,dlr,,Pontoon Dock DLR Station
+tick,2154.168,1122.075,940GZZDLCYP,dlr,,Cyprus DLR Station
+tick,1814.339,1130.478,940GZZDLSOQ,dlr,,South Quay DLR Station
+tick,2154.168,1147.551,940GZZDLGAL,dlr,,Gallions Reach DLR Station
+tick,1814.339,1155.72,940GZZDLCLA,dlr,,Crossharbour DLR Station
+tick,2151.267,1171.024,940GZZDLBEC,dlr,,Beckton DLR Station
+tick,2076.568,1173.272,940GZZDLKGV,dlr,,King George V DLR Station
+tick,1814.339,1180.961,940GZZDLMUD,dlr,,Mudchute DLR Station
+tick,1814.339,1206.203,940GZZDLISL,dlr,,Island Gardens DLR Station
+tick,1820.208,1324.671,940GZZDLDEP,dlr,,Deptford Bridge DLR Station
+tick,1820.208,1356.808,940GZZDLELV,dlr,,Elverson Road DLR Station
+tick,2325.488,278.332,910GBRTWOOD,elizabeth,,Brentwood
+tick,2263.994,339.827,910GHRLDWOD,elizabeth,,Harold Wood
+tick,2235.719,368.102,910GGIDEAPK,elizabeth,,Gidea Park
+tick,2172.769,431.051,910GCHDWLHT,elizabeth,,Chadwell Heath
+tick,2150.265,453.555,910GGODMAYS,elizabeth,,Goodmayes
+tick,2127.743,476.078,910GSVNKNGS,elizabeth,,Seven Kings
+tick,2107.746,496.075,910GILFORD,elizabeth,,Ilford
+tick,2082.994,520.826,910GMANRPK,elizabeth,,Manor Park
+tick,74.358,574.722,910GRDNGSTN,elizabeth,,Reading
+tick,80.226,574.722,910GRDNGSTN,elizabeth,,Reading
+tick,1990.199,613.621,910GMRYLAND,elizabeth,,Maryland
+tick,80.15,633.27,910GTWYFORD,elizabeth,,Twyford
+tick,80.15,691.814,910GMDNHEAD,elizabeth,,Maidenhead
+tick,80.15,724.906,910GTAPLOW,elizabeth,,Taplow
+tick,80.15,757.882,910GBNHAM,elizabeth,,Burnham (Berks)
+tick,80.15,816.426,910GSLOUGH,elizabeth,,Slough
+tick,80.15,849.518,910GLANGLEY,elizabeth,,Langley (Berks)
+tick,506.445,858.58,910GACTONML,elizabeth,,Acton Main Line
+tick,80.15,882.982,910GIVER,elizabeth,,Iver
+tick,128.082,932.924,910GWDRYTON,elizabeth,,West Drayton
+tick,310.541,938.523,910GHANWELL,elizabeth,,Hanwell
+tick,257.186,938.72,910GSTHALL,elizabeth,,Southall
+tick,1103.75,758.958,940GZZLUGPS,hammersmith-city,,Great Portland Street
+tick,2111.898,761.501,940GZZLUEHM,hammersmith-city,,East Ham
+tick,1940.55,795.092,940GZZLUBBB,hammersmith-city,,Bromley-by-Bow
+tick,2027.039,795.092,940GZZLUPLW,hammersmith-city,,Plaistow
+tick,2069.285,795.092,940GZZLUUPK,hammersmith-city,,Upton Park
+tick,1735.109,800.934,940GZZLUSGN,hammersmith-city,,Stepney Green
+tick,755.312,837.304,940GZZLURYO,hammersmith-city,,Royal Oak
+tick,1410.447,848.684,940GZZLUBBN,hammersmith-city,,Barbican
+tick,733.004,851.022,940GZZLUWSP,hammersmith-city,,Westbourne Park
+tick,721.573,870.917,940GZZLULAD,hammersmith-city,,Ladbroke Grove
+tick,703.704,888.786,940GZZLULRD,hammersmith-city,,Latimer Road
+tick,691.654,998.518,940GZZLUSBM,hammersmith-city,,Shepherd's Bush Market
+tick,691.654,1017.158,940GZZLUGHK,hammersmith-city,,Goldhawk Road
+tick,739.408,262.15,940GZZLUSTM,jubilee,,Stanmore
+tick,742.342,299.222,940GZZLUCPK,jubilee,,Canons Park
+tick,742.342,336.422,940GZZLUQBY,jubilee,,Queensbury
+tick,742.342,373.266,940GZZLUKBY,jubilee,,Kingsbury
+tick,797.217,455.546,940GZZLUNDN,jubilee,,Neasden
+tick,818.771,477.095,940GZZLUDOH,jubilee,,Dollis Hill
+tick,850.444,508.772,940GZZLUWIG,jubilee,,Willesden Green
+tick,873.092,531.42,940GZZLUKBN,jubilee,,Kilburn
+tick,1012.48,729.289,940GZZLUSJW,jubilee,,St. John's Wood
+tick,1531.851,1080.848,940GZZLUBMY,jubilee,,Bermondsey
+tick,2274.842,469.011,910GEMRSPKH,liberty,,Emerson Park
+tick,657.24,114.22,910GWATFDHS,lioness,,Watford High Street
+tick,657.24,191.836,910GCRPNDPK,lioness,,Carpenders Park
+tick,657.24,233.796,910GHTCHEND,lioness,,Hatch End
+tick,657.24,276.096,910GHEDSTNL,lioness,,Headstone Lane
+tick,657.24,449.06,910GSKENTON,lioness,,South Kenton
+tick,657.24,471.284,910GNWEMBLY,lioness,,North Wembley
+tick,657.24,519.956,910GSTNBGPK,lioness,,Stonebridge Park
+tick,657.24,541.52,910GHARLSDN,lioness,,Harlesden
+tick,663.04,630.428,910GKENSLG,lioness,,Kensal Green
+tick,848.43,672.738,910GKLBRNHR,lioness,,Kilburn High Road
+tick,194.022,87.588,940GZZLUCSM,metropolitan,,Chesham
+tick,304.858,173.636,940GZZLUWAF,metropolitan,,Watford
+tick,243.474,188.076,940GZZLUCYD,metropolitan,,Chorleywood
+tick,307.768,208.828,940GZZLUCXY,metropolitan,,Croxley
+tick,272.46,217.062,940GZZLURKW,metropolitan,,Rickmansworth
+tick,323.754,260.135,940GZZLUMPK,metropolitan,,Moor Park
+tick,349.762,286.143,940GZZLUNOW,metropolitan,,Northwood
+tick,386.105,322.485,940GZZLUNWH,metropolitan,,Northwood Hills
+tick,129.444,340.384,940GZZLUHGD,metropolitan,,Hillingdon
+tick,219.92,340.384,940GZZLURSP,metropolitan,,Ruislip
+tick,75.356,341.64,940GZZLUUXB,metropolitan,,Uxbridge
+tick,175.368,346.208,940GZZLUICK,metropolitan,,Ickenham
+tick,416.456,352.837,940GZZLUPNR,metropolitan,,Pinner
+tick,290.118,355.504,940GZZLURSM,metropolitan,,Ruislip Manor
+tick,442.248,378.628,940GZZLUNHA,metropolitan,,North Harrow
+tick,316.168,381.555,940GZZLUEAE,metropolitan,,Eastcote
+tick,713.288,420.092,940GZZLUPRD,metropolitan,,Preston Road
+tick,421.876,425.908,940GZZLUWHW,metropolitan,,West Harrow
+tick,1103.75,768.238,940GZZLUGPS,metropolitan,,Great Portland Street
+tick,1403.883,855.247,940GZZLUBBN,metropolitan,,Barbican
+tick,1561.566,916.969,940GZZLUALD,metropolitan,,Aldgate
+tick,1122.72,511.276,910GHMPSTDH,mildmay,,Hampstead Heath
+tick,720.488,571.988,910GKENR,mildmay,,Kensal Rise
+tick,779.864,571.988,910GBRBYPK,mildmay,,Brondesbury Park
+tick,1196.499,573.938,910GKNTSHTW,mildmay,,Kentish Town West
+tick,820.592,577.804,910GBRBY,mildmay,,Brondesbury
+tick,1624.336,621.15,910GDALSKLD,mildmay,,Dalston Kingsland
+tick,1800.008,653.024,910GHOMRTON,mildmay,,Homerton
+tick,1864.216,658.748,910GHACKNYW,mildmay,,Hackney Wick
+tick,540.448,993.548,910GACTNCTL,mildmay,,Acton Central
+tick,540.448,1021.332,910GSACTON,mildmay,,South Acton
+tick,1269.0,176.99,940GZZLUHBT,northern,,High Barnet
+tick,1266.066,204.614,940GZZLUTAW,northern,,Totteridge & Whetstone
+tick,1266.066,233.73,940GZZLUWOP,northern,,Woodside Park
+tick,833.645,237.233,940GZZLUEGW,northern,,Edgware
+tick,1266.066,261.45,940GZZLUWFN,northern,,West Finchley
+tick,866.932,274.662,940GZZLUBTK,northern,,Burnt Oak
+tick,1241.326,283.515,940GZZLUMHL,northern,,Mill Hill East
+tick,902.057,309.796,940GZZLUCND,northern,,Colindale
+tick,1266.066,323.918,940GZZLUFYC,northern,,Finchley Central
+tick,944.305,343.745,940GZZLUHCL,northern,,Hendon Central
+tick,1266.062,360.502,940GZZLUEFY,northern,,East Finchley
+tick,976.298,375.747,940GZZLUBTX,northern,,Brent Cross
+tick,1266.062,397.234,940GZZLUHGT,northern,,Highgate
+tick,1007.658,407.107,940GZZLUGGN,northern,,Golders Green
+tick,1038.557,438.006,940GZZLUHTD,northern,,Hampstead
+tick,1073.146,480.887,940GZZLUBZP,northern,,Belsize Park
+tick,1271.914,518.486,940GZZLUTFP,northern,,Tufnell Park
+tick,1170.251,577.986,940GZZLUCFM,northern,,Chalk Farm
+tick,1193.846,668.214,940GZZLUMTC,northern,,Mornington Crescent
+tick,1422.268,754.32,940GZZLUAGL,northern,,Angel
+tick,1193.846,845.498,940GZZLUGDG,northern,,Goodge Street
+tick,1327.398,1201.332,940GZZLUBOR,northern,,Borough
+tick,1014.598,1231.209,940GZZNEUGST,northern,,Nine Elms
+tick,1156.29,1353.586,940GZZLUOVL,northern,,Oval
+tick,1077.443,1440.92,940GZZLUCPC,northern,,Clapham Common
+tick,1056.318,1462.127,940GZZLUCPS,northern,,Clapham South
+tick,1006.583,1511.816,940GZZLUTBC,northern,,Tooting Bec
+tick,986.253,1532.14,940GZZLUTBY,northern,,Tooting Broadway
+tick,945.479,1564.794,940GZZLUCSD,northern,,Colliers Wood
+tick,859.735,1654.493,940GZZLUMDN,northern,,Morden
+tick,1475.624,140.872,940GZZLUCKS,piccadilly,,Cockfosters
+tick,1472.698,172.152,940GZZLUOAK,piccadilly,,Oakwood
+tick,1472.698,203.44,940GZZLUSGT,piccadilly,,Southgate
+tick,1472.698,234.726,940GZZLUASG,piccadilly,,Arnos Grove
+tick,1529.413,342.233,940GZZLUWOG,piccadilly,,Wood Green
+tick,129.444,345.38,940GZZLUHGD,piccadilly,,Hillingdon
+tick,219.92,345.38,940GZZLURSP,piccadilly,,Ruislip
+tick,75.356,349.948,940GZZLUUXB,piccadilly,,Uxbridge
+tick,175.368,351.202,940GZZLUICK,piccadilly,,Ickenham
+tick,286.587,359.035,940GZZLURSM,piccadilly,,Ruislip Manor
+tick,312.638,385.085,940GZZLUEAE,piccadilly,,Eastcote
+tick,1550.518,390.844,940GZZLUTPN,piccadilly,,Turnpike Lane
+tick,373.608,454.272,940GZZLUSHH,piccadilly,,South Harrow
+tick,1477.786,544.84,940GZZLUASL,piccadilly,,Arsenal
+tick,1477.786,571.4,940GZZLUHWY,piccadilly,,Holloway Road
+tick,441.788,594.068,940GZZLUSUT,piccadilly,,Sudbury Town
+tick,441.788,671.512,940GZZLUALP,piccadilly,,Alperton
+tick,1276.936,807.819,940GZZLURSQ,piccadilly,,Russell Square
+tick,441.788,867.308,940GZZLUNEN,piccadilly,,North Ealing
+tick,1221.645,913.195,940GZZLUCGN,piccadilly,,Covent Garden
+tick,1011.499,975.354,940GZZLUHPC,piccadilly,,Hyde Park Corner
+tick,963.258,1023.597,940GZZLUKNB,piccadilly,,Knightsbridge
+tick,404.37,1059.146,940GZZLUSEA,piccadilly,,South Ealing
+tick,876.722,1059.178,940GZZLUGTR,piccadilly,,Gloucester Road
+tick,375.097,1078.191,940GZZLUNFD,piccadilly,,Northfields
+tick,352.132,1101.155,940GZZLUBOS,piccadilly,,Boston Manor
+tick,320.092,1133.205,940GZZLUOSY,piccadilly,,Osterley
+tick,297.793,1155.514,940GZZLUHWE,piccadilly,,Hounslow East
+tick,274.945,1178.353,940GZZLUHWC,piccadilly,,Hounslow Central
+tick,244.899,1208.41,940GZZLUHWT,piccadilly,,Hounslow West
+tick,212.688,1240.594,940GZZLUHNX,piccadilly,,Hatton Cross
+tick,1370.916,434.74,910GCROUCHH,suffragette,,Crouch Hill
+tick,1923.968,538.996,910GLEYTNMR,suffragette,,Leyton Midland Road
+tick,2073.421,625.926,910GWDGRNPK,suffragette,,Woodgrange Park
+tick,1373.67,153.908,910GNBARNET,thameslink,,New Barnet
+tick,924.214,154.282,910GELTR,thameslink,,Elstree & Borehamwood
+tick,1373.67,198.36,910GOKLGHPK,thameslink,,Oakleigh Park
+tick,1373.67,243.168,910GNEWSGAT,thameslink,,New Southgate
+tick,924.214,263.202,910GMLHB,thameslink,,Mill Hill Broadway
+tick,924.214,390.802,910GHDON,thameslink,,Hendon
+tick,924.214,421.478,910GBRENTX,thameslink,,Brent Cross West
+tick,924.214,453.202,910GCRKLWD,thameslink,,Cricklewood
+tick,2014.48,1267.066,910GCRLN,thameslink,,Charlton
+tick,1749.84,1267.144,910GDEPTFD,thameslink,,Deptford
+tick,1957.772,1267.294,910GWCOMBEP,thameslink,,Westcombe Park
+tick,1920.192,1272.656,910GMAZEH,thameslink,,Maze Hill
+tick,2133.492,1272.88,910GPLMS,thameslink,,Plumstead
+tick,1249.896,1367.252,910GLBGHJN,thameslink,,Loughborough Junction
+tick,2264.208,1392.288,910GSLADEGN,thameslink,,Slade Green
+tick,1526.548,1398.69,910GNUNHEAD,thameslink,,Nunhead
+tick,1762.124,1484.382,910GCFPK,thameslink,,Crofton Park
+tick,934.473,1504.78,910GHYDNSRD,thameslink,,Haydons Road
+tick,1820.588,1534.624,910GBELNGHM,thameslink,,Bellingham
+tick,1846.399,1560.435,910GBCKNHMH,thameslink,,Beckenham Hill
+tick,754.86,1582.352,910GWIMLCHS,thameslink,,Wimbledon Chase
+tick,1879.286,1593.322,910GRBRN,thameslink,,Ravensbourne
+tick,1047.413,1606.454,910GTOOTING,thameslink,,Tooting
+tick,1208.781,1606.933,910GSTRETHM,thameslink,,Streatham
+tick,2011.316,1626.564,910GBICKLEY,thameslink,,Bickley
+tick,2182.668,1626.584,910GSTMRYC,thameslink,,St Mary Cray
+tick,2303.108,1632.58,910GSWLY,thameslink,,Swanley
+tick,1934.548,1633.494,910GSHRTLND,thameslink,,Shortlands
+tick,1989.056,1633.494,910GBROMLYS,thameslink,,Bromley South
+tick,2067.144,1666.24,910GPETSWD,thameslink,,Petts Wood
+tick,1088.275,1678.584,910GESTFLDS,thameslink,,Mitcham Eastfields
+tick,785.892,1737.437,910GSMERTON,thameslink,,South Merton
+tick,825.876,1777.422,910GMORDENS,thameslink,,Morden South
+tick,865.861,1817.406,910GSHLIER,thameslink,,St Helier
+tick,1043.876,1854.464,910GHKBG,thameslink,,Hackbridge
+tick,905.845,1857.391,910GSUTTONC,thameslink,,Sutton Common
+tick,1495.379,1889.788,910GSCROYDN,thameslink,,South Croydon
+tick,1043.876,1892.056,910GCRSHLTN,thameslink,,Carshalton
+tick,945.83,1897.376,910GWSUTTON,thameslink,,West Sutton
+tick,1452.899,1932.268,910GPURLEY,thameslink,,Purley
+tick,1381.084,2004.084,910GCOLSDNS,thameslink,,Coulsdon South
+tick,837.634,1541.23,940GZZCRDDR,tram,,Dundonald Road
+tick,862.1,1582.83,940GZZCRMTP,tram,,Merton Park
+tick,945.728,1666.459,940GZZCRPHI,tram,,Phipps Bridge
+tick,1715.26,1672.61,940GZZCRAVE,tram,,Avenue Road
+tick,966.874,1687.605,940GZZCRBGV,tram,,Belgrave Walk
+tick,987.871,1708.601,940GZZCRMCH,tram,,Mitcham
+tick,1652.644,1709.774,940GZZCRHAR,tram,,Harrington Road
+tick,1652.644,1752.358,940GZZCRARA,tram,,Arena
+tick,1652.644,1773.558,940GZZCRWOD,tram,,Woodside
+tick,1279.294,1782.67,940GZZCRCTR,tram,,Centrale
+tick,1375.518,1782.67,940GZZCRWEL,tram,,Wellesley Road
+tick,1067.31,1788.04,940GZZCRBED,tram,,Beddington Lane
+tick,1652.644,1794.762,940GZZCRBLA,tram,,Blackhorse Lane
+tick,1211.011,1802.331,940GZZCRRVC,tram,,Reeves Corner
+tick,1082.679,1803.409,940GZZCRTPA,tram,,Therapia Lane
+tick,1652.644,1815.966,940GZZCRADD,tram,,Addiscombe
+tick,1108.398,1827.402,940GZZCRAMP,tram,,Ampere Way
+tick,1166.13,1833.802,940GZZCRWAN,tram,,Wandle Park
+tick,1553.81,1833.806,940GZZCRLEB,tram,,Lebanon Road
+tick,1144.828,1839.62,940GZZCRWAD,tram,,Waddon Marsh
+tick,1290.11,1839.62,940GZZCRCHR,tram,,Church Street
+tick,1392.474,1839.62,940GZZCRCEN,tram,,George Street
+tick,1603.626,1839.62,940GZZCRSAN,tram,,Sandilands
+tick,1652.644,1864.166,940GZZCRLOY,tram,,Lloyd Park
+tick,1652.644,1887.142,940GZZCRCOO,tram,,Coombe Lane
+tick,1652.644,1910.122,940GZZCRGRA,tram,,Gravel Hill
+tick,1652.644,1933.1,940GZZCRADV,tram,,Addington Village
+tick,1652.644,1956.08,940GZZCRFLD,tram,,Fieldway
+tick,1652.644,1979.058,940GZZCRKGH,tram,,King Henry's Drive
+tick,1649.734,2002.04,940GZZCRNWA,tram,,New Addington
+tick,1054.706,1118.21,940GZZLUPCO,victoria,,Pimlico
+tick,1771.183,206.089,910GTHBLDSG,weaver,,Theobalds Grove
+tick,1634.001,225.714,910GENFLDTN,weaver,,Enfield Town
+tick,1741.961,235.31,910GTURKYST,weaver,,Turkey Street
+tick,1723.363,253.908,910GSBURY,weaver,,Southbury
+tick,1663.847,259.669,910GBHILLPK,weaver,,Bush Hill Park
+tick,1860.834,280.264,910GCHINGFD,weaver,,Chingford
+tick,1691.928,321.984,910GEDMNGRN,weaver,,Edmonton Green
+tick,1863.74,323.648,910GHGHMSPK,weaver,,Highams Park
+tick,1691.928,351.296,910GSIVRST,weaver,,Silver Street
+tick,1863.624,353.972,910GWDST,weaver,,Wood Street
+tick,1691.928,381.344,910GWHHRTLA,weaver,,White Hart Lane
+tick,1691.928,410.536,910GBRUCGRV,weaver,,Bruce Grove
+tick,1691.928,495.916,910GSTMFDHL,weaver,,Stamford Hill
+tick,1691.928,531.832,910GSTKNWNG,weaver,,Stoke Newington
+tick,1775.634,537.049,910GSTJMSST,weaver,,St James Street (London)
+tick,1757.012,547.448,910GCLAPTON,weaver,,Clapton
+tick,1691.928,567.052,910GRCTRYRD,weaver,,Rectory Road
+tick,1691.928,679.452,910GLONFLDS,weaver,,London Fields
+tick,1691.928,703.676,910GCAMHTH,weaver,,Cambridge Heath (London)
+tick,1685.926,732.628,910GBTHNLGR,weaver,,Bethnal Green
+tick,1592.198,654.573,910GDALS,windrush,,Dalston Junction
+tick,1603.552,674.168,910GHAGGERS,windrush,,Haggerston
+tick,1647.352,741.556,910GHOXTON,windrush,,Hoxton
+tick,1647.352,800.468,910GSHRDHST,windrush,,Shoreditch High Street
+tick,1653.168,1021.584,910GWAPPING,windrush,,Wapping
+tick,1647.352,1058.256,910GRTHERHI,windrush,,Rotherhithe
+tick,1647.352,1139.432,910GSURREYQ,windrush,,Surrey Quays
+tick,1013.56,1373.816,910GWNDSWRD,windrush,,Wandsworth Road
+tick,1653.168,1444.58,910GBROCKLY,windrush,,Brockley
+tick,1653.168,1467.152,910GHONROPK,windrush,,Honor Oak Park
+tick,1653.168,1489.068,910GFORESTH,windrush,,Forest Hill
+tick,1521.213,1668.364,910GANERLEY,windrush,,Anerley

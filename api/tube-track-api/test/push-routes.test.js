@@ -277,6 +277,28 @@ test('widget registrations are stored separately from activities', async () => {
 });
 
 const riverPier = { id: '930GCAD', lineIds: ['rb6'], arrivalStopIds: ['930GCAD', '930BCAD'] };
+test('National Rail tracking validates the station, operator namespace and CRS scope', async () => {
+    await withRoutes(async ({ call, store }) => {
+        const rail = registration({ hubId: 'HUBBEK', lineId: 'national-rail:SE', direction: 'any', stopIds: ['BKJ'] });
+        const good = await call('POST', '/api/v1/push/live-activities', { body: rail });
+        assert.equal(good.status, 201);
+        const stored = store.get((await good.json()).data.id);
+        assert.equal(stored.lineId, 'national-rail:SE');
+        assert.deepEqual(stored.stopIds, ['BKJ']);
+        for (const fields of [{ hubId: 'nr:XXX' }, { lineId: 'national-rail:' }, { stopIds: ['VIC'] },
+            { stopIds: ['940GZZLUOXC'] }, { direction: 'inbound' }, { direction: 'outbound' }]) {
+            const bad = await call('POST', '/api/v1/push/live-activities', { body: { ...rail, ...fields } });
+            assert.equal(bad.status, 400);
+        }
+        assert.deepEqual(store.get(stored.id).stopIds, ['BKJ']);
+        for (const direction of ['northbound', 'southbound', 'eastbound', 'westbound']) {
+            const result = await call('POST', '/api/v1/push/live-activities', { body: { ...rail, direction } });
+            assert.equal(result.status, 201);
+            assert.equal(store.get((await result.json()).data.id).direction, direction);
+        }
+    }, { rateLimiter: createRateLimiter({ maxRequests: 30 }) });
+});
+
 const riverRegistration = (overrides = {}) => registration({
     lineId: 'rb6', hubId: '930GCAD', stopIds: ['930GCAD'], direction: 'any', ...overrides
 });
