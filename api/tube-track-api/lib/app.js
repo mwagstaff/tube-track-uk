@@ -1,7 +1,9 @@
 import { createScheduledJourneyRoutes } from './scheduled-journeys.js';
+import { createCustomDepartureSource, createCustomDepartureRoutes } from './custom-departure-board.js';
 import compression from 'compression';
 import express from 'express';
 import { JourneyError, JourneyPlanner } from './journey-planner.js';
+import { CombinedJourneys, combinedJourneyRoutes } from './combined-journeys.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { includedLineIDs, visibleLines } from './line-gating.js';
 import { loadLineStatuses } from './line-status.js';
@@ -98,11 +100,13 @@ export function createApp({
     pushTokenStore = null,
     scheduledJourneyStore = null,
     usageStore = null,
-    journeyPlanner = new JourneyPlanner({ client })
+    journeyPlanner = new JourneyPlanner({ client }),
+    combinedJourneys = new CombinedJourneys({ tflPlanner: journeyPlanner })
 }) {
     const app = express();
     app.disable('x-powered-by');
     app.disable('etag');
+    const customDepartures = createCustomDepartureSource({ client, resourceCache, cache });
     app.use((req, res, next) => {
         res.set('X-Content-Type-Options', 'nosniff');
         next();
@@ -135,6 +139,8 @@ export function createApp({
     app.use('/api/v1/cable-car', createCableCarRoutes({ client, resourceCache }));
     app.use('/api/v1/thameslink', createThameslinkRoutes({ client, resourceCache }));
     app.use('/api/v1/national-rail', createNationalRailRoutes({ client, resourceCache }));
+    app.use('/api/v1/departure-board', createCustomDepartureRoutes(customDepartures));
+    app.use('/api/v2/journey-searches', combinedJourneyRoutes(combinedJourneys));
 
     app.get('/api/v1/line-colours', (req, res) => {
         const lines = visibleLines(LINE_COLOURS, includedLineIDs(req.query));
@@ -148,6 +154,12 @@ export function createApp({
             res.set('Cache-Control', 'public, max-age=86400');
             res.json({ data: stations, meta: { source: 'tfl', count: stations.length } });
         } catch (error) { next(error); }
+    });
+
+    app.get('/api/v2/journey-transfers', async (req, res, next) => {
+        res.set('Cache-Control', 'no-store');
+        try { res.json(await journeyPlanner.plan(req.query, { transfer: true })); }
+        catch (error) { next(error); }
     });
 
     app.get('/api/v1/journeys', async (req, res, next) => {
@@ -275,6 +287,7 @@ export function createApp({
     // act on.
     if (pushTokenStore) {
         app.use('/api/v1/push', createPushRoutes({
+            customDepartures,
             store: pushTokenStore,
             scheduleStore: scheduledJourneyStore,
             isKnownStop: (id) => journeyPlanner.byId.has(id),

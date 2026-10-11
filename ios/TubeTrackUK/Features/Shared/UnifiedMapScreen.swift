@@ -8,7 +8,6 @@ struct UnifiedMapScreen: View {
     @State private var initialLocationFocusFinished = false
     @State private var mapInteractionGeneration = 0
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Binding var closestStationPanelHidden: Bool
     @Binding var mapNavigationActive: Bool
     let onShowDisruptions: () -> Void
     @State private var layoutProgress: CGFloat = 0
@@ -168,6 +167,15 @@ struct UnifiedMapScreen: View {
             guard trainID != nil else { return }
             handleMapInteraction()
         }
+        .sheet(item: Binding(get: { selectedDepartureRequest }, set: { value in
+            if value == nil {
+                appState.clearStationSelection()
+                appState.river.clearSelection()
+            }
+        })) { request in
+            DepartureBoardCard(initialRequest: request, presentedAsSheet: true,
+                               preferredServiceID: appState.selectedStationDepartureOperatorID ?? appState.selectedStationDepartureLineID?.rawValue)
+        }
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)
         }
@@ -269,20 +277,6 @@ struct UnifiedMapScreen: View {
             || appState.selectedLineID != nil
     }
 
-    private func setClosestStationPanel(hidden: Bool) {
-        if callbackReduceMotion {
-            var transaction = Transaction()
-            transaction.disablesAnimations = true
-            withTransaction(transaction) {
-                closestStationPanelHidden = hidden
-            }
-        } else {
-            withAnimation(.smooth(duration: hidden ? 0.24 : 0.32)) {
-                closestStationPanelHidden = hidden
-            }
-        }
-    }
-
     private func setMapNavigation(active: Bool) {
         if active { handleMapInteraction() }
         guard mapNavigationActive != active else { return }
@@ -365,6 +359,14 @@ struct UnifiedMapScreen: View {
         }
     }
 
+    private var selectedDepartureRequest: DepartureBoardRequest? {
+        if let pier = appState.river.selectedPier { return .init(originID: pier.id) }
+        if let station = appState.selectedStation {
+            return .init(originID: appState.departureStop(id: station.id)?.id ?? station.hubID ?? station.id)
+        }
+        return nil
+    }
+
     private func bottomOverlayContent(availableSize: CGSize) -> some View {
         return VStack(spacing: 9) {
             if appState.selectedDisruption == nil,
@@ -388,16 +390,8 @@ struct UnifiedMapScreen: View {
 
             if appState.cableCar.hasSelection {
                 CableCarCard()
-            } else if let pier = appState.river.selectedPier {
-                RiverPierCard(pier: pier)
             } else if let boat = appState.river.selectedBoat {
                 RiverBoatCard(boat: boat)
-            } else if let station = appState.selectedStation {
-                StationDetailCard(
-                    station: station,
-                    onShowDisruption: showDisruptionDetails(_:)
-                )
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
             } else if let disruption = appState.selectedDisruption {
                 DisruptionDetailCard(
                     disruption: disruption,
@@ -445,11 +439,6 @@ struct UnifiedMapScreen: View {
 
             MapControlDock(
                 interactionGeneration: mapInteractionGeneration,
-                showsClosestStation: !appState.cableCar.hasSelection && !appState.river.hasSelection && appState.selectedDisruption == nil
-                    && appState.selectedTrain == nil
-                    && appState.showsClosestStation
-                    && !closestStationPanelHidden,
-                closestStationOpacity: 1,
                 showsReset: true,
                 onReset: { resetMapView(source: .mapOptions) },
                 onFocusUserLocation: focusMap(on:),
@@ -464,7 +453,6 @@ struct UnifiedMapScreen: View {
             reduceMotion ? nil : .smooth(duration: 0.32),
             value: appState.selectedDisruptionID
         )
-        .animation(.smooth(duration: 0.32), value: closestStationPanelHidden)
         .safeAreaPadding(.bottom, 4)
     }
 
@@ -505,14 +493,12 @@ struct UnifiedMapScreen: View {
         initialLocationFocusFinished = true
         appState.clearMapSelection()
         locationFocusRequest = request
-        setClosestStationPanel(hidden: false)
     }
 
     private func handleMapInteraction() {
         locationFocusRequest = nil
         mapInteractionGeneration &+= 1
         initialLocationFocusFinished = true
-        setClosestStationPanel(hidden: true)
     }
 
     private func focusOnInitialLocationIfNeeded() {

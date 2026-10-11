@@ -19,6 +19,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     public let stationName: String
     public let lineIDRaw: String
     public let operatorName: String?
+    public let boardRequest: DepartureBoardRequest?
     /// What the passenger sees — the station's own platform wording.
     public let direction: String
     /// The canonical filter that label resolved to when tracking started. The
@@ -32,10 +33,11 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
 
     public var isRiver: Bool { lineIDRaw.hasPrefix("rb") }
     public var isNationalRailOperator: Bool { lineIDRaw.hasPrefix("national-rail:") }
-    public var showsPlatforms: Bool { isNationalRailOperator || lineID?.isNationalRail == true }
+    public var showsPlatforms: Bool { boardRequest != nil || isNationalRailOperator || lineID?.isNationalRail == true }
     public var lineName: String { operatorName ?? lineID?.displayName ?? (isNationalRailOperator ? "National Rail" : lineIDRaw.uppercased()) }
     public var deepLink: DeepLink {
-        isRiver ? .pier(id: stationHubID, line: lineIDRaw) : .station(id: stationHubID, line: lineID)
+        if let boardRequest { return .board(boardRequest) }
+        return isRiver ? .pier(id: stationHubID, line: lineIDRaw) : .station(id: stationHubID, line: lineID)
     }
     public var lineID: TubeLineID? { TubeLineID(rawValue: lineIDRaw) }
     public var directionFilter: DepartureDirectionFilter {
@@ -62,7 +64,8 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     public init(
         activityID: String, stationHubID: String, stationName: String,
         lineIDRaw: String, direction: String, directionFilter: DepartureDirectionFilter,
-        startedAt: Date, hardEndsAt: Date, operatorName: String? = nil
+        startedAt: Date, hardEndsAt: Date, operatorName: String? = nil,
+        boardRequest: DepartureBoardRequest? = nil
     ) {
         scheduleID = nil
         self.activityID = activityID
@@ -70,6 +73,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         self.stationName = String(stationName.prefix(40))
         self.lineIDRaw = lineIDRaw
         self.operatorName = operatorName.map { String($0.prefix(40)) }
+        self.boardRequest = boardRequest
         self.direction = direction
         directionFilterRaw = directionFilter.rawValue
         startedAtEpoch = startedAt.epochSeconds
@@ -84,6 +88,7 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         stationName = try container.decodeIfPresent(String.self, forKey: .stationName) ?? ""
         lineIDRaw = try container.decodeIfPresent(String.self, forKey: .lineIDRaw) ?? ""
         operatorName = try container.decodeIfPresent(String.self, forKey: .operatorName)
+        boardRequest = try container.decodeIfPresent(DepartureBoardRequest.self, forKey: .boardRequest)
         direction = try container.decodeIfPresent(String.self, forKey: .direction) ?? ""
         directionFilterRaw = try container.decodeIfPresent(String.self, forKey: .directionFilterRaw)
             ?? DepartureDirectionFilter.resolve(label: direction).rawValue

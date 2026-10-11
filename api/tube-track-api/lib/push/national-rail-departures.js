@@ -32,7 +32,7 @@ export function railClockDate(value, referenceMs) {
     return candidates[0] ?? null;
 }
 
-export function nationalRailPredictions(board, crs, nowMs, { includeThameslink = false } = {}) {
+export function nationalRailPredictions(board, crs, nowMs, { includeThameslink = false, includeAllOperators = false } = {}) {
     if (!Array.isArray(board?.departures)) throw new Error('Invalid National Rail board');
     const referenceMs = Date.parse(board.lastSuccessfulUpdate);
     const seen = new Set();
@@ -42,7 +42,7 @@ export function nationalRailPredictions(board, crs, nowMs, { includeThameslink =
         const excludedCodes = includeThameslink ? ['LO', 'XR'] : ['TL', 'LO', 'XR'];
         const excludedNames = includeThameslink ? ['london overground', 'elizabeth line', 'tfl rail']
             : ['thameslink', 'london overground', 'elizabeth line', 'tfl rail'];
-        if (!text(row.serviceID) || excludedCodes.includes(code) || excludedNames.includes(name.toLowerCase())
+        if (!text(row.serviceID) || (!includeAllOperators && (excludedCodes.includes(code) || excludedNames.includes(name.toLowerCase())))
             || (row.serviceType && row.serviceType.toLowerCase() !== 'train')) return [];
         const scheduled = railClockDate(row.departure_time?.scheduled, referenceMs);
         if (scheduled === null) return [];
@@ -63,6 +63,9 @@ export function nationalRailPredictions(board, crs, nowMs, { includeThameslink =
         seen.add(id);
         const platform = row.platformIsHidden ? '' : text(row.platform);
         return [{ id, lineId: `national-rail:${code || name.toLowerCase() || 'unknown'}`, stopId: crs,
+            operatorName: name || 'National Rail',
+            destinationStopId: destinations.length === 1 ? text(destinations[0].crs) : null,
+            filterCRS: text(row.filterCRS), filterLocationCancelled: row.filterLocationCancelled === true,
             direction: nationalRailDirection({ station: crs, destinations: destinations.map((item) => text(item.crs)) }),
             destinationName: destinations.map((item) => text(item.locationName)).filter(Boolean).join(' & ') || 'Check station screens',
             platformName: platform ? `Platform ${platform}` : 'Platform to be confirmed',
@@ -99,12 +102,14 @@ export function nationalRailCondition(arrivals, lineId, direction = 'any') {
 export function createNationalRailDepartureSource({ resourceCache, fetchImpl = fetch, clock = Date.now,
     baseUrl = 'https://api.skynolimit.dev/train-track/' }) {
     return {
-        async departures(crs, { includeThameslink = false } = {}) {
+        async departures(crs, { includeThameslink = false, includeAllOperators = false, destinationCRS = null } = {}) {
             if (!/^[A-Z]{3}$/.test(crs)) throw new Error('Invalid railway station code');
-            const result = await resourceCache.get(`national-rail-departures:${crs}`, {
+            if (destinationCRS !== null && !/^[A-Z]{3}$/.test(destinationCRS)) throw new Error('Invalid destination code');
+            const result = await resourceCache.get(`national-rail-departures:${crs}${destinationCRS ? ':' + destinationCRS : ''}`, {
                 freshForMs: 30_000,
                 load: async () => {
-                    const response = await fetchImpl(new URL(`api/v2/departures/from/${crs}`, baseUrl), {
+                    const path = destinationCRS ? `api/v1/departures/from/${crs}/to/${destinationCRS}` : `api/v2/departures/from/${crs}`;
+                    const response = await fetchImpl(new URL(path, baseUrl), {
                         signal: AbortSignal.timeout(8_000), headers: { accept: 'application/json' }
                     });
                     if (!response.ok) throw new Error(`National Rail returned HTTP ${response.status}`);
@@ -115,9 +120,12 @@ export function createNationalRailDepartureSource({ resourceCache, fetchImpl = f
             });
             const updatedAtMs = Date.parse(result.data.lastSuccessfulUpdate);
             const nowMs = clock();
-            if (result.meta.stale || result.data.dataStatus !== 'live' || !Number.isFinite(updatedAtMs)
+            // A failed refresh may still leave a genuinely recent live board. Its source
+            // timestamp, not the cache refresh outcome, controls the 90-second limit.
+            if (result.data.dataStatus !== 'live' || !Number.isFinite(updatedAtMs)
                 || nowMs - updatedAtMs > 90_000) throw new Error('National Rail board is stale');
-            return { data: nationalRailPredictions(result.data, crs, nowMs, { includeThameslink }),
+            return { data: nationalRailPredictions(result.data, crs, nowMs, { includeThameslink, includeAllOperators })
+                .filter((row) => !destinationCRS || (row.filterCRS === destinationCRS && !row.filterLocationCancelled)),
                 meta: { updatedAt: new Date(updatedAtMs).toISOString(), stale: false } };
         }
     };

@@ -549,9 +549,11 @@ private struct StationDepartureGroupView: View {
 }
 
 struct StationDepartureRow: View {
+    @Environment(\.departureBoardYellow) private var yellowBoard
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let arrival: TfLArrivalPrediction
     let now: Date
+    var showsOperator = false
 
     var body: some View {
         Group {
@@ -577,9 +579,15 @@ struct StationDepartureRow: View {
                 .font(.appSubheadline(.medium))
                 .lineLimit(dynamicTypeSize.isAccessibilitySize ? nil : 2)
                 .strikethrough(arrival.isCancelled)
-                .foregroundStyle(arrival.isCancelled ? .secondary : .primary)
-            if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
-                Text(platform).font(.appCaption2()).foregroundStyle(.secondary)
+                .foregroundStyle(arrival.isCancelled ? Color.secondary : yellowBoard ? DepartureBoardTheme.yellow : Color.primary)
+            if showsOperator {
+                Text([StationDepartureMetadata.platformLabel(for: arrival),
+                      arrival.operatorName ?? DepartureBoardTheme.lineName(arrival.lineId)].compactMap { $0 }.joined(separator: " · "))
+                    .font(.appCaption2())
+                    .foregroundStyle(yellowBoard ? DepartureBoardTheme.yellow.opacity(0.8) : Color.secondary)
+            } else if let platform = StationDepartureMetadata.platformLabel(for: arrival) {
+                Text(platform).font(.appCaption2())
+                    .foregroundStyle(yellowBoard ? DepartureBoardTheme.yellow.opacity(0.8) : Color.secondary)
             }
             if let note = StationDepartureMetadata.serviceNote(for: arrival),
                note != StationDepartureMetadata.departureTime(for: arrival, now: now) {
@@ -595,7 +603,7 @@ struct StationDepartureRow: View {
         Text(StationDepartureMetadata.departureTime(for: arrival, now: now))
             .font(.appSubheadline(.bold))
             .monospacedDigit()
-            .foregroundStyle(arrival.isCancelled ? Color.red : Color.departureAccent)
+            .foregroundStyle(arrival.isCancelled ? Color.red : yellowBoard ? DepartureBoardTheme.yellow : Color.departureAccent)
             .lineLimit(1)
             .fixedSize(horizontal: true, vertical: false)
     }

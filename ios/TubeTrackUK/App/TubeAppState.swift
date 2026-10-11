@@ -20,7 +20,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .map: "Map"
-        case .nearMe: "Near Me"
+        case .nearMe: "Departures"
         case .journeys: "Journeys"
         case .profile: "Profile"
         }
@@ -29,7 +29,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     var symbol: String {
         switch self {
         case .map: "map"
-        case .nearMe: "location.fill"
+        case .nearMe: "list.bullet.rectangle"
         case .journeys: "point.topleft.down.to.point.bottomright.curvepath"
         case .profile: "person.crop.circle"
         }
@@ -112,6 +112,8 @@ final class TubeAppState {
     let river: RiverBusState
     let nationalRail: NationalRailStatusState
     let favourites: FavouriteStopsStore
+    let departureBoards: DepartureBoardStore
+    var linkedDepartureBoard: DepartureBoardRequest?
     var showsWorks = false
     private static let appearanceModeKey = "appearanceMode"
     private static let nearbyArrivalsStaleLifetime: TimeInterval = 5 * 60
@@ -179,10 +181,6 @@ final class TubeAppState {
         didSet {
             defaults.set(appearanceMode.rawValue, forKey: Self.appearanceModeKey)
         }
-    }
-
-    var showsClosestStation: Bool {
-        didSet { defaults.set(showsClosestStation, forKey: "showsClosestStation") }
     }
 
     var preferredColorScheme: ColorScheme? {
@@ -268,13 +266,13 @@ final class TubeAppState {
         self.river = RiverBusState(client: sharedClient, defaults: defaults, cache: snapshotCache)
         self.nationalRail = NationalRailStatusState(client: sharedClient, cache: snapshotCache)
         self.favourites = FavouriteStopsStore(defaults: defaults)
+        self.departureBoards = DepartureBoardStore(defaults: defaults, client: sharedClient)
         self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient))
         self.snapshotCache = snapshotCache
         self.connectivityMonitor = monitorsConnectivity
             && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
             ? NetworkConnectivityMonitor() : nil
         showsNationalRail = defaults.bool(forKey: "showsNationalRail")
-        showsClosestStation = defaults.object(forKey: "showsClosestStation") as? Bool ?? true
         appearanceMode = defaults.string(forKey: Self.appearanceModeKey)
             .flatMap(AppAppearanceMode.init(rawValue:)) ?? .system
 
@@ -827,6 +825,9 @@ final class TubeAppState {
             return
         }
         switch link {
+        case let .board(request):
+            selectedTab = .nearMe
+            linkedDepartureBoard = request
         case .status:
             selectedTab = .map
             highlightAllDisruptionsOnMap()

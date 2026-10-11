@@ -61,7 +61,8 @@ struct DepartureLiveActivity: Widget {
                 DepartureCountdown(
                     departure: context.nextDeparture,
                     isStale: context.isStale,
-                    font: .caption2.weight(.semibold)
+                    font: .caption2.weight(.semibold),
+                    compact: true
                 )
                 .frame(width: 58)
             } minimal: {
@@ -391,6 +392,7 @@ private struct DepartureCountdown: View {
     let departure: DepartureActivityAttributes.ContentState.Departure?
     let isStale: Bool
     var font: Font = .subheadline
+    var compact = false
 
     var body: some View {
         Group {
@@ -402,7 +404,9 @@ private struct DepartureCountdown: View {
                 } else if isStale {
                     Text(departure.expectedAt, format: DepartureCountdownFormatStyle.clockTime)
                 } else {
-                    Text(DepartureCountdownFormatStyle(expectedAt: departure.expectedAt).format(.now))
+                    let label = DepartureCountdownFormatStyle(expectedAt: departure.expectedAt).format(.now)
+                    Text(compact ? label.replacingOccurrences(of: " (", with: "\n(") : label)
+                        .accessibilityLabel(label)
                 }
             } else {
                 Text("—")
@@ -411,7 +415,8 @@ private struct DepartureCountdown: View {
         .font(font)
         .foregroundStyle(DepartureBoardStyle.yellow)
         .monospacedDigit()
-        .lineLimit(1)
+        .multilineTextAlignment(compact ? .center : .trailing)
+        .lineLimit(compact ? 2 : 1)
         .minimumScaleFactor(0.7)
     }
 }

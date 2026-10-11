@@ -97,6 +97,40 @@ struct JourneyPlannerTests {
         #expect(!model.isLoading)
     }
 
+    @Test func pullToRefreshWaitsForTheOwnedSearchAndKeepsResults() async throws {
+        let model = JourneyPlannerModel(service: TestJourneyService(value: try plan()))
+        model.from = station("940A")
+        model.to = station("940B")
+        model.startSearch()
+        await model.load()
+        let previousID = model.searchID
+        let refresh = Task { await model.refreshSuggestions() }
+        while !model.isLoading { await Task.yield() }
+        #expect(model.searchID != previousID)
+        #expect(model.result != nil)
+        await model.load()
+        await refresh.value
+        #expect(!model.isLoading)
+        #expect(model.result != nil)
+    }
+
+    @Test func cancellingRefreshWaitDoesNotCancelAnExistingSearch() async {
+        let model = JourneyPlannerModel(service: TestJourneyService())
+        model.from = station("940A")
+        model.to = station("940B")
+        model.startSearch()
+        let id = model.searchID
+        let refresh = Task { await model.refreshSuggestions() }
+        await Task.yield()
+        refresh.cancel()
+        await refresh.value
+        #expect(model.isLoading)
+        #expect(model.searchID == id)
+        await model.load()
+        #expect(!model.isLoading)
+        #expect(model.errorMessage != nil)
+    }
+
     @Test func worksIsPresentedSeparatelyFromTheFourTabs() {
         #expect(AppTab.allCases == [.map, .nearMe, .journeys, .profile])
         let state = TubeAppState(monitorsConnectivity: false)
@@ -104,6 +138,47 @@ struct JourneyPlannerTests {
         state.showDisruptionsOnMap(for: .tomorrow)
         #expect(!state.showsWorks)
         #expect(state.selectedTab == .map)
+    }
+
+    @Test func automaticRefreshRespectsExpiryAndKeepsPreviousChoices() async throws {
+        let model = JourneyPlannerModel(service: TestJourneyService(value: try plan()))
+        model.from = station("nr:KTH")
+        model.to = station("940B")
+        model.startSearch()
+        await model.load()
+        #expect(model.canSearch)
+        model.refreshIfNeeded(now: model.nextAutomaticRefresh.addingTimeInterval(-1))
+        #expect(!model.isLoading)
+        model.refreshIfNeeded(now: model.nextAutomaticRefresh)
+        #expect(model.isLoading)
+        #expect(model.result != nil)
+        let searchID = model.searchID
+        model.refreshIfNeeded(now: model.nextAutomaticRefresh.addingTimeInterval(60))
+        #expect(model.searchID == searchID)
+    }
+
+    @Test func mapJourneySelectionIncludesNationalRailStations() throws {
+        let state = TubeAppState(monitorsConnectivity: false)
+        state.graph = try TubeGraph.bundled().includingNationalRailStations()
+        let stop = try #require(DepartureStop.bundled.first { $0.id == "nr:KTH" })
+        #expect(state.prepareJourney(at: stop, asOrigin: true))
+        #expect(state.journeyPlanner.from?.id == "nr:KTH")
+    }
+
+    @Test func durationsUseHoursAndMinutes() {
+        for (minutes, expected) in [(0, "0 mins"), (1, "1 min"), (36, "36 mins"),
+                                    (60, "1 hour"), (61, "1 hour, 1 min"), (96, "1 hour, 36 mins"), (120, "2 hours")] {
+            #expect(JourneyFormatting.duration(minutes) == expected)
+        }
+    }
+
+    @Test func operatorBrandingDecodesWithoutBreakingLegacyLines() throws {
+        let branded = try JSONDecoder().decode(JourneyLine.self, from: Data(##"{"id":"southeastern","name":"Southeastern","direction":"Victoria","colour":"#1D2452","operatorCode":"SE"}"##.utf8))
+        #expect(branded.colour == "#1D2452")
+        #expect(branded.operatorCode == "SE")
+        let legacy = try JSONDecoder().decode(JourneyLine.self, from: Data(#"{"id":"victoria","name":"Victoria","direction":"Brixton"}"#.utf8))
+        #expect(legacy.colour == nil)
+        #expect(legacy.operatorCode == nil)
     }
 
     private func station(_ id: String, hub: String? = nil) -> TubeStation {

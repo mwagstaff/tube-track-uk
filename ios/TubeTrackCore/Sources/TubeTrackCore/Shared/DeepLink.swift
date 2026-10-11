@@ -12,6 +12,7 @@ public enum DeepLink: Equatable, Sendable {
     case line(TubeLineID)
     case station(id: String, line: TubeLineID?)
     case pier(id: String, line: String?)
+    case board(DepartureBoardRequest)
 
     public init?(url: URL) {
         guard url.scheme?.lowercased() == Self.scheme,
@@ -21,6 +22,16 @@ public enum DeepLink: Equatable, Sendable {
         }
         let segments = components.path.split(separator: "/").map(String.init)
         switch host {
+        case "departures":
+            guard segments.count == 1, segments[0].count <= 64 else { return nil }
+            func values(_ name: String) -> [String] {
+                components.queryItems?.first(where: { $0.name == name })?.value?
+                    .split(separator: ",").map(String.init) ?? []
+            }
+            let destinations = values("destinations"), lines = values("lines")
+            guard destinations.count <= 8, lines.count <= 16,
+                  (destinations + lines).allSatisfy({ $0.count <= 64 }) else { return nil }
+            self = .board(.init(originID: segments[0], destinationIDs: destinations, lineIDs: lines, direction: components.queryItems?.first(where: { $0.name == "direction" })?.value))
         case "status" where segments.isEmpty:
             self = .status
         case "line":
@@ -48,6 +59,12 @@ public enum DeepLink: Equatable, Sendable {
         var components = URLComponents()
         components.scheme = Self.scheme
         switch self {
+        case let .board(request):
+            components.host = "departures"
+            components.path = "/\(request.originID)"
+            components.queryItems = [.init(name: "destinations", value: request.destinationIDs.joined(separator: ",")),
+                                     .init(name: "lines", value: request.lineIDs.joined(separator: ",")),
+                                     .init(name: "direction", value: request.direction)]
         case .status:
             components.host = "status"
         case let .line(lineID):

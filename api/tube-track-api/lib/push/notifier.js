@@ -5,7 +5,7 @@ import {
 } from './change-detector.js';
 import { conditionsByLine } from './line-condition.js';
 import { liveActivityPayload } from './apns.js';
-import { MAXIMUM_DEPARTURES, projectBoard } from './departure-projection.js';
+import { MAXIMUM_DEPARTURES, projectBoard, destinationLabel, compactPlatformLabel } from './departure-projection.js';
 import { isRiverBusLine } from '../river.js';
 import { projectRiverBoard, riverCondition } from './river-departure-projection.js';
 import { LINE_COLOURS } from '../line-colours.js';
@@ -41,6 +41,7 @@ export class LiveActivityNotifier {
         thameslink = null,
         railDepartures = null,
         nationalRail = null,
+        customDepartures = null,
         clock = Date.now,
         maxDurationMs = ACTIVITY_MAX_DURATION_MS
     }) {
@@ -54,6 +55,7 @@ export class LiveActivityNotifier {
         this.thameslink = thameslink;
         this.railDepartures = railDepartures;
         this.nationalRail = nationalRail;
+        this.customDepartures = customDepartures;
         this.clock = clock;
         this.maxDurationMs = maxDurationMs;
     }
@@ -138,7 +140,23 @@ export class LiveActivityNotifier {
         let board;
         let condition;
         let sourceUpdatedAtMs = nowMs;
-        if (isRiver) {
+        if (row.lineId === 'custom-board') {
+            if (!this.customDepartures || !row.boardRequest) return 'unavailable';
+            try {
+                const result = await this.customDepartures.board(row.boardRequest);
+                sourceUpdatedAtMs = Date.parse(result.updatedAt);
+                if (result.stale || result.unavailableSources || nowMs - sourceUpdatedAtMs > 90_000
+                    || sourceUpdatedAtMs < (row.lastSourceUpdatedAtMs ?? 0)) return 'stale';
+                board = result.arrivals.slice(0, MAXIMUM_DEPARTURES).map(arrival => ({
+                    id: arrival.id, destination: destinationLabel(arrival).slice(0, 28),
+                    platform: compactPlatformLabel(arrival)?.slice(0, 14) ?? null,
+                    expectedAtEpoch: Math.round(Date.parse(arrival.expectedArrival ?? arrival.scheduledDeparture) / 1000),
+                    hasExpectedTime: arrival.expectedArrival != null,
+                    ...(['delayed', 'cancelled'].includes(arrival.status) ? { status: arrival.status } : {})
+                }));
+                condition = { rank: result.conditionRank ?? 4, headline: result.conditionHeadline ?? null };
+            } catch { return 'unavailable'; }
+        } else if (isRiver) {
             // River failures must neither empty a tracked pier nor stop rail pushes.
             if (!this.river) return 'unavailable';
             try {

@@ -354,11 +354,11 @@ struct StationDeparturesTests {
         let flooredPrediction = arrival(id: "floored", line: .northern, seconds: 179)
         let missingTime = arrival(id: "missing", line: .northern, seconds: nil)
 
-        #expect(StationDepartureMetadata.departureTime(for: dueByExpectedTime, now: now) == "Due")
-        #expect(StationDepartureMetadata.departureTime(for: oneMinute, now: now) == "1 min")
-        #expect(StationDepartureMetadata.departureTime(for: twoMinutes, now: now) == "2 mins")
-        #expect(StationDepartureMetadata.departureTime(for: dueByPrediction, now: now) == "Due")
-        #expect(StationDepartureMetadata.departureTime(for: flooredPrediction, now: now) == "2 mins")
+        #expect(StationDepartureMetadata.departureTime(for: dueByExpectedTime, now: now) == "Due (04:34)")
+        #expect(StationDepartureMetadata.departureTime(for: oneMinute, now: now) == "1 min (04:34)")
+        #expect(StationDepartureMetadata.departureTime(for: twoMinutes, now: now) == "2 mins (04:35)")
+        #expect(StationDepartureMetadata.departureTime(for: dueByPrediction, now: now) == "Due (04:34)")
+        #expect(StationDepartureMetadata.departureTime(for: flooredPrediction, now: now) == "2 mins (04:36)")
         #expect(StationDepartureMetadata.departureTime(for: missingTime, now: now) == "—")
     }
 
@@ -382,17 +382,17 @@ struct StationDeparturesTests {
         }
     }
 
-    @Test func distantDeparturesShowLondonClockTime() throws {
+    @Test func allDeparturesShowLondonClockTime() throws {
         let now = try #require(ISO8601DateFormatter().date(from: "2026-10-05T22:08:00Z"))
-        for seconds in [1200, 1201, 1380] {
+        for seconds in [180, 1200, 1201, 1380] {
             for hasExpectedArrival in [true, false] {
                 let prediction = arrival(
                     id: "distant", line: .thameslink,
                     expectedArrival: hasExpectedArrival ? now.addingTimeInterval(Double(seconds)) : nil,
                     seconds: hasExpectedArrival ? 999 : seconds
                 )
-                let expected = seconds == 1200 ? "20 mins"
-                    : seconds == 1201 ? "20 mins (23:28)" : "23 mins (23:31)"
+                let expected = seconds == 180 ? "3 mins (23:11)"
+                    : seconds <= 1201 ? "20 mins (23:28)" : "23 mins (23:31)"
                 #expect(StationDepartureMetadata.departureTime(for: prediction, now: now) == expected)
             }
         }

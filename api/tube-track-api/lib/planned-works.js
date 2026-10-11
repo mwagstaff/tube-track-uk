@@ -27,6 +27,7 @@ const LINE_IDS = new Map([
     ['dlr', 'dlr'],
     ['elizabeth', 'elizabeth'],
     ['london trams', 'tram'],
+    ['london cable car', 'london-cable-car'],
     ['liberty', 'liberty'],
     ['lioness', 'lioness'],
     ['mildmay', 'mildmay'],
@@ -74,7 +75,8 @@ function lineIDsForLabel(label) {
         && normalized.includes('elizabeth')
         && normalized.includes('london overground')
         && normalized.includes('london trams')) {
-        return [...new Set(LINE_IDS.values())];
+        // This combined label names rail and tram modes, not the cable car.
+        return [...new Set(LINE_IDS.values())].filter((id) => id !== 'london-cable-car');
     }
     return [];
 }

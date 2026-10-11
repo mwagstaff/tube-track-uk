@@ -1997,11 +1997,11 @@ struct BeckMapCanvas: View {
             guard let startScale = pinchStartScale, let mapPoint = pinchMapPoint else { return }
             let nextScale = min(maximumCameraScale, max(minimumCameraScale, startScale * magnification))
             if nextScale > cameraScale,
-               !BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+               !BeckMapOverviewVisibilityPolicy.shouldNotifyZoomIn(
                    at: cameraScale,
                    fittedScale: fittedCameraScale
                ),
-               BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+               BeckMapOverviewVisibilityPolicy.shouldNotifyZoomIn(
                    at: nextScale,
                    fittedScale: fittedCameraScale
                ) {
@@ -3859,7 +3859,7 @@ enum BeckMapLabelVisibilityPolicy {
 enum BeckMapOverviewVisibilityPolicy {
     static let fullyVisibleMaximumZoomRatio: Double = 1.08
     static let hiddenZoomRatio: Double = 1.55
-    static let closestStationAutoHideZoomRatio: Double = 1.38
+    static let userZoomNotificationRatio: Double = 1.38
 
     static func opacity(
         at cameraScale: Double,
@@ -3877,11 +3877,11 @@ enum BeckMapOverviewVisibilityPolicy {
         return 1 - fadeProgress
     }
 
-    static func shouldHideClosestStation(
+    static func shouldNotifyZoomIn(
         at cameraScale: Double,
         fittedScale: Double
     ) -> Bool {
-        cameraScale / max(0.000_001, fittedScale) >= closestStationAutoHideZoomRatio
+        cameraScale / max(0.000_001, fittedScale) >= userZoomNotificationRatio
     }
 
     static func shouldShowReset(

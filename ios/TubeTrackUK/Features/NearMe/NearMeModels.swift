@@ -80,9 +80,9 @@ enum NearbyStationFinder {
 
 enum NearbyDistanceFormatter {
     static func string(from distance: CLLocationDistance) -> String {
-        if distance < 1_000 {
-            return "\(max(1, Int(distance.rounded()))) m"
-        }
-        return String(format: "%.1f km", distance / 1_000)
+        guard distance.isFinite, distance >= 0 else { return "Distance unavailable" }
+        let miles = distance / 1_609.344
+        if miles < 0.1 { return "<0.1 mi" }
+        return String(format: "%.1f mi", miles)
     }
 }

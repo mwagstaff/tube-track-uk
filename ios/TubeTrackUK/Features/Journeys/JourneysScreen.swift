@@ -2,20 +2,19 @@ import SwiftUI
 
 struct JourneysScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(ScheduledJourneyStore.self) private var scheduleStore
     @State private var showsResults = false
-    @State private var stationField: StationField?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-
-    private enum StationField: String, Identifiable {
-        case from, to
-        var id: String { rawValue }
-    }
 
     var body: some View {
         @Bindable var planner = appState.journeyPlanner
 
         NavigationStack {
             List {
+                Section {
+                    scheduledJourneysLink
+                }
+
                 Section {
                     stationButton("From", station: planner.from, field: .from)
                     stationButton("To", station: planner.to, field: .to)
@@ -48,8 +47,8 @@ struct JourneysScreen: View {
                     }
                 } footer: {
                     Text(planner.accessibility == .none
-                         ? "Tube, DLR, Elizabeth line, Overground and trams. Times are London time."
-                         : "Routes use TfL’s accessibility data. Check station notices for lift outages and platform restrictions.")
+                         ? "National Rail, Tube, DLR, Elizabeth line, Overground, trams and official replacement buses, with walking connections. Times are London time."
+                         : "TfL legs use your step-free preference. National Rail and replacement-bus accessibility may be unverified. Check station notices and assistance requirements.")
                 }
 
                 Section {
@@ -107,28 +106,58 @@ struct JourneysScreen: View {
             .navigationDestination(isPresented: $showsResults) {
                 resultsDestination
             }
-            .sheet(item: $stationField) { field in
-                if let graph = appState.graph {
-                    StationSearchSheet(
-                        graph: graph,
-                        selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
-                        title: field == .from ? "Starting station" : "Destination",
-                        selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
-                        includesNationalRail: false
-                    ) { station in
-                        if field == .from { planner.from = station } else { planner.to = station }
-                    }
-                }
-            }
+
         }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .task(id: planner.searchID) { await planner.load() }
         .onChange(of: planner.result?.updatedAt) { _, updatedAt in
-            if updatedAt != nil { showsResults = true }
+            showsResults = updatedAt != nil
         }
         .onDisappear { planner.cancelSearch() }
         .onChange(of: appState.isOffline) { _, offline in
             if offline { planner.cancelSearch() }
+        }
+    }
+
+    private var scheduledJourneysLink: some View {
+        let count = scheduleStore.journeys.count
+        return NavigationLink {
+            ScheduledJourneysScreen()
+        } label: {
+            if dynamicTypeSize >= .accessibility4 {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Image(systemName: "calendar.badge.clock")
+                            .accessibilityHidden(true)
+                        Spacer()
+                        scheduledJourneyBadge
+                    }
+                    Text("Scheduled journeys")
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            } else {
+                HStack {
+                    Label("Scheduled journeys", systemImage: "calendar.badge.clock")
+                    Spacer()
+                    scheduledJourneyBadge
+                }
+            }
+        }
+        .accessibilityValue(count == 1 ? "1 journey" : "\(count) journeys")
+    }
+
+    @ViewBuilder
+    private var scheduledJourneyBadge: some View {
+        if !scheduleStore.journeys.isEmpty {
+            Text(scheduleStore.journeys.count, format: .number)
+                .font(.appCaption(.semibold))
+                .monospacedDigit()
+                .foregroundStyle(.white)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.tubeBlue, in: Capsule())
+                .fixedSize()
+                .accessibilityHidden(true)
         }
     }
 
@@ -143,7 +172,7 @@ struct JourneysScreen: View {
             if arguments[index + 1] == "map" {
                 JourneyMapScreen(journey: journey)
             } else if arguments[index + 1] == "details" {
-                JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt)
+                JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale)
             } else {
                 JourneyResultsScreen()
             }
@@ -155,11 +184,11 @@ struct JourneysScreen: View {
         #endif
     }
 
-    private func stationButton(_ title: String, station: TubeStation?, field: StationField) -> some View {
+    private func stationButton(_ title: String, station: TubeStation?, field: JourneyPlannerModel.StationField) -> some View {
         let layout = dynamicTypeSize.isAccessibilitySize
             ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6))
             : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 12))
-        return Button { stationField = field } label: {
+        return Button { appState.journeyPlanner.stationField = field } label: {
             layout {
                 Text(title)
                     .font(dynamicTypeSize.isAccessibilitySize ? .appCaption() : .appBody())
@@ -184,6 +213,7 @@ struct JourneysScreen: View {
 
 private struct JourneyResultsScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         List {
@@ -199,9 +229,21 @@ private struct JourneyResultsScreen: View {
             }
             if let response = appState.journeyPlanner.result { results(response) }
         }
-        .navigationTitle("Route choices")
+        .refreshable {
+            guard !appState.isOffline else { return }
+            await appState.journeyPlanner.refreshSuggestions()
+        }
+        .navigationTitle("Route suggestions")
         .navigationBarTitleDisplayMode(.inline)
         .journeyBackground()
+        .task(id: scenePhase) {
+            guard scenePhase == .active else { return }
+            while !Task.isCancelled {
+                if !appState.isOffline { appState.journeyPlanner.refreshIfNeeded() }
+                do { try await Task.sleep(for: .seconds(5)) }
+                catch { return }
+            }
+        }
     }
 
     @ViewBuilder
@@ -221,7 +263,7 @@ private struct JourneyResultsScreen: View {
                     .font(.appCaption())
                     .foregroundStyle(expired ? Color.orange : .secondary)
                     if expired {
-                        Button("Refresh journeys") { appState.journeyPlanner.startSearch(keepingResults: true) }
+                        Button("Refresh route suggestions") { appState.journeyPlanner.startSearch(keepingResults: true) }
                             .disabled(appState.isOffline || appState.journeyPlanner.isLoading)
                     }
                 }
@@ -233,7 +275,7 @@ private struct JourneyResultsScreen: View {
         ForEach(response.data.journeys) { journey in
             Section {
                 NavigationLink {
-                    JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt)
+                    JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale)
                 } label: {
                     JourneySummary(journey: journey)
                 }
@@ -281,18 +323,27 @@ private struct JourneySummary: View {
                 HStack(alignment: .firstTextBaseline) {
                     times
                     Spacer(minLength: 12)
-                    Text("\(journey.durationMinutes) min").font(.appHeadline())
+                    Text(JourneyFormatting.duration(journey.durationMinutes)).font(.appHeadline())
                 }
                 VStack(alignment: .leading, spacing: 4) {
                     times
-                    Text("\(journey.durationMinutes) min").font(.appHeadline())
+                    Text(JourneyFormatting.duration(journey.durationMinutes)).font(.appHeadline())
                 }
             }
             VStack(alignment: .leading, spacing: 6) {
                 ForEach(Array(journey.distinctLines.enumerated()), id: \.offset) { _, line in
-                    HStack(spacing: 8) {
-                        JourneyLineDot(line: line, diameter: 12)
-                        Text(line.name).font(.appSubheadline(.medium))
+                    if line.operatorCode != nil {
+                        Text(line.name)
+                            .font(.appSubheadline(.semibold))
+                            .foregroundStyle(line.brandForeground)
+                            .padding(.horizontal, 12).padding(.vertical, 6)
+                            .background(line.brandColour, in: Capsule())
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        HStack(spacing: 8) {
+                            JourneyLineDot(line: line, diameter: 12)
+                            Text(line.name).font(.appSubheadline(.medium))
+                        }
                     }
                 }
             }
@@ -337,13 +388,25 @@ private struct JourneySummary: View {
         state.graph = try? TubeGraph.bundled()
         return state
     }()
-    JourneysScreen().environment(state)
+    JourneysScreen()
+        .environment(state)
+        .environment(ScheduledJourneyStore(observesTokens: false))
+}
+
+#Preview("Journey planner · Large text") {
+    JourneysScreen()
+        .environment(TubeAppState(monitorsConnectivity: false))
+        .environment(ScheduledJourneyStore(observesTokens: false))
+        .environment(\.dynamicTypeSize, .accessibility3)
+        .preferredColorScheme(.dark)
 }
 
 struct JourneyDetailScreen: View {
     @Environment(TubeAppState.self) private var appState
+    @Environment(\.dismiss) private var dismiss
     let journey: PlannedJourney
     let expiresAt: Date
+    var isStale = false
 
     var body: some View {
         List {
@@ -353,9 +416,22 @@ struct JourneyDetailScreen: View {
                     Text(JourneyFormatting.date(journey.departureTime))
                         .font(.appCaption()).foregroundStyle(.secondary)
                     TimelineView(.periodic(from: .now, by: 15)) { context in
-                        if context.date >= expiresAt || appState.isOffline {
-                            Label("This plan needs refreshing. Return to Route choices for current options.", systemImage: "clock.badge.exclamationmark")
-                                .font(.appSubheadline()).foregroundStyle(.orange)
+                        if context.date >= expiresAt || isStale || appState.isOffline {
+                            VStack(alignment: .leading, spacing: 10) {
+                                Label("This plan needs refreshing.", systemImage: "clock.badge.exclamationmark")
+                                    .font(.appSubheadline()).foregroundStyle(.orange)
+                                Button {
+                                    appState.journeyPlanner.startSearch(keepingResults: true)
+                                    dismiss()
+                                } label: {
+                                    Label("Refresh route suggestions", systemImage: "arrow.clockwise")
+                                        .font(.appBody(.semibold))
+                                        .multilineTextAlignment(.leading)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                                .buttonStyle(.bordered)
+                                .disabled(appState.isOffline)
+                            }
                         }
                     }
                 }
@@ -364,14 +440,15 @@ struct JourneyDetailScreen: View {
                 NavigationLink {
                     JourneyMapScreen(journey: journey)
                 } label: {
-                    Label("Show journey on network map", systemImage: "map")
+                    Label("Show journey map", systemImage: "map")
                 }
             }
             ForEach(Array(journey.legs.enumerated()), id: \.element.id) { index, leg in
                 Section {
                     HStack(alignment: .top, spacing: 12) {
-                        if leg.mode == "walking" {
-                            Image(systemName: "figure.walk").font(.title2).accessibilityHidden(true)
+                        if ["walking", "transfer", "replacement-bus"].contains(leg.mode) {
+                            Image(systemName: leg.mode == "replacement-bus" ? "bus.fill" : leg.mode == "transfer" ? "arrow.triangle.swap" : "figure.walk")
+                                .font(.title2).accessibilityHidden(true)
                         } else {
                             ForEach(Array(leg.lines.enumerated()), id: \.offset) { _, line in
                                 JourneyLineDot(line: line, diameter: 26)
@@ -391,6 +468,15 @@ struct JourneyDetailScreen: View {
                     }
                     if leg.timing == "adjusted" {
                         Text("Timing adjusted by TfL").font(.appCaption()).foregroundStyle(.secondary)
+                    } else if leg.timing == "live" {
+                        Text("Live service times").font(.appCaption()).foregroundStyle(.secondary)
+                    } else if leg.timing == "scheduled", ["national-rail", "replacement-bus"].contains(leg.mode) {
+                        Label("Timetable times · live information unavailable", systemImage: "clock.badge.exclamationmark")
+                            .font(.appCaption()).foregroundStyle(.secondary)
+                    }
+                    if let scheduled = leg.scheduledDepartureTime, scheduled != leg.departureTime {
+                        Text("Scheduled departure \(JourneyFormatting.time(scheduled))")
+                            .font(.appCaption()).foregroundStyle(.secondary)
                     }
                     if !leg.stops.isEmpty {
                         DisclosureGroup("Stops") {
@@ -410,7 +496,7 @@ struct JourneyDetailScreen: View {
                         .foregroundStyle(warning.severity == "severe" ? Color.orange : .secondary)
                     }
                 } header: {
-                    Text("Leg \(index + 1) · \(leg.durationMinutes) min")
+                    Text("Leg \(index + 1) · \(JourneyFormatting.duration(leg.durationMinutes))")
                 } footer: {
                     if index + 1 < journey.legs.count {
                         let next = journey.legs[index + 1]
@@ -433,10 +519,28 @@ struct JourneyLineDot: View {
 
     var body: some View {
         Circle()
-            .fill(line.tubeLineID.map { Color.tubeLine($0) } ?? .secondary)
+            .fill(line.operatorCode != nil ? line.brandColour : line.tubeLineID.map { Color.tubeLine($0) } ?? .secondary)
             .overlay { Circle().strokeBorder(Color.primary.opacity(0.22), lineWidth: 1) }
             .frame(width: diameter * min(scale, 2), height: diameter * min(scale, 2))
             .accessibilityHidden(true)
+    }
+}
+
+private extension JourneyLine {
+    var brandRGB: (Double, Double, Double) {
+        guard let colour, colour.count == 7, colour.first == "#",
+              let rgb = UInt32(colour.dropFirst(), radix: 16) else { return (0.35, 0.39, 0.43) }
+        return (Double((rgb >> 16) & 255) / 255, Double((rgb >> 8) & 255) / 255, Double(rgb & 255) / 255)
+    }
+    var brandColour: Color {
+        let (r, g, b) = brandRGB
+        return Color(red: r, green: g, blue: b)
+    }
+    var brandForeground: Color {
+        let (r, g, b) = brandRGB
+        func linear(_ value: Double) -> Double { value <= 0.04045 ? value / 12.92 : pow((value + 0.055) / 1.055, 2.4) }
+        let luminance = 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b)
+        return luminance > 0.179 ? .black : .white
     }
 }
 

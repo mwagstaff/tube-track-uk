@@ -36,13 +36,13 @@ struct RootTabView: View {
     @State private var appStartupCompleted = false
     @State private var backgroundRevealShowsStartupChrome =
         AppStartupPresentation.initiallyShowsChrome
-    @State private var closestStationPanelHidden = false
     @State private var mapNavigationActive = false
     @State private var mapNavigation = MapTabNavigationState()
     @State private var profileShowsImageBackground = false
 
     var body: some View {
         @Bindable var state = appState
+        @Bindable var planner = appState.journeyPlanner
 
         ZStack {
             VStack(spacing: 0) {
@@ -61,7 +61,6 @@ struct RootTabView: View {
                     // and gesture surfaces return together at the same viewport.
                     NavigationStack {
                         UnifiedMapScreen(
-                            closestStationPanelHidden: $closestStationPanelHidden,
                             mapNavigationActive: $mapNavigationActive,
                             onShowDisruptions: {
                                 mapNavigation.showDisruptions()
@@ -78,7 +77,7 @@ struct RootTabView: View {
                     .tabItem { Label(AppTab.map.title, systemImage: AppTab.map.symbol) }
                     .tag(AppTab.map)
 
-                    NearMeScreen()
+                    DeparturesScreen()
                         .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
                         .tag(AppTab.nearMe)
 
@@ -121,6 +120,24 @@ struct RootTabView: View {
                     .opacity(backgroundRevealOpacity)
                     .allowsHitTesting(!appStartupCompleted)
                     .zIndex(10)
+            }
+        }
+        // Present outside the tab's NavigationStack so sheet teardown cannot
+        // replace the tab content. The picker always returns to its owner tab.
+        .sheet(item: $planner.stationField, onDismiss: {
+            appState.selectedTab = .journeys
+        }) { field in
+            if let graph = appState.graph {
+                StationSearchSheet(
+                    graph: graph,
+                    selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
+                    title: field == .from ? "Starting station" : "Destination",
+                    selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
+                    includesNationalRail: true,
+                    onClose: { planner.stationField = nil }
+                ) { station in
+                    if field == .from { planner.from = station } else { planner.to = station }
+                }
             }
         }
         .sheet(isPresented: $state.showsWorks) {
@@ -205,10 +222,7 @@ struct RootTabView: View {
         .onChange(of: appState.mapPresentationMode) {
             revealBackgroundIfNeeded()
         }
-        .onChange(of: appState.stationSelectionGeneration) {
-            guard appState.selectedStationID != nil else { return }
-            closestStationPanelHidden = true
-        }
+
         // Feeding the tracked board from the poll the app is already doing is
         // free and unbudgeted, so a Live Activity is exact whenever the app is
         // open — pushes only have to cover the gaps.

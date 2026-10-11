@@ -75,6 +75,22 @@ struct LiveActivityPushRegistrarTests {
         #expect(stopIDs.allSatisfy { !$0.isEmpty })
     }
 
+    @Test func customBoardRegistrationKeepsDestinationFiltersAndFrozenOrigin() async throws {
+        RegistrationURLProtocol.prepare(statusCode: 201)
+        let board = DepartureBoardRequest(originID: "HUBLEW", destinationIDs: ["HUBBAN"], lineIDs: ["dlr"])
+        let attributes = DepartureActivityAttributes(activityID: "DEADBEEF-1234-5678", stationHubID: "HUBLEW",
+            stationName: "Lewisham", lineIDRaw: "custom-board", direction: "Calling at Bank", directionFilter: .any,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(3600), boardRequest: board)
+        try await registrar().register(token: String(repeating: "ab", count: 32), attributes: attributes, frequentPushesEnabled: true)
+        let body = try #require(RegistrationURLProtocol.lastBody)
+        let json = try #require(try JSONSerialization.jsonObject(with: body) as? [String: Any])
+        let filter = try #require(json["boardRequest"] as? [String: Any])
+        #expect(json["lineId"] as? String == "custom-board")
+        #expect(filter["originID"] as? String == "HUBLEW")
+        #expect(filter["destinationIDs"] as? [String] == ["HUBBAN"])
+        #expect(filter["lineIDs"] as? [String] == ["dlr"])
+    }
+
     @Test("A direction the station does not label resolves to any, which the server accepts")
     func unlabelledDirectionsTravelAsAny() async throws {
         RegistrationURLProtocol.prepare(statusCode: 201)

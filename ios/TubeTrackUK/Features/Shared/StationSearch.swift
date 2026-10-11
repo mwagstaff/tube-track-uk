@@ -92,6 +92,7 @@ struct StationSearchSheet: View {
     var title: String = "Find a station"
     var selectionHint: String = "Selects and focuses this station on the map"
     var includesNationalRail: Bool = true
+    var onClose: (() -> Void)? = nil
     let onSelect: (TubeStation) -> Void
 
     private var suggestions: [TubeStation] {
@@ -103,16 +104,8 @@ struct StationSearchSheet: View {
         ).filter { includesNationalRail || !NationalRailMap.isExclusiveStation($0.id) }
     }
 
-    private var searchPresentation: Binding<Bool> {
-        Binding(
-            get: { searchIsPresented },
-            set: { presented in
-                searchIsPresented = presented
-                if !presented {
-                    dismiss()
-                }
-            }
-        )
+    private func close() {
+        if let onClose { onClose() } else { dismiss() }
     }
 
     var body: some View {
@@ -125,7 +118,7 @@ struct StationSearchSheet: View {
                         let lineIDs = graph.lineIDs(at: station)
                         Button {
                             onSelect(station)
-                            dismiss()
+                            close()
                         } label: {
                             HStack(alignment: .top, spacing: 8) {
                                 VStack(alignment: .leading, spacing: 5) {
@@ -163,13 +156,13 @@ struct StationSearchSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .searchable(
                 text: $query,
-                isPresented: searchPresentation,
+                isPresented: $searchIsPresented,
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Station name"
             )
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Done") { close() }
                 }
             }
         }

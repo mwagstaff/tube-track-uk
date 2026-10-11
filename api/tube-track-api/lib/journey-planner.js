@@ -113,11 +113,11 @@ export class JourneyPlanner {
         }
     }
 
-    async plan(query) {
+    async plan(query, { transfer = false } = {}) {
         const request = this.validate(query);
         const key = JSON.stringify([request.from.id, request.to.id, request.timeMode,
             request.timeMode === 'now' ? Math.floor(request.requestedAt / 15_000) : request.requestedAt,
-            request.accessibility, request.nationalRail]);
+            request.accessibility, request.nationalRail, transfer]);
         let entry = this.cache.get(key);
         const cached = !!entry && entry.expiresAt > this.clock();
         if (!cached) {
@@ -125,7 +125,7 @@ export class JourneyPlanner {
             if (!pending) {
                 if (this.active >= 2) throw new JourneyError('RATE_LIMITED', 'Journey planning is busy. Please try again shortly.', 429);
                 this.active += 1;
-                pending = this.load(request).catch((error) => {
+                pending = this.load(request, { transfer }).catch((error) => {
                     if (['TimeoutError', 'AbortError'].includes(error.name) || error.code === 'TFL_TIMEOUT') {
                         throw new JourneyError('UPSTREAM_UNAVAILABLE', 'TfL is taking too long to plan this journey. Please try again shortly.', 503);
                     }
@@ -162,7 +162,7 @@ export class JourneyPlanner {
         };
     }
 
-    async load(request) {
+    async load(request, { transfer = false } = {}) {
         // Bound the whole search, including cold station lookups and fallback,
         // to less than the mobile client's 20-second request timeout.
         const signal = AbortSignal.timeout(18_000);
@@ -198,9 +198,19 @@ export class JourneyPlanner {
         }
         let journeys = response.journeys.map((j) => normalizeJourney(j, request)).filter(Boolean);
         const messages = (response.stopMessages ?? []).map(clean).filter(Boolean);
+        // A transfer query needs no second least-interchange search if the
+        // primary result already supplies a usable direct vehicle leg. Its
+        // fresh disruption overlay is still checked before this decision.
+        let snapshot;
+        if (transfer) {
+            snapshot = await this.disruptions.snapshot(journeys, signal);
+            journeys = this.disruptions.enrich(journeys, snapshot);
+        }
+        const directTransfer = transfer && journeys.some(j => j.legs.filter(l => l.mode !== 'walking').length === 1
+            && j.disruption?.coverage === 'complete' && !j.disruption?.hasDisruption);
         // One bounded secondary search can find a useful different route. Never
         // manufacture a bypass or silently expand into buses/National Rail.
-        if (journeys.length && (new Set(journeys.map((j) => j.routeKey)).size < 2
+        if (!directTransfer && journeys.length && (new Set(journeys.map((j) => j.routeKey)).size < 2
             || journeys.every((j) => j.disruptionScore > 0))) {
             try {
                 const alternative = await this.fetch(path, {
@@ -209,11 +219,12 @@ export class JourneyPlanner {
                     metricLabel: 'journeys:alternative'
                 });
                 journeys = journeys.concat((alternative.journeys ?? []).map((j) => normalizeJourney(j, request)).filter(Boolean));
+                snapshot = undefined; // Include every alternative's travel window in the overlay.
             } catch {
                 messages.push('Additional alternatives could not be checked.');
             }
         }
-        const snapshot = await this.disruptions.snapshot(journeys, signal);
+        snapshot ??= await this.disruptions.snapshot(journeys, signal);
         journeys = this.disruptions.enrich(journeys, snapshot);
         if (journeys.some(j => ['partial', 'unavailable'].includes(j.disruption.coverage))) {
             messages.push('Some disruption information is unavailable. Check the notices before travelling.');
@@ -305,7 +316,15 @@ export function selectJourneys(journeys, request, now) {
     valid.sort((a, b) => request.timeMode === 'arriveBy'
         ? b.departureTime.localeCompare(a.departureTime) || a.durationMinutes - b.durationMinutes
         : a.arrivalTime.localeCompare(b.arrivalTime) || a.changes - b.changes || a.walkingMinutes - b.walkingMinutes);
-    const unique = [...new Map(valid.toReversed().map((j) => [j.routeKey, j])).values()].reverse();
+    // Keep the first (best-ranked) occurrence in sorted order. Replacing a
+    // Map value does not move its insertion position: building it backwards
+    // ordered routes by their worst departure rather than their best one.
+    const seen = new Set();
+    const unique = valid.filter(j => {
+        if (seen.has(j.routeKey)) return false;
+        seen.add(j.routeKey);
+        return true;
+    });
     if (!unique.length) return [];
     const first = unique[0];
     const lessDisrupted = unique.slice(1).filter((j) => j.disruptionScore < first.disruptionScore

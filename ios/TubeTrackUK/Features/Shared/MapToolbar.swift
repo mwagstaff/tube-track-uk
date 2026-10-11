@@ -385,8 +385,6 @@ struct MapControlDock: View {
     @State private var showsActions = false
 
     let interactionGeneration: Int
-    let showsClosestStation: Bool
-    let closestStationOpacity: Double
     let showsReset: Bool
     let onReset: () -> Void
     let onFocusUserLocation: (CLLocation) -> Void
@@ -449,13 +447,7 @@ struct MapControlDock: View {
                         .zIndex(2)
                     }
 
-                    if showsClosestStation {
-                        ClosestStationMapSection()
-                            .opacity(closestStationOpacity)
-                            .allowsHitTesting(closestStationOpacity > 0.12)
-                            .accessibilityHidden(closestStationOpacity <= 0.12)
-                            .transition(.opacity)
-                    }
+
                 }
             }
         }

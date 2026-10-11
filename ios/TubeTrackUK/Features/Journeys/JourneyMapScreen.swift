@@ -1,6 +1,62 @@
 import SwiftUI
+import MapKit
 
 struct JourneyMapScreen: View {
+    let journey: PlannedJourney
+
+    var body: some View {
+        if journey.legs.contains(where: { ["national-rail", "replacement-bus"].contains($0.mode) }) {
+            CombinedJourneyMapScreen(journey: journey)
+        } else {
+            TfLJourneyMapScreen(journey: journey)
+        }
+    }
+}
+
+private struct CombinedJourneyMapScreen: View {
+    @Environment(TubeAppState.self) private var appState
+    let journey: PlannedJourney
+    @State private var geometry = JourneyGeographicGeometry()
+
+    var body: some View {
+        Map {
+            ForEach(geometry.routes) { route in
+                MapPolyline(coordinates: route.points.map(\.coordinate))
+                    .stroke(.blue, lineWidth: 5)
+            }
+            ForEach(geometry.stations) { station in
+                Marker(station.name, coordinate: station.coordinate)
+            }
+        }
+        .mapStyle(.standard(elevation: .flat, pointsOfInterest: .excludingAll))
+        .safeAreaInset(edge: .bottom) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Start, end and change stations").font(.appHeadline())
+                Text(geometry.stations.map(\.name).joined(separator: " → "))
+                    .font(.appSubheadline())
+                if geometry.unmappedLegCount > 0 {
+                    Text("Some sections, walking links or replacement-bus roads are not drawn. Follow the full journey directions.")
+                        .font(.appCaption()).foregroundStyle(.secondary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding().background(.regularMaterial)
+        }
+        .navigationTitle("Journey map")
+        .navigationBarTitleDisplayMode(.inline)
+        .task(id: journey.id) {
+            guard let graph = appState.graph else { return }
+            let rail = NationalRailMap.bundled
+            let resolved = await Task.detached(priority: .userInitiated) {
+                JourneyGeographicGeometry.resolve(journey, graph: graph, rail: rail)
+            }.value
+            guard !Task.isCancelled else { return }
+            geometry = resolved
+        }
+    }
+}
+
+private struct TfLJourneyMapScreen: View {
     @Environment(TubeAppState.self) private var appState
     let journey: PlannedJourney
     // Keep this preview's camera and station selection independent of the Map tab.

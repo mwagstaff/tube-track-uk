@@ -47,7 +47,7 @@ function fakeClient({ responses = [] } = {}) {
     };
 }
 
-async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS, railDepartures, nationalRail } = {}) {
+async function fixture({ rows = [], client = fakeClient(), statuses, clock = () => NOW_MS, railDepartures, nationalRail, customDepartures } = {}) {
     const store = new PushTokenStore({
         filePath: path.join(os.tmpdir(), `tube-track-notifier-${process.hrtime.bigint()}.json`),
         flushDebounceMs: 60_000,
@@ -62,12 +62,33 @@ async function fixture({ rows = [], client = fakeClient(), statuses, clock = () 
         statuses: statuses ?? (async () => []),
         railDepartures,
         nationalRail,
+        customDepartures,
         clock
     });
     return { store, notifier, client };
 }
 
 const ABBEY_WOOD = '910GABWDXR';
+test('custom board background updates preserve filters and never substitute a partial board', async () => {
+    const boardRequest = { originID: 'HUBLEW', destinationIDs: ['HUBBAN'], lineIDs: ['dlr'] };
+    let partial = false;
+    const { notifier, client, store } = await fixture({
+        rows: [subscription({ lineId: 'custom-board', boardRequest })],
+        customDepartures: { async board(request) {
+            assert.deepEqual(request, boardRequest);
+            return { arrivals: [arrival()], updatedAt: new Date(NOW_MS).toISOString(),
+                unavailableSources: partial ? 1 : 0, stale: false };
+        } }
+    });
+    try {
+        await notifier.notify(snapshotWith([]));
+        assert.equal(client.sends.length, 1);
+        assert.equal(client.sends[0].payload.aps['content-state'].departures.length, 1);
+        partial = true;
+        await notifier.notify(snapshotWith([]));
+        assert.equal(client.sends.length, 1);
+    } finally { store.stop(); }
+});
 const HEATHROW = '910GHTRWTM4';
 function abbeyWoodBulk() {
     // Observed 2026-09-30: outbound times equal feed generation time, not

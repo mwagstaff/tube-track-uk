@@ -56,6 +56,7 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
             direction: attributes.directionFilterRaw,
             hubId: attributes.stationHubID,
             stopIds: stopIDs,
+            boardRequest: attributes.boardRequest,
             frequentPushesEnabled: frequentPushesEnabled
         )
 
@@ -100,6 +101,7 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         let direction: String
         let hubId: String
         let stopIds: [String]
+        let boardRequest: DepartureBoardRequest?
         let frequentPushesEnabled: Bool
     }
 }

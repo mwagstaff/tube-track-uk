@@ -360,12 +360,12 @@ struct BeckMapTests {
         #expect(RealWorldMapOverviewVisibilityPolicy.shouldShowReset(at: 1.081))
     }
 
-    @Test func closestStationAutoHidesAfterAUsefulZoomIncrease() {
-        #expect(!BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+    @Test func zoomNotificationFiresAfterAUsefulZoomIncrease() {
+        #expect(!BeckMapOverviewVisibilityPolicy.shouldNotifyZoomIn(
             at: 0.27,
             fittedScale: 0.2
         ))
-        #expect(BeckMapOverviewVisibilityPolicy.shouldHideClosestStation(
+        #expect(BeckMapOverviewVisibilityPolicy.shouldNotifyZoomIn(
             at: 0.28,
             fittedScale: 0.2
         ))

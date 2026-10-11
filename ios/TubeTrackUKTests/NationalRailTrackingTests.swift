@@ -25,16 +25,16 @@ struct NationalRailTrackingTests {
         #expect(attributes.showsPlatforms == ["national-rail:SE", "thameslink"].contains(line))
     }
 
-    @Test func liveActivityTimePillsSwitchToClockTimeBeyondTwentyMinutes() throws {
+    @Test func liveActivityTimePillsAlwaysIncludeCountdownAndLondonClock() throws {
         let departure = try #require(ISO8601DateFormatter().date(from: "2026-10-06T18:27:00Z"))
         let style = DepartureCountdownFormatStyle(expectedAt: departure)
-        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins")
-        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "19:27")
-        #expect(style.format(departure.addingTimeInterval(-1320)) == "19:27")
-        #expect(style.format(departure.addingTimeInterval(-120)) == "2 mins")
-        #expect(style.format(departure.addingTimeInterval(-59)) == "Due")
+        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins (19:27)")
+        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "20 mins (19:27)")
+        #expect(style.format(departure.addingTimeInterval(-1320)) == "22 mins (19:27)")
+        #expect(style.format(departure.addingTimeInterval(-120)) == "2 mins (19:27)")
+        #expect(style.format(departure.addingTimeInterval(-59)) == "Due (19:27)")
         let midnight = try #require(ISO8601DateFormatter().date(from: "2026-10-06T23:05:00Z"))
-        #expect(DepartureCountdownFormatStyle(expectedAt: midnight).format(midnight.addingTimeInterval(-1800)) == "00:05")
+        #expect(DepartureCountdownFormatStyle(expectedAt: midnight).format(midnight.addingTimeInterval(-1800)) == "30 mins (00:05)")
     }
 
     private func prediction(_ id: String, line: String = "national-rail:SE", minutes: Int,

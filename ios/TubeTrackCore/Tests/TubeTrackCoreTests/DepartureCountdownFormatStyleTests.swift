@@ -12,21 +12,21 @@ struct DepartureCountdownFormatStyleTests {
     ])
     func minutesAndDue(seconds: Double, label: String) {
         let style = DepartureCountdownFormatStyle(expectedAt: expectedAt)
-        #expect(style.format(expectedAt.addingTimeInterval(-seconds)) == label)
+        #expect(style.format(expectedAt.addingTimeInterval(-seconds)) == "\(label) (\(expectedAt.formatted(DepartureCountdownFormatStyle.clockTime)))")
     }
 
-    @Test func distantDepartureUsesOnlyLondonClockTime() throws {
+    @Test func allDeparturesIncludeLondonClockTime() throws {
         let departure = try #require(ISO8601DateFormatter().date(from: "2026-10-05T22:31:00Z"))
         let style = DepartureCountdownFormatStyle(expectedAt: departure)
-        #expect(style.format(departure.addingTimeInterval(-1380)) == "23:31")
-        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins")
-        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "23:31")
+        #expect(style.format(departure.addingTimeInterval(-1380)) == "23 mins (23:31)")
+        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins (23:31)")
+        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "20 mins (23:31)")
     }
 
     @Test func aNewSnapshotAdvancesFromMinutesToDue() {
         let style = DepartureCountdownFormatStyle(expectedAt: expectedAt)
-        #expect(style.format(expectedAt.addingTimeInterval(-125)) == "2 mins")
-        #expect(style.format(expectedAt.addingTimeInterval(-65)) == "1 min")
-        #expect(style.format(expectedAt.addingTimeInterval(-5)) == "Due")
+        #expect(style.format(expectedAt.addingTimeInterval(-125)) == "2 mins (08:00)")
+        #expect(style.format(expectedAt.addingTimeInterval(-65)) == "1 min (08:00)")
+        #expect(style.format(expectedAt.addingTimeInterval(-5)) == "Due (08:00)")
     }
 }

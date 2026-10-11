@@ -18,11 +18,9 @@ public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
 
     public func format(_ value: Date) -> String {
         let minutes = remainingMinutes(at: value)
-        guard minutes > 0 else { return "Due" }
-        if expectedAt.timeIntervalSince(value) > 20 * 60 {
-            return expectedAt.formatted(Self.clockTime)
-        }
-        return "\(minutes) \(minutes == 1 ? "min" : "mins")"
+        return StationDepartureMetadata.departureTimeLabel(
+            expectedAt: expectedAt, seconds: expectedAt.timeIntervalSince(value), minutes: minutes
+        )
     }
 
     private func remainingMinutes(at date: Date) -> Int {

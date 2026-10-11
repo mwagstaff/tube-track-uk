@@ -2,7 +2,6 @@ import SwiftUI
 
 private enum ProfileDestination: Hashable {
     case about
-    case scheduledJourneys
     case preferences
 }
 
@@ -24,9 +23,6 @@ struct ProfileScreen: View {
             NavigationStack(path: $navigationPath) {
                 List {
                     Section {
-                        NavigationLink(value: ProfileDestination.scheduledJourneys) {
-                            Label("Scheduled journeys", systemImage: "calendar.badge.clock")
-                        }
                         NavigationLink(value: ProfileDestination.preferences) {
                             Label("Preferences", systemImage: "slider.horizontal.3")
                         }
@@ -76,8 +72,6 @@ struct ProfileScreen: View {
                     switch destination {
                     case .about:
                         AboutScreen()
-                    case .scheduledJourneys:
-                        ScheduledJourneysScreen()
                     case .preferences:
                         PreferencesScreen()
                     }
@@ -140,14 +134,6 @@ struct PreferencesScreen: View {
         @Bindable var cable = appState.cableCar
         @Bindable var river = appState.river
         Form {
-            Section {
-                Toggle("Show closest station", isOn: $state.showsClosestStation)
-                    .tint(.blue)
-            } header: {
-                Text("Map")
-            } footer: {
-                Text("Show the closest station when you open the map or tap Current location. Touch the map to hide the card.")
-            }
             Section("Map layers") {
                 Toggle("Show Cable Car", isOn: $cable.isEnabled)
                     .tint(.red)

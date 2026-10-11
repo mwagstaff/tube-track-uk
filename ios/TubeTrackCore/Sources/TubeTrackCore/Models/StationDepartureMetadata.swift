@@ -118,18 +118,16 @@ public enum StationDepartureMetadata {
             seconds = arrival.timeToStation
         }
         guard let seconds else { return "—" }
-        if seconds < 45 { return "Due" }
         return departureTimeLabel(
             expectedAt: arrival.expectedArrival ?? now.addingTimeInterval(TimeInterval(seconds)),
             seconds: TimeInterval(seconds),
-            minutes: max(1, seconds / 60)
+            minutes: seconds < 45 ? 0 : max(1, seconds / 60)
         )
     }
 
     /// Shared wording across departure surfaces, preserving each surface's rounding policy.
     public static func departureTimeLabel(expectedAt: Date, seconds: TimeInterval, minutes: Int) -> String {
-        let countdown = "\(minutes) \(minutes == 1 ? "min" : "mins")"
-        guard seconds > 20 * 60 else { return countdown }
+        let countdown = minutes <= 0 ? "Due" : "\(minutes) \(minutes == 1 ? "min" : "mins")"
         return "\(countdown) (\(expectedAt.formatted(londonClockTime)))"
     }
 

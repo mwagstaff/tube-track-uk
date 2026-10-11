@@ -1,5 +1,6 @@
 import { ScheduledJourneyStore, JourneyScheduler } from './lib/scheduled-journeys.js';
 import { createApp } from './lib/app.js';
+import { createCustomDepartureSource } from './lib/custom-departure-board.js';
 import { loadConfig, LIVE_MODES } from './lib/config.js';
 import { LiveCache } from './lib/live-cache.js';
 import { LivePoller } from './lib/live-poller.js';
@@ -58,6 +59,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client,
         });
 
         const notifier = new LiveActivityNotifier({
+            customDepartures: createCustomDepartureSource({ client, resourceCache, cache }),
             store,
             client: apns,
             topic: config.push.liveActivityTopic,

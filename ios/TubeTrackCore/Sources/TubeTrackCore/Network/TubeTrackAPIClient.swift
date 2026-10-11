@@ -141,6 +141,7 @@ public actor TubeTrackAPIClient {
         _ path: String,
         queryItems: [URLQueryItem] = [],
         forceRefresh: Bool = false,
+        httpMethod: String = "GET",
         as type: Value.Type = Value.self
     ) async throws -> TubeTrackAPIResponse<Value> {
         guard var components = URLComponents(
@@ -154,6 +155,7 @@ public actor TubeTrackAPIClient {
         guard let url = components.url else { throw TubeTrackAPIClientError.invalidURL }
 
         var request = URLRequest(url: url)
+        request.httpMethod = httpMethod
         request.timeoutInterval = 20
         request.cachePolicy = forceRefresh
             ? .reloadRevalidatingCacheData
@@ -181,9 +183,9 @@ public actor TubeTrackAPIClient {
             throw TubeTrackAPIClientError.rateLimited(retryAfter: retryAfter)
         }
         guard (200 ..< 300).contains(response.statusCode) else {
-            if path == "/api/v1/journeys",
+            if path == "/api/v1/journeys" || path.hasPrefix("/api/v2/journey-searches"),
                let failure = try? JSONDecoder().decode(JourneyAPIError.self, from: data),
-               [400, 422, 503].contains(response.statusCode) {
+               [400, 404, 410, 422, 503, 504].contains(response.statusCode) {
                 throw TubeTrackAPIClientError.serviceError(
                     code: failure.error.code, message: failure.error.message
                 )

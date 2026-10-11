@@ -36,8 +36,9 @@ function waitFor(promise, signal) {
 }
 
 export class JourneyDisruptions {
-    constructor({ fetch, stations, clock = Date.now }) {
+    constructor({ fetch, stations, clock = Date.now, nonVehicleModes = ['walking'] }) {
         this.fetch = fetch;
+        this.nonVehicleModes = new Set(nonVehicleModes);
         this.clock = clock;
         this.cache = new ResourceCache({ clock });
         this.lineIDs = [...new Set(stations.flatMap(s => s.lineIds))].sort();
@@ -46,7 +47,7 @@ export class JourneyDisruptions {
 
     async snapshot(journeys, signal) {
         const now = this.clock();
-        const legs = journeys.flatMap(j => j.legs).filter(l => l.mode !== 'walking');
+        const legs = journeys.flatMap(j => j.legs).filter(l => !this.nonVehicleModes.has(l.mode));
         if (!legs.length) return {};
         const first = Math.min(...legs.map(l => Date.parse(l.departureTime)));
         const last = Math.max(...legs.map(l => Date.parse(l.arrivalTime)));
@@ -100,7 +101,7 @@ export class JourneyDisruptions {
             const legs = journey.legs.map(leg => this.enrichLeg(leg, snapshot));
             const issues = mergeIssues(legs.flatMap(leg => leg.disruption.issues));
             const sources = ['realtime', 'plannedWorks'].map(source => {
-                const checks = legs.filter(l => l.mode !== 'walking').map(l => l.disruption.sources.find(s => s.source === source));
+                const checks = legs.filter(l => !this.nonVehicleModes.has(l.mode)).map(l => l.disruption.sources.find(s => s.source === source));
                 const priority = ['unavailable', 'partial', 'stale', 'available', 'notApplicable'];
                 const status = priority.find(status => checks.some(c => c.status === status)) ?? 'notApplicable';
                 const dates = checks.map(c => c.checkedAt).filter(Boolean).sort();
@@ -125,7 +126,7 @@ export class JourneyDisruptions {
         const sources = [];
         for (const source of ['realtime', 'plannedWorks']) {
             const feed = snapshot[source] ?? { status: 'unavailable', checkedAt: null, data: [] };
-            const applicable = leg.mode !== 'walking' && (source !== 'realtime'
+            const applicable = !this.nonVehicleModes.has(leg.mode) && (source !== 'realtime'
                 || Date.parse(leg.departureTime) <= this.clock() + LIVE_HORIZON);
             const check = { source, status: applicable ? feed.status : 'notApplicable', checkedAt: applicable ? feed.checkedAt : null };
             sources.push(check);

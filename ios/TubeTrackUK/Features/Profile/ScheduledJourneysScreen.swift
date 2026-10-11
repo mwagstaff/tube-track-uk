@@ -145,7 +145,7 @@ struct ScheduledJourneyEditor: View {
                     .disabled(replacementError != nil || store.isSaving || store.isLoading)
                     if let replacementError { Text(replacementError).foregroundStyle(.secondary) }
                 } header: { Text(conflicts.count == 1 ? "Conflicts with a saved journey" : "Conflicts with saved journeys") } footer: {
-                    Text(conflicts.count == 1 ? "Replace deletes the entire conflicting journey, including its other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journey in Profile." : "Replace deletes the entire conflicting journeys, including their other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journeys in Profile.")
+                    Text(conflicts.count == 1 ? "Replace deletes the entire conflicting journey, including its other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journey in Journeys → Scheduled journeys." : "Replace deletes the entire conflicting journeys, including their other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journeys in Journeys → Scheduled journeys.")
                 }
             } else if let message = validationError {
                 Section { Text(message).foregroundStyle(.secondary) }

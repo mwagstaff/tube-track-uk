@@ -61,6 +61,21 @@ function registration(overrides = {}) {
     };
 }
 
+test('custom boards retain their verified immutable filter in push registrations', async () => {
+    const boardRequest = { originID: 'HUBLEW', destinationIDs: ['HUBBAN'], lineIDs: ['dlr'] };
+    await withRoutes(async ({ call, store }) => {
+        const response = await call('POST', '/api/v1/push/live-activities', { body: registration({
+            lineId: 'custom-board', direction: 'any', hubId: 'HUBLEW', boardRequest
+        }) });
+        assert.equal(response.status, 201);
+        assert.deepEqual(store.all({ type: 'liveActivity' })[0].boardRequest, boardRequest);
+        const invalid = await call('POST', '/api/v1/push/live-activities', { body: registration({
+            lineId: 'custom-board', hubId: 'HUBBAN', boardRequest
+        }) });
+        assert.equal(invalid.status, 400);
+    }, { customDepartures: { validate: async request => { assert.deepEqual(request, boardRequest); } } });
+});
+
 test('a registration without an install id is refused', async () => {
     await withRoutes(async ({ call }) => {
         const response = await call('POST', '/api/v1/push/live-activities', {

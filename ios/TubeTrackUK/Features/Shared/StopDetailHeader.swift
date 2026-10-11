@@ -17,7 +17,6 @@ struct StopDetailHeader<Directions: View>: View {
                     closeButton
                 }
                 HStack(spacing: 4) {
-                    FavouriteStopButton(stop: stop)
                     directions()
                     Spacer(minLength: 0)
                 }
@@ -39,7 +38,6 @@ struct StopDetailHeader<Directions: View>: View {
     }
 
     @ViewBuilder private var actions: some View {
-        FavouriteStopButton(stop: stop)
         directions()
         closeButton
     }

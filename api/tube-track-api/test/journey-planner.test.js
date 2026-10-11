@@ -268,3 +268,61 @@ test('planner all-clear notices are not normalized as disruptions', () => {
     assert.equal(result.warnings.length, 1);
     assert.equal(result.warnings[0].severity, 'minor');
 });
+
+for (const [name, transfer, warning, expected] of [
+    ['clear direct transfer', true, [], 1],
+    ['legacy direct journey', false, [], 2],
+    ['disrupted direct transfer', true, [severe], 2]
+]) test(`${name} requests the appropriate alternatives`, async () => {
+    let calls = 0;
+    const { planner } = makePlanner({ client: { fetchJSON: async path => {
+        if (path.startsWith('/Line/')) return allGood;
+        if (path.startsWith('/StopPoint')) return { icsCode: '10001' };
+        calls++;
+        return { journeys: [itinerary({ warnings: warning })] };
+    } } });
+    const result = await planner.plan(query, { transfer });
+    assert.equal(calls, expected);
+    assert.equal(result.data.journeys.length, 1);
+    await planner.plan(query, { transfer });
+    assert.equal(calls, expected, 'fresh identical transfer uses the cache');
+});
+
+test('unknown disruption coverage cannot enable the direct-transfer shortcut', async () => {
+    let calls = 0;
+    const { planner } = makePlanner({ client: { fetchJSON: async path => {
+        if (path.startsWith('/Line/')) throw new Error('Status unavailable');
+        if (path.startsWith('/StopPoint')) return { icsCode: '10001' };
+        calls++;
+        return { journeys: [itinerary()] };
+    } } });
+    const result = await planner.plan(query, { transfer: true });
+    assert.equal(calls, 2);
+    assert.notEqual(result.data.journeys[0].disruption.coverage, 'complete');
+});
+
+test('route deduplication never promotes a later arrival above the earliest route', () => {
+    const make = (id, routeKey, departure, arrival) => ({ id, routeKey,
+        departureTime: new Date(now + departure * 60000).toISOString(),
+        arrivalTime: new Date(now + arrival * 60000).toISOString(),
+        durationMinutes: arrival - departure, changes: 2, walkingMinutes: 0, disruptionScore: 0 });
+    const choices = selectJourneys([
+        make('early', 'A', 15, 109), make('late', 'B', 94, 203),
+        make('early-route-later-train', 'A', 120, 220)
+    ], request, now);
+    assert.equal(choices[0].id, 'early');
+    assert.deepEqual(choices[0].labels, ['earliestArrival']);
+    assert.equal(choices[0].waitingMinutes, 15);
+    assert.equal(choices[1].id, 'late');
+});
+
+test('arrive-by route deduplication preserves latest-departure ordering', () => {
+    const make = (id, routeKey, departure) => ({ id, routeKey,
+        departureTime: new Date(now + departure * 60000).toISOString(),
+        arrivalTime: new Date(now + 100 * 60000).toISOString(),
+        durationMinutes: 100 - departure, changes: 0, walkingMinutes: 0, disruptionScore: 0 });
+    const choices = selectJourneys([make('latest', 'A', 80), make('earlier', 'B', 60), make('old-A', 'A', 20)],
+        { ...request, timeMode: 'arriveBy', requestedAt: now + 100 * 60000 }, now);
+    assert.equal(choices[0].id, 'latest');
+    assert.deepEqual(choices[0].labels, ['latestDeparture']);
+});

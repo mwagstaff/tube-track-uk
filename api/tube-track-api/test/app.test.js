@@ -7,6 +7,7 @@ import { LiveCache } from '../lib/live-cache.js';
 import { createMetrics } from '../lib/metrics.js';
 import { normaliseArrival } from '../lib/normalise-arrival.js';
 import { ResourceCache } from '../lib/resource-cache.js';
+import { CombinedJourneys } from '../lib/combined-journeys.js';
 import { JourneyError } from '../lib/journey-planner.js';
 import { prediction } from './helpers.js';
 
@@ -432,4 +433,42 @@ test('estimates Thameslink trains from every mapped board', async () => {
         assert.equal(body.meta.count, body.data.length);
         assert.equal(body.meta.stale, false);
     }, { client });
+});
+
+test('v2 transfer endpoint opts into transfer planning without changing v1', async () => {
+    const calls = [];
+    await withServer(async ({ baseUrl }) => {
+        for (const path of ['/api/v2/journey-transfers', '/api/v1/journeys']) {
+            const response = await fetch(`${baseUrl}${path}?from=940A&to=940B`);
+            assert.equal(response.status, 200);
+            assert.equal(response.headers.get('cache-control'), 'no-store');
+        }
+        assert.deepEqual(calls, [{ transfer: true }, undefined]);
+    }, { journeyPlanner: { plan: async (_query, options) => { calls.push(options); return { data: { journeys: [] } }; } } });
+});
+
+test('combined HTTP response keeps the 12:10 departure ahead of a 94-minute wait', async () => {
+    const now = Date.parse('2026-10-09T10:55:00Z');
+    const at = minutes => new Date(now + minutes * 60000).toISOString();
+    const route = (id, operator, departure, arrival) => ({ id, departure: at(departure), arrival: at(arrival), changes: 2,
+        legs: [{ kind: 'vehicle', mode: 'rail', operator, departure: at(departure), arrival: at(arrival),
+            from: { crs: 'CLK', name: 'Clock House' }, to: { crs: 'ACC', name: 'Acton Central' } }] });
+    const service = new CombinedJourneys({ now: () => now, fetch: async (_url, options) =>
+        Response.json(options.method === 'POST' ? { id: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', status: 'queued' } : {
+            status: 'completed', result: { journeys: [
+                route('early', 'SW', 15, 109), route('later', 'SE', 94, 203), route('repeat', 'SW', 120, 220)
+            ], warnings: [], expiresAt: at(1) }
+        }) });
+    await withServer(async ({ baseUrl }) => {
+        const started = await fetch(`${baseUrl}/api/v2/journey-searches?from=nr:CLK&to=910GACTNCTL&timeMode=now`, { method: 'POST' });
+        assert.equal(started.status, 200);
+        const { data: job } = await started.json();
+        const response = await fetch(`${baseUrl}/api/v2/journey-searches/${job.id}`);
+        assert.equal(response.status, 200);
+        const choices = (await response.json()).data.result.data.journeys;
+        assert.equal(choices[0].departureTime, '2026-10-09T11:10:00.000Z');
+        assert.equal(choices[0].arrivalTime, '2026-10-09T12:44:00.000Z');
+        assert.equal(choices[0].waitingMinutes, 15);
+        assert.deepEqual(choices[0].labels, ['earliestArrival']);
+    }, { combinedJourneys: service });
 });

@@ -78,6 +78,7 @@ struct PlannedJourney: Decodable, Identifiable, Sendable {
         if labels.contains("earliestArrival") { return "Earliest estimated arrival" }
         if labels.contains("latestDeparture") { return "Latest departure to arrive on time" }
         if labels.contains("lessDisrupted") { return "Less reported disruption" }
+        if labels.contains("fewerChanges") { return "Fewer changes" }
         return nil
     }
 
@@ -111,6 +112,8 @@ struct JourneyLine: Decodable, Sendable {
     let id: String
     let name: String
     let direction: String
+    var colour: String? = nil
+    var operatorCode: String? = nil
 }
 
 struct JourneyWarning: Decodable, Identifiable, Sendable {
@@ -121,6 +124,15 @@ struct JourneyWarning: Decodable, Identifiable, Sendable {
 }
 
 enum JourneyFormatting {
+    static func duration(_ minutes: Int) -> String {
+        let value = max(0, minutes)
+        let hours = value / 60, remainder = value % 60
+        let mins = "\(remainder) \(remainder == 1 ? "min" : "mins")"
+        guard hours > 0 else { return mins }
+        let hourText = "\(hours) \(hours == 1 ? "hour" : "hours")"
+        return remainder == 0 ? hourText : "\(hourText), \(mins)"
+    }
+
     static func time(_ date: Date) -> String {
         LondonRailDate.formatted(date, dateFormat: "HH:mm")
     }

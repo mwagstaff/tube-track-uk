@@ -105,6 +105,7 @@ function readStopIds(value, isKnownStop) {
 export function createPushRoutes({
     store,
     scheduleStore = null,
+    customDepartures = null,
     isKnownStop = () => true,
     riverNetwork = async () => ({ piers: [] }),
     logger,
@@ -157,7 +158,15 @@ export function createPushRoutes({
         }
         const isRiver = isRiverBusLine(lineId);
         const isNationalRail = isNationalRailOperator(lineId);
-        if (!LINE_IDS.has(String(lineId)) && !isRiver && !isNationalRail) {
+        const isCustom = lineId === 'custom-board';
+        if (isCustom) {
+            try {
+                if (!customDepartures) throw new Error('Departure boards unavailable');
+                await customDepartures.validate(body.boardRequest);
+                if (body.boardRequest.originID !== hubId) throw new Error('Origin does not match');
+            } catch (error) { return badRequest(res, 'INVALID_BOARD', error.message); }
+        }
+        if (!LINE_IDS.has(String(lineId)) && !isRiver && !isNationalRail && !isCustom) {
             return badRequest(res, 'INVALID_LINE', 'lineId must be a line TubeTrack serves');
         }
         if (!DIRECTION_FILTERS.includes(String(direction ?? 'any'))) {
@@ -183,7 +192,7 @@ export function createPushRoutes({
         }
         // River subscriptions name exactly one canonical pier. Its berths are
         // resolved server-side, so callers cannot subscribe to unrelated stops.
-        const stopIds = isRiver
+        const stopIds = isCustom ? [hubId] : isRiver
             ? (Array.isArray(body.stopIds) && body.stopIds.length === 1 && body.stopIds[0] === pier.id ? [pier.id] : null)
             : isNationalRail ? readStopIds(body.stopIds, (id) => NATIONAL_RAIL_CODES_BY_STATION[hubId].includes(id))
             : readStopIds(body.stopIds, isKnownStop);
@@ -210,6 +219,7 @@ export function createPushRoutes({
             stopIds,
             lineId: String(lineId),
             direction: String(direction ?? 'any'),
+            ...(isCustom ? { boardRequest: body.boardRequest } : {}),
             frequentPushesEnabled: body.frequentPushesEnabled !== false,
             startedAtMs: occurrence?.startedAtMs ?? existing?.startedAtMs ?? clock(),
             ...(occurrence ? {

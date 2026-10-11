@@ -59,6 +59,33 @@ final class StationBoardActivityController {
 
     // MARK: - Lifecycle
 
+    func start(request: DepartureBoardRequest, stationName: String, callingAt: String,
+               board: CustomDepartureBoard) async {
+        guard !board.stale, board.unavailableSources == 0,
+              Date.now.timeIntervalSince(board.updatedAt) <= 90 else { return }
+        let now = Date.now
+        let attributes = DepartureActivityAttributes(activityID: UUID().uuidString,
+            stationHubID: request.originID, stationName: stationName, lineIDRaw: "custom-board",
+            direction: callingAt, directionFilter: .any, startedAt: now,
+            hardEndsAt: now.addingTimeInterval(DepartureActivityPolicy.maximumDuration),
+            operatorName: "Departures", boardRequest: request)
+        await begin(attributes: attributes, state: board.activityState(sequence: 1))
+    }
+
+    func isTracking(request: DepartureBoardRequest) -> Bool {
+        guard let trackedActivityID else { return false }
+        return DepartureActivityBridge.attributes(for: trackedActivityID)?.boardRequest == request
+    }
+
+    func update(request: DepartureBoardRequest, board: CustomDepartureBoard) async {
+        guard let trackedActivityID,
+              let attributes = DepartureActivityBridge.attributes(for: trackedActivityID),
+              attributes.boardRequest == request, !board.stale, board.unavailableSources == 0,
+              Date.now.timeIntervalSince(board.updatedAt) <= 90 else { return }
+        sequence += 1
+        await publish(board.activityState(sequence: sequence), attributes: attributes)
+    }
+
     func start(
         hubID: String,
         stationName: String,

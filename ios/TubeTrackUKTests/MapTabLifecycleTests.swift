@@ -7,13 +7,13 @@ import UIKit
 @Suite(.serialized)
 struct MapTabLifecycleTests {
     @Test(arguments: [true, false]) @MainActor
-    func coldLaunchStartsLocationWithoutTappingTheMap(showsClosestStation: Bool) async throws {
+    func coldLaunchStartsLocationRegardlessOfLegacyBoardPreference(legacyBoardPreference: Bool) async throws {
         let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
         let previousWindow = scene.windows.first(where: \.isKeyWindow)
         let window = UIWindow(windowScene: scene)
         let suiteName = "MapTabLifecycleTests.\(UUID().uuidString)"
         let defaults = try #require(UserDefaults(suiteName: suiteName))
-        defaults.set(showsClosestStation, forKey: "showsClosestStation")
+        defaults.set(legacyBoardPreference, forKey: "showsClosestStation")
         let state = TubeAppState(defaults: defaults, monitorsConnectivity: false)
         state.setNetworkAvailable(false)
         let manager = StartupLocationManager()
@@ -21,6 +21,7 @@ struct MapTabLifecycleTests {
         provider.locationManagerDidChangeAuthorization(manager)
         let host = UIHostingController(rootView: RootTabView()
             .environment(state)
+            .environment(ScheduledJourneyStore(defaults: defaults, observesTokens: false))
             .environment(provider)
             .environment(AppBackgroundImageStore(imageURLs: [], startsTimer: false))
             .environment(GameCenterService(defaults: defaults))
@@ -124,6 +125,89 @@ struct MapTabLifecycleTests {
             gestures.handleTap(at: CGPoint(x: 2, y: 2))
             #expect(state.selectedTab == .map)
         }
+    }
+
+    @Test @MainActor func journeyTabSelectionSurvivesUpdatingBothStationFields() async throws {
+        let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        let window = UIWindow(windowScene: scene)
+        let suite = "JourneyTabSelection.\(UUID())"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        let state = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        state.graph = try TubeGraph.bundled().includingNationalRailStations()
+        state.setNetworkAvailable(false)
+        let provider = UserLocationProvider(manager: StartupLocationManager())
+        let host = UIHostingController(rootView: RootTabView()
+            .environment(state).environment(provider)
+            .environment(ScheduledJourneyStore(defaults: defaults, observesTokens: false))
+            .environment(AppBackgroundImageStore(imageURLs: [], startsTimer: false))
+            .environment(GameCenterService(defaults: defaults))
+            .environment(TubeGameHighScoreStore(defaults: defaults))
+            .environment(StationBoardActivityController())
+            .environment(\.scenePhase, .active))
+        window.rootViewController = host
+        window.makeKeyAndVisible()
+        defer {
+            provider.setMapTracking(false)
+            state.setActive(false)
+            window.isHidden = true
+            window.rootViewController = nil
+            previousWindow?.makeKey()
+            defaults.removePersistentDomain(forName: suite)
+        }
+        func findTabs(_ controller: UIViewController) -> UITabBarController? {
+            if let tabs = controller as? UITabBarController { return tabs }
+            return controller.children.lazy.compactMap { findTabs($0) }.first
+        }
+        for _ in 0..<40 {
+            if let tabs = findTabs(host), tabs.viewControllers?.count == 4, tabs.delegate != nil { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        // Allow the appearance representable to install its tab observation.
+        try await Task.sleep(for: .milliseconds(200))
+        let tabs = try #require(findTabs(host))
+        #expect(tabs.viewControllers?.count == 4)
+        let journeys = try #require(tabs.viewControllers?[2])
+        tabs.selectedViewController = journeys
+        // Simulate UIKit's user-selection callback, rather than setting the
+        // model directly, so the real tab binding participates in this test.
+        tabs.delegate?.tabBarController?(tabs, didSelect: journeys)
+        #expect(state.selectedTab == .journeys)
+        state.journeyPlanner.stationField = .from
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(tabs.presentedViewController != nil || host.presentedViewController != nil)
+        state.journeyPlanner.from = state.graph?.stationsByID["nr:KTH"]
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        // Model the unwanted tab restoration reported during sheet teardown.
+        // The root presentation must return to Journeys after dismissal.
+        state.selectedTab = .map
+        state.journeyPlanner.stationField = nil
+        for _ in 0..<60 {
+            if state.selectedTab == .journeys, tabs.selectedViewController === journeys,
+               tabs.presentedViewController == nil, host.presentedViewController == nil { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        state.journeyPlanner.stationField = .to
+        try await Task.sleep(for: .milliseconds(400))
+        state.journeyPlanner.to = state.graph?.stationsByID["940GZZLUOXC"]
+        try await Task.sleep(for: .milliseconds(200))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        // Model the unwanted tab restoration reported during sheet teardown.
+        // The root presentation must return to Journeys after dismissal.
+        state.selectedTab = .map
+        state.journeyPlanner.stationField = nil
+        for _ in 0..<60 {
+            if state.selectedTab == .journeys, tabs.selectedViewController === journeys,
+               tabs.presentedViewController == nil, host.presentedViewController == nil { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
     }
 
     @MainActor private func coordinator(in view: UIView) -> BeckMapGestureSurface.Coordinator? {

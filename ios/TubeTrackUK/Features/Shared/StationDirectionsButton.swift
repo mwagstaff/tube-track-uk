@@ -53,3 +53,58 @@ struct StopDirectionsButton: View {
         ])
     }
 }
+
+struct DepartureDistanceButton: View {
+    @Environment(\.openURL) private var openURL
+    let stop: DepartureStop
+    let distance: Double?
+
+    var body: some View {
+        Button {
+            guard let url = DepartureDirections.url(latitude: stop.latitude, longitude: stop.longitude) else { return }
+            openURL(url) { accepted in
+                if !accepted {
+                    let destination = MKMapItem(location: CLLocation(latitude: stop.latitude, longitude: stop.longitude), address: nil)
+                    destination.name = stop.name
+                    destination.openInMaps(launchOptions: [MKLaunchOptionsDirectionsModeKey:
+                        (distance ?? .infinity) < 1_609.344 ? MKLaunchOptionsDirectionsModeWalking : MKLaunchOptionsDirectionsModeTransit])
+                }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: proximitySymbol)
+                Text(distance.map { "\(NearbyDistanceFormatter.string(from: $0)) · Get directions" } ?? "Get directions")
+                Image(systemName: "arrow.up.right").imageScale(.small)
+            }
+            .font(.appCaption())
+            .foregroundStyle(Color.accentColor)
+            .padding(.vertical, 8)
+            .frame(minHeight: 44)
+            .contentShape(.rect)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(distance.map { "\(NearbyDistanceFormatter.string(from: $0)) from \(stop.name). Get directions" } ?? "Directions to \(stop.name)")
+        .accessibilityHint("Opens directions in your default maps app. Distance is in a straight line.")
+    }
+
+    private var proximitySymbol: String {
+        guard let distance else { return "location" }
+        if distance < 160 { return "mappin.circle.fill" }
+        if distance < 805 { return "figure.walk" }
+        if distance < 1_609.344 { return "figure.walk.circle" }
+        return "arrow.triangle.turn.up.right.diamond"
+    }
+}
+
+enum DepartureDirections {
+    static func url(latitude: Double, longitude: Double) -> URL? {
+        guard latitude.isFinite, longitude.isFinite,
+              (-90...90).contains(latitude), (-180...180).contains(longitude) else { return nil }
+        var components = URLComponents()
+        components.scheme = "geo-navigation"
+        components.host = ""
+        components.path = "/directions"
+        components.queryItems = [URLQueryItem(name: "destination", value: "\(latitude),\(longitude)")]
+        return components.url
+    }
+}

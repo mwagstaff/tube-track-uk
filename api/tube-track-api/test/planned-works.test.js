@@ -62,6 +62,48 @@ test('parses dated rows from the six-month PDF without inventing exact times', (
     });
 });
 
+test('parses London Cable Car rows alongside rail closures', () => {
+    const pages = fixturePages();
+    pages.push({
+        number: 25,
+        lineCells: [{ bottom: 640, top: 710 }],
+        items: [
+            item('London Cable', 77, 692),
+            item('Car', 77, 679),
+            item('Saturday 24', 170, 692),
+            item('October', 170, 679),
+            item('Sunday 25', 255, 692),
+            item('October', 255, 679),
+            item('No service on the entire line', 340, 692)
+        ]
+    });
+    const parsed = parsePlannedTrackClosurePages(pages, {
+        minimumEvents: 2, minimumHorizonDays: 0
+    });
+    assert.deepEqual(parsed.works.map((work) => work.lineId), ['district', 'london-cable-car']);
+    assert.deepEqual(parsed.works[1].dateRange, { start: '2026-10-24', end: '2026-10-25' });
+    assert.equal(parsed.works[1].description, 'No service on the entire line');
+});
+
+test('combined rail and tram closures do not include the cable car', () => {
+    const pages = fixturePages();
+    pages[0].items.find((entry) => entry.str === 'District').str =
+        'London Underground, Docklands Light Railway, Elizabeth line, London Overground and London Trams';
+    const parsed = parsePlannedTrackClosurePages(pages, {
+        minimumEvents: 1, minimumHorizonDays: 0
+    });
+    assert.equal(parsed.works.length, 20);
+    assert.equal(parsed.works.some((work) => work.lineId === 'london-cable-car'), false);
+});
+
+test('still rejects unknown line labels rather than misattributing closures', () => {
+    const pages = fixturePages();
+    pages[0].items.find((entry) => entry.str === 'District').str = 'Unknown service';
+    assert.throws(() => parsePlannedTrackClosurePages(pages, {
+        minimumEvents: 1, minimumHorizonDays: 0
+    }), /Unrecognised line label.*Unknown service/);
+});
+
 test('fails closed when a PDF no longer contains a credible schedule', () => {
     assert.throws(
         () => parsePlannedTrackClosurePages(fixturePages()),

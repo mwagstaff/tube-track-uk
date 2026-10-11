@@ -483,3 +483,30 @@ their original 90-second observation window and next-pier ETA. Deploy this endpo
 to enable immediate shared estimates in the updated iOS app; older APIs retain
 the transition-only fallback. See [River Bus integration](docs/river-bus.md) for
 the contract, assumptions, recorded replay and regression coverage.
+
+
+### Custom departure boards
+
+`GET /api/v1/departure-board?origin=nr:KTH&destinations=910GBROMLYS&lines=` returns an envelope containing `arrivals`, `updatedAt`, `unavailableSources`, `unverifiedCount` and `stale`. Origins and destinations use the shared `data/departure-stops.json` hub IDs (river boards use canonical pier IDs). Up to eight destination IDs are OR-matched; optional line/operator IDs restrict the combined board. Filtering precedes sorting and the app's five-row compact limit. Full screen can display the remaining results.
+
+National Rail intermediate calls use TrainTrack's verified `/api/v1/departures/from/:crs/to/:crs` feed. Cancelled calls at the selected destination and unverified filters are excluded. Tube/DLR/tram and river boards require the published terminus or an unambiguous downstream calling pattern; reachability in a network graph is not sufficient. Source failures produce a partial-board notice rather than implying there are no services.
+
+Manual Live Activities register `lineId: "custom-board"` with a `boardRequest` object containing `originID`, `destinationIDs`, and `lineIDs`. Validation resolves all stops server-side. The notifier reuses the same board source and keeps the original direction/filter for the activity's lifetime. Partial or stale refreshes do not overwrite a tracked board. Existing registrations remain compatible. Deploy the API changes before distributing the app build that uses this endpoint.
+
+Regenerate both copies of the station catalogue after network changes:
+
+```sh
+python3 ios/Tools/StationIndexBuilder/build_departure_stops.py
+```
+
+Run that command from the repository root. River piers continue to come from the river network catalogue.
+
+
+Custom departure-board requests accept an optional `direction` heading alongside
+`origin`, `destinations` and `lines`. This selection is also saved in Live Activity
+registrations so background updates retain the selected line and direction. Deploy
+this API change before releasing the corresponding per-direction tracking UI.
+National Rail cache fallback keeps the original provider timestamp and is usable
+only within the existing 90-second freshness limit; failed refreshes no longer
+discard an otherwise fresh live snapshot. Source failures emit
+`departure_source_unavailable` with the origin, source and reason.
