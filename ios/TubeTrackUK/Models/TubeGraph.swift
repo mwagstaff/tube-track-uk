@@ -76,6 +76,7 @@ struct TubeGraph: Codable, Sendable {
     /// otherwise linear work quadratic.
     let stationsByID: [String: TubeStation]
     let segmentsByID: [String: TubeSegment]
+    let stationSearchIndex: StationSearch.Index
 
     private enum CodingKeys: String, CodingKey {
         case schemaVersion, generatedAt, source, schematicSize, stations, segments, lines
@@ -97,6 +98,7 @@ struct TubeGraph: Codable, Sendable {
         self.stations = stations
         self.segments = segments
         self.lines = lines
+        stationSearchIndex = StationSearch.Index(stations: stations)
         stationsByID = Dictionary(uniqueKeysWithValues: stations.map { ($0.id, $0) })
         segmentsByID = Dictionary(uniqueKeysWithValues: segments.map { ($0.id, $0) })
     }

@@ -107,6 +107,32 @@ struct StationSearchTests {
         )?.id == districtIssue.id)
     }
 
+    @Test func cachedEmptyListPreservesSelectedHubAndCombinedLines() throws {
+        let graph = try TubeGraph.bundled().includingNationalRailStations()
+        let index = graph.stationSearchIndex
+        #expect(index === graph.stationSearchIndex)
+        let tram = try #require(graph.stationsByID["940GZZCRWMB"])
+        for query in ["", "  ", "Wimbledon"] {
+            let matches = index.suggestions(matching: query, selectedStationID: tram.id)
+            #expect(matches.filter { $0.hubID == tram.hubID }.map(\.id) == [tram.id])
+        }
+        #expect(index.lineIDs(at: tram) == graph.lineIDs(at: tram))
+        let all = index.suggestions(matching: "")
+        #expect(all.contains { $0.id == "nr:KTH" })
+        #expect(Set(all.map { $0.hubID ?? $0.id }).count == all.count)
+    }
+
+    @Test func railFilteringPrecedesLimitAndCacheIsGraphScoped() {
+        let stations = [station(id: "nr:AAA", name: "Alpha"), station(id: "tube", name: "Alpine")]
+        let index = StationSearch.Index(stations: stations)
+        for query in ["", "al"] {
+            #expect(index.suggestions(matching: query, includesNationalRail: false, limit: 1).map(\.id) == ["tube"])
+        }
+        let replacement = StationSearch.Index(stations: [station(id: "new", name: "New station")])
+        #expect(replacement.suggestions(matching: "").map(\.id) == ["new"])
+        #expect(index.suggestions(matching: "").count == 2)
+    }
+
     private func station(
         id: String,
         name: String,

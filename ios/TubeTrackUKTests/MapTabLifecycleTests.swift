@@ -127,7 +127,8 @@ struct MapTabLifecycleTests {
         }
     }
 
-    @Test @MainActor func journeyTabSelectionSurvivesUpdatingBothStationFields() async throws {
+    @Test(arguments: [false, true]) @MainActor
+    func journeyTabSelectionSurvivesUpdatingBothStationFields(accessibleDarkMode: Bool) async throws {
         let scene = try #require(UIApplication.shared.connectedScenes.first as? UIWindowScene)
         let previousWindow = scene.windows.first(where: \.isKeyWindow)
         let window = UIWindow(windowScene: scene)
@@ -144,7 +145,9 @@ struct MapTabLifecycleTests {
             .environment(GameCenterService(defaults: defaults))
             .environment(TubeGameHighScoreStore(defaults: defaults))
             .environment(StationBoardActivityController())
-            .environment(\.scenePhase, .active))
+            .environment(\.scenePhase, .active)
+            .environment(\.colorScheme, accessibleDarkMode ? .dark : .light)
+            .environment(\.dynamicTypeSize, accessibleDarkMode ? .accessibility3 : .large))
         window.rootViewController = host
         window.makeKeyAndVisible()
         defer {
@@ -176,13 +179,12 @@ struct MapTabLifecycleTests {
         state.journeyPlanner.stationField = .from
         try await Task.sleep(for: .milliseconds(400))
         #expect(tabs.presentedViewController != nil || host.presentedViewController != nil)
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
         state.journeyPlanner.from = state.graph?.stationsByID["nr:KTH"]
         try await Task.sleep(for: .milliseconds(200))
         #expect(state.selectedTab == .journeys)
         #expect(tabs.selectedViewController === journeys)
-        // Model the unwanted tab restoration reported during sheet teardown.
-        // The root presentation must return to Journeys after dismissal.
-        state.selectedTab = .map
         state.journeyPlanner.stationField = nil
         for _ in 0..<60 {
             if state.selectedTab == .journeys, tabs.selectedViewController === journeys,
@@ -193,13 +195,12 @@ struct MapTabLifecycleTests {
         #expect(tabs.selectedViewController === journeys)
         state.journeyPlanner.stationField = .to
         try await Task.sleep(for: .milliseconds(400))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
         state.journeyPlanner.to = state.graph?.stationsByID["940GZZLUOXC"]
         try await Task.sleep(for: .milliseconds(200))
         #expect(state.selectedTab == .journeys)
         #expect(tabs.selectedViewController === journeys)
-        // Model the unwanted tab restoration reported during sheet teardown.
-        // The root presentation must return to Journeys after dismissal.
-        state.selectedTab = .map
         state.journeyPlanner.stationField = nil
         for _ in 0..<60 {
             if state.selectedTab == .journeys, tabs.selectedViewController === journeys,
@@ -208,6 +209,19 @@ struct MapTabLifecycleTests {
         }
         #expect(state.selectedTab == .journeys)
         #expect(tabs.selectedViewController === journeys)
+        // Dismissing without a selection must also preserve the tab and fields.
+        let from = state.journeyPlanner.from
+        let to = state.journeyPlanner.to
+        state.journeyPlanner.stationField = .from
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        state.journeyPlanner.stationField = nil
+        try await Task.sleep(for: .milliseconds(400))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        #expect(state.journeyPlanner.from == from)
+        #expect(state.journeyPlanner.to == to)
     }
 
     @MainActor private func coordinator(in view: UIView) -> BeckMapGestureSurface.Coordinator? {

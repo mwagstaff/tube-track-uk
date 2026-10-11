@@ -108,6 +108,21 @@ struct JourneysScreen: View {
             }
 
         }
+        // Keep presentation owned by this tab, outside its NavigationStack.
+        // Opening a picker must not invalidate or restore the root TabView.
+        .sheet(item: $planner.stationField) { field in
+            if let graph = appState.graph {
+                StationSearchSheet(
+                    graph: graph,
+                    selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
+                    title: field == .from ? "Starting station" : "Destination",
+                    selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
+                    onClose: { planner.stationField = nil }
+                ) { station in
+                    if field == .from { planner.from = station } else { planner.to = station }
+                }
+            }
+        }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .task(id: planner.searchID) { await planner.load() }
         .onChange(of: planner.result?.updatedAt) { _, updatedAt in

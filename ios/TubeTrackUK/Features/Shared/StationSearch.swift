@@ -1,77 +1,131 @@
 import SwiftUI
 
 enum StationSearch {
-    static func suggestions(
-        in stations: [TubeStation],
-        matching query: String,
-        limit: Int? = nil
-    ) -> [TubeStation] {
-        let normalizedQuery = normalized(query)
-        let queryTokens = normalizedQuery.split(separator: " ").map(String.init)
+    /// Immutable, graph-scoped data shared by both pickers and all subsequent
+    /// presentations. Graph loading prepares it off the main actor.
+    final class Index: Sendable {
+        private struct Entry: Sendable {
+            let station: TubeStation
+            let name: String
+            let words: [Substring]
+            let aliases: [String]
+            let searchableText: String
+        }
 
-        let matches = stations.compactMap { station -> (station: TubeStation, score: Int)? in
-            let name = normalized(station.name)
-            let aliases = station.searchAliases.map(normalized)
-            let searchableText = ([name] + aliases).joined(separator: " ")
+        private let entries: [Entry]
+        private let allStations: [TubeStation]
+        private let hubStations: [TubeStation]
+        private let stationsByID: [String: TubeStation]
+        private let hubOffsets: [String: Int]
+        private let linesByHub: [String: [TubeLineID]]
 
-            guard queryTokens.allSatisfy(searchableText.contains) else { return nil }
-
-            let score: Int
-            if normalizedQuery.isEmpty || name == normalizedQuery {
-                score = 0
-            } else if name.hasPrefix(normalizedQuery) {
-                score = 1
-            } else if name.split(separator: " ").contains(where: {
-                $0.hasPrefix(normalizedQuery)
-            }) {
-                score = 2
-            } else if name.contains(normalizedQuery) {
-                score = 3
-            } else if aliases.contains(normalizedQuery) {
-                score = 4
-            } else if aliases.contains(where: { $0.hasPrefix(normalizedQuery) }) {
-                score = 5
-            } else {
-                score = 6
+        init(stations: [TubeStation]) {
+            let sorted = stations.sorted {
+                let order = $0.name.localizedStandardCompare($1.name)
+                return order == .orderedSame ? $0.id < $1.id : order == .orderedAscending
             }
-            return (station, score)
+            allStations = sorted
+            entries = sorted.map { station in
+                let name = StationSearch.normalized(station.name)
+                let aliases = station.searchAliases.map(StationSearch.normalized)
+                return Entry(station: station, name: name, words: name.split(separator: " "),
+                             aliases: aliases, searchableText: ([name] + aliases).joined(separator: " "))
+            }
+            stationsByID = Dictionary(uniqueKeysWithValues: stations.map { ($0.id, $0) })
+            var hubs: [TubeStation] = []
+            var offsets: [String: Int] = [:]
+            var lines: [String: Set<TubeLineID>] = [:]
+            for station in sorted {
+                let hub = station.hubID ?? station.id
+                if offsets[hub] == nil {
+                    offsets[hub] = hubs.count
+                    hubs.append(station)
+                }
+                lines[hub, default: []].formUnion(station.lineIDs)
+            }
+            hubStations = hubs
+            hubOffsets = offsets
+            linesByHub = lines.mapValues { $0.sorted { $0.displayName < $1.displayName } }
         }
-        .sorted {
-            if $0.score != $1.score { return $0.score < $1.score }
-            let nameOrder = $0.station.name.localizedStandardCompare($1.station.name)
-            if nameOrder != .orderedSame { return nameOrder == .orderedAscending }
-            return $0.station.id < $1.station.id
-        }
-        .map(\.station)
 
-        guard let limit else { return matches }
-        return Array(matches.prefix(limit))
+        func lineIDs(at station: TubeStation) -> [TubeLineID] {
+            linesByHub[station.hubID ?? station.id] ?? station.lineIDs
+        }
+
+        func suggestions(
+            matching query: String,
+            selectedStationID: String? = nil,
+            deduplicatesHubs: Bool = true,
+            includesNationalRail: Bool = true,
+            limit: Int? = nil
+        ) -> [TubeStation] {
+            let query = StationSearch.normalized(query)
+            let ranked: [TubeStation]
+            if query.isEmpty {
+                // The initial list needs no normalization, ranking or hub scan.
+                var cached = deduplicatesHubs ? hubStations : allStations
+                if deduplicatesHubs, let selectedStationID,
+                   let station = stationsByID[selectedStationID],
+                   let offset = hubOffsets[station.hubID ?? station.id] {
+                    cached[offset] = station
+                }
+                if !includesNationalRail {
+                    cached = cached.filter { !NationalRailMap.isExclusiveStation($0.id) }
+                }
+                guard let limit else { return cached }
+                return Array(cached.prefix(max(0, limit)))
+            } else {
+                let tokens = query.split(separator: " ").map(String.init)
+                // Entries are already alphabetized. Buckets preserve that order
+                // without another localized sort on every keystroke.
+                var buckets = Array(repeating: [TubeStation](), count: 7)
+                for entry in entries {
+                    guard tokens.allSatisfy(entry.searchableText.contains) else { continue }
+                    let score: Int
+                    if entry.name == query { score = 0 }
+                    else if entry.name.hasPrefix(query) { score = 1 }
+                    else if entry.words.contains(where: { $0.hasPrefix(query) }) { score = 2 }
+                    else if entry.name.contains(query) { score = 3 }
+                    else if entry.aliases.contains(query) { score = 4 }
+                    else if entry.aliases.contains(where: { $0.hasPrefix(query) }) { score = 5 }
+                    else { score = 6 }
+                    buckets[score].append(entry.station)
+                }
+                ranked = buckets.flatMap { $0 }
+            }
+
+            var matches: [TubeStation] = []
+            var offsets: [String: Int] = [:]
+            // Filter before applying the result limit so excluded rail stations
+            // cannot crowd eligible stations out of the first 40 results.
+            for station in ranked {
+                guard includesNationalRail || !NationalRailMap.isExclusiveStation(station.id) else { continue }
+                let hub = station.hubID ?? station.id
+                if deduplicatesHubs, let offset = offsets[hub] {
+                    if station.id == selectedStationID { matches[offset] = station }
+                } else {
+                    offsets[hub] = matches.count
+                    matches.append(station)
+                }
+            }
+            guard let limit else { return matches }
+            return Array(matches.prefix(max(0, limit)))
+        }
     }
 
     static func suggestions(
-        in graph: TubeGraph,
-        matching query: String,
-        selectedStationID: String? = nil,
-        limit: Int? = nil
+        in stations: [TubeStation], matching query: String, limit: Int? = nil
     ) -> [TubeStation] {
-        let ranked = suggestions(in: graph.stations, matching: query)
-        var orderedHubIDs: [String] = []
-        var representativeByHubID: [String: TubeStation] = [:]
+        Index(stations: stations).suggestions(matching: query, deduplicatesHubs: false, limit: limit)
+    }
 
-        for station in ranked {
-            let hubID = station.hubID ?? station.id
-            if representativeByHubID[hubID] == nil {
-                orderedHubIDs.append(hubID)
-                representativeByHubID[hubID] = station
-            }
-            if station.id == selectedStationID {
-                representativeByHubID[hubID] = station
-            }
-        }
-
-        let matches = orderedHubIDs.compactMap { representativeByHubID[$0] }
-        guard let limit else { return matches }
-        return Array(matches.prefix(limit))
+    static func suggestions(
+        in graph: TubeGraph, matching query: String,
+        selectedStationID: String? = nil, limit: Int? = nil
+    ) -> [TubeStation] {
+        graph.stationSearchIndex.suggestions(
+            matching: query, selectedStationID: selectedStationID, limit: limit
+        )
     }
 
     private static func normalized(_ value: String) -> String {
@@ -96,12 +150,12 @@ struct StationSearchSheet: View {
     let onSelect: (TubeStation) -> Void
 
     private var suggestions: [TubeStation] {
-        StationSearch.suggestions(
-            in: graph,
+        graph.stationSearchIndex.suggestions(
             matching: query,
             selectedStationID: selectedStationID,
+            includesNationalRail: includesNationalRail,
             limit: query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : 40
-        ).filter { includesNationalRail || !NationalRailMap.isExclusiveStation($0.id) }
+        )
     }
 
     private func close() {
@@ -109,13 +163,14 @@ struct StationSearchSheet: View {
     }
 
     var body: some View {
+        let suggestions = suggestions
         NavigationStack {
             Group {
                 if suggestions.isEmpty {
                     ContentUnavailableView.search(text: query)
                 } else {
                     List(suggestions) { station in
-                        let lineIDs = graph.lineIDs(at: station)
+                        let lineIDs = graph.stationSearchIndex.lineIDs(at: station)
                         Button {
                             onSelect(station)
                             close()
@@ -250,5 +305,19 @@ private struct StationLineFlowLayout: Layout {
     private struct Arrangement {
         let origins: [CGPoint]
         let size: CGSize
+    }
+}
+
+#Preview("Station picker") {
+    if let graph = try? TubeGraph.bundled().includingNationalRailStations() {
+        StationSearchSheet(graph: graph, selectedStationID: nil, title: "Starting station") { _ in }
+    }
+}
+
+#Preview("Station picker · Large text, dark") {
+    if let graph = try? TubeGraph.bundled().includingNationalRailStations() {
+        StationSearchSheet(graph: graph, selectedStationID: "940GZZCRWMB", title: "Destination") { _ in }
+            .environment(\.dynamicTypeSize, .accessibility3)
+            .preferredColorScheme(.dark)
     }
 }

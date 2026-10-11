@@ -42,7 +42,6 @@ struct RootTabView: View {
 
     var body: some View {
         @Bindable var state = appState
-        @Bindable var planner = appState.journeyPlanner
 
         ZStack {
             VStack(spacing: 0) {
@@ -120,24 +119,6 @@ struct RootTabView: View {
                     .opacity(backgroundRevealOpacity)
                     .allowsHitTesting(!appStartupCompleted)
                     .zIndex(10)
-            }
-        }
-        // Present outside the tab's NavigationStack so sheet teardown cannot
-        // replace the tab content. The picker always returns to its owner tab.
-        .sheet(item: $planner.stationField, onDismiss: {
-            appState.selectedTab = .journeys
-        }) { field in
-            if let graph = appState.graph {
-                StationSearchSheet(
-                    graph: graph,
-                    selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
-                    title: field == .from ? "Starting station" : "Destination",
-                    selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
-                    includesNationalRail: true,
-                    onClose: { planner.stationField = nil }
-                ) { station in
-                    if field == .from { planner.from = station } else { planner.to = station }
-                }
             }
         }
         .sheet(isPresented: $state.showsWorks) {
