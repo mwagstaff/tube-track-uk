@@ -179,7 +179,7 @@ struct NationalRailDepartureGroupView: View {
                 Button("Cancel", role: .cancel) {}
             }
             .sheet(item: $scheduling) { journey in
-                NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+                NavigationStack { ScheduledJourneyEditor(journey: journey) }
             }
             .accessibilityHint(isTracking ? "Removes the departure board from the Lock Screen"
                                : "Choose to track now or add a scheduled journey")

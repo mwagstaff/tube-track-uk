@@ -647,7 +647,7 @@ struct StationDepartureBoardHeader: View {
             Button("Cancel", role: .cancel) {}
         }
         .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
         }
     }
 

@@ -5,10 +5,16 @@ struct JourneysScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(ScheduledJourneyStore.self) private var scheduleStore
     @State private var showsResults = false
+    @State private var schedulePresentation: ScheduledJourneyPresentation
+
+    init(schedulePresentation: ScheduledJourneyPresentation = ScheduledJourneyPresentation()) {
+        _schedulePresentation = State(initialValue: schedulePresentation)
+    }
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         @Bindable var planner = appState.journeyPlanner
+        @Bindable var schedules = schedulePresentation
 
         NavigationStack {
             List {
@@ -97,6 +103,9 @@ struct JourneysScreen: View {
             }
             .navigationTitle("Journeys")
             .journeyBackground()
+            .navigationDestination(isPresented: $schedules.showsList) {
+                ScheduledJourneysScreen(presentation: schedulePresentation)
+            }
             .navigationDestination(isPresented: $showsResults) {
                 resultsDestination
             }
@@ -117,6 +126,25 @@ struct JourneysScreen: View {
                 }
             }
         }
+        .sheet(item: $schedules.editing) { journey in
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
+        }
+        .confirmationDialog("Delete this scheduled journey?", isPresented: $schedules.showsDeleteConfirmation, titleVisibility: .visible, presenting: schedules.deleting) { journey in
+            Button("Delete journey", role: .destructive) {
+                Task {
+                    do { try await scheduleStore.delete(journey) }
+                    catch { schedules.error = error.localizedDescription }
+                }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { journey in
+            Text("This removes this journey and both its tracking windows.\n\n" + journey.replacementSummary)
+        }
+        .alert("Could not update journey", isPresented: Binding(
+            get: { schedules.error != nil }, set: { if !$0 { schedules.error = nil } }
+        )) {
+            Button("OK") { schedules.error = nil }
+        } message: { Text(schedules.error ?? "") }
         .background(Color(uiColor: .systemGroupedBackground).ignoresSafeArea())
         .task(id: planner.searchID) { await planner.load() }
         .onChange(of: planner.result?.updatedAt) { _, updatedAt in
@@ -130,8 +158,8 @@ struct JourneysScreen: View {
 
     private var scheduledJourneysLink: some View {
         let count = scheduleStore.journeys.count
-        return NavigationLink {
-            ScheduledJourneysScreen()
+        return Button {
+            schedulePresentation.showsList = true
         } label: {
             if dynamicTypeSize >= .accessibility4 {
                 VStack(alignment: .leading, spacing: 8) {
@@ -149,6 +177,8 @@ struct JourneysScreen: View {
                     Label("My scheduled journeys", systemImage: "calendar.badge.clock")
                     Spacer()
                     scheduledJourneyBadge
+                    Image(systemName: "chevron.right").font(.caption).foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
                 }
             }
         }
@@ -244,7 +274,7 @@ private struct JourneyResultsScreen: View {
             await appState.journeyPlanner.refreshSuggestions()
         }
         .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
         }
         .navigationTitle("Route suggestions")
         .navigationBarTitleDisplayMode(.inline)
@@ -536,7 +566,7 @@ struct JourneyDetailScreen: View {
         }
         .journeyBackground()
         .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
         }
         .navigationTitle("Journey details")
         .navigationBarTitleDisplayMode(.inline)

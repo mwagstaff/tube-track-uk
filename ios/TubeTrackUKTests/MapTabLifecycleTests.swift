@@ -1,5 +1,6 @@
 import CoreLocation
 import SwiftUI
+import TubeTrackCore
 import Testing
 import UIKit
 @testable import TubeTrackUK
@@ -138,9 +139,17 @@ struct MapTabLifecycleTests {
         state.graph = try TubeGraph.bundled().includingNationalRailStations()
         state.setNetworkAvailable(false)
         let provider = UserLocationProvider(manager: StartupLocationManager())
-        let host = UIHostingController(rootView: RootTabView()
+        let schedules = ScheduledJourneyPresentation()
+        let hub = try #require(StationIndex.bundled.hub(containing: "940GZZLUOXC"))
+        let saved = ScheduledJourney.suggested(outbound: ScheduledBoard(hub: hub, line: .central))
+        let cache: [String: Any] = ["journeys": [try JSONSerialization.jsonObject(with: JSONEncoder().encode(saved))],
+                                  "revision": 1, "maximumJourneys": 3]
+        defaults.set(try JSONSerialization.data(withJSONObject: cache), forKey: "scheduledJourneys.cache.\(AppInstall.identifier)")
+        let scheduleStore = ScheduledJourneyStore(defaults: defaults,
+            baseURL: URL(string: "http://127.0.0.1:1")!, observesTokens: false)
+        let host = UIHostingController(rootView: RootTabView(schedulePresentation: schedules)
             .environment(state).environment(provider)
-            .environment(ScheduledJourneyStore(defaults: defaults, observesTokens: false))
+            .environment(scheduleStore)
             .environment(AppBackgroundImageStore(imageURLs: [], startsTimer: false))
             .environment(GameCenterService(defaults: defaults))
             .environment(TubeGameHighScoreStore(defaults: defaults))
@@ -222,6 +231,46 @@ struct MapTabLifecycleTests {
         #expect(tabs.selectedViewController === journeys)
         #expect(state.journeyPlanner.from == from)
         #expect(state.journeyPlanner.to == to)
+
+        schedules.showsList = true
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(state.selectedTab == .journeys)
+        schedules.confirmDeletion(of: saved)
+        try await Task.sleep(for: .milliseconds(800))
+        func findAlert(_ controller: UIViewController) -> UIAlertController? {
+            if let alert = controller as? UIAlertController { return alert }
+            if let presented = controller.presentedViewController, let alert = findAlert(presented) { return alert }
+            return controller.children.lazy.compactMap { findAlert($0) }.first
+        }
+        let confirmation = try #require(findAlert(host))
+        #expect(confirmation.actions.contains { $0.title == "Delete journey" })
+        #expect(confirmation.actions.contains { $0.title == "Cancel" })
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        #expect(schedules.showsList)
+        #expect(scheduleStore.journeys == [saved])
+        // A later update must not dismiss the confirmation or change tabs.
+        state.journeyPlanner.accessibility = .platform
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(findAlert(host) === confirmation)
+        #expect(state.selectedTab == .journeys)
+        schedules.showsDeleteConfirmation = false
+        for _ in 0..<40 {
+            if findAlert(host) == nil { break }
+            try await Task.sleep(for: .milliseconds(50))
+        }
+        #expect(findAlert(host) == nil)
+        #expect(scheduleStore.journeys == [saved])
+        #expect(schedules.showsList)
+        #expect(state.selectedTab == .journeys)
+        schedules.editing = saved
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(state.selectedTab == .journeys)
+        #expect(tabs.selectedViewController === journeys)
+        schedules.editing = nil
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(schedules.showsList)
+        #expect(state.selectedTab == .journeys)
     }
 
     @MainActor private func coordinator(in view: UIView) -> BeckMapGestureSurface.Coordinator? {

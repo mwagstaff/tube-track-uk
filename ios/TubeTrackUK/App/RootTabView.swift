@@ -40,6 +40,12 @@ struct RootTabView: View {
     @State private var mapNavigation = MapTabNavigationState()
     @State private var profileShowsImageBackground = false
 
+    @State private var schedulePresentation: ScheduledJourneyPresentation
+
+    init(schedulePresentation: ScheduledJourneyPresentation = ScheduledJourneyPresentation()) {
+        _schedulePresentation = State(initialValue: schedulePresentation)
+    }
+
     var body: some View {
         @Bindable var state = appState
 
@@ -80,7 +86,7 @@ struct RootTabView: View {
                         .tabItem { Label(AppTab.nearMe.title, systemImage: AppTab.nearMe.symbol) }
                         .tag(AppTab.nearMe)
 
-                    JourneysScreen()
+                    JourneysScreen(schedulePresentation: schedulePresentation)
                         .tabItem { Label(AppTab.journeys.title, systemImage: AppTab.journeys.symbol) }
                         .tag(AppTab.journeys)
 

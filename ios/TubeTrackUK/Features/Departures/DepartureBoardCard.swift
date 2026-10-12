@@ -149,7 +149,7 @@ struct DepartureBoardCard: View {
         }
         .sheet(item: $editing) { editor($0) }
         .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+            NavigationStack { ScheduledJourneyEditor(journey: journey) }
         }
         .confirmationDialog("Track this journey", isPresented: Binding(
             get: { trackingChoice != nil }, set: { if !$0 { trackingChoice = nil } }

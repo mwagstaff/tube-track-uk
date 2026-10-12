@@ -1,11 +1,24 @@
 import SwiftUI
 import TubeTrackCore
 
+/// Owned by the Journeys tab, outside its navigation destinations and list rows.
+@MainActor @Observable
+final class ScheduledJourneyPresentation {
+    var showsList = false
+    var editing: ScheduledJourney?
+    private(set) var deleting: ScheduledJourney?
+    var showsDeleteConfirmation = false
+
+    func confirmDeletion(of journey: ScheduledJourney) {
+        deleting = journey
+        showsDeleteConfirmation = true
+    }
+    var error: String?
+}
+
 struct ScheduledJourneysScreen: View {
     @Environment(ScheduledJourneyStore.self) private var store
-    @State private var editing: ScheduledJourney?
-    @State private var deleting: ScheduledJourney?
-    @State private var error: String?
+    @Bindable var presentation: ScheduledJourneyPresentation
 
     var body: some View {
         List {
@@ -22,7 +35,7 @@ struct ScheduledJourneysScreen: View {
                         description: Text("Schedule departure boards for the days and times you travel."))
                 }
                 ForEach(store.journeys) { journey in
-                    Button { editing = journey } label: {
+                    Button { presentation.editing = journey } label: {
                         VStack(alignment: .leading, spacing: 6) {
                             HStack {
                                 Text(journey.title).font(.headline)
@@ -35,19 +48,22 @@ struct ScheduledJourneysScreen: View {
                         }
                         .foregroundStyle(.primary)
                     }
-                    .swipeActions {
-                        Button("Delete", role: .destructive) { deleting = journey }
+                    .swipeActions(allowsFullSwipe: false) {
+                        // Opening a confirmation is not deletion. A destructive
+                        // swipe button optimistically removes the row in SwiftUI.
+                        Button("Delete") { presentation.confirmDeletion(of: journey) }
+                            .tint(.red)
                     }
                     .contextMenu {
                         Button(journey.enabled ? "Pause" : "Enable", systemImage: journey.enabled ? "pause" : "play") {
                             var changed = journey
                             changed.enabled.toggle()
-                            Task { do { try await store.save(changed) } catch { self.error = error.localizedDescription } }
+                            Task { do { try await store.save(changed) } catch { presentation.error = error.localizedDescription } }
                         }
-                        Button("Delete", role: .destructive) { deleting = journey }
+                        Button("Delete", role: .destructive) { presentation.confirmDeletion(of: journey) }
                     }
                 }
-                Button { editing = ScheduledJourney() } label: {
+                Button { presentation.editing = ScheduledJourney() } label: {
                     Label("Add journey", systemImage: "plus")
                 }
                 .disabled(store.journeys.count >= store.maximumJourneys || store.isSaving || store.isLoading)
@@ -61,20 +77,7 @@ struct ScheduledJourneysScreen: View {
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.refresh() }
         .refreshable { await store.refresh() }
-        .sheet(item: $editing) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey) }
-        }
-        .confirmationDialog("Delete this scheduled journey?", isPresented: Binding(
-            get: { deleting != nil }, set: { if !$0 { deleting = nil } }
-        ), titleVisibility: .visible) {
-            Button("Delete journey", role: .destructive) {
-                guard let journey = deleting else { return }
-                Task { do { try await store.delete(journey) } catch { self.error = error.localizedDescription } }
-            }
-        }
-        .alert("Could not update journey", isPresented: Binding(get: { error != nil }, set: { if !$0 { error = nil } })) {
-            Button("OK") { error = nil }
-        } message: { Text(error ?? "") }
+
     }
 
     private func summary(_ label: String, _ window: ScheduledJourneyWindow) -> some View {
@@ -94,16 +97,34 @@ struct ScheduledJourneyEditor: View {
     @State private var replacement: JourneyReplacement?
     @State private var confirmsReplacement = false
 
-    init(journey: ScheduledJourney, suggestsReturn: Bool = false) {
+    init(journey: ScheduledJourney) {
         _journey = State(initialValue: journey)
         _morning = State(initialValue: WindowDraft(window: journey.morning, start: 450))
-        var returnDraft = WindowDraft(window: journey.afternoon, start: 990)
-        if suggestsReturn { returnDraft.enabled = true }
-        _afternoon = State(initialValue: returnDraft)
+        // Enable the return only when a station was inferred; users can add one below.
+        _afternoon = State(initialValue: WindowDraft(window: journey.afternoon, start: 990))
     }
 
     var body: some View {
         Form {
+            if !conflicts.isEmpty {
+                Section {
+                    Text("These times overlap with a saved journey. Replace it to use your new schedule.")
+                    ForEach(conflicts) { conflict in
+                        Text(conflict.replacementSummary)
+                    }
+                    Button(conflicts.count == 1 ? "Replace existing journey…" : "Replace existing journeys…", role: .destructive) {
+                        replacement = JourneyReplacement(journey: candidate, conflicts: conflicts)
+                        confirmsReplacement = true
+                    }
+                    .disabled(replacementError != nil || store.isSaving || store.isLoading)
+                    if let replacementError { Text(replacementError).foregroundStyle(.secondary) }
+                } header: { Text(conflicts.count == 1 ? "Already scheduled at this time" : "Already scheduled at these times") } footer: {
+                    Text("You’ll be asked to confirm. Replacement removes the journeys shown above, including their other windows. Or choose different days or times.")
+                }
+            } else if let message = validationError {
+                Section { Text(message).foregroundStyle(.secondary) }
+            }
+
             Section {
                 Text("Set your usual travel days and times. Check the suggested stations and directions before saving.")
                     .foregroundStyle(.secondary)
@@ -136,24 +157,6 @@ struct ScheduledJourneyEditor: View {
             } header: { Text("Summary") } footer: {
                 Text("A Live Activity starts at each window and finishes at its end. Delivery needs a connection and Live Activities enabled. A board you track manually takes priority. Changes apply from the next window.")
             }
-            if !conflicts.isEmpty {
-                Section {
-                    Text(conflicts.count == 1 ? "This saved journey uses the same days and overlapping times. Only one scheduled board can run at a time." : "These saved journeys use the same days and overlapping times. Only one scheduled board can run at a time.")
-                    ForEach(conflicts) { conflict in
-                        Text(conflict.replacementSummary)
-                    }
-                    Button(conflicts.count == 1 ? "Replace conflicting journey…" : "Replace conflicting journeys…", role: .destructive) {
-                        replacement = JourneyReplacement(journey: candidate, conflicts: conflicts)
-                        confirmsReplacement = true
-                    }
-                    .disabled(replacementError != nil || store.isSaving || store.isLoading)
-                    if let replacementError { Text(replacementError).foregroundStyle(.secondary) }
-                } header: { Text(conflicts.count == 1 ? "Conflicts with a saved journey" : "Conflicts with saved journeys") } footer: {
-                    Text(conflicts.count == 1 ? "Replace deletes the entire conflicting journey, including its other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journey in Journeys → My scheduled journeys." : "Replace deletes the entire conflicting journeys, including their other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journeys in Journeys → My scheduled journeys.")
-                }
-            } else if let message = validationError {
-                Section { Text(message).foregroundStyle(.secondary) }
-            }
             if let message = store.setupError {
                 Section {
                     Text(message).foregroundStyle(.secondary)
@@ -168,7 +171,7 @@ struct ScheduledJourneyEditor: View {
         .toolbar {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(store.isSaving) }
             ToolbarItem(placement: .confirmationAction) {
-                Button(store.isSaving ? "Saving…" : "Save") {
+                Button(store.isSaving ? "Saving…" : (conflicts.isEmpty ? "Save" : "Replace…")) {
                     if !conflicts.isEmpty {
                         replacement = JourneyReplacement(journey: candidate, conflicts: conflicts)
                         confirmsReplacement = true

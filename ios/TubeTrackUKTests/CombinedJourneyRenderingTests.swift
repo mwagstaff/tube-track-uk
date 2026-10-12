@@ -12,10 +12,18 @@ import XCTest
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
         let app = TubeAppState(defaults: defaults, monitorsConnectivity: false)
-        let store = ScheduledJourneyStore(defaults: defaults,
-            baseURL: URL(string: "http://127.0.0.1:1")!, observesTokens: false)
         let hub = try XCTUnwrap(StationIndex.bundled.hub(containing: "940GZZLUOXC"))
         let draft = ScheduledJourney.suggested(outbound: ScheduledBoard(hub: hub, line: .central, direction: .eastbound))
+        var saved = draft
+        saved.id = "existing-journey"
+        saved.name = "Existing commute"
+        let cache: [String: Any] = ["journeys": [try JSONSerialization.jsonObject(with: JSONEncoder().encode(saved))],
+                                  "revision": 1, "maximumJourneys": 3]
+        defaults.set(try JSONSerialization.data(withJSONObject: cache), forKey: "scheduledJourneys.cache.\(AppInstall.identifier)")
+        let store = ScheduledJourneyStore(defaults: defaults,
+            baseURL: URL(string: "http://127.0.0.1:1")!, observesTokens: false)
+        XCTAssertEqual(store.journeys, [saved])
+        XCTAssertEqual(draft.conflictingJourneys(in: store.journeys), [saved])
         let railStation = try XCTUnwrap(ScheduledBoard.railStation(id: "nr:KTH"))
         let railDraft = ScheduledJourney.suggested(outbound: ScheduledBoard(station: railStation,
             operatorID: "national-rail:SE", operatorName: "Southeastern", direction: .northbound))
@@ -24,7 +32,7 @@ import XCTest
             for variant in ["journeys", "editor", "rail"] {
                 let content = Group {
                     if variant != "journeys" {
-                        NavigationStack { ScheduledJourneyEditor(journey: variant == "rail" ? railDraft : draft, suggestsReturn: true) }
+                        NavigationStack { ScheduledJourneyEditor(journey: variant == "rail" ? railDraft : draft) }
                     } else { JourneysScreen() }
                 }.environment(app).environment(store)
                     .environment(\.colorScheme, scheme).environment(\.dynamicTypeSize, size)
