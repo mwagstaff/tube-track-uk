@@ -1,11 +1,11 @@
 import Foundation
 
-actor NationalRailArrivalsService {
-    struct Snapshot: Sendable {
-        var arrivals: [TfLArrivalPrediction] = []
-        var updatedAt: Date?
-        var isStale = false
-        var errorMessage: String?
+public actor NationalRailArrivalsService {
+    public struct Snapshot: Sendable {
+        public var arrivals: [TfLArrivalPrediction] = []
+        public var updatedAt: Date?
+        public var isStale = false
+        public var errorMessage: String?
     }
     private struct Cached: Sendable {
         let board: NationalRailBoard
@@ -14,9 +14,9 @@ actor NationalRailArrivalsService {
     private let client: TubeTrackAPIClient
     private var boards: [String: Cached] = [:]
 
-    init(client: TubeTrackAPIClient) { self.client = client }
+    public init(client: TubeTrackAPIClient) { self.client = client }
 
-    func fetch(stationIDs: [String], forceRefresh: Bool) async throws -> Snapshot {
+    public func fetch(stationIDs: [String], forceRefresh: Bool) async throws -> Snapshot {
         let codes = NationalRailStations.codes(for: stationIDs)
         let includesThameslink = stationIDs.contains { $0.hasPrefix("nr:") }
         var result = Snapshot()

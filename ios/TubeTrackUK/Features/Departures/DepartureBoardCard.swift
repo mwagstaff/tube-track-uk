@@ -1,4 +1,5 @@
 import SwiftUI
+import TubeTrackCore
 import UIKit
 
 enum DepartureBoardTheme {
@@ -22,6 +23,9 @@ struct DepartureBoardCard: View {
     var usesSavedView = true
     var presentedAsSheet = false
     var preferredServiceID: String? = nil
+    @Environment(ScheduledJourneyStore.self) private var scheduleStore: ScheduledJourneyStore?
+    @State private var trackingChoice: DepartureBoardDirectionGroup?
+    @State private var scheduling: ScheduledJourney?
     @State private var selectedServiceID: String?
     @State private var expandedDirections: Set<String> = []
     @State private var linkedConfiguration: DepartureFavourite?
@@ -144,6 +148,23 @@ struct DepartureBoardCard: View {
                                usesSavedView: usesSavedView, presentedAsSheet: true, preferredServiceID: serviceID)
         }
         .sheet(item: $editing) { editor($0) }
+        .sheet(item: $scheduling) { journey in
+            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+        }
+        .confirmationDialog("Track this journey", isPresented: Binding(
+            get: { trackingChoice != nil }, set: { if !$0 { trackingChoice = nil } }
+        ), titleVisibility: .visible, presenting: trackingChoice) { group in
+            Button("Start tracking now") { startTracking(group) }
+                .disabled(!canTrack(group))
+            if let draft = suggestedSchedule(group), scheduleStore != nil {
+                Button("Add scheduled journey") { scheduling = draft }
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: { group in
+            if !trackingRequest(group).destinationIDs.isEmpty {
+                Text("Scheduled journeys track this service and direction. Calling-at filters apply only when you start tracking now.")
+            }
+        }
         .sheet(item: $filtering) { request in
             DepartureDirectionFilterEditor(request: request) { saved in
                 var changed = configuration
@@ -425,18 +446,37 @@ struct DepartureBoardCard: View {
             let trackedRequest = trackingRequest(group)
             let tracking = activity.isTracking(request: trackedRequest)
             Button(tracking ? "Stop tracking" : "Track", systemImage: tracking ? "stop.circle" : "livephoto") {
-                Task {
-                    if tracking { await activity.end(reason: .userEnded) }
-                    else if let board, let filteredBoard = directionBoard(board, group: group) {
-                        let name = services.first { $0.id == serviceID }?.name ?? serviceID
-                        await activity.start(request: trackedRequest, stationName: origin?.name ?? "Departures",
-                                             callingAt: "\(name) · \(group.title)", board: filteredBoard)
-                    }
-                }
+                if tracking { Task { await activity.end(reason: .userEnded) } }
+                else if suggestedSchedule(group) != nil && scheduleStore != nil { trackingChoice = group }
+                else { startTracking(group) }
             }.font(.appCaption(.semibold)).frame(minHeight: 44)
                 .accessibilityLabel(tracking ? "Stop tracking \(group.title)" : "Track \(services.first { $0.id == serviceID }?.name ?? serviceID) \(group.title)")
-                .disabled(!tracking && !canTrack(group))
+                .disabled(!tracking && !canTrack(group) && (scheduleStore == nil || suggestedSchedule(group) == nil))
         }
+    }
+
+    private func startTracking(_ group: DepartureBoardDirectionGroup) {
+        guard let activity, let serviceID, canTrack(group),
+              let board, let filteredBoard = directionBoard(board, group: group) else { return }
+        let trackedRequest = trackingRequest(group)
+        let name = services.first { $0.id == serviceID }?.name ?? serviceID
+        Task {
+            await activity.start(request: trackedRequest, stationName: origin?.name ?? "Departures",
+                                 callingAt: "\(name) · \(group.title)", board: filteredBoard)
+        }
+    }
+
+    private func suggestedSchedule(_ group: DepartureBoardDirectionGroup) -> ScheduledJourney? {
+        guard let origin, let serviceID else { return nil }
+        let name = services.first { $0.id == serviceID }?.name ?? serviceID
+        let direction = DepartureDirectionFilter.resolve(label: group.title)
+        guard let outbound = ScheduledBoard.departure(station: origin, serviceID: serviceID,
+                                                      serviceName: name, direction: direction) else { return nil }
+        let destinations = trackingRequest(group).destinationIDs
+        let returning = destinations.count == 1 ? appState.departureStop(id: destinations[0]).flatMap {
+            ScheduledBoard.departure(station: $0, serviceID: serviceID, serviceName: name, direction: direction.reversed)
+        } : nil
+        return .suggested(outbound: outbound, returning: returning)
     }
 
     private func canTrack(_ group: DepartureBoardDirectionGroup) -> Bool {

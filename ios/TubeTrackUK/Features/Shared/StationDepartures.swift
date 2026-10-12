@@ -614,7 +614,7 @@ struct StationDepartureBoardHeader: View {
 
     @Environment(ScheduledJourneyStore.self) private var scheduleStore: ScheduledJourneyStore?
     @State private var scheduling: ScheduledJourney?
-    @State private var choosesPeriod = false
+    @State private var choosesTracking = false
     let group: StationDepartureGroup
     var statuses: [TfLLineStatus] = []
     var tracking: DepartureTrackingContext?
@@ -635,12 +635,19 @@ struct StationDepartureBoardHeader: View {
             }
         }
 
-        .confirmationDialog("Use this station for", isPresented: $choosesPeriod, titleVisibility: .visible) {
-            Button("Morning departures") { schedule(morning: true) }
-            Button("Afternoon departures") { schedule(morning: false) }
+        .confirmationDialog("Track this journey", isPresented: $choosesTracking, titleVisibility: .visible) {
+            if let tracking, let boardActivity, boardActivity.areActivitiesEnabled {
+                Button("Start tracking now") {
+                    Task { await toggleTracking(tracking, controller: boardActivity, isTracking: false) }
+                }
+            }
+            if scheduleStore != nil {
+                Button("Add scheduled journey") { schedule() }
+            }
+            Button("Cancel", role: .cancel) {}
         }
         .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey) }
+            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
         }
     }
 
@@ -674,32 +681,34 @@ struct StationDepartureBoardHeader: View {
     @ViewBuilder private var boardActions: some View {
         if let tracking {
             HStack(spacing: 7) {
-                if scheduleStore != nil {
-                    DepartureBoardActionButton(title: "Schedule", systemImage: "calendar.badge.clock") {
-                        choosesPeriod = true
-                    }
-                    .accessibilityLabel("Schedule \(group.lineID.displayName) \(group.direction) departures")
-                    .accessibilityHint("Sets the days and times for this departure board")
-                }
                 if let boardActivity, boardActivity.areActivitiesEnabled {
                     trackButton(tracking: tracking, controller: boardActivity)
+                } else if scheduleStore != nil {
+                    DepartureBoardActionButton(title: "Track", systemImage: "calendar.badge.clock") {
+                        choosesTracking = true
+                    }
                 }
             }
             .fixedSize(horizontal: true, vertical: false)
         }
     }
 
-    private func schedule(morning: Bool) {
+    private func schedule() {
         guard let tracking, let hub = StationIndex.bundled.hub(containing: tracking.hubID) else { return }
         let board = ScheduledBoard(hub: hub, line: group.lineID,
             direction: DepartureDirectionFilter.resolve(label: group.direction))
-        let window = ScheduledJourneyWindow(startMinute: morning ? 480 : 960,
-            endMinute: morning ? 600 : 1080, board: board)
-        scheduling = ScheduledJourney(morning: morning ? window : nil, afternoon: morning ? nil : window)
+        // Only suggest a terminus when all departures agree; the editor lets
+        // passengers choose the station where they actually leave the train.
+        let destinations = Set(group.arrivals.compactMap(\.destinationNaptanId))
+        let destination = destinations.count == 1
+            ? destinations.first.flatMap { StationIndex.bundled.hub(containing: $0) } : nil
+        let returning = destination.flatMap { destination -> ScheduledBoard? in
+            guard destination.id != hub.id, destination.lineIDs.contains(group.lineID) else { return nil }
+            return ScheduledBoard(hub: destination, line: group.lineID, direction: board.direction.reversed)
+        }
+        scheduling = .suggested(outbound: board, returning: returning)
     }
 
-    /// One tap yields station, line and direction — exactly the identity a
-    /// tracked board needs — so there is nothing further to configure.
     @ViewBuilder
     private func trackButton(
         tracking: DepartureTrackingContext,
@@ -711,8 +720,14 @@ struct StationDepartureBoardHeader: View {
             direction: group.direction
         )
         DepartureTrackButton(isTracking: isTracking, boardName: "\(group.lineID.displayName) \(group.direction)") {
-            Task { await toggleTracking(tracking, controller: controller, isTracking: isTracking) }
+            if isTracking {
+                Task { await toggleTracking(tracking, controller: controller, isTracking: true) }
+            } else {
+                choosesTracking = true
+            }
         }
+        .accessibilityHint(isTracking ? "Removes the departure board from the Lock Screen"
+                           : "Choose to track now or add a scheduled journey")
     }
 
     private func toggleTracking(

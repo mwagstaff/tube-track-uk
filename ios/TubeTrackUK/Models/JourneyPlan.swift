@@ -1,4 +1,5 @@
 import Foundation
+import TubeTrackCore
 
 enum JourneyTimeMode: String, CaseIterable, Identifiable, Sendable {
     case now, departAt, arriveBy
@@ -163,5 +164,44 @@ extension PlannedJourney {
         return legs.filter { $0.mode != "walking" }.flatMap(\.lines).filter {
             seen.insert($0.tubeLineID?.rawValue ?? $0.id + $0.name).inserted
         }
+    }
+}
+
+
+extension PlannedJourney {
+    /// Schedule the first board in each direction, excluding walking connections.
+    /// Unsupported transport at either end must not silently become another leg.
+    var suggestedSchedule: ScheduledJourney? {
+        let transit = legs.filter { !["walking", "transfer"].contains($0.mode) }
+        guard let first = transit.first,
+              let outbound = scheduledBoard(for: first, returning: false) else { return nil }
+        let returning = transit.last.flatMap { scheduledBoard(for: $0, returning: true) }
+        return .suggested(outbound: outbound, returning: returning)
+    }
+
+    private func scheduledBoard(for leg: JourneyLeg, returning: Bool) -> ScheduledBoard? {
+        if leg.mode == "national-rail" {
+            guard leg.lines.count == 1, let service = leg.lines.first,
+                  let code = service.operatorCode?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(),
+                  !code.isEmpty, !["LO", "XR"].contains(code),
+                  let station = ScheduledBoard.railStation(id: returning ? leg.to.id : leg.from.id) else { return nil }
+            // Use Any direction unless the planner explicitly supplies a compass
+            // direction. Destination bearings can differ from the train's terminus.
+            let direction = DepartureDirectionFilter.resolve(label: service.direction)
+            if code == "TL", let hub = StationIndex.bundled.hub(containing: station.id), hub.lineIDs.contains(.thameslink) {
+                return ScheduledBoard(hub: hub, line: .thameslink, direction: returning ? direction.reversed : direction)
+            }
+            if code == "TL" && !station.id.hasPrefix("nr:") { return nil }
+            return ScheduledBoard(station: station, operatorID: "national-rail:\(code)",
+                operatorName: service.name, direction: returning ? direction.reversed : direction)
+        }
+        guard leg.mode != "replacement-bus",
+              leg.lines.count == 1, let line = leg.lines.first?.tubeLineID,
+              let hub = StationIndex.bundled.hub(containing: returning ? leg.to.id : leg.from.id),
+              hub.lineIDs.contains(line) else { return nil }
+        // Planner direction text often names a terminus rather than a compass
+        // direction. Keep unknown directions editable instead of guessing.
+        let direction = DepartureDirectionFilter.resolve(label: leg.lines[0].direction)
+        return ScheduledBoard(hub: hub, line: line, direction: returning ? direction.reversed : direction)
     }
 }

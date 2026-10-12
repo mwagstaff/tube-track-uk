@@ -57,7 +57,7 @@ struct ScheduledJourneysScreen: View {
                 Text("All times use London time, including British Summer Time. Manually tracked boards take priority. Journeys are saved for this installation only.")
             }
         }
-        .navigationTitle("Scheduled journeys")
+        .navigationTitle("My scheduled journeys")
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.refresh() }
         .refreshable { await store.refresh() }
@@ -94,18 +94,24 @@ struct ScheduledJourneyEditor: View {
     @State private var replacement: JourneyReplacement?
     @State private var confirmsReplacement = false
 
-    init(journey: ScheduledJourney) {
+    init(journey: ScheduledJourney, suggestsReturn: Bool = false) {
         _journey = State(initialValue: journey)
-        _morning = State(initialValue: WindowDraft(window: journey.morning, start: 8 * 60))
-        _afternoon = State(initialValue: WindowDraft(window: journey.afternoon, start: 16 * 60))
+        _morning = State(initialValue: WindowDraft(window: journey.morning, start: 450))
+        var returnDraft = WindowDraft(window: journey.afternoon, start: 990)
+        if suggestsReturn { returnDraft.enabled = true }
+        _afternoon = State(initialValue: returnDraft)
     }
 
     var body: some View {
         Form {
             Section {
+                Text("Set your usual travel days and times. Check the suggested stations and directions before saving.")
+                    .foregroundStyle(.secondary)
                 TextField("Name (optional)", text: $journey.name)
                 Toggle("Enabled", isOn: $journey.enabled)
             }
+            ScheduledWindowEditor(title: "Morning · Outbound", draft: $morning) { stationPicker = .morning }
+            ScheduledWindowEditor(title: "Afternoon · Return", draft: $afternoon) { stationPicker = .afternoon }
             Section("Days") {
                 HStack {
                     Button("Weekdays") { journey.days = [1, 2, 3, 4, 5] }
@@ -123,8 +129,6 @@ struct ScheduledJourneyEditor: View {
                     ))
                 }
             }
-            ScheduledWindowEditor(title: "Morning", draft: $morning) { stationPicker = .morning }
-            ScheduledWindowEditor(title: "Afternoon", draft: $afternoon) { stationPicker = .afternoon }
             Section {
                 Text("\(journey.daysSummary) · London time")
                 if let w = morning.window { Text("Morning: \(w.board.stationName) · \(w.timeSummary)") }
@@ -145,10 +149,17 @@ struct ScheduledJourneyEditor: View {
                     .disabled(replacementError != nil || store.isSaving || store.isLoading)
                     if let replacementError { Text(replacementError).foregroundStyle(.secondary) }
                 } header: { Text(conflicts.count == 1 ? "Conflicts with a saved journey" : "Conflicts with saved journeys") } footer: {
-                    Text(conflicts.count == 1 ? "Replace deletes the entire conflicting journey, including its other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journey in Journeys → Scheduled journeys." : "Replace deletes the entire conflicting journeys, including their other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journeys in Journeys → Scheduled journeys.")
+                    Text(conflicts.count == 1 ? "Replace deletes the entire conflicting journey, including its other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journey in Journeys → My scheduled journeys." : "Replace deletes the entire conflicting journeys, including their other windows, and saves this journey. You can also change these days or times, or edit or pause the saved journeys in Journeys → My scheduled journeys.")
                 }
             } else if let message = validationError {
                 Section { Text(message).foregroundStyle(.secondary) }
+            }
+            if let message = store.setupError {
+                Section {
+                    Text(message).foregroundStyle(.secondary)
+                    Button("Retry setup") { Task { await store.refresh() } }
+                        .disabled(store.isLoading || store.isSaving)
+                }
             }
             if let error { Section { Text(error).foregroundStyle(.red) } }
         }
@@ -158,14 +169,20 @@ struct ScheduledJourneyEditor: View {
             ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(store.isSaving) }
             ToolbarItem(placement: .confirmationAction) {
                 Button(store.isSaving ? "Saving…" : "Save") {
+                    if !conflicts.isEmpty {
+                        replacement = JourneyReplacement(journey: candidate, conflicts: conflicts)
+                        confirmsReplacement = true
+                        return
+                    }
                     Task {
                         do { try await store.save(candidate); dismiss() }
                         catch { self.error = error.localizedDescription }
                     }
                 }
-                .disabled(validationError != nil || store.isSaving || store.isLoading)
+                .disabled((conflicts.isEmpty ? validationError : replacementError) != nil || store.isSaving || store.isLoading)
             }
         }
+        .task { await store.refresh() }
         .interactiveDismissDisabled(store.isSaving)
         .confirmationDialog(replacement?.conflicts.count == 1 ? "Replace conflicting journey?" : "Replace conflicting journeys?", isPresented: $confirmsReplacement,
                             titleVisibility: .visible, presenting: replacement) { replacement in
@@ -185,9 +202,23 @@ struct ScheduledJourneyEditor: View {
         // A Form section is flattened into reusable rows. Present once from the
         // stable editor, rather than attaching a presenter to those rows.
         .sheet(item: $stationPicker) { period in
-            ScheduledStationPicker(select: { hub in
-                guard let line = hub.lineIDs.first else { return }
-                let board = ScheduledBoard(hub: hub, line: line)
+            ScheduledStationPicker(select: { stop in
+                let current = period == .morning ? morning.board : afternoon.board
+                let other = period == .morning ? afternoon.board : morning.board
+                let preferred = current ?? other
+                let board: ScheduledBoard
+                if (!stop.railCodes.isEmpty && preferred?.isNationalRail == true)
+                    || StationIndex.bundled.hub(containing: stop.id) == nil {
+                    board = ScheduledBoard(station: stop, operatorID: "national-rail:", operatorName: nil)
+                } else {
+                    guard let hub = StationIndex.bundled.hub(containing: stop.id) else { return }
+                    let preferredLine = preferred.flatMap { TubeLineID(rawValue: $0.lineId) }
+                    guard let line = preferredLine.flatMap({ hub.lineIDs.contains($0) ? $0 : nil })
+                        ?? hub.lineIDs.first else { return }
+                    let direction: DepartureDirectionFilter = preferred?.lineId == line.rawValue
+                        ? (current?.direction ?? other?.direction.reversed ?? .any) : .any
+                    board = ScheduledBoard(hub: hub, line: line, direction: direction)
+                }
                 switch period {
                 case .morning: morning.board = board
                 case .afternoon: afternoon.board = board
@@ -255,12 +286,39 @@ private struct ScheduledWindowEditor: View {
     let title: String
     @Binding var draft: WindowDraft
     let chooseStation: () -> Void
+    @State private var railGroups: [NationalRailDepartureGroup] = []
     @State private var directions: [DepartureDirectionFilter] = [.any]
     @State private var directionsKey: String?
     @State private var directionError: String?
     @State private var loadingDirections = false
     @State private var directionRetry = 0
     private static let arrivalsService = StationArrivalsService(client: TubeTrackAPIClient())
+    private static let railService = NationalRailArrivalsService(client: TubeTrackAPIClient(
+        configuration: TubeTrackAPIConfiguration(baseURL: URL(string: "https://api.skynolimit.dev/train-track")!)))
+
+    private var services: [(id: String, name: String)] {
+        guard let board = draft.board else { return [] }
+        var result = StationIndex.bundled.hub(containing: board.hubId)?.lineIDs.map {
+            (id: $0.rawValue, name: $0.displayName)
+        } ?? []
+        result += railGroups.filter { $0.operatorID != "national-rail:unknown" }.map {
+            (id: $0.operatorID, name: $0.name)
+        }
+        if !result.contains(where: { $0.id == board.lineId }) {
+            result.append((id: board.lineId, name: board.operatorName ?? "Choose operator"))
+        }
+        return result
+    }
+
+    private func selectService(_ id: String) {
+        guard var board = draft.board else { return }
+        board.lineId = id
+        board.direction = .any
+        board.operatorName = railGroups.first { $0.operatorID == id }?.name
+        board.stopIds = board.isNationalRail ? NationalRailStations.codes(for: [board.hubId])
+            : StationIndex.bundled.hub(containing: board.hubId)?.stopIDs ?? []
+        draft.board = board
+    }
 
     private var directionTaskID: String {
         "\(draft.enabled):\(draft.board?.hubId ?? ""):\(draft.board?.lineId ?? ""):\(directionRetry)"
@@ -281,7 +339,7 @@ private struct ScheduledWindowEditor: View {
 
     var body: some View {
         Section {
-            Toggle("\(title) departures", isOn: $draft.enabled)
+            Toggle("Include this leg", isOn: $draft.enabled)
             if draft.enabled {
                 Button(action: chooseStation) {
                     HStack {
@@ -292,12 +350,9 @@ private struct ScheduledWindowEditor: View {
                         Image(systemName: "chevron.right").font(.caption)
                     }
                 }
-                if let board = draft.board, let hub = StationIndex.bundled.hub(containing: board.hubId) {
-                    Picker("Line", selection: Binding(get: { board.lineId }, set: { value in
-                        draft.board?.lineId = value
-                        draft.board?.direction = .any
-                    })) {
-                        ForEach(hub.lineIDs) { line in Text(line.displayName).tag(line.rawValue) }
+                if let board = draft.board {
+                    Picker("Line or operator", selection: Binding(get: { board.lineId }, set: selectService)) {
+                        ForEach(services, id: \.id) { service in Text(service.name).tag(service.id) }
                     }
                     Picker("Direction", selection: Binding(get: { board.direction }, set: { draft.board?.direction = $0 })) {
                         ForEach(directionOptions, id: \.self) { direction in
@@ -305,37 +360,55 @@ private struct ScheduledWindowEditor: View {
                         }
                     }
                 }
-                if loadingDirections { ProgressView("Loading directions…") }
+                if draft.board?.direction == .any {
+                    Text("Any direction includes trains both ways. Choose a direction if you only want departures towards your destination.")
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+                if loadingDirections { ProgressView("Loading services and directions…") }
                 if let directionError {
                     Text(directionError).font(.footnote).foregroundStyle(.secondary)
-                    Button("Retry directions") { directionRetry += 1 }
+                    Button("Reload services and directions") { directionRetry += 1 }
                 }
                 DatePicker("Starts", selection: timeBinding(\.startMinute), displayedComponents: .hourAndMinute)
                 DatePicker("Ends", selection: timeBinding(\.endMinute), displayedComponents: .hourAndMinute)
             }
         } header: { Text(title) } footer: {
             if draft.enabled { Text("London time · Maximum two hours · Ends on the same day") }
+            else { Text("Add this leg to track your return departures automatically.") }
         }
         .environment(\.timeZone, calendar.timeZone)
         .task(id: directionTaskID) {
             directions = [.any]
+            railGroups = []
             directionError = nil
             loadingDirections = false
             guard draft.enabled, let board = draft.board else { return }
             loadingDirections = true
             do {
-                let arrivals = try await Self.arrivalsService.fetch(stationIDs: board.stopIds, forceRefresh: directionRetry > 0)
+                var railArrivals: [TfLArrivalPrediction] = []
+                if !NationalRailStations.codes(for: [board.hubId]).isEmpty {
+                    let snapshot = try await Self.railService.fetch(stationIDs: [board.hubId], forceRefresh: directionRetry > 0)
+                    try Task.checkCancellation()
+                    railArrivals = snapshot.arrivals
+                    railGroups = NationalRailDepartureGroup.groups(from: railArrivals)
+                    directionError = snapshot.errorMessage
+                    if railGroups.isEmpty && board.isNationalRail {
+                        directionError = "No operators are currently reported here. Try again when live departures are available."
+                    }
+                }
+                let arrivals = board.isNationalRail ? railArrivals
+                    : try await Self.arrivalsService.fetch(stationIDs: board.stopIds, forceRefresh: directionRetry > 0)
                 try Task.checkCancellation()
                 directions = DepartureDirectionFilter.available(in: arrivals, lineID: board.lineId)
                 directionsKey = directionTaskID
-                if directions == [.any] {
-                    directionError = "No specific directions are currently reported for this station and line. You can use Any direction or try again later."
+                if directions == [.any] && directionError == nil {
+                    directionError = "No specific directions are currently reported for this station and service. You can use Any direction or try again later."
                 }
                 loadingDirections = false
             } catch {
                 guard !Task.isCancelled else { return }
                 loadingDirections = false
-                directionError = "Couldn’t load directions. You can use Any direction or retry."
+                directionError = "Couldn’t load services and directions. You can use Any direction or retry."
             }
         }
     }
@@ -351,17 +424,23 @@ private struct ScheduledWindowEditor: View {
 
 private struct ScheduledStationPicker: View {
     @State private var query = ""
-    let select: (StationHub) -> Void
+    let select: (DepartureStop) -> Void
+    private var stations: [DepartureStop] {
+        DepartureStop.bundled.filter { stop in
+            stop.mode != "river" && (!stop.railCodes.isEmpty || StationIndex.bundled.hub(containing: stop.id) != nil)
+                && (query.isEmpty || stop.name.localizedStandardContains(query))
+        }
+    }
     let cancel: () -> Void
     var body: some View {
         NavigationStack {
-            List(StationIndex.bundled.search(query)) { hub in
+            List(stations) { hub in
                 Button {
                     select(hub)
                 } label: {
                     VStack(alignment: .leading, spacing: 4) {
                         Text(hub.name).foregroundStyle(.primary)
-                        Text(hub.lineIDs.map(\.displayName).joined(separator: " · "))
+                        Text((hub.lineIDs.compactMap { TubeLineID(rawValue: $0)?.displayName } + (hub.railCodes.isEmpty ? [] : ["National Rail"])).joined(separator: " · "))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }

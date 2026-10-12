@@ -2,7 +2,10 @@
 
 Each installation can save up to three journeys. A journey contains ISO weekdays
 (Monday = 1), an enabled flag, and one or both morning/afternoon windows. Each
-window stores station, line, direction and start/end minutes after midnight.
+window stores station, line or National Rail operator, direction and start/end
+minutes after midnight. National Rail boards use `lineId: "national-rail:SE"` (for
+example), an `operatorName`, a canonical station ID and server-resolved CRS codes.
+Existing TfL boards retain their original wire format.
 Times always refer to `Europe/London`; the phone and server timezones do not
 change the commute. Enabled windows cannot overlap on any shared weekday.
 
@@ -34,7 +37,8 @@ are preserved for recovery and disable scheduling without disabling manual Track
 ## Activity lifecycle
 
 The scheduler checks every 15 seconds. At a due window it projects a fresh board
-using the existing TfL cache (or the Thameslink board source), persists an
+using the existing TfL cache, Thameslink source or National Rail operator feed,
+persists an
 occurrence claim and sends an ActivityKit `start` push. The existing activity
 attributes/UI are reused with an optional `scheduleID` and the window's hard end.
 An update token delivered to the awakened app is registered against the persisted
@@ -78,3 +82,28 @@ Verify start/update/end with the app backgrounded and terminated, token rotation
 manual Track priority, swipe dismissal, and disabled permissions. Repeat with
 production APNs in TestFlight. Review the editor's light/dark/large-text previews
 and VoiceOver labels on device. Simulator compilation alone does not verify APNs.
+
+
+## National Rail schedules
+
+National Rail station names and CRS codes are resolved from the bundled station
+catalogue; client-provided station names and stop codes are never trusted. The
+operator ID and display name are stored with the board. Directions are Any,
+Northbound, Southbound, Eastbound or Westbound. Operator choices come from live
+boards or a planned route; missing service information leaves an editable draft.
+London Overground and Elizabeth line retain their dedicated TfL boards. Thameslink
+uses its dedicated source at interchanges and the operator feed at rail-only stops.
+
+The initial rail board uses the same projection and disruption headlines as manual
+tracking, including cancelled trains, delays and platform visibility. Stale data
+(older than 90 seconds), empty operator boards and unresolved selected directions
+do not trigger a start; the scheduler retries within its existing start grace
+period. Requests are shared by station within a scheduler pass, capped at 40 station
+requests per pass, and use the shared resource cache. Once the app registers the
+update token, the existing National Rail notifier supplies subsequent updates.
+Scheduled ends and deletions still run during rail-feed outages.
+
+Deploy this server support before releasing the client. A signed-device APNs check
+must verify a National Rail start with operator branding, subsequent updates and
+its scheduled end, including with the app terminated. Local automated tests verify
+the payloads and state transitions but cannot confirm delivery to a physical device.

@@ -1,4 +1,5 @@
 import SwiftUI
+import TubeTrackCore
 
 /// The National Rail double arrow supplied in the design reference, drawn as
 /// a vector so the small mark stays sharp at every Dynamic Type size.
@@ -73,6 +74,9 @@ struct NationalRailOperatorPill: View {
 
 struct NationalRailDepartureGroupView: View {
     @Environment(StationBoardActivityController.self) private var boardActivity: StationBoardActivityController?
+    @Environment(ScheduledJourneyStore.self) private var scheduleStore: ScheduledJourneyStore?
+    @State private var scheduling: ScheduledJourney?
+    @State private var choosesTracking = false
     @State private var expanded = false
     let group: NationalRailDepartureGroup
     let now: Date
@@ -148,23 +152,39 @@ struct NationalRailDepartureGroupView: View {
     }
 
     @ViewBuilder private var trackButton: some View {
-        if group.direction != .any, let tracking, let controller = boardActivity, controller.areActivitiesEnabled {
+        if let tracking, let controller = boardActivity {
             let updatedAt = tracking.nationalRailUpdatedAt ?? tracking.updatedAt
             let isTracking = controller.isTracking(hubID: tracking.hubID, lineIDRaw: group.operatorID,
                 direction: group.direction.displayName)
             DepartureTrackButton(isTracking: isTracking,
                 boardName: "\(group.name) \(group.direction.displayName) at \(tracking.stationName)") {
-                Task {
-                    if isTracking { await controller.end(reason: .userEnded) }
-                    else if isFresh, let updatedAt {
+                if isTracking { Task { await controller.end(reason: .userEnded) } }
+                else { choosesTracking = true }
+            }
+            .confirmationDialog("Track this journey", isPresented: $choosesTracking, titleVisibility: .visible) {
+                Button("Start tracking now") {
+                    Task {
+                        guard isFresh, let updatedAt, Date.now.timeIntervalSince(updatedAt) <= 90 else { return }
                         await controller.start(hubID: tracking.hubID, stationName: tracking.stationName,
                             group: group, updatedAt: updatedAt)
                     }
                 }
+                .disabled(!controller.areActivitiesEnabled || group.direction == .any || !isFresh || updatedAt == nil || now.timeIntervalSince(updatedAt ?? .distantPast) > 90)
+                if scheduleStore != nil, group.operatorID != "national-rail:unknown", let station = ScheduledBoard.railStation(id: tracking.hubID) {
+                    Button("Add scheduled journey") {
+                        scheduling = .suggested(outbound: ScheduledBoard(station: station,
+                            operatorID: group.operatorID, operatorName: group.name, direction: group.direction))
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
             }
+            .sheet(item: $scheduling) { journey in
+                NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+            }
+            .accessibilityHint(isTracking ? "Removes the departure board from the Lock Screen"
+                               : "Choose to track now or add a scheduled journey")
             .fixedSize(horizontal: true, vertical: false)
-            .disabled(!isTracking && (!isFresh || updatedAt == nil
-                || now.timeIntervalSince(updatedAt ?? .distantPast) > 90))
+
             .accessibilityIdentifier("departures-track-\(group.id)")
         }
     }

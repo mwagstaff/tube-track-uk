@@ -1,4 +1,5 @@
 import SwiftUI
+import TubeTrackCore
 
 struct JourneysScreen: View {
     @Environment(TubeAppState.self) private var appState
@@ -13,6 +14,8 @@ struct JourneysScreen: View {
             List {
                 Section {
                     scheduledJourneysLink
+                } footer: {
+                    Text("Your regular journeys, tracked automatically. Save a route below or add one in My scheduled journeys.")
                 }
 
                 Section {
@@ -91,15 +94,6 @@ struct JourneysScreen: View {
                     }
                 }
 
-                if !planner.isLoading && planner.errorMessage == nil {
-                    Section {
-                        ContentUnavailableView(
-                            "Where are you heading?", systemImage: "point.topleft.down.to.point.bottomright.curvepath",
-                            description: Text("Choose two stations to compare journey times and reported disruption.")
-                        )
-                    }
-                    .listRowBackground(Color.clear)
-                }
             }
             .navigationTitle("Journeys")
             .journeyBackground()
@@ -147,12 +141,12 @@ struct JourneysScreen: View {
                         Spacer()
                         scheduledJourneyBadge
                     }
-                    Text("Scheduled journeys")
+                    Text("My scheduled journeys")
                         .fixedSize(horizontal: false, vertical: true)
                 }
             } else {
                 HStack {
-                    Label("Scheduled journeys", systemImage: "calendar.badge.clock")
+                    Label("My scheduled journeys", systemImage: "calendar.badge.clock")
                     Spacer()
                     scheduledJourneyBadge
                 }
@@ -229,6 +223,7 @@ struct JourneysScreen: View {
 private struct JourneyResultsScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.scenePhase) private var scenePhase
+    @State private var scheduling: ScheduledJourney?
 
     var body: some View {
         List {
@@ -247,6 +242,9 @@ private struct JourneyResultsScreen: View {
         .refreshable {
             guard !appState.isOffline else { return }
             await appState.journeyPlanner.refreshSuggestions()
+        }
+        .sheet(item: $scheduling) { journey in
+            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
         }
         .navigationTitle("Route suggestions")
         .navigationBarTitleDisplayMode(.inline)
@@ -293,6 +291,11 @@ private struct JourneyResultsScreen: View {
                     JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale)
                 } label: {
                     JourneySummary(journey: journey)
+                }
+                if let schedule = journey.suggestedSchedule {
+                    Button { scheduling = schedule } label: {
+                        Label("Save as scheduled journey", systemImage: "calendar.badge.plus")
+                    }
                 }
             }
         }
@@ -422,6 +425,7 @@ struct JourneyDetailScreen: View {
     let journey: PlannedJourney
     let expiresAt: Date
     var isStale = false
+    @State private var scheduling: ScheduledJourney?
 
     var body: some View {
         List {
@@ -456,6 +460,15 @@ struct JourneyDetailScreen: View {
                     JourneyMapScreen(journey: journey)
                 } label: {
                     Label("Show journey map", systemImage: "map")
+                }
+            }
+            if let schedule = journey.suggestedSchedule {
+                Section {
+                    Button { scheduling = schedule } label: {
+                        Label("Save as scheduled journey", systemImage: "calendar.badge.plus")
+                    }
+                } footer: {
+                    Text("Track the first departure board each way on your usual travel days. You can review the stations and times before saving.")
                 }
             }
             ForEach(Array(journey.legs.enumerated()), id: \.element.id) { index, leg in
@@ -522,6 +535,9 @@ struct JourneyDetailScreen: View {
             }
         }
         .journeyBackground()
+        .sheet(item: $scheduling) { journey in
+            NavigationStack { ScheduledJourneyEditor(journey: journey, suggestsReturn: true) }
+        }
         .navigationTitle("Journey details")
         .navigationBarTitleDisplayMode(.inline)
     }

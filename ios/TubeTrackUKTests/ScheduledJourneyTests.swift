@@ -8,6 +8,38 @@ struct ScheduledJourneyTests {
             stopIDs: ["940GZZLUOXC"], lineIDs: [.central]), line: .central, direction: .eastbound)
     }
 
+    @Test func railSchedulesRoundTripWithoutChangingLegacyBoards() throws {
+        let station = try #require(ScheduledBoard.railStation(id: "nr:KTH"))
+        let rail = ScheduledBoard(station: station, operatorID: "national-rail:SE", operatorName: "Southeastern", direction: .northbound)
+        #expect(rail.stopIds == ["KTH"])
+        #expect(rail.isNationalRail)
+        #expect(ScheduledBoard.departure(station: station, serviceID: "national-rail:SE", serviceName: "Southeastern", direction: .northbound) == rail)
+        #expect(ScheduledBoard.departure(station: station, serviceID: "national-rail:unknown", serviceName: "Unknown", direction: .any) == nil)
+        let journey = ScheduledJourney.suggested(outbound: rail)
+        #expect(try JSONDecoder().decode(ScheduledJourney.self, from: JSONEncoder().encode(journey)) == journey)
+        #expect(ScheduledJourney.validationError(for: [journey]) == nil)
+        let missingOperator = ScheduledBoard(station: station, operatorID: "national-rail:", operatorName: nil)
+        #expect(ScheduledJourney.validationError(for: [.suggested(outbound: missingOperator)]) != nil)
+        let legacy = try JSONDecoder().decode(ScheduledBoard.self, from: Data(#"{"hubId":"940GZZLUOXC","stationName":"Oxford Circus","lineId":"central","direction":"eastbound","stopIds":["940GZZLUOXC"]}"#.utf8))
+        #expect(legacy == board)
+        #expect(legacy.operatorName == nil)
+    }
+
+    @Test func suggestedCommuteUsesWeekdaysAndRequestedWindows() {
+        var returning = board
+        returning.direction = board.direction.reversed
+        let journey = ScheduledJourney.suggested(outbound: board, returning: returning)
+        #expect(journey.days == [1, 2, 3, 4, 5])
+        #expect(journey.morning?.timeSummary == "07:30–09:30")
+        #expect(journey.afternoon?.timeSummary == "16:30–18:30")
+        #expect(journey.afternoon?.board.direction == .westbound)
+        #expect(ScheduledJourney.validationError(for: [journey]) == nil)
+        #expect(ScheduledJourney.suggested(outbound: board).afternoon == nil)
+        for direction in DepartureDirectionFilter.allCases {
+            #expect(direction.reversed.reversed == direction)
+        }
+    }
+
     @Test func unnamedReplacementSummaryOmitsPlaceholderName() {
         let window = ScheduledJourneyWindow(startMinute: 480, endMinute: 600, board: board)
         let unnamed = ScheduledJourney(name: "  ", morning: window)
@@ -61,7 +93,7 @@ struct ScheduledJourneyTests {
         #expect(error.contains("Office"))
         #expect(error.contains("Oxford Circus (08:00–10:00)"))
         #expect(error.contains("Mon, Wed"))
-        #expect(error.contains("Profile → Scheduled journeys"))
+        #expect(error.contains("Journeys → My scheduled journeys"))
         var paused = saved
         paused.enabled = false
         #expect(ScheduledJourney.validationError(for: draft, existing: [paused]) == nil)

@@ -89,6 +89,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client,
             }).load();
             scheduler = new JourneyScheduler({ store: schedules, pushStore: store, apns,
                 topic: config.push.liveActivityTopic, cache, logger,
+                nationalRail: createNationalRailDepartureSource({ resourceCache }),
                 railDepartures: createRailDepartureSource({ client, resourceCache }),
                 thameslink: createThameslinkDataSource({ client, resourceCache }) });
         } catch (error) {

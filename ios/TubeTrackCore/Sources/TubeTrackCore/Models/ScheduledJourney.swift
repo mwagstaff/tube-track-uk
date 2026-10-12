@@ -6,6 +6,38 @@ public struct ScheduledBoard: Codable, Hashable, Sendable {
     public var lineId: String
     public var direction: DepartureDirectionFilter
     public var stopIds: [String]
+    public var operatorName: String?
+    public var isNationalRail: Bool { lineId.hasPrefix("national-rail:") }
+
+    public init(station: DepartureStop, operatorID: String, operatorName: String?,
+                direction: DepartureDirectionFilter = .any) {
+        hubId = station.id
+        stationName = station.name
+        lineId = operatorID
+        self.operatorName = operatorName.map { String($0.prefix(40)) }
+        self.direction = direction
+        stopIds = NationalRailStations.codes(for: [station.id])
+    }
+
+    public static func departure(station: DepartureStop, serviceID: String, serviceName: String,
+                                 direction: DepartureDirectionFilter) -> Self? {
+        if serviceID == "national-rail:TL", let hub = StationIndex.bundled.hub(containing: station.id), hub.lineIDs.contains(.thameslink) {
+            return Self(hub: hub, line: .thameslink, direction: direction)
+        }
+        if serviceID == "national-rail:TL" && !station.id.hasPrefix("nr:") { return nil }
+        if serviceID.hasPrefix("national-rail:"), !["national-rail:", "national-rail:unknown", "national-rail:LO", "national-rail:XR"].contains(serviceID),
+           !NationalRailStations.codes(for: [station.id]).isEmpty {
+            return Self(station: station, operatorID: serviceID, operatorName: serviceName, direction: direction)
+        }
+        guard let line = TubeLineID(rawValue: serviceID),
+              let hub = StationIndex.bundled.hub(containing: station.id), hub.lineIDs.contains(line) else { return nil }
+        return Self(hub: hub, line: line, direction: direction)
+    }
+
+    public static func railStation(id: String) -> DepartureStop? {
+        DepartureStop.bundled.first { !$0.railCodes.isEmpty &&
+            ($0.id == id || $0.stopIDs.contains(id) || $0.railCodes.contains(id)) }
+    }
 
     public init(hub: StationHub, line: TubeLineID, direction: DepartureDirectionFilter = .any) {
         hubId = hub.id
@@ -62,6 +94,14 @@ public struct ScheduledJourney: Codable, Identifiable, Hashable, Sendable {
         self.afternoon = afternoon
     }
 
+    /// A weekday commute draft. Return station is optional when a departure board
+    /// does not identify the passenger's destination.
+    public static func suggested(outbound: ScheduledBoard, returning: ScheduledBoard? = nil) -> Self {
+        Self(name: String(outbound.stationName.prefix(60)),
+             morning: .init(startMinute: 450, endMinute: 570, board: outbound),
+             afternoon: returning.map { .init(startMinute: 990, endMinute: 1110, board: $0) })
+    }
+
     public var title: String {
         name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Scheduled journey" : name
     }
@@ -111,6 +151,11 @@ public struct ScheduledJourney: Codable, Identifiable, Hashable, Sendable {
             if journey.name.count > 60 { return "Keep the journey name under 60 characters." }
             let windows = [journey.morning, journey.afternoon].compactMap { $0 }
             if windows.isEmpty { return "Add a morning or afternoon window." }
+            if windows.contains(where: { $0.board.isNationalRail &&
+                ($0.board.lineId == "national-rail:" || $0.board.lineId == "national-rail:unknown"
+                 || $0.board.operatorName?.isEmpty != false || $0.board.stopIds.isEmpty) }) {
+                return "Choose a National Rail station and operator for each enabled leg."
+            }
             if windows.contains(where: { !$0.isValid }) {
                 return "Each window must end later on the same day and last no more than two hours."
             }
@@ -132,7 +177,7 @@ public struct ScheduledJourney: Codable, Identifiable, Hashable, Sendable {
                     if first.journey.id == second.journey.id {
                         return "\(first.description) overlaps with \(second.description.lowercasedFirstLetter) on \(days). Change one of these windows."
                     }
-                    return "\(first.description) overlaps with another enabled journey: “\(second.journey.title)” — \(second.description.lowercasedFirstLetter), on \(days). Edit or pause that journey in Profile → Scheduled journeys, or choose different days or times."
+                    return "\(first.description) overlaps with another enabled journey: “\(second.journey.title)” — \(second.description.lowercasedFirstLetter), on \(days). Edit or pause that journey in Journeys → My scheduled journeys, or choose different days or times."
                 }
             }
         }

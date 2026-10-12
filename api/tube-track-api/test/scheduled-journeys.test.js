@@ -7,6 +7,7 @@ import express from 'express';
 import { ScheduledJourneyStore, JourneyScheduler, createScheduledJourneyRoutes,
     validateJourneys, londonTime, londonWindow } from '../lib/scheduled-journeys.js';
 import { PushTokenStore } from '../lib/push/token-store.js';
+import { LiveActivityNotifier } from '../lib/push/notifier.js';
 import { createPushRoutes } from '../lib/push-routes.js';
 
 const station = { id: '940GZZLUOXC', name: 'Oxford Circus', lineIds: ['central'], stopIds: ['940GZZLUOXC'] };
@@ -157,3 +158,95 @@ test('ambiguous APNs failures never produce duplicate starts', async () => fixtu
     assert.equal(calls, 1);
     assert.equal(Object.values(store.rows[install].occurrences)[0].status, 'unknown');
 }));
+
+
+const railBoard = { hubId: 'nr:KTH', stationName: 'Untrusted name', lineId: 'national-rail:SE',
+    operatorName: 'Southeastern', direction: 'northbound', stopIds: ['XXX'] };
+const railJourney = () => journey({ morning: { startMinute: 480, endMinute: 600, board: railBoard } });
+const railResult = (overrides = {}) => ({ data: [{ id: 'rail-1', lineId: 'national-rail:SE',
+    direction: 'northbound', destinationName: 'London Victoria', platformName: 'Platform 2',
+    expectedArrival: '2026-09-29T07:05:00Z', hasExpectedTime: true, status: 'cancelled' },
+    { id: 'other-operator', lineId: 'national-rail:SN', direction: 'northbound',
+      expectedArrival: '2026-09-29T07:06:00Z', hasExpectedTime: true }],
+    meta: { updatedAt: '2026-09-29T07:00:00Z', stale: false }, ...overrides });
+
+test('rail schedules canonicalize station names and CRS codes and reject unsupported identities', () => {
+    const saved = validateJourneys([railJourney()], stations)[0].morning.board;
+    assert.equal(saved.stationName, 'Kent House');
+    assert.deepEqual(saved.stopIds, ['KTH']);
+    assert.equal(saved.operatorName, 'Southeastern');
+    for (const change of [{ hubId: 'nr:XXX' }, { direction: 'inbound' }, { operatorName: '' },
+        { lineId: 'national-rail:' }, { lineId: 'national-rail:unknown' }, { lineId: 'national-rail:LO' },
+        { lineId: 'national-rail:XR' }, { operatorName: 'a'.repeat(61) }]) {
+        assert.throws(() => validateJourneys([journey({ morning: { startMinute: 480, endMinute: 600,
+            board: { ...railBoard, ...change } } })], stations));
+    }
+    // Cross-mode overlaps use exactly the same replacement rules.
+    assert.throws(() => validateJourneys([railJourney(), journey({ id: 'journey-0002' })], stations), /overlap/);
+});
+
+test('rail schedule starts without TfL, registers its token and ends during a rail outage', async () => fixture(async ({ setup, scheduler, setTime, sends, pushStore, call, cache }) => {
+    let calls = 0;
+    scheduler.nationalRail = { departures: async (crs, options) => {
+        calls++; assert.equal(crs, 'KTH'); assert.equal(options.includeThameslink, true); return railResult();
+    } };
+    cache.read = () => null;
+    await setup([railJourney()]);
+    setTime('2026-09-29T07:00:00Z');
+    await scheduler.tick();
+    assert.equal(calls, 1);
+    assert.equal(sends.length, 1);
+    const aps = sends[0].payload.aps;
+    assert.equal(aps.attributes.lineIDRaw, 'national-rail:SE');
+    assert.equal(aps.attributes.operatorName, 'Southeastern');
+    assert.equal(aps.attributes.stationName, 'Kent House');
+    assert.equal(aps['content-state'].conditionHeadline, 'Cancellations');
+    assert.deepEqual(aps['content-state'].departures.map(row => row.id), ['rail-1']);
+    assert.equal((await call('POST', '/push/live-activities', { ...railBoard, stopIds: ['KTH'],
+        activityId: aps.attributes.activityID, token })).status, 201);
+    const saved = pushStore.all()[0];
+    assert.equal(saved.lineId, 'national-rail:SE');
+    assert.deepEqual(saved.stopIds, ['KTH']);
+    assert.equal(saved.scheduleId, 'journey-0001');
+    await scheduler.tick();
+    assert.equal(sends.length, 1);
+    const updates = [];
+    const notifier = new LiveActivityNotifier({ store: pushStore, nationalRail: scheduler.nationalRail,
+        client: { send: async request => { updates.push(request); return { ok: true }; } },
+        topic: 'app.push-type.liveactivity', clock: () => Date.parse('2026-09-29T07:00:30Z') });
+    await notifier.notify({ arrivals: [], updatedAtMs: Date.parse('2026-09-29T07:00:30Z') });
+    assert.equal(updates.length, 1);
+    assert.equal(updates[0].payload.aps.event, 'update');
+    assert.deepEqual(updates[0].payload.aps['content-state'].departures.map(row => row.id), ['rail-1']);
+    scheduler.nationalRail.departures = async () => { throw new Error('offline'); };
+    setTime('2026-09-29T09:00:01Z');
+    await scheduler.tick();
+    assert.equal(sends[1].payload.aps.event, 'end');
+    assert.equal(pushStore.size, 0);
+}));
+
+test('rail starts reject stale, empty and unresolved directions, then retry fresh data', async () => fixture(async ({ setup, scheduler, setTime, sends }) => {
+    await setup([railJourney()]);
+    setTime('2026-09-29T07:00:00Z');
+    for (const result of [railResult({ meta: { stale: true, updatedAt: '2026-09-29T07:00:00Z' } }),
+        railResult({ meta: { stale: false, updatedAt: '2026-09-29T06:58:00Z' } }),
+        railResult({ data: [] }), railResult({ data: railResult().data.map(row => ({ ...row, direction: null })) })]) {
+        scheduler.nationalRail = { departures: async () => result };
+        await scheduler.tick();
+        assert.equal(sends.length, 0);
+    }
+    scheduler.nationalRail = { departures: async () => railResult() };
+    await scheduler.tick();
+    assert.equal(sends.length, 1);
+}));
+
+test('rail initial boards share a station fetch across simultaneous schedules', async () => {
+    let count = 0;
+    const scheduler = new JourneyScheduler({ nationalRail: { departures: async () => { count++; return railResult(); } } });
+    const shared = new Map();
+    const canonical = validateJourneys([railJourney()], stations)[0].morning.board;
+    const now = Date.parse('2026-09-29T07:00:00Z');
+    await scheduler.initialState(canonical, now, shared);
+    await scheduler.initialState(canonical, now, shared);
+    assert.equal(count, 1);
+});

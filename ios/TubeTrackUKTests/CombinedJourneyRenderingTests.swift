@@ -1,8 +1,55 @@
 import SwiftUI
+import TubeTrackCore
 import XCTest
 @testable import TubeTrackUK
 
 @MainActor final class CombinedJourneyRenderingTests: XCTestCase {
+    func testScheduleEditorAndJourneysAtStandardAndAccessibilitySizes() async throws {
+        let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        defer { previousWindow?.makeKey() }
+        let suite = "schedule-render-\(UUID())"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let app = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        let store = ScheduledJourneyStore(defaults: defaults,
+            baseURL: URL(string: "http://127.0.0.1:1")!, observesTokens: false)
+        let hub = try XCTUnwrap(StationIndex.bundled.hub(containing: "940GZZLUOXC"))
+        let draft = ScheduledJourney.suggested(outbound: ScheduledBoard(hub: hub, line: .central, direction: .eastbound))
+        let railStation = try XCTUnwrap(ScheduledBoard.railStation(id: "nr:KTH"))
+        let railDraft = ScheduledJourney.suggested(outbound: ScheduledBoard(station: railStation,
+            operatorID: "national-rail:SE", operatorName: "Southeastern", direction: .northbound))
+        for (name, scheme, size) in [("light", ColorScheme.light, DynamicTypeSize.large),
+                                     ("dark", .dark, .large), ("accessibility", .dark, .accessibility3)] {
+            for variant in ["journeys", "editor", "rail"] {
+                let content = Group {
+                    if variant != "journeys" {
+                        NavigationStack { ScheduledJourneyEditor(journey: variant == "rail" ? railDraft : draft, suggestsReturn: true) }
+                    } else { JourneysScreen() }
+                }.environment(app).environment(store)
+                    .environment(\.colorScheme, scheme).environment(\.dynamicTypeSize, size)
+                let host = UIHostingController(rootView: content)
+                let window = UIWindow(windowScene: scene)
+                window.rootViewController = host
+                window.frame = CGRect(x: 0, y: 0, width: 390, height: 844)
+                window.makeKeyAndVisible()
+                try await Task.sleep(for: .milliseconds(300))
+                host.view.layoutIfNeeded()
+                let image = UIGraphicsImageRenderer(bounds: host.view.bounds).image { _ in
+                    host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true)
+                }
+                XCTAssertGreaterThan(image.size.height, 800)
+                let attachment = XCTAttachment(image: image)
+                attachment.name = "schedule-\(variant)-\(name)"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+                try image.pngData()?.write(to: URL(fileURLWithPath: "/tmp/\(attachment.name).png"))
+                window.isHidden = true
+                window.rootViewController = nil
+            }
+        }
+    }
+
     func testMixedJourneyDetailAtStandardAndAccessibilitySizes() async throws {
         let journey = try JSONDecoder.tfl.decode(PlannedJourney.self, from: Data(Self.fixture.utf8))
         let suite = "combined-render-\(UUID())"

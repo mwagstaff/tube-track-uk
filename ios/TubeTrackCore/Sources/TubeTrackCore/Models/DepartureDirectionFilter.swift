@@ -15,6 +15,18 @@ public enum DepartureDirectionFilter: String, CaseIterable, Sendable, Codable {
     case inbound
     case outbound
 
+    public var reversed: Self {
+        switch self {
+        case .any: .any
+        case .northbound: .southbound
+        case .southbound: .northbound
+        case .eastbound: .westbound
+        case .westbound: .eastbound
+        case .inbound: .outbound
+        case .outbound: .inbound
+        }
+    }
+
     public var displayName: String {
         switch self {
         case .any: "Any direction"

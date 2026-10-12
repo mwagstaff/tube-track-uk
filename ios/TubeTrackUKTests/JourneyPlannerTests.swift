@@ -4,6 +4,40 @@ import Testing
 
 @MainActor
 struct JourneyPlannerTests {
+    @Test func scheduleUsesSupportedEndpointsAndReversesReturnDirection() throws {
+        let fixture = Self.fixture
+            .replacingOccurrences(of: "940A", with: "940GZZLUOXC")
+            .replacingOccurrences(of: "940B", with: "940GZZLUTCR")
+            .replacingOccurrences(of: "northern", with: "central")
+            .replacingOccurrences(of: "\"direction\":\"Beta\"", with: "\"direction\":\"Eastbound\"")
+        let plan = try JSONDecoder.tfl.decode(JourneyPlan.self, from: Data(fixture.utf8))
+        let draft = try #require(plan.journeys[0].suggestedSchedule)
+        #expect(draft.morning?.board.stopIds.contains("940GZZLUOXC") == true)
+        #expect(draft.afternoon?.board.stopIds.contains("940GZZLUTCR") == true)
+        #expect(draft.morning?.board.direction.rawValue == "eastbound")
+        #expect(draft.afternoon?.board.direction.rawValue == "westbound")
+        let unsupported = fixture.replacingOccurrences(of: "\"mode\":\"tube\"", with: "\"mode\":\"national-rail\"")
+        let rail = try JSONDecoder.tfl.decode(JourneyPlan.self, from: Data(unsupported.utf8))
+        #expect(rail.journeys[0].suggestedSchedule == nil)
+        #expect(try self.plan().journeys[0].suggestedSchedule == nil)
+    }
+
+    @Test func railJourneySuggestionsUseOperatorCodesAndCanonicalReturnStations() throws {
+        let fixture = Self.fixture
+            .replacingOccurrences(of: "940A", with: "nr:KTH")
+            .replacingOccurrences(of: "940B", with: "HUBVIC")
+            .replacingOccurrences(of: "\"mode\":\"tube\"", with: "\"mode\":\"national-rail\"")
+            .replacingOccurrences(of: "\"direction\":\"Beta\"", with: "\"direction\":\"Northbound\",\"operatorCode\":\"SE\"")
+        let plan = try JSONDecoder.tfl.decode(JourneyPlan.self, from: Data(fixture.utf8))
+        let draft = try #require(plan.journeys[0].suggestedSchedule)
+        #expect(draft.morning?.board.lineId == "national-rail:SE")
+        #expect(draft.morning?.board.stopIds == ["KTH"])
+        #expect(draft.afternoon?.board.stopIds == ["VIC"])
+        #expect(draft.afternoon?.board.direction.rawValue == "southbound")
+        #expect(draft.morning?.timeSummary == "07:30–09:30")
+        #expect(draft.afternoon?.timeSummary == "16:30–18:30")
+    }
+
     @Test func queryUsesStationIDsExplicitTimeAndAccessibilityWithoutCredentials() {
         let time = Date(timeIntervalSince1970: 1_700_000_000)
         let request = JourneyRequest(from: "940A", to: "940B", timeMode: .arriveBy, time: time, accessibility: .train)

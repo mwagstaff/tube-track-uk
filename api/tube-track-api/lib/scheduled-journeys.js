@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import express from 'express';
 import { defaultDataDirectory } from './push/token-store.js';
@@ -8,6 +9,12 @@ import { DIRECTION_FILTERS, projectBoard } from './push/departure-projection.js'
 import { correctRailBoard } from './push/rail-departures.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { THAMESLINK_STOP_IDS } from './thameslink.js';
+import { isNationalRailOperator, NATIONAL_RAIL_CODES_BY_STATION,
+    projectNationalRailBoard, nationalRailCondition } from './push/national-rail-departures.js';
+
+const railStations = JSON.parse(readFileSync(new URL('../data/departure-stops.json', import.meta.url)))
+    .filter(stop => stop.railCodes.length);
+const railStationById = new Map(railStations.flatMap(stop => [stop.id, ...stop.stopIDs].map(id => [id, stop])));
 
 export const MAX_SCHEDULED_JOURNEYS = 3;
 const idPattern = /^[A-Za-z0-9-]{8,64}$/;
@@ -61,15 +68,29 @@ export function validateJourneys(journeys, stationById) {
                 || w.startMinute < 0 || w.endMinute >= 1440 || w.endMinute <= w.startMinute
                 || w.endMinute - w.startMinute > 120) fail('Each window must be on the same day and last no more than two hours.');
             const b = w.board;
-            const station = stationById.get(b?.hubId);
-            if (!station || !station.lineIds.includes(b.lineId) || !modeByLine.has(b.lineId)
-                || !DIRECTION_FILTERS.includes(b.direction)) fail('Choose a valid station, line and direction.');
-            const stopIds = station.stopIds.filter((id) => b.lineId !== 'thameslink' || THAMESLINK_STOP_IDS.has(id));
-            if (!stopIds.length) fail('This station does not have a supported departure board.');
-            windows[period] = { startMinute: w.startMinute, endMinute: w.endMinute, board: {
-                hubId: station.id, stationName: station.name.slice(0, 40), lineId: b.lineId,
-                direction: b.direction, stopIds
-            } };
+            let canonical;
+            if (isNationalRailOperator(b?.lineId)) {
+                const station = railStationById.get(b.hubId);
+                const stopIds = station && NATIONAL_RAIL_CODES_BY_STATION[station.id];
+                if (!station || !stopIds?.length || !['any', 'northbound', 'southbound', 'eastbound', 'westbound'].includes(b.direction)
+                    || ['national-rail:unknown', 'national-rail:LO', 'national-rail:XR'].includes(b.lineId)
+                    || (b.lineId === 'national-rail:TL' && !station.id.startsWith('nr:')) || b.lineId.trim() !== b.lineId) {
+                    fail('Choose a valid National Rail station, operator and direction.');
+                }
+                if (typeof b.operatorName !== 'string' || !b.operatorName.trim() || b.operatorName.length > 60
+                    || /[\x00-\x1f]/.test(b.operatorName)) fail('Choose a National Rail operator.');
+                canonical = { hubId: station.id, stationName: station.name.slice(0, 40), lineId: b.lineId,
+                    direction: b.direction, stopIds, operatorName: b.operatorName.trim().slice(0, 40) };
+            } else {
+                const station = stationById.get(b?.hubId);
+                if (!station || !station.lineIds.includes(b.lineId) || !modeByLine.has(b.lineId)
+                    || !DIRECTION_FILTERS.includes(b.direction)) fail('Choose a valid station, line and direction.');
+                const stopIds = station.stopIds.filter((id) => b.lineId !== 'thameslink' || THAMESLINK_STOP_IDS.has(id));
+                if (!stopIds.length) fail('This station does not have a supported departure board.');
+                canonical = { hubId: station.id, stationName: station.name.slice(0, 40), lineId: b.lineId,
+                    direction: b.direction, stopIds };
+            }
+            windows[period] = { startMinute: w.startMinute, endMinute: w.endMinute, board: canonical };
         }
         if (!windows.morning && !windows.afternoon) fail('Add a morning or afternoon window.');
         return { id: j.id, name: j.name.trim(), enabled: j.enabled, days: [...new Set(j.days)].sort(), ...windows };
@@ -188,8 +209,8 @@ export function createScheduledJourneyRoutes({ store, stationById, clock = Date.
 export class JourneyScheduler {
     running = null;
     timer = null;
-    constructor({ store, pushStore, apns, topic, cache, thameslink, railDepartures, logger, clock = Date.now }) {
-        Object.assign(this, { store, pushStore, apns, topic, cache, thameslink, railDepartures, logger, clock });
+    constructor({ store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, logger, clock = Date.now }) {
+        Object.assign(this, { store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, logger, clock });
     }
     start() {
         this.timer = setInterval(() => { void this.tick(); }, 15000);
@@ -203,7 +224,32 @@ export class JourneyScheduler {
             .finally(() => { this.running = null; });
         return this.running;
     }
-    async initialState(board, now) {
+    async initialState(board, now, railBoards = new Map()) {
+        if (isNationalRailOperator(board.lineId)) {
+            if (!this.nationalRail) return null;
+            const arrivals = [];
+            let updatedAtMs = now;
+            for (const crs of board.stopIds) {
+                const includeThameslink = board.hubId.startsWith('nr:');
+                const key = `${crs}:${includeThameslink}`;
+                if (!railBoards.has(key)) {
+                    if (railBoards.size >= 40) return null;
+                    railBoards.set(key, this.nationalRail.departures(crs, { includeThameslink }));
+                }
+                const result = await railBoards.get(key);
+                const fetchedAt = Date.parse(result?.meta?.updatedAt);
+                if (!result || result.meta.stale || !Number.isFinite(fetchedAt) || now - fetchedAt > 90000) return null;
+                updatedAtMs = Math.min(updatedAtMs, fetchedAt);
+                arrivals.push(...result.data);
+            }
+            const departures = projectNationalRailBoard({ arrivals, lineId: board.lineId, direction: board.direction });
+            // Do not start an empty or direction-unresolved activity. Retry within
+            // the existing start grace period while the provider catches up.
+            if (!departures.length) return null;
+            const condition = nationalRailCondition(arrivals, board.lineId, board.direction);
+            return { departures, updatedAtEpoch: Math.floor(updatedAtMs / 1000),
+                conditionRank: condition.rank, conditionHeadline: condition.headline, sequence: 1 };
+        }
         let predictions;
         let updatedAtMs;
         if (board.lineId === 'thameslink') {
@@ -228,6 +274,7 @@ export class JourneyScheduler {
             updatedAtEpoch: Math.floor(updatedAtMs / 1000), conditionRank: 3, conditionHeadline: null, sequence: 1 };
     }
     async run() {
+        const railBoards = new Map();
         const now = this.clock();
         // End independently of departure polling, including outages and edits.
         for (const row of this.pushStore.all({ type: 'liveActivity' })) {
@@ -264,7 +311,7 @@ export class JourneyScheduler {
                         r.installId === installId && !r.scheduleId && now < (r.hardEndsAtMs ?? r.startedAtMs + 5400000));
                     let state;
                     if (!manual) {
-                        try { state = await this.initialState(w.board, now); } catch { continue; }
+                        try { state = await this.initialState(w.board, now, railBoards); } catch { continue; }
                         if (!state) continue;
                     }
                     const activityId = `scheduled-${crypto.randomUUID()}`;
@@ -295,11 +342,13 @@ export class JourneyScheduler {
                             return;
                         }
                         const b = o.board;
+                        if (isNationalRailOperator(b.lineId) && sendTime - state.updatedAtEpoch * 1000 > 90000) return;
                         const attributes = { activityID: activityId, stationHubID: b.hubId, stationName: b.stationName,
                             lineIDRaw: b.lineId, direction: b.direction === 'any' ? 'Any direction'
                                 : b.direction[0].toUpperCase() + b.direction.slice(1),
                             directionFilterRaw: b.direction, startedAtEpoch: Math.floor(o.startedAtMs / 1000),
-                            hardEndsAtEpoch: Math.floor(o.hardEndsAtMs / 1000), scheduleID: journey.id };
+                            hardEndsAtEpoch: Math.floor(o.hardEndsAtMs / 1000), scheduleID: journey.id,
+                            ...(b.operatorName ? { operatorName: b.operatorName } : {}) };
                         try {
                             const result = await this.apns.send({ token: current.device.token, topic: this.topic,
                                 pushType: 'liveactivity', priority: 10, environment: current.device.environment,

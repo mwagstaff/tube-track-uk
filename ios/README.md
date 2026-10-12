@@ -495,3 +495,23 @@ The Departures tab replaces the passenger-facing Near Me tab (the internal `near
 Outbound and return service restrictions are independently representable, with the return initially following outbound choices. Favourite UUIDs and endpoint IDs provide stable identities for future paired scheduling; new outbound/return scheduling is not implemented. Existing scheduled journeys are unaffected.
 
 The app requires the new `/api/v1/departure-board` API for these boards; deploy the matching server changes first. Calling-point uncertainty is reported and excluded, not guessed. Cable car views retain operating status/hours because that service has no timed departure feed.
+
+
+### My scheduled journeys
+
+The Journeys tab links to My scheduled journeys above the planner. On supported TfL
+boards, Track offers Start tracking now or Add scheduled journey. Route suggestions
+and journey details also offer Save as scheduled journey when the first transit leg
+has a supported board. Drafts default to weekdays, 07:30–09:30 outbound and
+16:30–18:30 return, in London time. For journeys with changes, only the first board
+each way is scheduled. Review the suggested return station and direction; if no
+return station can be resolved, choose one or switch off that leg. National Rail operator boards use the same schedule editor, with canonical station
+codes and an operator picker populated from reported departures. Known operators
+from a planned route remain selectable when no trains are currently reported.
+Thameslink uses its dedicated board at TfL interchanges and the operator feed at
+rail-only stations. Calling-at filters on shared boards are not saved in schedules;
+the tracking choice explains this before opening the editor.
+
+Save detects overlapping enabled journeys on shared days and asks before replacing
+them. Replacement removes the entire conflicting journeys, including other windows,
+in one revision-checked request; a failed save preserves the existing schedules.
