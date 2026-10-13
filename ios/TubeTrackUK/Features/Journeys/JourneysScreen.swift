@@ -113,15 +113,21 @@ struct JourneysScreen: View {
         }
         // Keep presentation owned by this tab, outside its NavigationStack.
         // Opening a picker must not invalidate or restore the root TabView.
-        .sheet(item: $planner.stationField) { field in
+        .sheet(item: $planner.stationField, onDismiss: {
+            JourneyNavigationDiagnostics.record("picker dismissed tab=\(appState.selectedTab.rawValue)")
+        }) { field in
             if let graph = appState.graph {
                 StationSearchSheet(
                     graph: graph,
                     selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
                     title: field == .from ? "Starting station" : "Destination",
                     selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
-                    onClose: { planner.stationField = nil }
+                    onClose: {
+                        JourneyNavigationDiagnostics.record("picker close field=\(field.rawValue) tab=\(appState.selectedTab.rawValue)")
+                        planner.stationField = nil
+                    }
                 ) { station in
+                    JourneyNavigationDiagnostics.record("picker selected field=\(field.rawValue) tab=\(appState.selectedTab.rawValue)")
                     if field == .from { planner.from = station } else { planner.to = station }
                 }
             }
@@ -150,7 +156,13 @@ struct JourneysScreen: View {
         .onChange(of: planner.result?.updatedAt) { _, updatedAt in
             showsResults = updatedAt != nil
         }
-        .onDisappear { planner.cancelSearch() }
+        .onChange(of: planner.stationField) { old, new in
+            JourneyNavigationDiagnostics.record("picker field old=\(old?.rawValue ?? "none") new=\(new?.rawValue ?? "none") tab=\(appState.selectedTab.rawValue)")
+        }
+        .onDisappear {
+            JourneyNavigationDiagnostics.record("Journeys disappeared tab=\(appState.selectedTab.rawValue) picker=\(planner.stationField?.rawValue ?? "none")")
+            planner.cancelSearch()
+        }
         .onChange(of: appState.isOffline) { _, offline in
             if offline { planner.cancelSearch() }
         }

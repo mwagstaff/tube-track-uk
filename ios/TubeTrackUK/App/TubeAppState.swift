@@ -57,6 +57,18 @@ enum MapResetSource: String, Sendable {
     case unspecified
 }
 
+/// Navigation-only breadcrumbs; never log station names, IDs or search text.
+enum JourneyNavigationDiagnostics {
+    private static let logger = Logger(
+        subsystem: Bundle.main.bundleIdentifier ?? "dev.skynolimit.TubeTrackUK",
+        category: "JourneyNavigation"
+    )
+
+    static func record(_ message: String) {
+        logger.notice("\(message, privacy: .public)")
+    }
+}
+
 enum MapResetDiagnostics {
     static let logger = Logger(
         subsystem: Bundle.main.bundleIdentifier ?? "dev.skynolimit.TubeTrackUK",
@@ -121,6 +133,10 @@ final class TubeAppState {
     var selectedTab: AppTab = .map {
         didSet {
             guard selectedTab != oldValue else { return }
+            JourneyNavigationDiagnostics.record("tab changed old=\(oldValue.rawValue) new=\(selectedTab.rawValue) picker=\(journeyPlanner.stationField?.rawValue ?? "none")")
+            if oldValue == .journeys, selectedTab == .map {
+                JourneyNavigationDiagnostics.record("Journeys to Map caller: " + Thread.callStackSymbols.prefix(14).joined(separator: " | "))
+            }
             updateSelectedStationArrivalsVisibility()
             updateLiveTrainPollingVisibility()
         }

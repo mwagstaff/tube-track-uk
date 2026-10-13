@@ -81,7 +81,7 @@ struct ScheduledJourneysScreen: View {
     }
 
     private func summary(_ label: String, _ window: ScheduledJourneyWindow) -> some View {
-        Text("\(label): \(window.board.stationName) · \(window.timeSummary)")
+        Text("\(label): \(window.board.stationName) · \(window.timeSummary) · \(window.board.callingAtSummary)")
             .font(.subheadline).foregroundStyle(.secondary)
     }
 }
@@ -94,6 +94,7 @@ struct ScheduledJourneyEditor: View {
     @State private var afternoon: WindowDraft
     @State private var error: String?
     @State private var stationPicker: ScheduledStationPeriod?
+    @State private var callingPicker: ScheduledStationPeriod?
     @State private var replacement: JourneyReplacement?
     @State private var confirmsReplacement = false
 
@@ -131,8 +132,8 @@ struct ScheduledJourneyEditor: View {
                 TextField("Name (optional)", text: $journey.name)
                 Toggle("Enabled", isOn: $journey.enabled)
             }
-            ScheduledWindowEditor(title: "Morning · Outbound", draft: $morning) { stationPicker = .morning }
-            ScheduledWindowEditor(title: "Afternoon · Return", draft: $afternoon) { stationPicker = .afternoon }
+            ScheduledWindowEditor(title: "Morning · Outbound", draft: $morning, chooseStation: { stationPicker = .morning }, chooseCallingStops: { callingPicker = .morning })
+            ScheduledWindowEditor(title: "Afternoon · Return", draft: $afternoon, chooseStation: { stationPicker = .afternoon }, chooseCallingStops: { callingPicker = .afternoon })
             Section("Days") {
                 HStack {
                     Button("Weekdays") { journey.days = [1, 2, 3, 4, 5] }
@@ -152,8 +153,8 @@ struct ScheduledJourneyEditor: View {
             }
             Section {
                 Text("\(journey.daysSummary) · London time")
-                if let w = morning.window { Text("Morning: \(w.board.stationName) · \(w.timeSummary)") }
-                if let w = afternoon.window { Text("Afternoon: \(w.board.stationName) · \(w.timeSummary)") }
+                if let w = morning.window { Text("Morning: \(w.board.stationName) · \(w.timeSummary) · \(w.board.callingAtSummary)") }
+                if let w = afternoon.window { Text("Afternoon: \(w.board.stationName) · \(w.timeSummary) · \(w.board.callingAtSummary)") }
             } header: { Text("Summary") } footer: {
                 Text("A Live Activity starts at each window and finishes at its end. Delivery needs a connection and Live Activities enabled. A board you track manually takes priority. Changes apply from the next window.")
             }
@@ -204,6 +205,17 @@ struct ScheduledJourneyEditor: View {
         }
         // A Form section is flattened into reusable rows. Present once from the
         // stable editor, rather than attaching a presenter to those rows.
+        .sheet(item: $callingPicker) { period in
+            let board = period == .morning ? morning.board : afternoon.board
+            DepartureEndpointPicker(stops: DepartureStop.bundled.filter {
+                $0.mode == "rail" && $0.id != board?.hubId && !$0.stopIDs.contains(board?.hubId ?? "")
+            }, selectedIDs: board?.destinationIDs ?? [], multiple: true) { ids in
+                switch period {
+                case .morning: morning.board?.destinationIDs = ids
+                case .afternoon: afternoon.board?.destinationIDs = ids
+                }
+            }
+        }
         .sheet(item: $stationPicker) { period in
             ScheduledStationPicker(select: { stop in
                 let current = period == .morning ? morning.board : afternoon.board
@@ -289,6 +301,7 @@ private struct ScheduledWindowEditor: View {
     let title: String
     @Binding var draft: WindowDraft
     let chooseStation: () -> Void
+    let chooseCallingStops: () -> Void
     @State private var railGroups: [NationalRailDepartureGroup] = []
     @State private var directions: [DepartureDirectionFilter] = [.any]
     @State private var directionsKey: String?
@@ -354,6 +367,15 @@ private struct ScheduledWindowEditor: View {
                     }
                 }
                 if let board = draft.board {
+                    Button(action: chooseCallingStops) {
+                        LabeledContent("Calling at", value: board.callingAtSummary)
+                    }
+                    .accessibilityHint("Choose stops to filter this leg’s departures")
+                    if !(board.destinationIDs ?? []).isEmpty {
+                        Button("Show all departures") { draft.board?.destinationIDs = [] }
+                    }
+                    Text("Only services calling at any selected stop are shown, including intermediate stops. Leave empty for all departures.")
+                        .font(.footnote).foregroundStyle(.secondary)
                     Picker("Line or operator", selection: Binding(get: { board.lineId }, set: selectService)) {
                         ForEach(services, id: \.id) { service in Text(service.name).tag(service.id) }
                     }

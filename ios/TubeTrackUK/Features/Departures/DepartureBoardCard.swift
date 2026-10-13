@@ -470,12 +470,14 @@ struct DepartureBoardCard: View {
         guard let origin, let serviceID else { return nil }
         let name = services.first { $0.id == serviceID }?.name ?? serviceID
         let direction = DepartureDirectionFilter.resolve(label: group.title)
-        guard let outbound = ScheduledBoard.departure(station: origin, serviceID: serviceID,
+        guard var outbound = ScheduledBoard.departure(station: origin, serviceID: serviceID,
                                                       serviceName: name, direction: direction) else { return nil }
         let destinations = trackingRequest(group).destinationIDs
-        let returning = destinations.count == 1 ? appState.departureStop(id: destinations[0]).flatMap {
+        outbound.destinationIDs = destinations
+        var returning = destinations.count == 1 ? appState.departureStop(id: destinations[0]).flatMap {
             ScheduledBoard.departure(station: $0, serviceID: serviceID, serviceName: name, direction: direction.reversed)
         } : nil
+        returning?.destinationIDs = [origin.id]
         return .suggested(outbound: outbound, returning: returning)
     }
 

@@ -25,6 +25,19 @@ struct ScheduledJourneyTests {
         #expect(legacy.operatorName == nil)
     }
 
+    @Test func callingStopsSurviveSaveAndEdit() throws {
+        var filtered = board
+        filtered.destinationIDs = ["HUBBAN"]
+        let journey = ScheduledJourney.suggested(outbound: filtered, returning: board)
+        var decoded = try JSONDecoder().decode(ScheduledJourney.self, from: JSONEncoder().encode(journey))
+        #expect(decoded.morning?.board.destinationIDs == ["HUBBAN"])
+        #expect(decoded.afternoon?.board.destinationIDs == nil)
+        #expect(filtered.callingAtSummary == "Bank")
+        decoded.morning?.board.destinationIDs = []
+        let cleared = try JSONDecoder().decode(ScheduledJourney.self, from: JSONEncoder().encode(decoded))
+        #expect(cleared.morning?.board.callingAtSummary == "All departures")
+    }
+
     @Test func suggestedCommuteUsesWeekdaysAndRequestedWindows() {
         var returning = board
         returning.direction = board.direction.reversed

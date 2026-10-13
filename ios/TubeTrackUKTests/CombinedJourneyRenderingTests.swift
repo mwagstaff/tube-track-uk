@@ -13,7 +13,9 @@ import XCTest
         defer { defaults.removePersistentDomain(forName: suite) }
         let app = TubeAppState(defaults: defaults, monitorsConnectivity: false)
         let hub = try XCTUnwrap(StationIndex.bundled.hub(containing: "940GZZLUOXC"))
-        let draft = ScheduledJourney.suggested(outbound: ScheduledBoard(hub: hub, line: .central, direction: .eastbound))
+        var filteredBoard = ScheduledBoard(hub: hub, line: .central, direction: .eastbound)
+        filteredBoard.destinationIDs = ["HUBBAN", "HUBTCR"]
+        let draft = ScheduledJourney.suggested(outbound: filteredBoard)
         var saved = draft
         saved.id = "existing-journey"
         saved.name = "Existing commute"

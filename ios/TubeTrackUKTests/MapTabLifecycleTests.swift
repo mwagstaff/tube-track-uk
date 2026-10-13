@@ -180,10 +180,17 @@ struct MapTabLifecycleTests {
         let tabs = try #require(findTabs(host))
         #expect(tabs.viewControllers?.count == 4)
         let journeys = try #require(tabs.viewControllers?[2])
-        tabs.selectedViewController = journeys
-        // Simulate UIKit's user-selection callback, rather than setting the
-        // model directly, so the real tab binding participates in this test.
-        tabs.delegate?.tabBarController?(tabs, didSelect: journeys)
+        // Appearance customization must leave SwiftUI's complete native
+        // delegate intact, including callbacks this test does not simulate.
+        if let journeyTab = tabs.tabs.first(where: { $0.viewController === journeys }) {
+            let previousTab = tabs.selectedTab
+            #expect(tabs.delegate?.tabBarController?(tabs, shouldSelectTab: journeyTab) != false)
+            tabs.selectedTab = journeyTab
+            tabs.delegate?.tabBarController?(tabs, didSelectTab: journeyTab, previousTab: previousTab)
+        } else {
+            tabs.selectedViewController = journeys
+            tabs.delegate?.tabBarController?(tabs, didSelect: journeys)
+        }
         #expect(state.selectedTab == .journeys)
         state.journeyPlanner.stationField = .from
         try await Task.sleep(for: .milliseconds(400))
@@ -273,6 +280,23 @@ struct MapTabLifecycleTests {
         #expect(state.selectedTab == .journeys)
     }
 
+    @Test @MainActor func appearanceLeavesNativeTabDelegateIntact() async {
+        let tabs = UITabBarController()
+        let nativeDelegate = NativeTabDelegate()
+        tabs.delegate = nativeDelegate
+        let appearance = TabBarAppearanceController()
+        tabs.addChild(appearance)
+        tabs.view.addSubview(appearance.view)
+        appearance.didMove(toParent: tabs)
+
+        for transparent in [true, false, true] {
+            appearance.backgroundIsTransparent = transparent
+            appearance.applyAppearanceWhenAttached()
+            try? await Task.sleep(for: .milliseconds(50))
+            #expect(tabs.delegate === nativeDelegate)
+        }
+    }
+
     @MainActor private func coordinator(in view: UIView) -> BeckMapGestureSurface.Coordinator? {
         for gesture in view.gestureRecognizers ?? [] {
             if let coordinator = gesture.delegate as? BeckMapGestureSurface.Coordinator {
@@ -319,3 +343,6 @@ private struct MapTabsHarness: View {
         .environment(locationProvider)
     }
 }
+
+@MainActor
+private final class NativeTabDelegate: NSObject, UITabBarControllerDelegate {}

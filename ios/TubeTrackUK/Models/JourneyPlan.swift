@@ -180,6 +180,17 @@ extension PlannedJourney {
     }
 
     private func scheduledBoard(for leg: JourneyLeg, returning: Bool) -> ScheduledBoard? {
+        guard var board = unfilteredScheduledBoard(for: leg, returning: returning) else { return nil }
+        let destinationID = returning ? leg.from.id : leg.to.id
+        if let stop = DepartureStop.bundled.first(where: {
+            $0.id == destinationID || $0.stopIDs.contains(destinationID) || $0.railCodes.contains(destinationID)
+        }), stop.id != board.hubId {
+            board.destinationIDs = [stop.id]
+        }
+        return board
+    }
+
+    private func unfilteredScheduledBoard(for leg: JourneyLeg, returning: Bool) -> ScheduledBoard? {
         if leg.mode == "national-rail" {
             guard leg.lines.count == 1, let service = leg.lines.first,
                   let code = service.operatorCode?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased(),

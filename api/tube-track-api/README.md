@@ -510,3 +510,10 @@ National Rail cache fallback keeps the original provider timestamp and is usable
 only within the existing 90-second freshness limit; failed refreshes no longer
 discard an otherwise fresh live snapshot. Source failures emit
 `departure_source_unavailable` with the origin, source and reason.
+
+
+Scheduled journey windows accept optional `board.destinationIDs` (up to eight canonical rail stop IDs).
+Omitting or clearing the list keeps all departures for the selected service and direction.
+Selected stops use the custom departure source to verify intermediate calls before limiting results,
+for both scheduled starts and later Live Activity updates. Partial or unavailable sources never
+fall back to an unfiltered board. Deploy this API version before distributing the calling-stop editor.

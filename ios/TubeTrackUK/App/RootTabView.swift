@@ -61,7 +61,14 @@ struct RootTabView: View {
                     )
                 }
 
-                TabView(selection: $state.selectedTab) {
+                TabView(selection: Binding(
+                    get: { appState.selectedTab },
+                    set: { tab in
+                        JourneyNavigationDiagnostics.record("SwiftUI tab request old=\(appState.selectedTab.rawValue) new=\(tab.rawValue)")
+                        appState.selectedTab = tab
+                        mapNavigation.handleTabSelection(tab)
+                    }
+                )) {
                     // Keep the map's identity across tab switches so its camera
                     // and gesture surfaces return together at the same viewport.
                     NavigationStack {
@@ -102,10 +109,7 @@ struct RootTabView: View {
                         backgroundColor: tabBarBackgroundColor,
                         backgroundIsTransparent: tabBarBackgroundIsTransparent,
                         screenFurnitureVisible: !mapNavigationActive,
-                        reduceMotion: reduceMotion,
-                        onMapTabSelected: {
-                            mapNavigation.handleTabSelection(.map)
-                        }
+                        reduceMotion: reduceMotion
                     )
                     .frame(width: 0, height: 0)
                 }
@@ -160,6 +164,7 @@ struct RootTabView: View {
             Task { await boardActivity.endIfExpired() }
             if phase == .active {
                 if backgroundImageStore.appDidBecomeActive(), !appState.isGameActive {
+                    JourneyNavigationDiagnostics.record("foreground artwork reset tab=\(appState.selectedTab.rawValue)")
                     appState.selectedTab = .map
                     appState.mapPresentationMode = .beck
                 }
@@ -420,7 +425,6 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
     let backgroundIsTransparent: Bool
     let screenFurnitureVisible: Bool
     let reduceMotion: Bool
-    let onMapTabSelected: () -> Void
 
     func makeUIViewController(context: Context) -> TabBarAppearanceController {
         TabBarAppearanceController()
@@ -434,30 +438,22 @@ private struct TabBarBackgroundConfigurator: UIViewControllerRepresentable {
         viewController.backgroundIsTransparent = backgroundIsTransparent
         viewController.screenFurnitureVisible = screenFurnitureVisible
         viewController.reduceMotion = reduceMotion
-        viewController.onMapTabSelected = onMapTabSelected
         viewController.applyAppearanceWhenAttached()
     }
 
-    static func dismantleUIViewController(
-        _ viewController: TabBarAppearanceController,
-        coordinator: Void
-    ) {
-        viewController.stopObservingSelection()
-    }
 }
 
 @MainActor
-private final class TabBarAppearanceController: UIViewController, UITabBarControllerDelegate {
+// SwiftUI owns UITabBarController.delegate. Replacing it can leave its selection
+// out of sync with the visible tab and restore Map during a sheet update.
+final class TabBarAppearanceController: UIViewController {
     var backgroundColor = UIColor.systemBackground
     var backgroundIsTransparent = false
     var screenFurnitureVisible = true
     var reduceMotion = false
-    var onMapTabSelected: () -> Void = {}
     private weak var configuredTabBar: UITabBar?
     private var appliedBackgroundColor: UIColor?
     private var appliedBackgroundIsTransparent: Bool?
-    private weak var observedTabBarController: UITabBarController?
-    private var forwardingDelegate: (any UITabBarControllerDelegate)?
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -477,7 +473,6 @@ private final class TabBarAppearanceController: UIViewController, UITabBarContro
             return
         }
         let tabBar = resolvedTabBarController.tabBar
-        observeSelection(on: resolvedTabBarController)
 
         // Hiding chrome at pan onset changes only alpha. Reinstalling appearance
         // here also rebuilds the tab bar's glass/layout on that first touch frame.
@@ -523,45 +518,6 @@ private final class TabBarAppearanceController: UIViewController, UITabBarContro
         configuredTabBar = tabBar
     }
 
-    func stopObservingSelection() {
-        guard let observedTabBarController,
-              observedTabBarController.delegate === self else { return }
-        observedTabBarController.delegate = forwardingDelegate
-        self.observedTabBarController = nil
-        forwardingDelegate = nil
-    }
-
-    private func observeSelection(on tabBarController: UITabBarController) {
-        guard observedTabBarController !== tabBarController
-                || tabBarController.delegate !== self else { return }
-
-        stopObservingSelection()
-        forwardingDelegate = tabBarController.delegate
-        observedTabBarController = tabBarController
-        tabBarController.delegate = self
-    }
-
-    func tabBarController(
-        _ tabBarController: UITabBarController,
-        shouldSelect viewController: UIViewController
-    ) -> Bool {
-        forwardingDelegate?.tabBarController?(
-            tabBarController,
-            shouldSelect: viewController
-        ) ?? true
-    }
-
-    func tabBarController(
-        _ tabBarController: UITabBarController,
-        didSelect viewController: UIViewController
-    ) {
-        forwardingDelegate?.tabBarController?(
-            tabBarController,
-            didSelect: viewController
-        )
-        guard tabBarController.viewControllers?.first === viewController else { return }
-        onMapTabSelected()
-    }
 }
 
 @MainActor

@@ -1,3 +1,4 @@
+import { scheduledBoardRequest } from './push/scheduled-board-request.js';
 import express from 'express';
 import { DIRECTION_FILTERS } from './push/departure-projection.js';
 import { isRiverBusLine } from './river.js';
@@ -226,6 +227,7 @@ export function createPushRoutes({
                 scheduleId: occurrence.journeyId,
                 hardEndsAtMs: occurrence.hardEndsAtMs,
                 ...occurrence.board,
+                boardRequest: scheduledBoardRequest(occurrence.board),
                 apnsEnvironment: scheduleStore.rows[req.installId]?.device?.environment,
                 lastBoard: existing?.lastBoard ?? occurrence.state?.departures ?? [],
                 sequence: existing?.sequence ?? 1

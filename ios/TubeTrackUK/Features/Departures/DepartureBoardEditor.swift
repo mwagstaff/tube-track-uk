@@ -134,6 +134,9 @@ struct DepartureEndpointPicker: View {
         NavigationStack {
             List {
                 if multiple { Text("Choose up to 8 stops · \(selectedIDs.count) selected").foregroundStyle(.secondary) }
+                if results.isEmpty {
+                    ContentUnavailableView.search(text: query)
+                }
                 ForEach(results) { stop in
                     Button {
                         if !multiple { onSelect([stop.id]); dismiss() }
@@ -149,7 +152,9 @@ struct DepartureEndpointPicker: View {
                             Spacer()
                             if selectedIDs.contains(stop.id) { Image(systemName: "checkmark") }
                         }
-                    }.disabled(multiple && selectedIDs.count >= 8 && !selectedIDs.contains(stop.id))
+                    }
+                    .accessibilityAddTraits(selectedIDs.contains(stop.id) ? .isSelected : [])
+                    .disabled(multiple && selectedIDs.count >= 8 && !selectedIDs.contains(stop.id))
                 }
             }
             .searchable(text: $query, prompt: "Station or pier")

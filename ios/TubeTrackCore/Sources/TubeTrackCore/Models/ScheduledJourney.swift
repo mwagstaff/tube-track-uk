@@ -6,6 +6,14 @@ public struct ScheduledBoard: Codable, Hashable, Sendable {
     public var lineId: String
     public var direction: DepartureDirectionFilter
     public var stopIds: [String]
+    /// Nil preserves compatibility with journeys saved before calling-stop filters.
+    public var destinationIDs: [String]?
+    public var callingAtSummary: String {
+        let names = (destinationIDs ?? []).map { id in
+            DepartureStop.bundled.first { $0.id == id }?.name ?? id
+        }
+        return names.isEmpty ? "All departures" : names.joined(separator: ", ")
+    }
     public var operatorName: String?
     public var isNationalRail: Bool { lineId.hasPrefix("national-rail:") }
 

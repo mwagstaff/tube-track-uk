@@ -1,3 +1,4 @@
+import { scheduledBoardRequest } from './push/scheduled-board-request.js';
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
@@ -5,15 +6,16 @@ import path from 'node:path';
 import express from 'express';
 import { defaultDataDirectory } from './push/token-store.js';
 import { createRateLimiter } from './push-routes.js';
-import { DIRECTION_FILTERS, projectBoard } from './push/departure-projection.js';
+import { DIRECTION_FILTERS, projectBoard, destinationLabel, compactPlatformLabel } from './push/departure-projection.js';
 import { correctRailBoard } from './push/rail-departures.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { THAMESLINK_STOP_IDS } from './thameslink.js';
 import { isNationalRailOperator, NATIONAL_RAIL_CODES_BY_STATION,
     projectNationalRailBoard, nationalRailCondition } from './push/national-rail-departures.js';
 
-const railStations = JSON.parse(readFileSync(new URL('../data/departure-stops.json', import.meta.url)))
-    .filter(stop => stop.railCodes.length);
+const departureStops = JSON.parse(readFileSync(new URL('../data/departure-stops.json', import.meta.url)));
+const departureStopById = new Map(departureStops.map(stop => [stop.id, stop]));
+const railStations = departureStops.filter(stop => stop.railCodes.length);
 const railStationById = new Map(railStations.flatMap(stop => [stop.id, ...stop.stopIDs].map(id => [id, stop])));
 
 export const MAX_SCHEDULED_JOURNEYS = 3;
@@ -89,6 +91,15 @@ export function validateJourneys(journeys, stationById) {
                 if (!stopIds.length) fail('This station does not have a supported departure board.');
                 canonical = { hubId: station.id, stationName: station.name.slice(0, 40), lineId: b.lineId,
                     direction: b.direction, stopIds };
+            }
+            if (b.destinationIDs != null) {
+                if (!Array.isArray(b.destinationIDs) || b.destinationIDs.length > 8
+                    || b.destinationIDs.some(id => typeof id !== 'string' || !departureStopById.has(id)
+                        || departureStopById.get(id).mode !== 'rail' || id === canonical.hubId
+                        || departureStopById.get(id).stopIDs.includes(canonical.hubId))) {
+                    fail('Choose up to eight calling stops, different from the starting station.');
+                }
+                canonical.destinationIDs = [...new Set(b.destinationIDs)].sort();
             }
             windows[period] = { startMinute: w.startMinute, endMinute: w.endMinute, board: canonical };
         }
@@ -209,8 +220,8 @@ export function createScheduledJourneyRoutes({ store, stationById, clock = Date.
 export class JourneyScheduler {
     running = null;
     timer = null;
-    constructor({ store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, logger, clock = Date.now }) {
-        Object.assign(this, { store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, logger, clock });
+    constructor({ store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, customDepartures, logger, clock = Date.now }) {
+        Object.assign(this, { store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, customDepartures, logger, clock });
     }
     start() {
         this.timer = setInterval(() => { void this.tick(); }, 15000);
@@ -225,6 +236,23 @@ export class JourneyScheduler {
         return this.running;
     }
     async initialState(board, now, railBoards = new Map()) {
+        const request = scheduledBoardRequest(board);
+        if (request) {
+            if (!this.customDepartures) return null;
+            const result = await this.customDepartures.board(request);
+            const updatedAt = Date.parse(result.updatedAt);
+            if (result.stale || result.unavailableSources || !Number.isFinite(updatedAt) || now - updatedAt > 90000) return null;
+            const departures = result.arrivals.slice(0, 4).map(arrival => ({
+                id: arrival.id, destination: destinationLabel(arrival).slice(0, 28),
+                platform: compactPlatformLabel(arrival)?.slice(0, 14) ?? null,
+                expectedAtEpoch: Math.round(Date.parse(arrival.expectedArrival ?? arrival.scheduledDeparture) / 1000),
+                hasExpectedTime: arrival.expectedArrival != null,
+                ...(['delayed', 'cancelled'].includes(arrival.status) ? { status: arrival.status } : {})
+            }));
+            if (!departures.length) return null;
+            return { departures, updatedAtEpoch: Math.floor(updatedAt / 1000),
+                conditionRank: result.conditionRank ?? 4, conditionHeadline: result.conditionHeadline ?? null, sequence: 1 };
+        }
         if (isNationalRailOperator(board.lineId)) {
             if (!this.nationalRail) return null;
             const arrivals = [];

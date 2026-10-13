@@ -140,7 +140,7 @@ export class LiveActivityNotifier {
         let board;
         let condition;
         let sourceUpdatedAtMs = nowMs;
-        if (row.lineId === 'custom-board') {
+        if (row.lineId === 'custom-board' || (row.scheduleId && row.boardRequest)) {
             if (!this.customDepartures || !row.boardRequest) return 'unavailable';
             try {
                 const result = await this.customDepartures.board(row.boardRequest);

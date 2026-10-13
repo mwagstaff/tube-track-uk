@@ -87,7 +87,7 @@ async function createPushStack({ config, logger, metrics, resourceCache, client,
             schedules = await new ScheduledJourneyStore({
                 ...(config.push.dataDir ? { dataDir: config.push.dataDir } : {})
             }).load();
-            scheduler = new JourneyScheduler({ store: schedules, pushStore: store, apns,
+            scheduler = new JourneyScheduler({ customDepartures: createCustomDepartureSource({ client, resourceCache, cache }), store: schedules, pushStore: store, apns,
                 topic: config.push.liveActivityTopic, cache, logger,
                 nationalRail: createNationalRailDepartureSource({ resourceCache }),
                 railDepartures: createRailDepartureSource({ client, resourceCache }),

@@ -250,3 +250,54 @@ test('rail initial boards share a station fetch across simultaneous schedules', 
     await scheduler.initialState(canonical, now, shared);
     assert.equal(count, 1);
 });
+
+
+test('calling stops are bounded, canonical and optional for legacy journeys', () => {
+    const withStops = destinationIDs => journey({ morning: { ...journey().morning, board: { ...board, destinationIDs } } });
+    const saved = validateJourneys([withStops(['HUBBAN', 'HUBBAN'])], stations)[0].morning.board;
+    assert.deepEqual(saved.destinationIDs, ['HUBBAN']);
+    assert.equal(validateJourneys([journey()], stations)[0].morning.board.destinationIDs, undefined);
+    for (const ids of [['missing'], [board.hubId], Array(9).fill('HUBBAN'), 'HUBBAN', [null]]) {
+        assert.throws(() => validateJourneys([withStops(ids)], stations), /calling stops/);
+    }
+});
+
+test('calling filters survive save, start and token registration and govern subsequent pushes', async () => fixture(async ({ setup, scheduler, setTime, sends, pushStore, call }) => {
+    const filtered = journey({ morning: { ...journey().morning, board: { ...board, destinationIDs: ['HUBBAN'] } } });
+    const requests = [];
+    const customDepartures = { board: async request => {
+        requests.push(request);
+        return { arrivals: [{ id: 'matching-train', destinationName: 'Epping', platformName: 'Platform 2',
+            expectedArrival: '2026-09-29T07:05:00Z' }], updatedAt: '2026-09-29T07:00:00Z', stale: false, unavailableSources: 0 };
+    } };
+    scheduler.customDepartures = customDepartures;
+    await setup([filtered]);
+    setTime('2026-09-29T07:00:00Z');
+    await scheduler.tick();
+    assert.equal(sends.length, 1);
+    const aps = sends[0].payload.aps;
+    assert.deepEqual(aps['content-state'].departures.map(row => row.id), ['matching-train']);
+    assert.equal((await call('POST', '/push/live-activities', { ...board,
+        activityId: aps.attributes.activityID, token })).status, 201);
+    assert.deepEqual(pushStore.all()[0].boardRequest.destinationIDs, ['HUBBAN']);
+    const updates = [];
+    const notifier = new LiveActivityNotifier({ store: pushStore, customDepartures,
+        client: { send: async request => { updates.push(request); return { ok: true }; } },
+        topic: 'app.push-type.liveactivity', clock: () => Date.parse('2026-09-29T07:00:30Z') });
+    await notifier.notify({ arrivals: [], updatedAtMs: Date.parse('2026-09-29T07:00:30Z') });
+    assert.equal(updates.length, 1);
+    assert.equal(requests.length, 2);
+    for (const request of requests) assert.deepEqual(request, {
+        originID: board.hubId, destinationIDs: ['HUBBAN'], lineIDs: ['central'], direction: 'Eastbound'
+    });
+}));
+
+test('filtered starts never fall back to unfiltered departures on empty or partial responses', async () => {
+    const filtered = { ...board, destinationIDs: ['HUBBAN'] };
+    for (const result of [{ arrivals: [] }, { arrivals: [{}], unavailableSources: 1 }, { arrivals: [{}], stale: true }]) {
+        const scheduler = new JourneyScheduler({ customDepartures: { board: async () => ({
+            updatedAt: '2026-09-29T07:00:00Z', ...result
+        }) } });
+        assert.equal(await scheduler.initialState(filtered, Date.parse('2026-09-29T07:00:00Z')), null);
+    }
+});
