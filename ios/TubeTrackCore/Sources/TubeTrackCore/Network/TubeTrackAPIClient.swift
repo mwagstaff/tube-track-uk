@@ -125,12 +125,14 @@ public actor TubeTrackAPIClient {
 
     public func get<Value: Decodable & Sendable>(
         _ path: String,
+        pathComponents: [String] = [],
         queryItems: [URLQueryItem] = [],
         forceRefresh: Bool = false,
         as type: Value.Type = Value.self
     ) async throws -> Value {
         try await getSnapshot(
             path,
+            pathComponents: pathComponents,
             queryItems: queryItems,
             forceRefresh: forceRefresh,
             as: type
@@ -139,13 +141,14 @@ public actor TubeTrackAPIClient {
 
     public func getSnapshot<Value: Decodable & Sendable>(
         _ path: String,
+        pathComponents: [String] = [],
         queryItems: [URLQueryItem] = [],
         forceRefresh: Bool = false,
         httpMethod: String = "GET",
         as type: Value.Type = Value.self
     ) async throws -> TubeTrackAPIResponse<Value> {
         guard var components = URLComponents(
-            url: baseURL.appending(path: path),
+            url: pathComponents.reduce(baseURL.appending(path: path)) { $0.appending(component: $1) },
             resolvingAgainstBaseURL: false
         ) else {
             throw TubeTrackAPIClientError.invalidURL

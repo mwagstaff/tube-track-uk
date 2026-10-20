@@ -209,7 +209,7 @@ struct ScheduledJourneyEditor: View {
             let board = period == .morning ? morning.board : afternoon.board
             DepartureEndpointPicker(stops: DepartureStop.bundled.filter {
                 $0.mode == "rail" && $0.id != board?.hubId && !$0.stopIDs.contains(board?.hubId ?? "")
-            }, selectedIDs: board?.destinationIDs ?? [], multiple: true) { ids in
+            }, selectedIDs: board?.destinationIDs ?? [], title: "Calling at") { ids in
                 switch period {
                 case .morning: morning.board?.destinationIDs = ids
                 case .afternoon: afternoon.board?.destinationIDs = ids
@@ -370,11 +370,11 @@ private struct ScheduledWindowEditor: View {
                     Button(action: chooseCallingStops) {
                         LabeledContent("Calling at", value: board.callingAtSummary)
                     }
-                    .accessibilityHint("Choose stops to filter this leg’s departures")
+                    .accessibilityHint("Choose the Calling at destination for this leg")
                     if !(board.destinationIDs ?? []).isEmpty {
                         Button("Show all departures") { draft.board?.destinationIDs = [] }
                     }
-                    Text("Only services calling at any selected stop are shown, including intermediate stops. Leave empty for all departures.")
+                    Text("Only services calling at your selected destination are shown, including intermediate stops. Leave empty for all departures.")
                         .font(.footnote).foregroundStyle(.secondary)
                     Picker("Line or operator", selection: Binding(get: { board.lineId }, set: selectService)) {
                         ForEach(services, id: \.id) { service in Text(service.name).tag(service.id) }

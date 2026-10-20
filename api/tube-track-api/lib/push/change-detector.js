@@ -2,7 +2,7 @@
 //
 // Routine updates use APNs priority 5, which Apple excludes from the Live
 // Activity push budget. Refresh on the 30-second poll cadence;
-// priority 10 remains reserved for changes needing immediate attention.
+// priority 10 is reserved for material changes and the initial board.
 // https://sosumi.ai/documentation/activitykit/starting-and-updating-live-activities-with-activitykit-push-notifications
 //
 // Pure. Previous board in, next board out, a verdict back.
@@ -25,6 +25,7 @@ const HEARTBEAT_TOLERANCE_MS = 2_000;
 export const REASONS = Object.freeze({
     firstPush: 'first_push',
     leadDeparture: 'lead_departure',
+    followingDeparture: 'following_departure',
     boardMembership: 'board_membership',
     platform: 'platform',
     destination: 'destination',
@@ -34,20 +35,18 @@ export const REASONS = Object.freeze({
     heartbeat: 'heartbeat'
 });
 
-// Priority 10 wakes a locked device immediately and costs battery; it is for
-// things a passenger would otherwise act on wrongly — a train that vanished, a
-// platform that moved, or service that got worse.
-const URGENT_REASONS = new Set([
+// Material changes affect which train a passenger takes or where they wait.
+// Small prediction jitter and the passage of time only need routine refreshes.
+const MATERIAL_REASONS = new Set([
     REASONS.boardEmptied,
     REASONS.boardMembership,
     REASONS.platform,
     REASONS.destination,
     REASONS.serviceStatus,
-    REASONS.severity
+    REASONS.severity,
+    REASONS.leadDeparture,
+    REASONS.followingDeparture
 ]);
-
-// Matches the Live Activity: less than one minute is "Due".
-const DUE_SECONDS = 60;
 
 function ids(board) {
     return board.map((row) => row.id).join('|');
@@ -56,13 +55,6 @@ function ids(board) {
 function leadDelta(previous, next) {
     if (previous.length === 0 || next.length === 0) return null;
     return Math.abs(next[0].expectedAtEpoch - previous[0].expectedAtEpoch);
-}
-
-function becameUrgent(previous, next, nowMs) {
-    if (previous.length === 0 || next.length === 0) return false;
-    const pulledForward = next[0].expectedAtEpoch < previous[0].expectedAtEpoch;
-    const secondsAway = next[0].expectedAtEpoch - Math.floor(nowMs / 1_000);
-    return pulledForward && secondsAway < DUE_SECONDS;
 }
 
 export function staleWindowMs(frequentPushesEnabled) {
@@ -109,7 +101,7 @@ function decideOnMerit({
 
     const verdict = (reason) => ({
         shouldPush: true,
-        priority: URGENT_REASONS.has(reason) ? 10 : 5,
+        priority: MATERIAL_REASONS.has(reason) ? 10 : 5,
         reason
     });
 
@@ -117,15 +109,13 @@ function decideOnMerit({
         return verdict(REASONS.boardEmptied);
     }
 
-    // Severity getting worse is worth waking the device for; recovering is not.
+    // Both disruption and recovery change the passenger’s travel options.
     if (
         typeof nextSeverityRank === 'number'
         && typeof previousSeverityRank === 'number'
         && nextSeverityRank !== previousSeverityRank
     ) {
-        return nextSeverityRank < previousSeverityRank
-            ? verdict(REASONS.severity)
-            : { shouldPush: true, priority: 5, reason: REASONS.severity };
+        return verdict(REASONS.severity);
     }
 
     if (ids(previous) !== ids(next)) {
@@ -134,13 +124,7 @@ function decideOnMerit({
 
     const delta = leadDelta(previous, next);
     if (delta !== null && delta >= LEAD_DEPARTURE_THRESHOLD_SECONDS) {
-        return {
-            shouldPush: true,
-            // A train that got later is a plan change; one pulled forward into
-            // "Due" is someone about to miss it.
-            priority: becameUrgent(previous, next, nowMs) ? 10 : 5,
-            reason: REASONS.leadDeparture
-        };
+        return verdict(REASONS.leadDeparture);
     }
 
     for (let index = 0; index < next.length; index += 1) {
@@ -155,6 +139,13 @@ function decideOnMerit({
             || (next[index].hasExpectedTime ?? true) !== (previous[index]?.hasExpectedTime ?? true)) {
             return verdict(REASONS.serviceStatus);
         }
+    }
+
+    // Following trains also matter when a passenger is choosing a later service.
+    if (next.some((departure, index) => index > 0
+        && Math.abs(departure.expectedAtEpoch - previous[index].expectedAtEpoch)
+            >= LEAD_DEPARTURE_THRESHOLD_SECONDS)) {
+        return verdict(REASONS.followingDeparture);
     }
 
     const heartbeat = frequentPushesEnabled ? HEARTBEAT_MS : RELAXED_HEARTBEAT_MS;

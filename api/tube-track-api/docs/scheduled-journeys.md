@@ -107,3 +107,62 @@ Deploy this server support before releasing the client. A signed-device APNs che
 must verify a National Rail start with operator branding, subsequent updates and
 its scheduled end, including with the app terminated. Local automated tests verify
 the payloads and state transitions but cannot confirm delivery to a physical device.
+
+
+## Troubleshooting scheduled Live Activities
+
+In the iOS app, open **Profile → Share diagnostics**, then share the prepared JSON
+report. The app keeps the latest 2,000 events from the past seven days across
+launches. Reports contain software versions, permissions, the installation ID,
+activity IDs, lifecycle observations, content timestamps, and registration HTTP
+results or error domain/code. Push addresses, schedule credentials, request bodies,
+and raw error descriptions are not recorded. The history is stored locally outside
+backups; sharing is user initiated. Events are written on a serial background queue.
+No client can log while iOS has suspended it, so gaps must be interpreted alongside
+server events. An observed update is not proof of the exact time a push arrived.
+
+Server events use `activityId` and `installId` to correlate starts, registrations,
+update outcomes and ends. `scheduled_update_registration_missing` warns after two
+minutes without a registered update address, once per occurrence per process.
+Registration evidence is persisted with the occurrence to prevent false alarms
+after a successfully completed activity is removed. Warnings can recur after a
+server restart for still-missing registrations, and expire a day after the window.
+`push_registration_request_result` includes unsuccessful requests and structured
+validation error codes. `push_update_outcome` logs outcome changes, including stale
+sources, and `push_update_accepted` records successful APNs submissions. Acceptance
+by APNs is not a delivery receipt. `scheduled_end_result` records accepted/rejected
+end attempts. Start events include the source timestamp and scheduled end time.
+
+After rollout, test on a signed phone with the app backgrounded and terminated:
+verify the start, token registration, updates, and scheduled dismissal; then export
+the report and match the activity ID to the server log. Server logging requires a
+server deployment; client diagnostics require installing the updated app.
+
+
+### Apple delivery lookup identifiers
+
+Every APNs HTTP attempt now has a fresh UUID `requestId`, also supplied in the
+`apns-id` header. `apns_request_result` records the returned `apnsId` and
+`apnsUniqueId`, environment, activity ID, event, sequence, priority, expiry,
+staleness deadline and elapsed time. Transport failures retain the known IDs in
+`apns_request_failed`; a retry against another environment has its own request ID.
+Credentials, device addresses and notification bodies are never included.
+
+For a sandbox push, sign in to https://icloud.developer.apple.com/dashboard/notifications,
+select the app's bundle ID, open Delivery Log, and use **apnsUniqueId** from the
+server event. Apple makes development delivery logs available for seven days.
+A normal `apnsId` is not a substitute for a missing `apns-unique-id`. A missing
+unique ID remains null; old discarded IDs cannot be reconstructed from the app's
+sequence counter. Production does not offer these per-notification delivery logs.
+See https://sosumi.ai/documentation/usernotifications/testing-notifications-using-the-push-notification-console.
+
+Priority 10 is reserved for material changes and starts/ends: trains appearing,
+disappearing or changing order; platforms or destinations changing; cancellation,
+delay, prediction availability, disruption or recovery; and prediction changes of
+at least 60 seconds in any displayed row, earlier or later.
+Routine refreshes use priority 5: Apple excludes those from the Live Activity
+high-priority budget. Sending every 30-second heartbeat with priority 10 would
+request roughly 120 budgeted deliveries per hour per board, potentially causing
+throttling. Frequent Updates permission raises the allowance; it is not unlimited.
+Neither priority guarantees delivery or bypasses connectivity loss. Review delivery
+outcomes before changing expiry or escalating heartbeat priority.

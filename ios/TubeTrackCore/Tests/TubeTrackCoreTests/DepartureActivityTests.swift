@@ -3,6 +3,24 @@ import Testing
 @testable import TubeTrackCore
 
 struct DepartureActivityTests {
+    @Test func callingAtLabelSurvivesActivityRoundTrip() throws {
+        let destination = try #require(DepartureStop.bundled.first { $0.mode == "rail" })
+        let attributes = DepartureActivityAttributes(
+            activityID: "calling-at", stationHubID: "origin", stationName: "Origin",
+            lineIDRaw: "custom-board", direction: "Northbound", directionFilter: .northbound,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400),
+            boardRequest: .init(originID: "origin", destinationIDs: [destination.id], direction: "Northbound"))
+        let restored = try JSONDecoder().decode(DepartureActivityAttributes.self,
+                                               from: JSONEncoder().encode(attributes))
+        #expect(restored.callingAtLabel == "Calling at " + destination.name)
+        #expect(restored.deepLink == .board(attributes.boardRequest!))
+    }
+
+    @Test func legacyActivityWithoutCallingAtHasNoLabel() throws {
+        let legacy = try JSONDecoder().decode(DepartureActivityAttributes.self, from: Data("{}".utf8))
+        #expect(legacy.callingAtLabel == nil)
+    }
+
     private let updatedAt = Date(timeIntervalSince1970: 1_800_000_000)
 
     private func arrival(

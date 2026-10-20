@@ -19,7 +19,7 @@ struct DepartureLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Text(context.attributes.direction)
+                    Text(context.attributes.directionLabel(for: context.state))
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(DepartureBoardStyle.yellow)
                         .lineLimit(1)
@@ -32,8 +32,13 @@ struct DepartureLiveActivity: Widget {
                         DepartureCountdown(
                             departure: context.nextDeparture,
                             isStale: context.isStale,
+                            transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw),
                             font: .title3.weight(.semibold)
                         )
+                        if let departure = context.nextDeparture {
+                            DepartureRailStatusIcon(departure: departure,
+                                transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw))
+                        }
                     }
                 }
                 DynamicIslandExpandedRegion(.center) {
@@ -45,10 +50,13 @@ struct DepartureLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 2) {
+                        DepartureCallingAtLabel(text: context.attributes.callingAtLabel)
                         ForEach(Array(context.followingDepartures.enumerated()), id: \.offset) { index, departure in
                             DepartureActivityRow(
                                 departure: departure, position: index + 2,
-                                isStale: context.isStale, showsPlatforms: context.attributes.showsPlatforms,
+                                isStale: context.isStale,
+                                transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw),
+                                showsPlatforms: context.attributes.showsPlatforms,
                                 font: .system(.caption, design: .monospaced)
                             )
                         }
@@ -61,6 +69,7 @@ struct DepartureLiveActivity: Widget {
                 DepartureCountdown(
                     departure: context.nextDeparture,
                     isStale: context.isStale,
+                    transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw),
                     font: .caption2.weight(.semibold),
                     compact: true
                 )
@@ -98,11 +107,13 @@ private struct DepartureActivityWatchView: View {
             stationName: context.attributes.stationName,
             lineID: context.attributes.lineID,
             lineName: context.attributes.lineName,
-            direction: context.attributes.direction,
-            directionFilter: context.attributes.directionFilter,
+            direction: context.attributes.directionLabel(for: context.state),
+            directionFilter: DepartureDirectionFilter.resolve(label: context.attributes.directionLabel(for: context.state)),
+            callingAt: context.attributes.callingAtLabel,
             condition: context.condition,
             departures: Array(context.visibleDepartures.prefix(2)),
             isStale: context.isStale,
+            transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw),
             showsPlatforms: context.attributes.showsPlatforms,
             deepLink: context.deepLink
         )
@@ -110,14 +121,17 @@ private struct DepartureActivityWatchView: View {
 }
 
 private struct DepartureActivityWatchCard: View {
+    @DepartureDisplayStorage private var displayPreferences
     let stationName: String
     let lineID: TubeLineID?
     var lineName: String = ""
     let direction: String
     let directionFilter: DepartureDirectionFilter
+    var callingAt: String? = nil
     let condition: LineServiceCondition
     let departures: [DepartureActivityAttributes.ContentState.Departure]
     let isStale: Bool
+    var transitType: DepartureTransitType = .underground
     var showsPlatforms = false
     let deepLink: URL
 
@@ -149,6 +163,8 @@ private struct DepartureActivityWatchCard: View {
                 .layoutPriority(1)
             }
 
+            DepartureCallingAtLabel(text: callingAt)
+
             if departures.isEmpty {
                 Text("No departures due")
                     .font(.subheadline.weight(.semibold))
@@ -168,10 +184,11 @@ private struct DepartureActivityWatchCard: View {
                                 DeparturePlatformPill(departure: departure, font: .caption2.weight(.semibold))
                             }
                             DepartureCountdown(
-                                departure: departure, isStale: isStale,
+                                departure: departure, isStale: isStale, transitType: transitType,
                                 font: .subheadline.weight(.bold)
                             )
                             .fixedSize(horizontal: true, vertical: false)
+                            DepartureRailStatusIcon(departure: departure, transitType: transitType)
                         }
                     }
                 }
@@ -206,13 +223,18 @@ private struct DepartureActivityWatchCard: View {
 
     private var accessibilityLabel: String {
         let heading = "\(stationName), \(lineName.isEmpty ? lineID?.displayName ?? "" : lineName), "
-            + "\(direction), \(condition.accessibilityDescription)"
+            + "\(direction), \(condition.accessibilityDescription)" + (callingAt.map { ", " + $0 } ?? "")
         let staleDescription = isStale ? ". Live updates paused" : ""
         guard !departures.isEmpty else { return heading + ", no departures due" + staleDescription }
         let trains = departures.enumerated().map { index, departure in
-            let prediction = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+            let prediction = isStale ? departure.expectedAt.formatted(DepartureCountdownFormatStyle.clockTime)
+                : DepartureCountdownFormatStyle(expectedAt: departure.expectedAt,
+                    transitType: departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType,
+                    preferences: displayPreferences).format(.now)
             let platform = showsPlatforms ? departure.platformPillLabel.map { ", platform \($0.dropFirst())" } ?? "" : ""
-            let destination = departure.destination + platform
+            let railStatus = (departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType) == .nationalRail
+                ? ", " + departure.railServiceStatus.departureAccessibilityLabel : ""
+            let destination = departure.destination + platform + railStatus
             if departure.isCancelled {
                 return "\(index == 0 ? "Next" : "Then") \(destination), cancelled"
             }
@@ -234,7 +256,7 @@ private struct DepartureActivityLockScreenView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("\(context.attributes.stationName) · \(context.attributes.lineName) · \(context.attributes.direction)")
+            Text("\(context.attributes.stationName) · \(context.attributes.lineName) · \(context.attributes.callingAtLabel ?? context.attributes.directionLabel(for: context.state))")
                 .font(.caption2.weight(.medium))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -247,6 +269,7 @@ private struct DepartureActivityLockScreenView: View {
                     ForEach(Array(context.visibleDepartures.enumerated()), id: \.offset) { index, departure in
                         DepartureActivityRow(
                             departure: departure, position: index + 1, isStale: context.isStale,
+                            transitType: DepartureTransitType(lineID: context.attributes.lineIDRaw),
                             showsPlatforms: context.attributes.showsPlatforms
                         )
                     }
@@ -264,6 +287,21 @@ private struct DepartureActivityLockScreenView: View {
 }
 
 // MARK: - Pieces
+
+private struct DepartureCallingAtLabel: View {
+    let text: String?
+
+    var body: some View {
+        if let text {
+            Text(text)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(DepartureBoardStyle.yellow)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel(text)
+        }
+    }
+}
 
 private enum DepartureBoardStyle {
     static let yellow = Color(red: 1, green: 0.86, blue: 0)
@@ -318,10 +356,23 @@ private struct DepartureActivityStatusIcon: View {
     }
 }
 
+private struct DepartureRailStatusIcon: View {
+    let departure: DepartureActivityAttributes.ContentState.Departure
+    let transitType: DepartureTransitType
+
+    var body: some View {
+        if (departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType) == .nationalRail {
+            RailDepartureStatusIcon(status: departure.railServiceStatus)
+        }
+    }
+}
+
 private struct DepartureActivityRow: View {
+    @DepartureDisplayStorage private var displayPreferences
     let departure: DepartureActivityAttributes.ContentState.Departure
     let position: Int
     let isStale: Bool
+    var transitType: DepartureTransitType = .underground
     var showsPlatforms = false
     var font: Font = .system(.subheadline, design: .monospaced)
 
@@ -339,13 +390,14 @@ private struct DepartureActivityRow: View {
                 DeparturePlatformPill(departure: departure)
             }
             DepartureCountdown(
-                departure: departure, isStale: isStale,
+                departure: departure, isStale: isStale, transitType: transitType,
                 font: .system(.caption, design: .monospaced).weight(.semibold)
             )
             .multilineTextAlignment(.center)
             .frame(width: 72)
             .padding(.vertical, 3)
             .background(DepartureBoardStyle.timeBackground, in: .rect(cornerRadius: 4))
+            DepartureRailStatusIcon(departure: departure, transitType: transitType)
         }
         .foregroundStyle(DepartureBoardStyle.yellow)
         .accessibilityElement(children: .ignore)
@@ -353,9 +405,14 @@ private struct DepartureActivityRow: View {
     }
 
     private var accessibilityLabel: String {
-        let time = departure.expectedAt.formatted(date: .omitted, time: .shortened)
+        let time = isStale ? departure.expectedAt.formatted(DepartureCountdownFormatStyle.clockTime)
+            : DepartureCountdownFormatStyle(expectedAt: departure.expectedAt,
+                transitType: departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType,
+                preferences: displayPreferences).format(.now)
         let platform = showsPlatforms ? departure.platformPillLabel.map { ", platform \($0.dropFirst())" } ?? "" : ""
-        let destination = departure.destination + platform
+        let railStatus = (departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType) == .nationalRail
+            ? ", " + departure.railServiceStatus.departureAccessibilityLabel : ""
+        let destination = departure.destination + platform + railStatus
         if departure.isCancelled { return "\(position), \(destination), cancelled" }
         if !departure.hasExpectedTime { return "\(position), \(destination), \(departure.isDelayed ? "delayed" : "check station screens"), departure time unconfirmed" }
         if departure.isDelayed { return "\(position), \(destination), delayed, expected \(time)" }
@@ -389,8 +446,10 @@ private struct DeparturePlatformPill: View {
 /// The countdown at rendering time, refreshed with each new snapshot. Once iOS
 /// marks the activity stale it becomes the clock time the train was predicted for.
 private struct DepartureCountdown: View {
+    @DepartureDisplayStorage private var displayPreferences
     let departure: DepartureActivityAttributes.ContentState.Departure?
     let isStale: Bool
+    var transitType: DepartureTransitType = .underground
     var font: Font = .subheadline
     var compact = false
 
@@ -404,8 +463,12 @@ private struct DepartureCountdown: View {
                 } else if isStale {
                     Text(departure.expectedAt, format: DepartureCountdownFormatStyle.clockTime)
                 } else {
-                    let label = DepartureCountdownFormatStyle(expectedAt: departure.expectedAt).format(.now)
-                    Text(compact ? label.replacingOccurrences(of: " (", with: "\n(") : label)
+                    let label = DepartureCountdownFormatStyle(
+                        expectedAt: departure.expectedAt,
+                        transitType: departure.lineIDRaw.map { DepartureTransitType(lineID: $0) } ?? transitType,
+                        preferences: displayPreferences
+                    ).format(.now)
+                    Text(label)
                         .accessibilityLabel(label)
                 }
             } else {
@@ -471,7 +534,7 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
     }
 
     var deepLink: URL {
-        attributes.deepLink.url
+        attributes.deepLink(for: state).url
     }
 }
 
@@ -515,6 +578,12 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
     DepartureActivityAttributes.ContentState.previewRail
 }
 
+#Preview("National Rail Calling at · Lock Screen", as: .content, using: DepartureActivityAttributes.previewNationalRailCallingAt) {
+    DepartureLiveActivity()
+} contentStates: {
+    DepartureActivityAttributes.ContentState.previewRail
+}
+
 #Preview("Island expanded", as: .dynamicIsland(.expanded), using: DepartureActivityAttributes.preview) {
     DepartureLiveActivity()
 } contentStates: {
@@ -529,10 +598,24 @@ private extension ActivityViewContext<DepartureActivityAttributes> {
 }
 
 extension DepartureActivityAttributes {
+    static var previewCallingAt: Self {
+        .init(activityID: "calling-at-preview", stationHubID: "HUBLEW", stationName: "Lewisham",
+              lineIDRaw: "dlr", direction: "Northbound", directionFilter: .northbound,
+              startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400),
+              boardRequest: .init(originID: "HUBLEW", destinationIDs: ["HUBBAN"], lineIDs: ["dlr"]))
+    }
+
     static var previewNationalRail: Self {
         .init(activityID: "rail-preview", stationHubID: "HUBBEK", stationName: "Kent House",
             lineIDRaw: "national-rail:SE", direction: "All departures", directionFilter: .any,
             startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400), operatorName: "Southeastern")
+    }
+
+    static var previewNationalRailCallingAt: Self {
+        .init(activityID: "rail-calling-at-preview", stationHubID: "HUBBEK", stationName: "Kent House",
+            lineIDRaw: "national-rail:SE", direction: "Northbound", directionFilter: .northbound,
+            startedAt: .now, hardEndsAt: .now.addingTimeInterval(5400), operatorName: "Southeastern",
+            boardRequest: .init(originID: "HUBBEK", destinationIDs: ["HUBVIC"], lineIDs: ["national-rail:SE"]))
     }
 
     static var previewThameslink: Self {
@@ -571,15 +654,15 @@ extension DepartureActivityAttributes {
 extension DepartureActivityAttributes.ContentState {
     static var previewRail: Self {
         .init(departures: [
-            departure("1", "London Victoria", 2), departure("2", "Orpington", 12),
-            departure("3", "London Victoria", 15), departure("4", "London Victoria", 22)
+            departure("1", "London Victoria", 2, status: .onTime), departure("2", "Orpington", 12, status: .delayed),
+            departure("3", "London Victoria", 15, status: .cancelled), departure("4", "London Victoria", 22, status: .unknown)
         ], updatedAt: .now, conditionRank: 1, conditionHeadline: "Delays", sequence: 1)
     }
 
-    private static func departure(_ id: String, _ destination: String, _ minutes: Double) -> Departure {
+    private static func departure(_ id: String, _ destination: String, _ minutes: Double, status: RailServiceStatus? = nil) -> Departure {
         Departure(
             id: id, destination: destination, platform: "Platform 2",
-            expectedAt: .now.addingTimeInterval(minutes * 60)
+            expectedAt: .now.addingTimeInterval(minutes * 60), status: status
         )
     }
 
@@ -622,4 +705,17 @@ extension DepartureActivityAttributes.ContentState {
             updatedAt: .now, conditionRank: 0, conditionHeadline: "Severe delays", sequence: 4
         )
     }
+}
+
+#Preview("Calling at · Lock Screen", as: .content, using: DepartureActivityAttributes.previewCallingAt) {
+    DepartureLiveActivity()
+} contentStates: {
+    DepartureActivityAttributes.ContentState.previewFresh
+    DepartureActivityAttributes.ContentState.previewEmpty
+}
+
+#Preview("Calling at · Island", as: .dynamicIsland(.expanded), using: DepartureActivityAttributes.previewCallingAt) {
+    DepartureLiveActivity()
+} contentStates: {
+    DepartureActivityAttributes.ContentState.previewFresh
 }

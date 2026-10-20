@@ -1,0 +1,15 @@
+Target dependency graph (5 targets)
+Target 'AllIncludingTests' in project 'Aggregate'
+➜ Explicit dependency on target 'TubeTrackCoreTests-product' in project 'TubeTrackCore'
+➜ Dependency on target 'TubeTrackCoreTests-product' in project 'TubeTrackCore' via transitive dependency through 'TubeTrackCoreTests-test-runner'
+➜ Explicit dependency on target 'TubeTrackCore-product' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore_TubeTrackCore' in project 'TubeTrackCore'
+Target 'TubeTrackCore-product' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore_TubeTrackCore' in project 'TubeTrackCore'
+Target 'TubeTrackCoreTests-product' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore' in project 'TubeTrackCore'
+Target 'TubeTrackCore' in project 'TubeTrackCore'
+➜ Explicit dependency on target 'TubeTrackCore_TubeTrackCore' in project 'TubeTrackCore'
+Target 'TubeTrackCore_TubeTrackCore' in project 'TubeTrackCore' (no dependencies)

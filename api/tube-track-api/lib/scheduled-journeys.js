@@ -158,9 +158,18 @@ export class ScheduledJourneyStore {
     }
 }
 
-export function createScheduledJourneyRoutes({ store, stationById, clock = Date.now }) {
+export function createScheduledJourneyRoutes({ store, stationById, logger, clock = Date.now }) {
     const router = express.Router();
     const allow = createRateLimiter({ maxRequests: 30 });
+    router.use((req, res, next) => {
+        res.on('finish', () => {
+            logger?.info('schedule_request_result', {
+                installId: idPattern.test(req.get('X-TubeTrack-Install') ?? '') ? req.get('X-TubeTrack-Install') : null,
+                method: req.method, route: req.route?.path ?? 'unmatched', status: res.statusCode
+            });
+        });
+        next();
+    });
     router.use(express.json({ limit: '16kb' }));
     router.use((req, res, next) => {
         res.set('Cache-Control', 'no-store');
@@ -209,6 +218,8 @@ export function createScheduledJourneyRoutes({ store, stationById, clock = Date.
             fail('Live Activity setup is incomplete.');
         }
         await mutate(req, (row) => { row.device = { token, activitiesEnabled, frequentPushesEnabled, environment }; });
+        logger?.info('schedule_device_registered', { installId: req.installId, environment,
+            activitiesEnabled, frequentPushesEnabled });
         res.sendStatus(204);
     });
     router.use((error, req, res, next) => {
@@ -218,6 +229,7 @@ export function createScheduledJourneyRoutes({ store, stationById, clock = Date.
 }
 
 export class JourneyScheduler {
+    missingRegistrationWarnings = new Set();
     running = null;
     timer = null;
     constructor({ store, pushStore, apns, topic, cache, thameslink, railDepartures, nationalRail, customDepartures, logger, clock = Date.now }) {
@@ -247,7 +259,9 @@ export class JourneyScheduler {
                 platform: compactPlatformLabel(arrival)?.slice(0, 14) ?? null,
                 expectedAtEpoch: Math.round(Date.parse(arrival.expectedArrival ?? arrival.scheduledDeparture) / 1000),
                 hasExpectedTime: arrival.expectedArrival != null,
-                ...(['delayed', 'cancelled'].includes(arrival.status) ? { status: arrival.status } : {})
+                lineIDRaw: arrival.lineId,
+                ...(arrival.direction ? { directionRaw: arrival.direction } : {}),
+                ...(['delayed', 'cancelled', 'unknown'].includes(arrival.status) ? { status: arrival.status } : {})
             }));
             if (!departures.length) return null;
             return { departures, updatedAtEpoch: Math.floor(updatedAt / 1000),
@@ -304,6 +318,31 @@ export class JourneyScheduler {
     async run() {
         const railBoards = new Map();
         const now = this.clock();
+        const subscriptions = this.pushStore.all({ type: 'liveActivity' });
+        const registered = new Set(subscriptions.map((row) => row.activityId));
+        const relevant = new Set();
+        for (const [installId, installation] of Object.entries(this.store.rows)) {
+            for (const occurrence of Object.values(installation.occurrences ?? {})) {
+                if (!['sent', 'unknown'].includes(occurrence.status) || occurrence.cancelled
+                    || now > occurrence.hardEndsAtMs + 86400000) continue;
+                relevant.add(occurrence.activityId);
+                if (occurrence.updateRegisteredAtMs || registered.has(occurrence.activityId)
+                    || now - (occurrence.sentAtMs ?? occurrence.startedAtMs) < 120000
+                    || this.missingRegistrationWarnings.has(occurrence.activityId)) continue;
+                this.missingRegistrationWarnings.add(occurrence.activityId);
+                this.logger?.warn('scheduled_update_registration_missing', {
+                    installId, activityId: occurrence.activityId, scheduleId: occurrence.journeyId,
+                    startStatus: occurrence.status, startedAtMs: occurrence.startedAtMs,
+                    hardEndsAtMs: occurrence.hardEndsAtMs,
+                    elapsedSeconds: Math.floor((now - (occurrence.sentAtMs ?? occurrence.startedAtMs)) / 1000),
+                    windowExpired: now >= occurrence.hardEndsAtMs
+                });
+            }
+        }
+        // Bound memory and emit once per occurrence per server process, including after restart.
+        for (const id of this.missingRegistrationWarnings) {
+            if (!relevant.has(id)) this.missingRegistrationWarnings.delete(id);
+        }
         // End independently of departure polling, including outages and edits.
         for (const row of this.pushStore.all({ type: 'liveActivity' })) {
             if (!row.scheduleId) continue;
@@ -312,12 +351,16 @@ export class JourneyScheduler {
             const state = { departures: row.lastBoard ?? [], updatedAtEpoch: Math.floor(now / 1000),
                 conditionRank: 3, conditionHeadline: 'Tracking finished', sequence: (row.sequence ?? 0) + 1 };
             try {
-                const result = await this.apns.send({ token: row.token, topic: this.topic, pushType: 'liveactivity',
+                const result = await this.apns.send({ activityId: row.activityId, token: row.token, topic: this.topic, pushType: 'liveactivity',
                     environment: row.apnsEnvironment, priority: 10, expiration: Math.floor(now / 1000) + 3600,
                     payload: { aps: { timestamp: Math.floor(now / 1000), event: 'end', 'content-state': state,
                         'dismissal-date': Math.floor(now / 1000) } } });
+                this.logger?.info('scheduled_end_result', { apnsId: result.apnsId, apnsUniqueId: result.apnsUniqueId, activityId: row.activityId,
+                    installId: row.installId, scheduleId: row.scheduleId,
+                    status: result.status, accepted: result.ok, dead: result.dead,
+                    reason: result.reason, cause: occurrence?.cancelled ? 'cancelled' : 'window_ended' });
                 if (result.ok || result.dead) this.pushStore.delete(row.id);
-            } catch (error) { this.logger?.warn('scheduled_end_failed', { error: error.message }); }
+            } catch (error) { this.logger?.warn('scheduled_end_failed', { apnsId: error.apnsId, apnsUniqueId: error.apnsUniqueId, activityId: row.activityId, installId: row.installId, error: error.message }); }
         }
         const local = londonTime(now);
         for (const [installId, row] of Object.entries(this.store.rows)) {
@@ -339,8 +382,17 @@ export class JourneyScheduler {
                         r.installId === installId && !r.scheduleId && now < (r.hardEndsAtMs ?? r.startedAtMs + 5400000));
                     let state;
                     if (!manual) {
-                        try { state = await this.initialState(w.board, now, railBoards); } catch { continue; }
-                        if (!state) continue;
+                        try { state = await this.initialState(w.board, now, railBoards); }
+                        catch (error) {
+                            this.logger?.warn('scheduled_start_deferred', { installId, scheduleId: journey.id,
+                                occurrenceKey: key, reason: 'source_error', error: error.message });
+                            continue;
+                        }
+                        if (!state) {
+                            this.logger?.info('scheduled_start_deferred', { installId, scheduleId: journey.id,
+                                occurrenceKey: key, reason: 'no_fresh_board' });
+                            continue;
+                        }
                     }
                     const activityId = `scheduled-${crypto.randomUUID()}`;
                     const occurrence = { activityId, journeyId: journey.id, board: w.board, state,
@@ -357,7 +409,11 @@ export class JourneyScheduler {
                         current.occurrences[key] = occurrence;
                         return true;
                     });
-                    if (!claimed || manual) continue;
+                    if (!claimed || manual) {
+                        this.logger?.info('scheduled_start_skipped', { installId, activityId,
+                            scheduleId: journey.id, reason: manual ? 'manual_precedence' : 'claim_lost' });
+                        continue;
+                    }
                     await this.store.transaction(async (rows) => {
                         const current = rows[installId];
                         const o = current.occurrences[key];
@@ -372,13 +428,16 @@ export class JourneyScheduler {
                         const b = o.board;
                         if (isNationalRailOperator(b.lineId) && sendTime - state.updatedAtEpoch * 1000 > 90000) return;
                         const attributes = { activityID: activityId, stationHubID: b.hubId, stationName: b.stationName,
+                            boardRequest: scheduledBoardRequest(b) ?? { originID: b.hubId, destinationIDs: [],
+                                lineIDs: [b.lineId], ...(b.direction !== 'any'
+                                    ? { direction: b.direction[0].toUpperCase() + b.direction.slice(1) } : {}) },
                             lineIDRaw: b.lineId, direction: b.direction === 'any' ? 'Any direction'
                                 : b.direction[0].toUpperCase() + b.direction.slice(1),
                             directionFilterRaw: b.direction, startedAtEpoch: Math.floor(o.startedAtMs / 1000),
                             hardEndsAtEpoch: Math.floor(o.hardEndsAtMs / 1000), scheduleID: journey.id,
                             ...(b.operatorName ? { operatorName: b.operatorName } : {}) };
                         try {
-                            const result = await this.apns.send({ token: current.device.token, topic: this.topic,
+                            const result = await this.apns.send({ activityId, token: current.device.token, topic: this.topic,
                                 pushType: 'liveactivity', priority: 10, environment: current.device.environment,
                                 expiration: Math.min(Math.floor(sendTime / 1000) + 60, attributes.hardEndsAtEpoch),
                                 payload: { aps: { timestamp: Math.floor(sendTime / 1000), event: 'start',
@@ -386,12 +445,14 @@ export class JourneyScheduler {
                                     'content-state': state, 'input-push-token': 1,
                                     'stale-date': Math.min(state.updatedAtEpoch + 180, attributes.hardEndsAtEpoch),
                                     alert: { title: 'Your scheduled journey', body: `${b.stationName} departures are ready.` } } } });
+                            o.sentAtMs = sendTime;
                             o.status = result.ok ? 'sent' : 'rejected';
                             if (result.dead) current.device.activitiesEnabled = false;
-                            this.logger?.info('scheduled_start_result', { status: o.status, reason: result.reason });
+                            this.logger?.info('scheduled_start_result', { apnsId: result.apnsId, apnsUniqueId: result.apnsUniqueId, installId, activityId, scheduleId: journey.id, lineId: b.lineId, environment: current.device.environment, startedAtMs: o.startedAtMs, hardEndsAtMs: o.hardEndsAtMs, sourceUpdatedAtEpoch: state.updatedAtEpoch, status: o.status, apnsStatus: result.status, reason: result.reason });
                         } catch (error) {
+                            o.sentAtMs = sendTime;
                             o.status = 'unknown';
-                            this.logger?.warn('scheduled_start_unknown', { error: error.message });
+                            this.logger?.warn('scheduled_start_unknown', { apnsId: error.apnsId, apnsUniqueId: error.apnsUniqueId, installId, activityId, scheduleId: journey.id, error: error.message });
                         }
                     });
                 }

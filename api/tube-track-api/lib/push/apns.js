@@ -20,13 +20,15 @@ const DEAD_TOKEN_REASONS = new Set([
 ]);
 
 export class ApnsError extends Error {
-    constructor(message, { status, reason, retryable, dead } = {}) {
+    constructor(message, { status, reason, retryable, dead, apnsId, apnsUniqueId } = {}) {
         super(message);
         this.name = 'ApnsError';
         this.status = status ?? null;
         this.reason = reason ?? null;
         this.retryable = retryable === true;
         this.dead = dead === true;
+        this.apnsId = apnsId ?? null;
+        this.apnsUniqueId = apnsUniqueId ?? null;
     }
 }
 
@@ -151,15 +153,23 @@ export class ApnsClient {
      * Sends one notification. Resolves `{ status, reason, apnsId, dead }` for
      * anything APNs answered, and rejects only when the request never completed.
      */
-    send({ token, topic, pushType, priority = 5, expiration, payload, collapseId, environment = this.environment }) {
+    send({ token, topic, pushType, priority = 5, expiration, payload, collapseId, activityId, environment = this.environment }) {
         if (!token) throw new Error('A device token is required');
         if (!topic) throw new Error('An APNs topic is required');
 
+        const requestId = crypto.randomUUID();
+        const startedAt = Date.now();
+        const diagnostic = {
+            requestId, activityId: activityId ?? payload?.aps?.attributes?.activityID,
+            notificationEvent: payload?.aps?.event, sequence: payload?.aps?.['content-state']?.sequence,
+            environment, topic, priority, expiration, staleDateSeconds: payload?.aps?.['stale-date']
+        };
         const body = Buffer.from(JSON.stringify(payload));
         const headers = {
             ':method': 'POST',
             ':path': `/3/device/${token}`,
             authorization: `bearer ${this.signer.token()}`,
+            'apns-id': requestId,
             'apns-topic': topic,
             'apns-push-type': pushType,
             'apns-priority': String(priority),
@@ -173,34 +183,46 @@ export class ApnsClient {
             try {
                 request = this.#session(environment).request(headers);
             } catch (error) {
-                reject(new ApnsError(error.message, { retryable: true }));
+                this.logger?.warn?.('apns_request_failed', { ...diagnostic,
+                    apnsId: requestId, failure: 'connection', durationMs: Date.now() - startedAt });
+                reject(new ApnsError(error.message, { retryable: true, apnsId: requestId }));
                 return;
             }
 
             let status = null;
-            let apnsId = null;
+            let apnsId = requestId;
+            let apnsUniqueId = null;
             let raw = '';
             let settled = false;
             const settle = (fn, value) => {
                 if (settled) return;
                 settled = true;
+                const details = { ...diagnostic, apnsId, apnsUniqueId,
+                    status, durationMs: Date.now() - startedAt };
+                if (fn === reject) {
+                    this.logger?.warn?.('apns_request_failed', { ...details, failure: 'transport' });
+                } else {
+                    this.logger?.info?.('apns_request_result', { ...details, reason: value.reason,
+                        accepted: value.ok });
+                }
                 fn(value);
             };
 
             request.on('response', (responseHeaders) => {
                 status = responseHeaders[':status'];
-                apnsId = responseHeaders['apns-id'] ?? null;
+                apnsId = responseHeaders['apns-id'] ?? requestId;
+                apnsUniqueId = responseHeaders['apns-unique-id'] ?? null;
             });
             request.setEncoding('utf8');
             request.on('data', (chunk) => {
                 raw += chunk;
             });
             request.on('error', (error) => {
-                settle(reject, new ApnsError(error.message, { retryable: true }));
+                settle(reject, new ApnsError(error.message, { retryable: true, apnsId, apnsUniqueId }));
             });
             request.setTimeout(this.requestTimeoutMs, () => {
                 request.close(http2.constants.NGHTTP2_CANCEL);
-                settle(reject, new ApnsError('APNs request timed out', { retryable: true }));
+                settle(reject, new ApnsError('APNs request timed out', { retryable: true, apnsId, apnsUniqueId }));
             });
             request.on('end', () => {
                 let reason = null;
@@ -215,6 +237,7 @@ export class ApnsClient {
                     status,
                     reason,
                     apnsId,
+                    apnsUniqueId,
                     ok: status === 200,
                     dead: isDeadTokenResponse({ status, reason }),
                     // 429 and 5xx are Apple asking for patience, not a verdict.

@@ -43,9 +43,11 @@ final class ScheduledJourneyStore {
 
     func start() {
         guard observesTokens, tokenTask == nil else { return }
+        LiveActivityDiagnostics.record("schedule_address_observer_started")
         tokenTask = Task { [weak self] in
             for await token in Activity<DepartureActivityAttributes>.pushToStartTokenUpdates {
                 guard !Task.isCancelled, let self else { return }
+                LiveActivityDiagnostics.record("schedule_address_received")
                 self.pushToken = token.map { String(format: "%02x", $0) }.joined()
                 do { try await self.registerDevice() }
                 catch { self.setupError = error.localizedDescription }
@@ -120,7 +122,9 @@ final class ScheduledJourneyStore {
         let token = pushToken ?? Activity<DepartureActivityAttributes>.pushToStartToken.map {
             $0.map { String(format: "%02x", $0) }.joined()
         }
-        guard let token else { throw ScheduleError("Live Activity setup is not ready. Check your connection and try again.") }
+        guard let token else {
+            LiveActivityDiagnostics.record("schedule_address_unavailable")
+            throw ScheduleError("Live Activity setup is not ready. Check your connection and try again.") }
         #if DEBUG
         let environment = "sandbox"
         #else
@@ -150,7 +154,17 @@ final class ScheduledJourneyStore {
         request.setValue(ScheduleCredentials.key, forHTTPHeaderField: "X-TubeTrack-Schedule-Key")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.httpBody = try body.map { try JSONEncoder().encode($0) }
-        let (data, response) = try await session.data(for: request)
+        LiveActivityDiagnostics.record("schedule_request", ["method": method, "path": path])
+        let data: Data
+        let response: URLResponse
+        do { (data, response) = try await session.data(for: request) }
+        catch {
+            LiveActivityDiagnostics.record("schedule_request_failed", LiveActivityDiagnostics.errorFields(error)
+                .merging(["method": method, "path": path]) { _, new in new })
+            throw error
+        }
+        LiveActivityDiagnostics.record("schedule_response", ["method": method, "path": path,
+            "httpStatus": String((response as? HTTPURLResponse)?.statusCode ?? -1)])
         guard let http = response as? HTTPURLResponse else { throw ScheduleError("Could not contact the journey service.") }
         guard (200..<300).contains(http.statusCode) else {
             if http.statusCode == 409 { throw ScheduleError("Your journeys changed. Close this editor and reload your journeys before trying again.") }

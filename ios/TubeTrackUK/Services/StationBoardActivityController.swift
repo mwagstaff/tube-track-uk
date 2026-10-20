@@ -31,6 +31,10 @@ final class StationBoardActivityController {
     private static let dismissAfter: TimeInterval = 120
 
     init(registrar: any LiveActivityPushRegistering = NoopLiveActivityPushRegistrar()) {
+        LiveActivityDiagnostics.record("activity_controller_started", [
+            "activitiesEnabled": String(DepartureActivityBridge.areActivitiesEnabled),
+            "frequentUpdatesEnabled": String(DepartureActivityBridge.frequentPushesEnabled)
+        ])
         self.registrar = registrar
         isFrequentPushesEnabled = DepartureActivityBridge.frequentPushesEnabled
         adoptExistingActivity()
@@ -59,16 +63,16 @@ final class StationBoardActivityController {
 
     // MARK: - Lifecycle
 
-    func start(request: DepartureBoardRequest, stationName: String, callingAt: String,
+    func start(request: DepartureBoardRequest, stationName: String, serviceName: String,
                board: CustomDepartureBoard) async {
         guard !board.stale, board.unavailableSources == 0,
               Date.now.timeIntervalSince(board.updatedAt) <= 90 else { return }
         let now = Date.now
         let attributes = DepartureActivityAttributes(activityID: UUID().uuidString,
             stationHubID: request.originID, stationName: stationName, lineIDRaw: "custom-board",
-            direction: callingAt, directionFilter: .any, startedAt: now,
+            direction: request.direction ?? "All departures", directionFilter: DepartureDirectionFilter.resolve(label: request.direction ?? ""), startedAt: now,
             hardEndsAt: now.addingTimeInterval(DepartureActivityPolicy.maximumDuration),
-            operatorName: "Departures", boardRequest: request)
+            operatorName: serviceName, boardRequest: request)
         await begin(attributes: attributes, state: board.activityState(sequence: 1))
     }
 
@@ -305,6 +309,7 @@ final class StationBoardActivityController {
         }
         tokenTask?.cancel()
         tokenTask = nil
+        LiveActivityDiagnostics.record("activity_end_requested", ["reason": reason.rawValue])
         await DepartureActivityBridge.endAll(dismissAfter: Self.dismissAfter)
         Self.logger.notice("Ended tracking: \(reason.rawValue, privacy: .public)")
         for id in ids {
@@ -330,6 +335,7 @@ final class StationBoardActivityController {
               let attributes = DepartureActivityBridge.attributes(for: id) else {
             return
         }
+        LiveActivityDiagnostics.record("activity_adopted", ["activityID": id])
         trackedActivityID = id
         lastUpdatedAt = DepartureActivityBridge.state(for: id)?.updatedAt
         sequence = DepartureActivityBridge.state(for: id)?.sequence ?? 0
@@ -348,6 +354,7 @@ final class StationBoardActivityController {
             return other.scheduleID == nil && other.hardEndsAt > .now
         }
         if manual || attributes.hardEndsAt <= .now {
+            LiveActivityDiagnostics.record("activity_adoption_declined", ["activityID": id, "reason": manual ? "manual_precedence" : "expired"])
             await DepartureActivityBridge.end(activityID: id, dismissAfter: 0)
             await registrar.unregister(activityID: id)
             return
@@ -360,6 +367,7 @@ final class StationBoardActivityController {
         }
         tokenTask?.cancel()
         registeredTokens.removeAll()
+        LiveActivityDiagnostics.record("activity_adopted", ["activityID": id])
         trackedActivityID = id
         lastUpdatedAt = DepartureActivityBridge.state(for: id)?.updatedAt
         sequence = DepartureActivityBridge.state(for: id)?.sequence ?? 1
@@ -392,6 +400,7 @@ final class StationBoardActivityController {
         // once; registering the same one twice is a wasted round trip.
         guard registeredTokens.insert(token).inserted else { return }
         for attempt in 0..<3 {
+            LiveActivityDiagnostics.record("registration_attempt", ["activityID": attributes.activityID, "attempt": String(attempt + 1)])
             do {
                 try Task.checkCancellation()
                 try await registrar.register(
@@ -404,17 +413,20 @@ final class StationBoardActivityController {
                 }
                 return
             } catch {
+                LiveActivityDiagnostics.record("registration_attempt_failed", LiveActivityDiagnostics.errorFields(error).merging(["activityID": attributes.activityID, "attempt": String(attempt + 1), "cancelled": String(Task.isCancelled)]) { _, new in new })
                 if Task.isCancelled { break }
                 Self.logger.warning("Could not register activity push token: \(error.localizedDescription, privacy: .public)")
                 if attempt < 2 { try? await Task.sleep(for: .seconds(2 * (attempt + 1))) }
             }
         }
+        LiveActivityDiagnostics.record("registration_exhausted", ["activityID": attributes.activityID])
         registeredTokens.remove(token)
     }
 
     private func observeFrequentPushEnablement() {
         enablementTask = Task { [weak self] in
             for await enabled in DepartureActivityBridge.frequentPushEnablementUpdates() {
+                LiveActivityDiagnostics.record("frequent_updates_permission", ["enabled": String(enabled)])
                 self?.isFrequentPushesEnabled = enabled
             }
         }

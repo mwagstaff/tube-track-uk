@@ -116,6 +116,20 @@ public struct CustomDepartureBoard: Codable, Sendable {
     public let conditionRank: Int?
     public let conditionHeadline: String?
 
+    /// Freeze the last snapshot during interruptions rather than aging every row off screen.
+    public func displayReferenceDate(at now: Date, interrupted: Bool = false) -> Date {
+        interrupted || stale || unavailableSources > 0 || now.timeIntervalSince(updatedAt) > 90
+            ? updatedAt : now
+    }
+
+    public func retainingLastAvailable(_ previous: Self?) -> Self {
+        guard arrivals.isEmpty, stale || unavailableSources > 0,
+              let previous, !previous.arrivals.isEmpty else { return self }
+        return .init(arrivals: previous.arrivals, updatedAt: previous.updatedAt,
+                     unavailableSources: unavailableSources, unverifiedCount: previous.unverifiedCount,
+                     stale: true, conditionRank: conditionRank, conditionHeadline: conditionHeadline)
+    }
+
     public func upcoming(at now: Date) -> [TfLArrivalPrediction] {
         arrivals.filter {
             ($0.expectedArrival ?? $0.scheduledDeparture ?? .distantPast) > now.addingTimeInterval(-15)
@@ -134,7 +148,8 @@ public struct CustomDepartureBoard: Codable, Sendable {
             guard let date = arrival.expectedArrival ?? arrival.scheduledDeparture else { return nil }
             return .init(id: arrival.id, destination: StationDepartureMetadata.destinationLabel(for: arrival),
                          platform: StationDepartureMetadata.compactPlatformLabel(for: arrival), expectedAt: date,
-                         status: arrival.serviceStatus, hasExpectedTime: arrival.expectedArrival != nil)
+                         status: arrival.serviceStatus, hasExpectedTime: arrival.expectedArrival != nil, lineIDRaw: arrival.lineId,
+                         direction: DepartureDirectionFilter.resolve(label: StationDepartureMetadata.directionLabel(for: arrival)))
         }, updatedAt: updatedAt, conditionRank: unavailableSources > 0 || stale ? 3 : conditionRank ?? 4,
               conditionHeadline: unavailableSources > 0 ? "Some services unavailable" : conditionHeadline, sequence: sequence)
     }

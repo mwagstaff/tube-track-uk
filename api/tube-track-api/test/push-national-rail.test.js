@@ -56,6 +56,8 @@ test('destination directions scope projections and disruptions without service d
             operatorCode: 'TL', operator: 'Thameslink', destination: { crs: 'BDM' } })]);
     const arrivals = nationalRailPredictions(input, 'SAC', NOW, { includeThameslink: true });
     assert.deepEqual(arrivals.map((item) => item.direction), ['southbound', 'northbound']);
+    assert.deepEqual(projectNationalRailBoard({ arrivals, lineId: 'national-rail:TL' })
+        .map(item => item.directionRaw).sort(), ['northbound', 'southbound']);
     assert.deepEqual(projectNationalRailBoard({ arrivals, lineId: 'national-rail:TL', direction: 'southbound' })
         .map((item) => item.id), ['national-rail:SAC:south']);
     assert.deepEqual(nationalRailCondition(arrivals, 'national-rail:TL', 'southbound'), { rank: 4, headline: 'Departures on time' });

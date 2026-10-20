@@ -116,6 +116,24 @@ export function createPushRoutes({
 }) {
     const router = express.Router();
 
+    router.use((req, res, next) => {
+        const started = clock();
+        const json = res.json.bind(res);
+        res.json = (body) => {
+            if (typeof body?.error?.code === 'string') res.locals.diagnosticCode = body.error.code.slice(0, 80);
+            return json(body);
+        };
+        res.on('finish', () => {
+            const activityId = req.body?.activityId ?? req.params?.activityId;
+            logger?.info('push_registration_request_result', {
+                installId: ID_PATTERN.test(req.get('X-TubeTrack-Install') ?? '') ? req.get('X-TubeTrack-Install') : null,
+                activityId: typeof activityId === 'string' && ID_PATTERN.test(activityId) ? activityId : null,
+                method: req.method, route: req.route?.path ?? 'unmatched', status: res.statusCode,
+                errorCode: res.locals.diagnosticCode, durationMs: clock() - started
+            });
+        });
+        next();
+    });
     router.use(express.json({ limit: BODY_LIMIT }));
 
     router.use((error, req, res, next) => {
@@ -233,7 +251,23 @@ export function createPushRoutes({
                 sequence: existing?.sequence ?? 1
             } : {})
         });
-        logger?.info('push_subscription_registered', { id, lineId, direction });
+        if (occurrence && !occurrence.updateRegisteredAtMs) {
+            // Diagnostic persistence must never turn a successful registration into a failure.
+            try {
+                await scheduleStore.transaction((rows) => {
+                    const saved = Object.values(rows[req.installId]?.occurrences ?? {})
+                        .find((item) => item.activityId === activityId);
+                    if (saved) saved.updateRegisteredAtMs ??= clock();
+                });
+            } catch (error) {
+                logger?.warn('scheduled_registration_diagnostic_failed', { activityId, error: error.message });
+            }
+        }
+        logger?.info('push_subscription_registered', { id, activityId, installId: req.installId,
+            lineId, direction, scheduleId: occurrence?.journeyId,
+            registrationDelaySeconds: occurrence ? Math.floor((clock() - occurrence.startedAtMs) / 1000) : undefined,
+            windowExpired: occurrence ? clock() >= occurrence.hardEndsAtMs : false,
+            replacement: Boolean(existing) });
         metrics?.setPushTokens?.(store.countByType());
 
         return res.status(201).json({ data: { id } });

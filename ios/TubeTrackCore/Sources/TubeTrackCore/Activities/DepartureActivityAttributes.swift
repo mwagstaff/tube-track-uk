@@ -31,13 +31,41 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
     /// on a Lock Screen all day.
     public let hardEndsAtEpoch: Int
 
+    /// Resolve bundled station names for both app-started and scheduled activities.
+    /// Keep all legacy destinations visible until the passenger edits that board.
+    public var callingAtLabel: String? {
+        guard let ids = boardRequest?.destinationIDs, !ids.isEmpty else { return nil }
+        let names = ids.map { id in
+            DepartureStop.bundled.first { $0.id == id || $0.stopIDs.contains(id) || $0.railCodes.contains(id) }?.name ?? id
+        }
+        return "Calling at " + names.joined(separator: " or ")
+    }
+
     public var isRiver: Bool { lineIDRaw.hasPrefix("rb") }
     public var isNationalRailOperator: Bool { lineIDRaw.hasPrefix("national-rail:") }
     public var showsPlatforms: Bool { boardRequest != nil || isNationalRailOperator || lineID?.isNationalRail == true }
     public var lineName: String { operatorName ?? lineID?.displayName ?? (isNationalRailOperator ? "National Rail" : lineIDRaw.uppercased()) }
     public var deepLink: DeepLink {
-        if let boardRequest { return .board(boardRequest) }
-        return isRiver ? .pier(id: stationHubID, line: lineIDRaw) : .station(id: stationHubID, line: lineID)
+        deepLink(for: nil)
+    }
+
+    /// Keep the displayed direction and tap destination in sync, including older
+    /// scheduled activities whose immutable attributes requested any direction.
+    public func directionLabel(for state: ContentState?) -> String {
+        if let label = boardRequest?.direction, !label.isEmpty { return label }
+        if directionFilter != .any { return directionFilter.displayName }
+        if let inferred = state?.commonDirection { return inferred.displayName }
+        return direction
+    }
+
+    public func deepLink(for state: ContentState?) -> DeepLink {
+        if isRiver, boardRequest == nil { return .pier(id: stationHubID, line: lineIDRaw) }
+        var request = boardRequest ?? DepartureBoardRequest(originID: stationHubID, lineIDs: [lineIDRaw])
+        if request.direction == nil {
+            let label = directionLabel(for: state)
+            if DepartureDirectionFilter.resolve(label: label) != .any { request.direction = label }
+        }
+        return .board(request)
     }
     public var lineID: TubeLineID? { TubeLineID(rawValue: lineIDRaw) }
     public var directionFilter: DepartureDirectionFilter {
@@ -101,6 +129,8 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
         public static let maximumDepartures = 4
 
         public struct Departure: Codable, Hashable, Sendable, Identifiable {
+            public let lineIDRaw: String?
+            public let directionRaw: String?
             public let id: String
             public let destination: String
             public let platform: String?
@@ -116,6 +146,12 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
             public var isCancelled: Bool { status == RailServiceStatus.cancelled.rawValue }
             public var isDelayed: Bool { status == RailServiceStatus.delayed.rawValue }
 
+            /// Older payloads omit status for normal running trains.
+            public var railServiceStatus: RailServiceStatus {
+                status.map { RailServiceStatus(rawValue: $0) ?? .unknown }
+                    ?? (hasExpectedTime ? .onTime : .unknown)
+            }
+
             /// Only known platform identifiers become pills. Missing, hidden
             /// and truncated "to be confirmed" labels must not imply a platform.
             public var platformPillLabel: String? {
@@ -130,18 +166,23 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
 
             public init(
                 id: String, destination: String, platform: String?, expectedAt: Date,
-                status: RailServiceStatus? = nil, hasExpectedTime: Bool = true
+                status: RailServiceStatus? = nil, hasExpectedTime: Bool = true, lineIDRaw: String? = nil,
+                direction: DepartureDirectionFilter? = nil
             ) {
+                self.lineIDRaw = lineIDRaw
+                directionRaw = direction?.rawValue
                 self.id = id
                 self.destination = String(destination.prefix(28))
                 self.platform = platform.map { String($0.prefix(14)) }
                 expectedAtEpoch = expectedAt.epochSeconds
-                self.status = status.flatMap { [.delayed, .cancelled].contains($0) ? $0.rawValue : nil }
+                self.status = status == .onTime ? nil : status?.rawValue
                 self.hasExpectedTime = hasExpectedTime
             }
 
             public init(from decoder: any Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
+                lineIDRaw = try container.decodeIfPresent(String.self, forKey: .lineIDRaw)
+                directionRaw = try container.decodeIfPresent(String.self, forKey: .directionRaw)
                 id = try container.decodeIfPresent(String.self, forKey: .id) ?? UUID().uuidString
                 destination = try container.decodeIfPresent(String.self, forKey: .destination) ?? "Check front of train"
                 platform = try container.decodeIfPresent(String.self, forKey: .platform)
@@ -149,6 +190,14 @@ public struct DepartureActivityAttributes: Codable, Hashable, Sendable {
                 status = try container.decodeIfPresent(String.self, forKey: .status)
                 hasExpectedTime = try container.decodeIfPresent(Bool.self, forKey: .hasExpectedTime) ?? true
             }
+        }
+
+        /// Only infer a heading when every visible row has the same known direction.
+        public var commonDirection: DepartureDirectionFilter? {
+            guard let raw = departures.first?.directionRaw,
+                  let direction = DepartureDirectionFilter(rawValue: raw), direction != .any,
+                  departures.allSatisfy({ $0.directionRaw == raw }) else { return nil }
+            return direction
         }
 
         public var departures: [Departure]

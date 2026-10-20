@@ -65,6 +65,7 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
         let (_, response) = try await session.data(for: request)
+        LiveActivityDiagnostics.record("registration_response", ["activityID": attributes.activityID, "httpStatus": String((response as? HTTPURLResponse)?.statusCode ?? -1)])
         guard let http = response as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
             let status = (response as? HTTPURLResponse)?.statusCode ?? -1
             Self.logger.warning("Push registration refused: \(status, privacy: .public)")
@@ -80,7 +81,14 @@ struct LiveActivityPushRegistrar: LiveActivityPushRegistering {
         )
         // The server treats this as idempotent, and an activity that has already
         // ended locally is no worse off if the call never lands.
-        _ = try? await session.data(for: request)
+        do {
+            let (_, response) = try await session.data(for: request)
+            LiveActivityDiagnostics.record("unregistration_response", ["activityID": activityID,
+                "httpStatus": String((response as? HTTPURLResponse)?.statusCode ?? -1)])
+        } catch {
+            LiveActivityDiagnostics.record("unregistration_failed", LiveActivityDiagnostics.errorFields(error)
+                .merging(["activityID": activityID]) { _, new in new })
+        }
     }
 
     private func request(path: String, method: String) -> URLRequest {

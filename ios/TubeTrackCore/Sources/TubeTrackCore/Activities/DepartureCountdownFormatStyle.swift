@@ -5,6 +5,8 @@ import Foundation
 /// the widget extension. App refreshes and server pushes advance the snapshot.
 public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
     public let expectedAt: Date
+    public let transitType: DepartureTransitType
+    public let preferences: DepartureDisplayPreferences
 
     public static let clockTime = Date.VerbatimFormatStyle(
         format: "\(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits)",
@@ -12,14 +14,18 @@ public struct DepartureCountdownFormatStyle: FormatStyle, Sendable {
         calendar: Calendar(identifier: .gregorian)
     )
 
-    public init(expectedAt: Date) {
+    public init(expectedAt: Date, transitType: DepartureTransitType = .underground,
+                preferences: DepartureDisplayPreferences = .init()) {
+        self.transitType = transitType
+        self.preferences = preferences
         self.expectedAt = expectedAt
     }
 
     public func format(_ value: Date) -> String {
         let minutes = remainingMinutes(at: value)
         return StationDepartureMetadata.departureTimeLabel(
-            expectedAt: expectedAt, seconds: expectedAt.timeIntervalSince(value), minutes: minutes
+            expectedAt: expectedAt, seconds: expectedAt.timeIntervalSince(value), minutes: minutes,
+            transitType: transitType, preferences: preferences
         )
     }
 

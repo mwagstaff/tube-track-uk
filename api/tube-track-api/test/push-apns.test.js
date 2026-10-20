@@ -252,3 +252,71 @@ test('a request that never answers rejects rather than hanging', async () => {
 
     await assert.rejects(pending, /timed out/);
 });
+
+
+test('delivery diagnostics preserve both Apple identifiers without credentials or payloads', async () => {
+    const session = fakeSession();
+    const logs = [];
+    const { client } = clientWith(session, { logger: {
+        info: (event, details) => logs.push({ event, ...details })
+    } });
+    const pending = client.send({ token: 'private-device-address', topic: 'app.push-type.liveactivity',
+        activityId: 'scheduled-example', pushType: 'liveactivity', priority: 5, expiration: 1800000060,
+        payload: { aps: { event: 'update', 'stale-date': 1800000180,
+            'content-state': { sequence: 27, privateField: 'private-payload' } } } });
+    const request = session.requests[0];
+    assert.match(request.headers['apns-id'], /^[0-9a-f-]{36}$/);
+    request.emit('response', { ':status': 200, 'apns-id': request.headers['apns-id'],
+        'apns-unique-id': 'apple-delivery-lookup-id' });
+    request.emit('end');
+    const result = await pending;
+    assert.equal(result.apnsUniqueId, 'apple-delivery-lookup-id');
+    assert.equal(result.apnsId, request.headers['apns-id']);
+    assert.equal(logs.length, 1);
+    assert.equal(logs[0].event, 'apns_request_result');
+    assert.equal(logs[0].notificationEvent, 'update');
+    assert.equal(logs[0].activityId, 'scheduled-example');
+    assert.equal(logs[0].sequence, 27);
+    assert.equal(logs[0].expiration, 1800000060);
+    assert.equal(logs[0].apnsUniqueId, result.apnsUniqueId);
+    assert.ok(!JSON.stringify(logs).includes('private-device-address'));
+    assert.ok(!JSON.stringify(logs).includes('private-payload'));
+    assert.ok(!JSON.stringify(logs).includes(request.headers.authorization));
+});
+
+test('failed APNs attempts remain traceable and log only once', async () => {
+    const session = fakeSession();
+    const logs = [];
+    const { client } = clientWith(session, { logger: {
+        warn: (event, details) => logs.push({ event, ...details })
+    } });
+    const pending = client.send({ token: 'private-device-address', topic: 't', pushType: 'liveactivity', payload: {} });
+    const request = session.requests[0];
+    request.emit('response', { ':status': 200, 'apns-unique-id': 'lookup-on-failure' });
+    request.emit('error', new Error('connection lost'));
+    request.emit('end');
+    await assert.rejects(pending, (error) => error.apnsId === request.headers['apns-id']
+        && error.apnsUniqueId === 'lookup-on-failure');
+    assert.equal(logs.length, 1);
+    assert.equal(logs[0].accepted, undefined);
+    assert.equal(logs[0].apnsUniqueId, 'lookup-on-failure');
+});
+
+test('each attempt gets a distinct request ID even without Apple response identifiers', async () => {
+    const session = fakeSession();
+    const { client } = clientWith(session);
+    const ids = [];
+    for (let i = 0; i < 2; i += 1) {
+        const pending = client.send({ token: 'a', topic: 't', payload: {} });
+        const request = session.requests.at(-1);
+        request.emit('response', { ':status': 400 });
+        request.emit('data', '{"reason":"BadDeviceToken"}');
+        request.emit('end');
+        const result = await pending;
+        assert.equal(result.apnsId, request.headers['apns-id']);
+        assert.equal(result.apnsUniqueId, null);
+        assert.equal(result.ok, false);
+        ids.push(result.apnsId);
+    }
+    assert.notEqual(ids[0], ids[1]);
+});

@@ -25,6 +25,14 @@ Boards refresh with the existing 30-second station polling and retain up to five
 minutes of explicitly marked saved data during an outage. UK-local departure
 times are resolved against the source timestamp, including midnight and DST.
 
+National Rail and Thameslink departure rows open a calling-points sheet. Details
+load on demand from TrainTrack's existing `/api/v2/service_details/{serviceID}`
+endpoint, using the selected service and boarding CRS. The sheet shows scheduled,
+expected and actual UK-local times, cancelled calls and separate train portions.
+Thameslink fallback rows without a service ID require a unique live-board match
+on operator, scheduled departure and destination; unmatched services show a retry
+state rather than an inferred stopping pattern. No server deployment is required.
+
 `TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json` maps the existing map's stops
 and interchanges to 236 CRS codes, including mainline-only operators at Underground
 stops. Regenerate it with `python3 Tools/NationalRailStationsBuilder/build.py /path/to/train-track-uk` from this directory; the builder uses TrainTrack's station
@@ -490,7 +498,7 @@ expiry or the 90-second freshness window.
 
 The Departures tab replaces the passenger-facing Near Me tab (the internal `nearMe` route remains compatible with existing links). Favourites and Nearby share `DepartureBoardCard` with the Map. The Map does not open a nearby board automatically. Nearby starts with five stations/piers and offers Show more; departures are grouped into separate direction boards, each displaying the next five matching services. Coloured line/operator pills select one service, initially matching the tapped map roundel. Each direction shows five rows until View all is selected, and provides Show fewer and a line/direction-specific Track control. DLR uses a known destination bearing when no compass direction is reported; unknown directions retain their platform heading or appear under Other departures. Opening a board uses one large native sheet from the Map, Departures and activity links. It retains the selection, supports landscape, provides an X close button and swipe dismissal, and offers a temporary keep-awake toggle. Each direction has its own Filter control beside Track; calling-at selections are saved per station, service and direction and are included in the tracked board request. An empty filtered board keeps its controls available. The expanded sheet places the departure title, favourite star and close control in the navigation bar. Plan journey offers Start here and End here for stations supported by the journey planner, preserving the other endpoint and returning to journey setup without starting a search. Station distance is displayed in miles with a proximity icon and Get directions label. Tapping it requests directions through the system navigation URL scheme, falling back to Apple Maps if unavailable.
 
-`DepartureBoardStore` persists favourite configurations, manual direction overrides, remembered board filters and the last-used tab locally. Existing station/pier bookmarks are copied once on upgrade. Editing uses a draft and explicit Save. A favourite holds one outbound origin plus up to eight destinations; near any destination, its return board calls back at the outbound origin. Location switching requires a 150-metre advantage to avoid jitter. Without location, the last leg remains selected and favourites sort alphabetically. Reverse persists until Use location is selected. An already-running Live Activity keeps its original leg and filter.
+`DepartureBoardStore` persists favourite configurations, manual direction overrides, remembered board filters and the last-used tab locally. Existing station/pier bookmarks are copied once on upgrade. Editing uses a draft and explicit Save. A favourite holds one outbound origin and an optional Calling at destination; near that destination, its return board calls back at the outbound origin. Location switching requires a 150-metre advantage to avoid jitter. Without location, the last leg remains selected and favourites sort alphabetically. Reverse persists until Use location is selected. An already-running Live Activity keeps its original leg and filter.
 
 Outbound and return service restrictions are independently representable, with the return initially following outbound choices. Favourite UUIDs and endpoint IDs provide stable identities for future paired scheduling; new outbound/return scheduling is not implemented. Existing scheduled journeys are unaffected.
 

@@ -1,0 +1,4 @@
+module TubeTrackCore {
+header "TubeTrackCore-Swift.h"
+export *
+}

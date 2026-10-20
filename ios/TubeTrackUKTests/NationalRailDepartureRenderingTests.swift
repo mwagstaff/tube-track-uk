@@ -9,7 +9,8 @@ final class NationalRailDepartureRenderingTests: XCTestCase {
         let arrivals = [
             departure("1", destination: "London Victoria", minutes: 4, status: .onTime, now: now),
             departure("2", destination: "Orpington", minutes: 12, status: .cancelled, now: now),
-            departure("3", destination: "Bromley South", minutes: 18, status: .delayed, now: now)
+            departure("3", destination: "Bromley South", minutes: 18, status: .delayed, now: now),
+            departure("4", destination: "Sevenoaks", minutes: 22, status: .unknown, now: now)
         ]
         let group = try XCTUnwrap(NationalRailDepartureGroup.groups(from: arrivals).first)
         for (name, scheme, size) in [("light", ColorScheme.light, DynamicTypeSize.large),
@@ -17,6 +18,17 @@ final class NationalRailDepartureRenderingTests: XCTestCase {
             let view = VStack(alignment: .leading, spacing: 16) {
                 Text("Beckenham Junction").font(.appHeadline())
                 NationalRailOperatorPill(name: group.name, id: group.id, selected: true) {}
+                Divider()
+                Text("Thameslink").font(.appHeadline())
+                ForEach(arrivals, id: \.id) { arrival in
+                    StationDepartureRow(arrival: TfLArrivalPrediction(
+                        id: "thameslink-" + arrival.id, vehicleId: nil, lineId: "thameslink",
+                        stationName: nil, naptanId: "ZFD", platformName: "Platform 2",
+                        direction: "southbound", destinationName: arrival.destinationName,
+                        destinationNaptanId: nil, towards: nil, expectedArrival: arrival.expectedArrival,
+                        timeToStation: arrival.timeToStation, currentLocation: nil,
+                        scheduledDeparture: arrival.scheduledDeparture, serviceStatus: arrival.serviceStatus), now: now)
+                }
                 Divider()
                 ForEach(group.directionGroups) { directionGroup in
                     NationalRailDepartureGroupView(group: directionGroup, now: now,
@@ -38,6 +50,28 @@ final class NationalRailDepartureRenderingTests: XCTestCase {
             attachment.lifetime = .keepAlways
             add(attachment)
         }
+    }
+
+    func testUnflaggedDeparturesArePresentedAsOnTime() {
+        XCTAssertEqual(RailServiceStatus.unknown.departureAccessibilityLabel, "On time")
+        XCTAssertEqual(RailServiceStatus.onTime.departureAccessibilityLabel, "On time")
+        XCTAssertEqual(RailServiceStatus.delayed.departureAccessibilityLabel, "Delayed")
+        XCTAssertEqual(RailServiceStatus.cancelled.departureAccessibilityLabel, "Cancelled")
+    }
+
+    func testLiveActivityPreservesUnknownStatusAndReadsLegacyNormalTrains() throws {
+        typealias Departure = DepartureActivityAttributes.ContentState.Departure
+        for status in [RailServiceStatus.onTime, .delayed, .cancelled, .unknown] {
+            let departure = Departure(id: "train", destination: "London", platform: nil,
+                expectedAt: .now, status: status)
+            let decoded = try JSONDecoder().decode(Departure.self, from: JSONEncoder().encode(departure))
+            XCTAssertEqual(decoded.railServiceStatus, status)
+        }
+        let legacy = Departure(id: "legacy", destination: "London", platform: nil, expectedAt: .now)
+        XCTAssertEqual(legacy.railServiceStatus, .onTime)
+        let unconfirmed = Departure(id: "unknown", destination: "London", platform: nil,
+            expectedAt: .now, hasExpectedTime: false)
+        XCTAssertEqual(unconfirmed.railServiceStatus, .unknown)
     }
 
     private func departure(_ id: String, destination: String, minutes: Int,

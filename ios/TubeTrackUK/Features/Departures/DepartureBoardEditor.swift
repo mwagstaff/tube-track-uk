@@ -31,20 +31,20 @@ struct DepartureBoardEditor: View {
                     Button { picker = .origin } label: {
                         LabeledContent("From", value: origin?.name ?? "Choose station or pier")
                     }
-                    ForEach(draft.outbound.destinationIDs, id: \.self) { id in
+                    ForEach(Array(draft.outbound.destinationIDs.prefix(1)), id: \.self) { id in
                         HStack {
                             Text(appState.departureStop(id: id)?.name ?? id)
                             Spacer()
                             Button("Remove destination", systemImage: "minus.circle") {
-                                draft.outbound.destinationIDs.removeAll { $0 == id }
+                                draft.outbound.destinationIDs = []
                             }.labelStyle(.iconOnly)
                                 .accessibilityLabel("Remove \(appState.departureStop(id: id)?.name ?? id)")
                         }
                     }
-                    Button("Choose destinations", systemImage: "mappin.and.ellipse") { picker = .destinations }
+                    Button("Choose destination", systemImage: "mappin.and.ellipse") { picker = .destinations }
                         .disabled(origin == nil)
                 } header: { Text("Calling at") } footer: {
-                    Text("Shows services calling at any selected stop, including intermediate stops. Leave empty for all departures. Return journeys are included automatically.")
+                    Text("Shows services calling at your selected destination, including intermediate stops. Leave empty for all departures. Return journeys are included automatically.")
                 }
                 Section {
                     serviceChoices(selection: $draft.outbound.lineIDs)
@@ -62,14 +62,14 @@ struct DepartureBoardEditor: View {
                     }
                 }
             }
-            .navigationTitle(savingFavourite ? "Save departure board" : "Filter departures")
+            .navigationTitle(savingFavourite ? "Save departure board" : "Calling at")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Save") {
                         draft.outbound = .init(originID: draft.outbound.originID,
-                            destinationIDs: draft.outbound.destinationIDs, lineIDs: draft.outbound.lineIDs)
+                            destinationIDs: Array(draft.outbound.destinationIDs.prefix(1)), lineIDs: draft.outbound.lineIDs)
                         if !draft.endpointIDs.contains(draft.lastOriginID) { draft.lastOriginID = draft.outbound.originID }
                         if let manual = draft.manualOriginID, !draft.endpointIDs.contains(manual) { draft.manualOriginID = nil }
                         onSave(draft); dismiss()
@@ -80,7 +80,7 @@ struct DepartureBoardEditor: View {
                 DepartureEndpointPicker(stops: appState.departureStops.filter {
                     selection == .origin || ($0.id != draft.outbound.originID && $0.mode == origin?.mode)
                 }, selectedIDs: selection == .origin ? [draft.outbound.originID] : draft.outbound.destinationIDs,
-                    multiple: selection == .destinations) { ids in
+                    title: selection == .destinations ? "Calling at" : "Starting station") { ids in
                     if selection == .origin, let id = ids.first {
                         draft.outbound.originID = id
                         draft.outbound.destinationIDs.removeAll { $0 == id || appState.departureStop(id: $0)?.mode != appState.departureStop(id: id)?.mode }
@@ -119,54 +119,32 @@ struct DepartureBoardEditor: View {
 }
 
 struct DepartureEndpointPicker: View {
-    @Environment(\.dismiss) private var dismiss
     let stops: [DepartureStop]
-    @State var selectedIDs: [String]
-    var multiple = false
+    let selectedIDs: [String]
+    var title = "Choose origin"
     let onSelect: ([String]) -> Void
-    @State private var query = ""
-    private var results: [DepartureStop] {
-        stops.filter { query.isEmpty || $0.name.localizedStandardContains(query)
-            || $0.railCodes.contains { $0.localizedStandardContains(query) } }
-            .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
-    }
+
     var body: some View {
-        NavigationStack {
-            List {
-                if multiple { Text("Choose up to 8 stops · \(selectedIDs.count) selected").foregroundStyle(.secondary) }
-                if results.isEmpty {
-                    ContentUnavailableView.search(text: query)
-                }
-                ForEach(results) { stop in
-                    Button {
-                        if !multiple { onSelect([stop.id]); dismiss() }
-                        else if selectedIDs.contains(stop.id) { selectedIDs.removeAll { $0 == stop.id } }
-                        else if selectedIDs.count < 8 { selectedIDs.append(stop.id) }
-                    } label: {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                Text(stop.name)
-                                Text(stop.mode == "river" ? "River Bus" : stop.railCodes.joined(separator: " · "))
-                                    .font(.caption).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if selectedIDs.contains(stop.id) { Image(systemName: "checkmark") }
-                        }
-                    }
-                    .accessibilityAddTraits(selectedIDs.contains(stop.id) ? .isSelected : [])
-                    .disabled(multiple && selectedIDs.count >= 8 && !selectedIDs.contains(stop.id))
-                }
+        StationPickerSheet(title: title, selectedID: selectedIDs.first,
+                           selectionHint: "Selects this station", searchPrompt: stops.contains { $0.mode == "river" } ? "Station or pier" : "Station name",
+                           results: { query in
+            let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
+            let tokens = query.split(whereSeparator: \.isWhitespace).map(String.init)
+            let matches = stops.filter { stop in
+                let searchable = ([stop.name] + stop.railCodes).joined(separator: " ")
+                return tokens.allSatisfy { searchable.localizedStandardContains($0) }
+            }.sorted {
+                let lhs = $0.name.lowercased().hasPrefix(query.lowercased())
+                let rhs = $1.name.lowercased().hasPrefix(query.lowercased())
+                if lhs != rhs { return lhs }
+                return $0.name.localizedStandardCompare($1.name) == .orderedAscending
             }
-            .searchable(text: $query, prompt: "Station or pier")
-            .navigationTitle(multiple ? "Calling at" : "Choose origin")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                if multiple {
-                    ToolbarItem(placement: .confirmationAction) { Button("Done") { onSelect(selectedIDs); dismiss() } }
-                }
+            return (query.isEmpty ? matches : Array(matches.prefix(40))).map { stop in
+                StationPickerEntry(id: stop.id, name: stop.name,
+                    lineIDs: stop.lineIDs.compactMap(TubeLineID.init(rawValue:)).sorted { $0.displayName < $1.displayName },
+                    subtitle: stop.mode == "river" ? "River Bus" : (stop.railCodes.isEmpty ? nil : "National Rail"))
             }
-        }
+        }, onSelect: { onSelect([$0.id]) })
     }
 }
 
@@ -182,34 +160,43 @@ struct DepartureDirectionFilterEditor: View {
         NavigationStack {
             Form {
                 Section {
-                    ForEach(request.destinationIDs, id: \.self) { id in
+                    ForEach(Array(request.destinationIDs.prefix(1)), id: \.self) { id in
                         HStack {
                             Text(appState.departureStop(id: id)?.name ?? id)
                             Spacer()
                             Button("Remove stop", systemImage: "minus.circle") {
-                                request.destinationIDs.removeAll { $0 == id }
+                                request.destinationIDs = []
                             }.labelStyle(.iconOnly)
                                 .accessibilityLabel("Remove \(appState.departureStop(id: id)?.name ?? id)")
                         }
                     }
-                    Button("Choose calling points", systemImage: "mappin.and.ellipse") { showsStops = true }
+                    Button("Choose destination", systemImage: "mappin.and.ellipse") { showsStops = true }
                     Button("Show all departures") { request.destinationIDs = [] }
                         .disabled(request.destinationIDs.isEmpty)
                 } header: { Text("Calling at") } footer: {
-                    Text("Shows services calling at any selected stop. Leave empty for all departures in this direction. Other directions keep their own filters.")
+                    Text("Shows services calling at your selected destination. Leave empty for all departures in this direction. Other directions keep their own filters.")
                 }
             }
-            .navigationTitle("Filter \(request.direction ?? "departures")")
+            .navigationTitle("Calling at")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) { Button("Save") { onSave(request); dismiss() } }
+                ToolbarItem(placement: .confirmationAction) { Button("Save") {
+                        request.destinationIDs = Array(request.destinationIDs.prefix(1))
+                        onSave(request); dismiss()
+                    } }
             }
             .sheet(isPresented: $showsStops) {
                 DepartureEndpointPicker(stops: appState.departureStops.filter {
                     $0.id != request.originID && $0.mode == appState.departureStop(id: request.originID)?.mode
-                }, selectedIDs: request.destinationIDs, multiple: true) { request.destinationIDs = $0 }
+                }, selectedIDs: request.destinationIDs, title: "Calling at") { request.destinationIDs = $0 }
             }
         }
     }
+}
+
+#Preview("Calling at · Dark, large text") {
+    DepartureEndpointPicker(stops: DepartureStop.bundled, selectedIDs: [], title: "Calling at") { _ in }
+        .environment(\.dynamicTypeSize, .accessibility3)
+        .preferredColorScheme(.dark)
 }

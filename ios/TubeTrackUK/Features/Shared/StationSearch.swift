@@ -137,10 +137,6 @@ enum StationSearch {
 }
 
 struct StationSearchSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var query = ""
-    @State private var searchIsPresented = true
-
     let graph: TubeGraph
     let selectedStationID: String?
     var title: String = "Find a station"
@@ -149,28 +145,56 @@ struct StationSearchSheet: View {
     var onClose: (() -> Void)? = nil
     let onSelect: (TubeStation) -> Void
 
-    private var suggestions: [TubeStation] {
-        graph.stationSearchIndex.suggestions(
-            matching: query,
-            selectedStationID: selectedStationID,
-            includesNationalRail: includesNationalRail,
-            limit: query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : 40
-        )
+    var body: some View {
+        StationPickerSheet(title: title, selectedID: selectedStationID,
+                           selectionHint: selectionHint, onClose: onClose, results: { query in
+            graph.stationSearchIndex.suggestions(
+                matching: query, selectedStationID: selectedStationID,
+                includesNationalRail: includesNationalRail,
+                limit: query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? nil : 40
+            ).map { station in
+                StationPickerEntry(id: station.id, name: station.name,
+                    lineIDs: graph.stationSearchIndex.lineIDs(at: station),
+                    subtitle: NationalRailMap.isExclusiveStation(station.id) ? "National Rail" : nil)
+            }
+        }, onSelect: { entry in
+            if let station = graph.stationsByID[entry.id] { onSelect(station) }
+        })
     }
+}
+
+struct StationPickerEntry: Identifiable {
+    let id: String
+    let name: String
+    let lineIDs: [TubeLineID]
+    var subtitle: String? = nil
+}
+
+/// Shared presentation for journey stations and departure-board destinations.
+struct StationPickerSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var query = ""
+    @State private var searchIsPresented = true
+    let title: String
+    let selectedID: String?
+    let selectionHint: String
+    var searchPrompt = "Station name"
+    var onClose: (() -> Void)? = nil
+    let results: (String) -> [StationPickerEntry]
+    let onSelect: (StationPickerEntry) -> Void
 
     private func close() {
         if let onClose { onClose() } else { dismiss() }
     }
 
     var body: some View {
-        let suggestions = suggestions
+        let suggestions = results(query)
         NavigationStack {
             Group {
                 if suggestions.isEmpty {
                     ContentUnavailableView.search(text: query)
                 } else {
                     List(suggestions) { station in
-                        let lineIDs = graph.stationSearchIndex.lineIDs(at: station)
                         Button {
                             onSelect(station)
                             close()
@@ -180,18 +204,18 @@ struct StationSearchSheet: View {
                                     Text(station.name)
                                         .font(.appBody(.semibold))
                                         .foregroundStyle(.primary)
-
-                                    if lineIDs.isEmpty, NationalRailMap.isExclusiveStation(station.id) {
-                                        Label { Text("National Rail") } icon: { NationalRailMark().frame(width: 18, height: 12) }
-                                            .font(.appCaption())
-                                    } else {
-                                        StationLineLegend(lineIDs: lineIDs)
+                                    StationLineLegend(lineIDs: station.lineIDs)
+                                    if let subtitle = station.subtitle {
+                                        if subtitle == "National Rail" {
+                                            Label { Text(subtitle) } icon: { NationalRailMark().frame(width: 18, height: 12) }
+                                                .font(.appCaption())
+                                        } else {
+                                            Text(subtitle).font(.appCaption()).foregroundStyle(.secondary)
+                                        }
                                     }
                                 }
-
                                 Spacer(minLength: 8)
-
-                                if selectedStationID == station.id {
+                                if selectedID == station.id {
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundStyle(.tint)
                                         .accessibilityHidden(true)
@@ -201,24 +225,19 @@ struct StationSearchSheet: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(station.name)
-                        .accessibilityValue(lineIDs.isEmpty ? "National Rail" : lineIDs.map(\.displayName).joined(separator: ", "))
+                        .accessibilityValue((station.lineIDs.map(\.displayName) + [station.subtitle].compactMap { $0 }).joined(separator: ", "))
                         .accessibilityHint(selectionHint)
+                        .accessibilityAddTraits(selectedID == station.id ? .isSelected : [])
                     }
                     .listStyle(.plain)
                 }
             }
             .navigationTitle(title)
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(
-                text: $query,
-                isPresented: $searchIsPresented,
-                placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "Station name"
-            )
+            .searchable(text: $query, isPresented: $searchIsPresented,
+                        placement: .navigationBarDrawer(displayMode: .always), prompt: searchPrompt)
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { close() }
-                }
+                ToolbarItem(placement: .confirmationAction) { Button("Done") { close() } }
             }
         }
         .onAppear { searchIsPresented = true }

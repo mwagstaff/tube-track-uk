@@ -25,16 +25,16 @@ struct NationalRailTrackingTests {
         #expect(attributes.showsPlatforms == ["national-rail:SE", "thameslink"].contains(line))
     }
 
-    @Test func liveActivityTimePillsAlwaysIncludeCountdownAndLondonClock() throws {
+    @Test func liveActivityMinuteFormatUsesSingularPluralAndDue() throws {
         let departure = try #require(ISO8601DateFormatter().date(from: "2026-10-06T18:27:00Z"))
         let style = DepartureCountdownFormatStyle(expectedAt: departure)
-        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins (19:27)")
-        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "20 mins (19:27)")
-        #expect(style.format(departure.addingTimeInterval(-1320)) == "22 mins (19:27)")
-        #expect(style.format(departure.addingTimeInterval(-120)) == "2 mins (19:27)")
-        #expect(style.format(departure.addingTimeInterval(-59)) == "Due (19:27)")
+        #expect(style.format(departure.addingTimeInterval(-1200)) == "20 mins")
+        #expect(style.format(departure.addingTimeInterval(-1200.001)) == "20 mins")
+        #expect(style.format(departure.addingTimeInterval(-1320)) == "22 mins")
+        #expect(style.format(departure.addingTimeInterval(-120)) == "2 mins")
+        #expect(style.format(departure.addingTimeInterval(-59)) == "Due")
         let midnight = try #require(ISO8601DateFormatter().date(from: "2026-10-06T23:05:00Z"))
-        #expect(DepartureCountdownFormatStyle(expectedAt: midnight).format(midnight.addingTimeInterval(-1800)) == "30 mins (00:05)")
+        #expect(DepartureCountdownFormatStyle(expectedAt: midnight).format(midnight.addingTimeInterval(-1800)) == "30 mins")
     }
 
     private func prediction(_ id: String, line: String = "national-rail:SE", minutes: Int,
@@ -117,7 +117,7 @@ struct NationalRailTrackingTests {
             from: JSONEncoder().encode(attributes))
         #expect(decoded == attributes && decoded.isNationalRailOperator)
         #expect(decoded.lineName == "Southeastern")
-        #expect(DeepLink(url: decoded.deepLink.url) == .station(id: "nr:BKJ", line: nil))
+        #expect(DeepLink(url: decoded.deepLink.url) == .board(.init(originID: "nr:BKJ", lineIDs: ["national-rail:SE"])))
         let old = try JSONDecoder().decode(DepartureActivityAttributes.self,
             from: Data(#"{"lineIDRaw":"central"}"#.utf8))
         #expect(old.operatorName == nil && old.lineName == "Central")
@@ -125,4 +125,48 @@ struct NationalRailTrackingTests {
             from: Data(#"{"id":"old","expectedAtEpoch":1800000000}"#.utf8))
         #expect(departure.hasExpectedTime)
     }
+}
+
+struct LiveActivityNavigationTests {
+    private func activity(direction: DepartureDirectionFilter = .any,
+                          request: DepartureBoardRequest? = nil) -> DepartureActivityAttributes {
+        .init(activityID: "rail", stationHubID: "HUBVIC", stationName: "Victoria",
+              lineIDRaw: "national-rail:SE", direction: direction.displayName, directionFilter: direction,
+              startedAt: .now, hardEndsAt: .now.addingTimeInterval(3600),
+              operatorName: "Southeastern", boardRequest: request)
+    }
+
+    private func state(_ directions: [DepartureDirectionFilter?]) -> DepartureActivityAttributes.ContentState {
+        .init(departures: directions.enumerated().map { index, direction in
+            .init(id: String(index), destination: "Orpington", platform: "2", expectedAt: .now,
+                  direction: direction)
+        }, updatedAt: .now, conditionRank: 4, conditionHeadline: nil, sequence: 1)
+    }
+
+    @Test func activityLinksRetainStationOperatorDirectionAndCallingAtFilter() throws {
+        let request = DepartureBoardRequest(originID: "HUBVIC", destinationIDs: ["nr:ORP"],
+                                           lineIDs: ["national-rail:SE"], direction: "Southbound")
+        let attributes = activity(request: request)
+        let restored = try JSONDecoder().decode(DepartureActivityAttributes.self,
+                                               from: JSONEncoder().encode(attributes))
+        #expect(restored.directionLabel(for: nil) == "Southbound")
+        #expect(DeepLink(url: restored.deepLink.url) == .board(request))
+        #expect(activity(direction: .southbound).deepLink == .board(.init(
+            originID: "HUBVIC", lineIDs: ["national-rail:SE"], direction: "Southbound")))
+    }
+
+    @Test func legacyAnyDirectionActivitiesUseKnownTrainDirectionsForHeadingAndLink() throws {
+        let southbound = state([.southbound, .southbound])
+        let restored = try JSONDecoder().decode(DepartureActivityAttributes.ContentState.self,
+                                               from: JSONEncoder().encode(southbound))
+        #expect(activity().directionLabel(for: restored) == "Southbound")
+        #expect(DeepLink(url: activity().deepLink(for: restored).url) == .board(.init(
+            originID: "HUBVIC", lineIDs: ["national-rail:SE"], direction: "Southbound")))
+        for ambiguous in [state([]), state([nil]), state([.southbound, nil]), state([.southbound, .northbound])] {
+            #expect(activity().directionLabel(for: ambiguous) == "Any direction")
+            #expect(activity().deepLink(for: ambiguous) == activity().deepLink)
+        }
+        #expect(activity(direction: .northbound).directionLabel(for: southbound) == "Northbound")
+    }
+
 }

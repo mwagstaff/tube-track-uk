@@ -1,0 +1,2780 @@
+[
+  {
+    "contents" : {
+      "guid" : "Workspace:/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore",
+      "name" : "TubeTrackCore",
+      "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore",
+      "projects" : [
+        "2bb7e9db9296bd075cee110326e080e03a7259546e6f18a47e53b089c2c9b72a",
+        "6a5624792a71df0c9a7d2d26d2e58987fd0213efc15eb615439a08a2302dde97"
+      ]
+    },
+    "signature" : "6f796d68a9d3b7aee01627267d450130c131b697b0be411051f9091199ab8215",
+    "type" : "workspace"
+  },
+  {
+    "contents" : {
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "CLANG_ENABLE_MODULES[__platform_filter=driverkit]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=ios-maccatalyst]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=ios;ios-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=macos]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=tvos;tvos-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=watchos;watchos-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=xros;xros-simulator]" : "YES",
+            "CODE_SIGNING_REQUIRED" : "NO",
+            "CODE_SIGN_IDENTITY" : "",
+            "COMPILER_WORKING_DIRECTORY" : "$(WORKSPACE_DIR)",
+            "COPY_PHASE_STRIP" : "NO",
+            "DEBUG_INFORMATION_FORMAT" : "dwarf",
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=driverkit]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=ios-maccatalyst]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=ios;ios-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=macos]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=tvos;tvos-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=watchos;watchos-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=xros;xros-simulator]" : "@rpath",
+            "ENABLE_NS_ASSERTIONS" : "YES",
+            "ENABLE_TESTABILITY" : "YES",
+            "ENABLE_TESTING_SEARCH_PATHS" : "YES",
+            "ENTITLEMENTS_REQUIRED" : "NO",
+            "GCC_OPTIMIZATION_LEVEL" : "0",
+            "GCC_PREPROCESSOR_DEFINITIONS" : [
+              "$(inherited)",
+              "SWIFT_PACKAGE",
+              "DEBUG=1"
+            ],
+            "INDEX_ENABLE_DATA_STORE" : "YES",
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "KEEP_PRIVATE_EXTERNS" : "NO",
+            "LIBTOOL_NO_WARNING_FOR_NO_SYMBOLS" : "YES",
+            "LINKER_DRIVER" : "auto",
+            "MACOSX_DEPLOYMENT_TARGET" : "12.0",
+            "ONLY_ACTIVE_ARCH" : "YES",
+            "OTHER_CFLAGS" : [
+              "$(inherited)",
+              "-DXcode"
+            ],
+            "OTHER_LDRFLAGS" : [
+
+            ],
+            "OTHER_SWIFT_FLAGS" : [
+              "$(inherited)",
+              "-DXcode"
+            ],
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SKIP_INSTALL" : "YES",
+            "SPECIALIZATION_SDK_OPTIONS[__platform_filter=ios;ios-simulator]" : [
+
+            ],
+            "SPECIALIZATION_SDK_OPTIONS[__platform_filter=watchos;watchos-simulator]" : [
+
+            ],
+            "SUPPORTED_PLATFORMS" : [
+              "$(AVAILABLE_PLATFORMS)"
+            ],
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_PACKAGE",
+              "DEBUG"
+            ],
+            "SWIFT_INSTALL_OBJC_HEADER" : "NO",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "",
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Onone",
+            "TARGETED_DEVICE_FAMILY" : "",
+            "TVOS_DEPLOYMENT_TARGET" : "15.0",
+            "USE_HEADERMAP" : "NO",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE:tubetrackcore::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "CLANG_ENABLE_MODULES[__platform_filter=driverkit]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=ios-maccatalyst]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=ios;ios-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=macos]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=tvos;tvos-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=watchos;watchos-simulator]" : "YES",
+            "CLANG_ENABLE_MODULES[__platform_filter=xros;xros-simulator]" : "YES",
+            "CODE_SIGNING_REQUIRED" : "NO",
+            "CODE_SIGN_IDENTITY" : "",
+            "COMPILER_WORKING_DIRECTORY" : "$(WORKSPACE_DIR)",
+            "COPY_PHASE_STRIP" : "YES",
+            "DEBUG_INFORMATION_FORMAT" : "dwarf-with-dsym",
+            "DEPLOYMENT_POSTPROCESSING" : "YES",
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=driverkit]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=ios-maccatalyst]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=ios;ios-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=macos]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=tvos;tvos-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=watchos;watchos-simulator]" : "@rpath",
+            "DYLIB_INSTALL_NAME_BASE[__platform_filter=xros;xros-simulator]" : "@rpath",
+            "ENABLE_TESTING_SEARCH_PATHS" : "YES",
+            "ENTITLEMENTS_REQUIRED" : "NO",
+            "GCC_OPTIMIZATION_LEVEL" : "s",
+            "GCC_PREPROCESSOR_DEFINITIONS" : [
+              "$(inherited)",
+              "SWIFT_PACKAGE"
+            ],
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "KEEP_PRIVATE_EXTERNS" : "NO",
+            "LIBTOOL_NO_WARNING_FOR_NO_SYMBOLS" : "YES",
+            "LINKER_DRIVER" : "auto",
+            "MACOSX_DEPLOYMENT_TARGET" : "12.0",
+            "OTHER_CFLAGS" : [
+              "$(inherited)",
+              "-DXcode"
+            ],
+            "OTHER_LDRFLAGS" : [
+
+            ],
+            "OTHER_SWIFT_FLAGS" : [
+              "$(inherited)",
+              "-DXcode"
+            ],
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SKIP_INSTALL" : "YES",
+            "SPECIALIZATION_SDK_OPTIONS[__platform_filter=ios;ios-simulator]" : [
+
+            ],
+            "SPECIALIZATION_SDK_OPTIONS[__platform_filter=watchos;watchos-simulator]" : [
+
+            ],
+            "SUPPORTED_PLATFORMS" : [
+              "$(AVAILABLE_PLATFORMS)"
+            ],
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_PACKAGE"
+            ],
+            "SWIFT_INSTALL_OBJC_HEADER" : "NO",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "",
+            "SWIFT_OPTIMIZATION_LEVEL" : "-Owholemodule",
+            "TARGETED_DEVICE_FAMILY" : "",
+            "TVOS_DEPLOYMENT_TARGET" : "15.0",
+            "USE_HEADERMAP" : "NO",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE:tubetrackcore::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "defaultConfigurationName" : "Release",
+      "groupTree" : {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_0",
+            "name" : "AdditionalFiles",
+            "path" : "/",
+            "sourceTree" : "<absolute>",
+            "type" : "group"
+          },
+          {
+            "children" : [
+
+            ],
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_1",
+            "name" : "Binaries",
+            "path" : "/",
+            "sourceTree" : "<absolute>",
+            "type" : "group"
+          },
+          {
+            "children" : [
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_0",
+                "name" : "CompactStationDeparturePolicyTests.swift",
+                "path" : "CompactStationDeparturePolicyTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_1",
+                "name" : "DeepLinkTests.swift",
+                "path" : "DeepLinkTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_2",
+                "name" : "DepartureActivityTests.swift",
+                "path" : "DepartureActivityTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_3",
+                "name" : "DepartureBoardContinuityTests.swift",
+                "path" : "DepartureBoardContinuityTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_4",
+                "name" : "DepartureCountdownFormatStyleTests.swift",
+                "path" : "DepartureCountdownFormatStyleTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_5",
+                "name" : "DepartureDirectionFilterTests.swift",
+                "path" : "DepartureDirectionFilterTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_6",
+                "name" : "DepartureDisplayPreferencesTests.swift",
+                "path" : "DepartureDisplayPreferencesTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_7",
+                "name" : "DepartureTimelineTests.swift",
+                "path" : "DepartureTimelineTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_8",
+                "name" : "FreshnessTests.swift",
+                "path" : "FreshnessTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_9",
+                "name" : "LineStatusProjectionTests.swift",
+                "path" : "LineStatusProjectionTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_10",
+                "name" : "StationDeparturesTests.swift",
+                "path" : "StationDeparturesTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_11",
+                "name" : "StationIndexTests.swift",
+                "path" : "StationIndexTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_12",
+                "name" : "WidgetRefreshPolicyTests.swift",
+                "path" : "WidgetRefreshPolicyTests.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              }
+            ],
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Tests/TubeTrackCoreTests",
+            "sourceTree" : "<absolute>",
+            "type" : "group"
+          },
+          {
+            "fileType" : "file",
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_3",
+            "name" : "$(CONFIGURATION_BUILD_DIR)/TubeTrackCore_TubeTrackCore.bundle",
+            "path" : "$(CONFIGURATION_BUILD_DIR)/TubeTrackCore_TubeTrackCore.bundle",
+            "sourceTree" : "<group>",
+            "type" : "file"
+          },
+          {
+            "fileType" : "file",
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_4",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/DepartureStops.json",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/DepartureStops.json",
+            "sourceTree" : "<absolute>",
+            "type" : "file"
+          },
+          {
+            "fileType" : "file",
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_5",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailDirections.json",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailDirections.json",
+            "sourceTree" : "<absolute>",
+            "type" : "file"
+          },
+          {
+            "fileType" : "file",
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_6",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/NationalRailStations.json",
+            "sourceTree" : "<absolute>",
+            "type" : "file"
+          },
+          {
+            "fileType" : "file",
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_7",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/StationIndex.json",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Resources/StationIndex.json",
+            "sourceTree" : "<absolute>",
+            "type" : "file"
+          },
+          {
+            "children" : [
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_0",
+                "name" : "Activities/ActivityKitBridge.swift",
+                "path" : "Activities/ActivityKitBridge.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_1",
+                "name" : "Activities/DepartureActivityAttributes.swift",
+                "path" : "Activities/DepartureActivityAttributes.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_2",
+                "name" : "Activities/DepartureActivityBoard.swift",
+                "path" : "Activities/DepartureActivityBoard.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_3",
+                "name" : "Activities/DepartureActivityPolicy.swift",
+                "path" : "Activities/DepartureActivityPolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_4",
+                "name" : "Activities/DepartureCountdownFormatStyle.swift",
+                "path" : "Activities/DepartureCountdownFormatStyle.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_5",
+                "name" : "Models/CompactStationDeparturePolicy.swift",
+                "path" : "Models/CompactStationDeparturePolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_6",
+                "name" : "Models/DepartureDirectionFilter.swift",
+                "path" : "Models/DepartureDirectionFilter.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_7",
+                "name" : "Models/DepartureDisplayPreferences.swift",
+                "path" : "Models/DepartureDisplayPreferences.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_8",
+                "name" : "Models/DepartureFavourite.swift",
+                "path" : "Models/DepartureFavourite.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_9",
+                "name" : "Models/DepartureTimeline.swift",
+                "path" : "Models/DepartureTimeline.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_10",
+                "name" : "Models/Freshness.swift",
+                "path" : "Models/Freshness.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_11",
+                "name" : "Models/LineServiceCondition.swift",
+                "path" : "Models/LineServiceCondition.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_12",
+                "name" : "Models/LineStatusProjection.swift",
+                "path" : "Models/LineStatusProjection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_13",
+                "name" : "Models/LossyList.swift",
+                "path" : "Models/LossyList.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_14",
+                "name" : "Models/NationalRailDepartures.swift",
+                "path" : "Models/NationalRailDepartures.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_15",
+                "name" : "Models/NationalRailDirection.swift",
+                "path" : "Models/NationalRailDirection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_16",
+                "name" : "Models/ScheduledJourney.swift",
+                "path" : "Models/ScheduledJourney.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_17",
+                "name" : "Models/StationDepartureGroup.swift",
+                "path" : "Models/StationDepartureGroup.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_18",
+                "name" : "Models/StationDepartureMetadata.swift",
+                "path" : "Models/StationDepartureMetadata.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_19",
+                "name" : "Models/StationDepartureSelection.swift",
+                "path" : "Models/StationDepartureSelection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_20",
+                "name" : "Models/TfLModels.swift",
+                "path" : "Models/TfLModels.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_21",
+                "name" : "Models/TubeLine.swift",
+                "path" : "Models/TubeLine.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_22",
+                "name" : "Models/WidgetRefreshPolicy.swift",
+                "path" : "Models/WidgetRefreshPolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_23",
+                "name" : "Network/SnapshotCache.swift",
+                "path" : "Network/SnapshotCache.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_24",
+                "name" : "Network/TubeTrackAPIClient.swift",
+                "path" : "Network/TubeTrackAPIClient.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_25",
+                "name" : "Services/NationalRailArrivalsService.swift",
+                "path" : "Services/NationalRailArrivalsService.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_26",
+                "name" : "Services/StationArrivalsService.swift",
+                "path" : "Services/StationArrivalsService.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_27",
+                "name" : "Shared/AppGroup.swift",
+                "path" : "Shared/AppGroup.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_28",
+                "name" : "Shared/AppInstall.swift",
+                "path" : "Shared/AppInstall.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_29",
+                "name" : "Shared/DeepLink.swift",
+                "path" : "Shared/DeepLink.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_30",
+                "name" : "Stations/StationIndex.swift",
+                "path" : "Stations/StationIndex.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_31",
+                "name" : "UI/StatusSymbol.swift",
+                "path" : "UI/StatusSymbol.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_32",
+                "name" : "UI/TubeLineDot.swift",
+                "path" : "UI/TubeLineDot.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              }
+            ],
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore",
+            "sourceTree" : "<absolute>",
+            "type" : "group"
+          },
+          {
+            "children" : [
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_0",
+                "name" : "Activities/ActivityKitBridge.swift",
+                "path" : "Activities/ActivityKitBridge.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_1",
+                "name" : "Activities/DepartureActivityAttributes.swift",
+                "path" : "Activities/DepartureActivityAttributes.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_2",
+                "name" : "Activities/DepartureActivityBoard.swift",
+                "path" : "Activities/DepartureActivityBoard.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_3",
+                "name" : "Activities/DepartureActivityPolicy.swift",
+                "path" : "Activities/DepartureActivityPolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_4",
+                "name" : "Activities/DepartureCountdownFormatStyle.swift",
+                "path" : "Activities/DepartureCountdownFormatStyle.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_5",
+                "name" : "Models/CompactStationDeparturePolicy.swift",
+                "path" : "Models/CompactStationDeparturePolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_6",
+                "name" : "Models/DepartureDirectionFilter.swift",
+                "path" : "Models/DepartureDirectionFilter.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_7",
+                "name" : "Models/DepartureDisplayPreferences.swift",
+                "path" : "Models/DepartureDisplayPreferences.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_8",
+                "name" : "Models/DepartureFavourite.swift",
+                "path" : "Models/DepartureFavourite.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_9",
+                "name" : "Models/DepartureTimeline.swift",
+                "path" : "Models/DepartureTimeline.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_10",
+                "name" : "Models/Freshness.swift",
+                "path" : "Models/Freshness.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_11",
+                "name" : "Models/LineServiceCondition.swift",
+                "path" : "Models/LineServiceCondition.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_12",
+                "name" : "Models/LineStatusProjection.swift",
+                "path" : "Models/LineStatusProjection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_13",
+                "name" : "Models/LossyList.swift",
+                "path" : "Models/LossyList.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_14",
+                "name" : "Models/NationalRailDepartures.swift",
+                "path" : "Models/NationalRailDepartures.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_15",
+                "name" : "Models/NationalRailDirection.swift",
+                "path" : "Models/NationalRailDirection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_16",
+                "name" : "Models/ScheduledJourney.swift",
+                "path" : "Models/ScheduledJourney.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_17",
+                "name" : "Models/StationDepartureGroup.swift",
+                "path" : "Models/StationDepartureGroup.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_18",
+                "name" : "Models/StationDepartureMetadata.swift",
+                "path" : "Models/StationDepartureMetadata.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_19",
+                "name" : "Models/StationDepartureSelection.swift",
+                "path" : "Models/StationDepartureSelection.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_20",
+                "name" : "Models/TfLModels.swift",
+                "path" : "Models/TfLModels.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_21",
+                "name" : "Models/TubeLine.swift",
+                "path" : "Models/TubeLine.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_22",
+                "name" : "Models/WidgetRefreshPolicy.swift",
+                "path" : "Models/WidgetRefreshPolicy.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_23",
+                "name" : "Network/SnapshotCache.swift",
+                "path" : "Network/SnapshotCache.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_24",
+                "name" : "Network/TubeTrackAPIClient.swift",
+                "path" : "Network/TubeTrackAPIClient.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_25",
+                "name" : "Services/NationalRailArrivalsService.swift",
+                "path" : "Services/NationalRailArrivalsService.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_26",
+                "name" : "Services/StationArrivalsService.swift",
+                "path" : "Services/StationArrivalsService.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_27",
+                "name" : "Shared/AppGroup.swift",
+                "path" : "Shared/AppGroup.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_28",
+                "name" : "Shared/AppInstall.swift",
+                "path" : "Shared/AppInstall.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_29",
+                "name" : "Shared/DeepLink.swift",
+                "path" : "Shared/DeepLink.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_30",
+                "name" : "Stations/StationIndex.swift",
+                "path" : "Stations/StationIndex.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_31",
+                "name" : "UI/StatusSymbol.swift",
+                "path" : "UI/StatusSymbol.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              },
+              {
+                "fileType" : "sourcecode.swift",
+                "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_32",
+                "name" : "UI/TubeLineDot.swift",
+                "path" : "UI/TubeLineDot.swift",
+                "sourceTree" : "<group>",
+                "type" : "file"
+              }
+            ],
+            "guid" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9",
+            "name" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore",
+            "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore",
+            "sourceTree" : "<absolute>",
+            "type" : "group"
+          }
+        ],
+        "guid" : "PACKAGE:tubetrackcore::MAINGROUP",
+        "name" : "",
+        "path" : "",
+        "sourceTree" : "<group>",
+        "type" : "group"
+      },
+      "guid" : "PACKAGE:tubetrackcore",
+      "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Package.swift",
+      "projectDirectory" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore",
+      "projectIsPackage" : "true",
+      "projectName" : "TubeTrackCore",
+      "targets" : [
+        "17d14ca6a77edf20a457e68a98e669bbf3c3e881a37172965444225306987d56",
+        "dea7af78619d6e6591c0c3cec14af538a48f833fcd03a9f5b33bb5b3157d9907",
+        "911c0daf6fcdede3e71587e71413f7cff26c86966adc2dcf0e3acf6ea0ff0848",
+        "a094076ad58c84789034bd1c317d0183faea61f620a87ab0492065ef04ff464a",
+        "ef672d8ddf15851b6c5c19da866a0b0079d0e67c313a8b925711440041c32824",
+        "5b2604eda2d2f0379bf95f17e069e615c30bab288c3addaf170e36dafdb7a9e8",
+        "823ff5b94fcfc29536c5d1a4cef77d16c0f8153a288ac42b0ff6eeac39df6784"
+      ]
+    },
+    "signature" : "2bb7e9db9296bd075cee110326e080e03a7259546e6f18a47e53b089c2c9b72a",
+    "type" : "project"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "APPLE_TEST_BUNDLE_RPATH" : "$(APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE:default=NO))",
+            "APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_NO" : "@loader_path/../../..",
+            "APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_YES" : "@loader_path/../..",
+            "BUILD_SERVER_PROTOCOL_TARGET_TAGS" : [
+              "$(inherited)",
+              "test"
+            ],
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "GENERATE_EMBED_IN_CODE_ACCESSORS" : "NO",
+            "GENERATE_INFOPLIST_FILE" : "YES",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "INDEX_ENABLE_DATA_STORE" : "YES",
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "LD_RUNPATH_SEARCH_PATHS" : [
+              "$(RPATH_ORIGIN)/Frameworks",
+              "$(RPATH_ORIGIN)/../Frameworks",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=driverkit]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=ios-maccatalyst]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=ios;ios-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=macos]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=tvos;tvos-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=watchos;watchos-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=xros;xros-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "MACOSX_DEPLOYMENT_TARGET" : "14.0",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCoreTests",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCoreTests",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCoreTests.symbolgraphs",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCoreTests.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCoreTests",
+            "TARGET_TEMP_DIR_SUFFIX" : "-p",
+            "TVOS_DEPLOYMENT_TARGET" : "17.0",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "APPLE_TEST_BUNDLE_RPATH" : "$(APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_$(SHALLOW_BUNDLE:default=NO))",
+            "APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_NO" : "@loader_path/../../..",
+            "APPLE_TEST_BUNDLE_RPATH_SHALLOW_BUNDLE_YES" : "@loader_path/../..",
+            "BUILD_SERVER_PROTOCOL_TARGET_TAGS" : [
+              "$(inherited)",
+              "test"
+            ],
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "GENERATE_EMBED_IN_CODE_ACCESSORS" : "NO",
+            "GENERATE_INFOPLIST_FILE" : "YES",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "INDEX_ENABLE_DATA_STORE" : "YES",
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "LD_RUNPATH_SEARCH_PATHS" : [
+              "$(RPATH_ORIGIN)/Frameworks",
+              "$(RPATH_ORIGIN)/../Frameworks",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=driverkit]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=ios-maccatalyst]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=ios;ios-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=macos]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=tvos;tvos-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=watchos;watchos-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "LD_RUNPATH_SEARCH_PATHS[__platform_filter=xros;xros-simulator]" : [
+              "$(APPLE_TEST_BUNDLE_RPATH)",
+              "$(inherited)"
+            ],
+            "MACOSX_DEPLOYMENT_TARGET" : "14.0",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCoreTests",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCoreTests",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCoreTests.symbolgraphs",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCoreTests.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCoreTests",
+            "TARGET_TEMP_DIR_SUFFIX" : "-p",
+            "TVOS_DEPLOYMENT_TARGET" : "17.0",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_0",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::0",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_1",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_2",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_3",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::3",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_4",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::4",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_5",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::5",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_6",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::6",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_7",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::7",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_8",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::8",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_9",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::9",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_10",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::10",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_11",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::11",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_2::REF_12",
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0::12",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            }
+          ],
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.sources"
+        },
+        {
+          "buildFiles" : [
+            {
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_1::0",
+              "platformFilters" : [
+
+              ],
+              "targetReference" : "PACKAGE-TARGET:TubeTrackCore"
+            }
+          ],
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests::BUILDPHASE_1",
+          "type" : "com.apple.buildphase.frameworks"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests",
+      "name" : "TubeTrackCoreTests-product",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests",
+        "name" : "$(EXECUTABLE_NAME)",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "com.apple.product-type.bundle.unit-test",
+      "type" : "standard"
+    },
+    "signature" : "17d14ca6a77edf20a457e68a98e669bbf3c3e881a37172965444225306987d56",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "LD_RUNPATH_SEARCH_PATHS" : [
+              "$(inherited)",
+              "$(RPATH_ORIGIN)"
+            ],
+            "LINKER_DRIVER" : "swiftc",
+            "MACOSX_DEPLOYMENT_TARGET" : "14.0",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCoreTests-test-runner",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCoreTests_test_runner",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "NO",
+            "SWIFT_VERSION" : "5.0",
+            "TARGET_NAME" : "TubeTrackCoreTests-test-runner",
+            "TVOS_DEPLOYMENT_TARGET" : "17.0",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "DRIVERKIT_DEPLOYMENT_TARGET" : "21.0",
+            "IPHONEOS_DEPLOYMENT_TARGET" : "26.0",
+            "IPHONEOS_DEPLOYMENT_TARGET[__platform_filter=ios-maccatalyst]" : "26.0",
+            "LD_RUNPATH_SEARCH_PATHS" : [
+              "$(inherited)",
+              "$(RPATH_ORIGIN)"
+            ],
+            "LINKER_DRIVER" : "swiftc",
+            "MACOSX_DEPLOYMENT_TARGET" : "14.0",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCoreTests-test-runner",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCoreTests_test_runner",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "NO",
+            "SWIFT_VERSION" : "5.0",
+            "TARGET_NAME" : "TubeTrackCoreTests-test-runner",
+            "TVOS_DEPLOYMENT_TARGET" : "17.0",
+            "WATCHOS_DEPLOYMENT_TARGET" : "26.0",
+            "XROS_DEPLOYMENT_TARGET" : "1.0"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+
+          ],
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.sources"
+        },
+        {
+          "buildFiles" : [
+            {
+              "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner::BUILDPHASE_1::0",
+              "platformFilters" : [
+
+              ],
+              "targetReference" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests"
+            }
+          ],
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner::BUILDPHASE_1",
+          "type" : "com.apple.buildphase.frameworks"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner",
+      "name" : "TubeTrackCoreTests-test-runner",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-TARGET:TubeTrackCoreTests_test_runner",
+        "name" : "TubeTrackCoreTests-test-runner",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "com.apple.product-type.tool.swiftpm-test-runner",
+      "type" : "standard"
+    },
+    "signature" : "dea7af78619d6e6591c0c3cec14af538a48f833fcd03a9f5b33bb5b3157d9907",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "EXECUTABLE_PREFIX" : "lib",
+            "EXECUTABLE_PREFIX[__platform_filter=windows-msvc]" : "",
+            "PRODUCT_NAME" : "TubeTrackCore",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "TARGET_NAME" : "TubeTrackCore-product",
+            "TARGET_TEMP_DIR_SUFFIX" : "-p",
+            "USES_SWIFTPM_UNSAFE_FLAGS" : "NO"
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "EXECUTABLE_PREFIX" : "lib",
+            "EXECUTABLE_PREFIX[__platform_filter=windows-msvc]" : "",
+            "PRODUCT_NAME" : "TubeTrackCore",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "TARGET_NAME" : "TubeTrackCore-product",
+            "TARGET_TEMP_DIR_SUFFIX" : "-p",
+            "USES_SWIFTPM_UNSAFE_FLAGS" : "NO"
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+            {
+              "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore::BUILDPHASE_0::0",
+              "platformFilters" : [
+
+              ],
+              "targetReference" : "PACKAGE-TARGET:TubeTrackCore"
+            }
+          ],
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.frameworks"
+        },
+        {
+          "buildFiles" : [
+
+          ],
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore::BUILDPHASE_1",
+          "type" : "com.apple.buildphase.sources"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore",
+      "name" : "TubeTrackCore-product",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore",
+        "name" : "$(EXECUTABLE_NAME)",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "com.apple.product-type.library.static",
+      "type" : "standard"
+    },
+    "signature" : "911c0daf6fcdede3e71587e71413f7cff26c86966adc2dcf0e3acf6ea0ff0848",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "Swift",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "DEFINES_MODULE" : "YES",
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "GENERATE_PRELINK_OBJECT_FILE" : "NO",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "MODULEMAP_FILE_CONTENTS" : "module TubeTrackCore {\nheader \"TubeTrackCore-Swift.h\"\nexport *\n}",
+            "MODULEMAP_PATH" : "$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+            "PACKAGE_RESOURCE_BUNDLE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "STRIP_INSTALLED_PRODUCT" : "NO",
+            "SUPPORTS_TEXT_BASED_API" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_OBJC_INTERFACE_HEADER_DIR" : "$(GENERATED_MODULEMAP_DIR)",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "TubeTrackCore-Swift.h",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TAPI_DYLIB_INSTALL_NAME" : "TubeTrackCore",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-t"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+              "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES" : [
+                "$(inherited)",
+                "TubeTrackCore_TubeTrackCore"
+              ],
+              "FRAMEWORK_SEARCH_PATHS" : [
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_RUNPATH_SEARCH_PATHS" : [
+                "$(RPATH_ORIGIN)",
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_WARN_DUPLICATE_LIBRARIES" : "NO",
+              "OTHER_CFLAGS" : [
+                "-fmodule-map-file=$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+                "$(inherited)"
+              ]
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "Swift",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "DEFINES_MODULE" : "YES",
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "GENERATE_PRELINK_OBJECT_FILE" : "NO",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "MODULEMAP_FILE_CONTENTS" : "module TubeTrackCore {\nheader \"TubeTrackCore-Swift.h\"\nexport *\n}",
+            "MODULEMAP_PATH" : "$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+            "PACKAGE_RESOURCE_BUNDLE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "STRIP_INSTALLED_PRODUCT" : "NO",
+            "SUPPORTS_TEXT_BASED_API" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_OBJC_INTERFACE_HEADER_DIR" : "$(GENERATED_MODULEMAP_DIR)",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "TubeTrackCore-Swift.h",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TAPI_DYLIB_INSTALL_NAME" : "TubeTrackCore",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-t"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+              "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES" : [
+                "$(inherited)",
+                "TubeTrackCore_TubeTrackCore"
+              ],
+              "FRAMEWORK_SEARCH_PATHS" : [
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_RUNPATH_SEARCH_PATHS" : [
+                "$(RPATH_ORIGIN)",
+                "$(inherited)"
+              ],
+              "LD_WARN_DUPLICATE_LIBRARIES" : "NO",
+              "OTHER_CFLAGS" : [
+                "-fmodule-map-file=$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+                "$(inherited)"
+              ]
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_0",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::0",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_1",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_2",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_3",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::3",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_4",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::4",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_5",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::5",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_6",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::6",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_7",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::7",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_8",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::8",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_9",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::9",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_10",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::10",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_11",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::11",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_12",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::12",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_13",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::13",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_14",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::14",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_15",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::15",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_16",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::16",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_17",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::17",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_18",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::18",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_19",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::19",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_20",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::20",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_21",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::21",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_22",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::22",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_23",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::23",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_24",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::24",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_25",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::25",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_26",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::26",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_27",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::27",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_28",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::28",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_29",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::29",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_30",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::30",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_31",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::31",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_8::REF_32",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0::32",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            }
+          ],
+          "guid" : "PACKAGE-TARGET:TubeTrackCore::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.sources"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "dynamicTargetVariantGuid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic",
+      "guid" : "PACKAGE-TARGET:TubeTrackCore",
+      "name" : "TubeTrackCore",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-TARGET:TubeTrackCore",
+        "name" : "$(EXECUTABLE_NAME)",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "org.swift.product-type.library.static",
+      "type" : "standard"
+    },
+    "signature" : "a094076ad58c84789034bd1c317d0183faea61f620a87ab0492065ef04ff464a",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "None",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "EXECUTABLE_NAME" : "",
+            "GENERATE_INFOPLIST_FILE" : "YES",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "resource",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore.resources",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "TARGET_NAME" : "TubeTrackCore_TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-b"
+          },
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "None",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "EXECUTABLE_NAME" : "",
+            "GENERATE_INFOPLIST_FILE" : "YES",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "resource",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore.resources",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "TARGET_NAME" : "TubeTrackCore_TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-b"
+          },
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_4",
+              "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDPHASE_0::0",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false",
+              "resourceRule" : "process"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_5",
+              "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false",
+              "resourceRule" : "process"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_6",
+              "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false",
+              "resourceRule" : "process"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_7",
+              "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDPHASE_0::3",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false",
+              "resourceRule" : "process"
+            }
+          ],
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.resources"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+
+      ],
+      "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+      "name" : "TubeTrackCore_TubeTrackCore",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-RESOURCE:TubeTrackCore",
+        "name" : "TubeTrackCore_TubeTrackCore",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "com.apple.product-type.bundle",
+      "type" : "standard"
+    },
+    "signature" : "ef672d8ddf15851b6c5c19da866a0b0079d0e67c313a8b925711440041c32824",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore-TubeTrackCorePackageTests.TubeTrackCorePackageTests::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore-TubeTrackCorePackageTests.TubeTrackCorePackageTests::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "PACKAGE-PRODUCT:tubetrackcore-TubeTrackCorePackageTests.TubeTrackCorePackageTests",
+      "name" : "TubeTrackCorePackageTests-product",
+      "type" : "aggregate"
+    },
+    "signature" : "823ff5b94fcfc29536c5d1a4cef77d16c0f8153a288ac42b0ff6eeac39df6784",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "approvedByUser" : "true",
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "Swift",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "DEFINES_MODULE" : "YES",
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "EXECUTABLE_PREFIX" : "lib",
+            "EXECUTABLE_PREFIX[__platform_filter=windows-msvc]" : "",
+            "GENERATE_EMBED_IN_CODE_ACCESSORS" : "YES",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "MODULEMAP_FILE_CONTENTS" : "module TubeTrackCore {\nheader \"TubeTrackCore-Swift.h\"\nexport *\n}",
+            "MODULEMAP_PATH" : "$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+            "PACKAGE_RESOURCE_BUNDLE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore",
+            "PRODUCT_NAME" : "TubeTrackCore",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SUPPORTS_TEXT_BASED_API" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_OBJC_INTERFACE_HEADER_DIR" : "$(GENERATED_MODULEMAP_DIR)",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "TubeTrackCore-Swift.h",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-t"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+              "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES" : [
+                "$(inherited)",
+                "TubeTrackCore_TubeTrackCore"
+              ],
+              "FRAMEWORK_SEARCH_PATHS" : [
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_RUNPATH_SEARCH_PATHS" : [
+                "$(RPATH_ORIGIN)",
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_WARN_DUPLICATE_LIBRARIES" : "NO",
+              "OTHER_CFLAGS" : [
+                "-fmodule-map-file=$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+                "$(inherited)"
+              ]
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "COREML_CODEGEN_LANGUAGE" : "Swift",
+            "COREML_COMPILER_CONTAINER" : "swift-package",
+            "DEFINES_MODULE" : "YES",
+            "DOCC_EXTRACT_PROJECT_HEADERS_DOCUMENTATION" : "YES",
+            "EXECUTABLE_PREFIX" : "lib",
+            "EXECUTABLE_PREFIX[__platform_filter=windows-msvc]" : "",
+            "GENERATE_EMBED_IN_CODE_ACCESSORS" : "YES",
+            "GENERATE_RESOURCE_ACCESSORS" : "YES",
+            "MODULEMAP_FILE_CONTENTS" : "module TubeTrackCore {\nheader \"TubeTrackCore-Swift.h\"\nexport *\n}",
+            "MODULEMAP_PATH" : "$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+            "PACKAGE_RESOURCE_BUNDLE_NAME" : "TubeTrackCore_TubeTrackCore",
+            "PACKAGE_RESOURCE_TARGET_KIND" : "regular",
+            "PRODUCT_BUNDLE_IDENTIFIER" : "tubetrackcore.TubeTrackCore",
+            "PRODUCT_MODULE_NAME" : "TubeTrackCore",
+            "PRODUCT_NAME" : "TubeTrackCore",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SUPPORTS_TEXT_BASED_API" : "NO",
+            "SWIFT_ACTIVE_COMPILATION_CONDITIONS" : [
+              "$(inherited)",
+              "SWIFT_MODULE_RESOURCE_BUNDLE_AVAILABLE"
+            ],
+            "SWIFT_DISABLE_PARSE_AS_LIBRARY" : "NO",
+            "SWIFT_ENABLE_BARE_SLASH_REGEX" : "NO",
+            "SWIFT_LIBRARIES_ONLY" : "YES",
+            "SWIFT_OBJC_INTERFACE_HEADER_DIR" : "$(GENERATED_MODULEMAP_DIR)",
+            "SWIFT_OBJC_INTERFACE_HEADER_NAME" : "TubeTrackCore-Swift.h",
+            "SWIFT_PACKAGE_NAME" : "tubetrackcore",
+            "SWIFT_VERSION" : "6",
+            "SYMBOL_GRAPH_EXTRACTOR_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TAPI_EXTRACT_API_OUTPUT_DIR" : "$(TARGET_BUILD_DIR)/$(CURRENT_ARCH)/TubeTrackCore.symbolgraphs",
+            "TARGET_NAME" : "TubeTrackCore",
+            "TARGET_TEMP_DIR_SUFFIX" : "-t"
+          },
+          "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+              "EMBED_PACKAGE_RESOURCE_BUNDLE_NAMES" : [
+                "$(inherited)",
+                "TubeTrackCore_TubeTrackCore"
+              ],
+              "FRAMEWORK_SEARCH_PATHS" : [
+                "$(BUILT_PRODUCTS_DIR)/PackageFrameworks",
+                "$(inherited)"
+              ],
+              "LD_RUNPATH_SEARCH_PATHS" : [
+                "$(RPATH_ORIGIN)",
+                "$(inherited)"
+              ],
+              "LD_WARN_DUPLICATE_LIBRARIES" : "NO",
+              "OTHER_CFLAGS" : [
+                "-fmodule-map-file=$(GENERATED_MODULEMAP_DIR)/TubeTrackCore.modulemap",
+                "$(inherited)"
+              ]
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+        {
+          "buildFiles" : [
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_0",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::0",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_1",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::1",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_2",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::2",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_3",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::3",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_4",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::4",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_5",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::5",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_6",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::6",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_7",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::7",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_8",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::8",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_9",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::9",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_10",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::10",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_11",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::11",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_12",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::12",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_13",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::13",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_14",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::14",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_15",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::15",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_16",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::16",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_17",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::17",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_18",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::18",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_19",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::19",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_20",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::20",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_21",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::21",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_22",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::22",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_23",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::23",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_24",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::24",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_25",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::25",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_26",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::26",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_27",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::27",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_28",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::28",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_29",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::29",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_30",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::30",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_31",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::31",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            },
+            {
+              "codeSignOnCopy" : "false",
+              "fileReference" : "PACKAGE:tubetrackcore::MAINGROUP::REF_9::REF_32",
+              "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0::32",
+              "platformFilters" : [
+
+              ],
+              "removeHeadersOnCopy" : "false"
+            }
+          ],
+          "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic::BUILDPHASE_0",
+          "type" : "com.apple.buildphase.sources"
+        }
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic",
+      "name" : "TubeTrackCore",
+      "productReference" : {
+        "guid" : "PRODUCTREF-PACKAGE-TARGET:TubeTrackCore--27689DEE2C1DE1E5-dynamic",
+        "name" : "$(EXECUTABLE_NAME)",
+        "type" : "file"
+      },
+      "productTypeIdentifier" : "com.apple.product-type.library.dynamic",
+      "type" : "standard"
+    },
+    "signature" : "5b2604eda2d2f0379bf95f17e069e615c30bab288c3addaf170e36dafdb7a9e8",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "YES",
+            "SUPPORTED_PLATFORMS" : [
+              "$(AVAILABLE_PLATFORMS)"
+            ]
+          },
+          "guid" : "AGGREGATE::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+            "PRODUCT_NAME" : "$(TARGET_NAME)",
+            "SDKROOT" : "auto",
+            "SDK_VARIANT" : "auto",
+            "SKIP_INSTALL" : "YES",
+            "SUPPORTED_PLATFORMS" : [
+              "$(AVAILABLE_PLATFORMS)"
+            ]
+          },
+          "guid" : "AGGREGATE::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "defaultConfigurationName" : "Release",
+      "developmentRegion" : "en",
+      "groupTree" : {
+        "children" : [
+
+        ],
+        "guid" : "AGGREGATE::MAINGROUP",
+        "name" : "",
+        "path" : "",
+        "sourceTree" : "<group>",
+        "type" : "group"
+      },
+      "guid" : "AGGREGATE",
+      "path" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Package.swift",
+      "projectDirectory" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore",
+      "projectIsPackage" : "true",
+      "projectName" : "Aggregate",
+      "targets" : [
+        "53b9fcd9844d00c91690a634f948d2c673ac191cd00ee5fca918fc56680b9800",
+        "715cfa3828feb7ccbb6faa5f2dd783a1551a2a220c45b51ebc6a8507762ee624"
+      ]
+    },
+    "signature" : "6a5624792a71df0c9a7d2d26d2e58987fd0213efc15eb615439a08a2302dde97",
+    "type" : "project"
+  },
+  {
+    "contents" : {
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "ALL-INCLUDING-TESTS::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "ALL-INCLUDING-TESTS::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCoreTests.TubeTrackCoreTests",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCoreTests_test_runner",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "ALL-INCLUDING-TESTS",
+      "name" : "AllIncludingTests",
+      "type" : "aggregate"
+    },
+    "signature" : "53b9fcd9844d00c91690a634f948d2c673ac191cd00ee5fca918fc56680b9800",
+    "type" : "target"
+  },
+  {
+    "contents" : {
+      "buildConfigurations" : [
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "ALL-EXCLUDING-TESTS::BUILDCONFIG_0",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Debug"
+        },
+        {
+          "buildSettings" : {
+
+          },
+          "guid" : "ALL-EXCLUDING-TESTS::BUILDCONFIG_1",
+          "impartedBuildProperties" : {
+            "buildSettings" : {
+
+            }
+          },
+          "name" : "Release"
+        }
+      ],
+      "buildPhases" : [
+
+      ],
+      "buildRules" : [
+
+      ],
+      "customTasks" : [
+
+      ],
+      "dependencies" : [
+        {
+          "guid" : "PACKAGE-PRODUCT:tubetrackcore_TubeTrackCore.TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-TARGET:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        },
+        {
+          "guid" : "PACKAGE-RESOURCE:TubeTrackCore",
+          "platformFilters" : [
+
+          ]
+        }
+      ],
+      "guid" : "ALL-EXCLUDING-TESTS",
+      "name" : "AllExcludingTests",
+      "type" : "aggregate"
+    },
+    "signature" : "715cfa3828feb7ccbb6faa5f2dd783a1551a2a220c45b51ebc6a8507762ee624",
+    "type" : "target"
+  }
+]

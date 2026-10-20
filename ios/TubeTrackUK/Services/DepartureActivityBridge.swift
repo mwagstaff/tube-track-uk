@@ -39,10 +39,26 @@ enum DepartureActivityBridge {
             .map(\.attributes.activityID)
     }
 
+    static func recordDiagnosticSnapshot(reason: String) {
+        for activity in Activity<DepartureActivityAttributes>.activities {
+            LiveActivityDiagnostics.record("activity_snapshot", [
+                "activityID": activity.attributes.activityID,
+                "scheduleID": activity.attributes.scheduleID ?? "manual",
+                "state": String(describing: activity.activityState),
+                "hasPushAddress": String(activity.pushToken != nil),
+                "updatedAt": activity.content.state.updatedAt.ISO8601Format(),
+                "staleAt": activity.content.staleDate?.ISO8601Format() ?? "none",
+                "endsAt": activity.attributes.hardEndsAt.ISO8601Format(),
+                "sequence": String(activity.content.state.sequence), "reason": reason
+            ])
+        }
+    }
+
     static func activityIDs() -> AsyncStream<String> {
         AsyncStream { continuation in
             let task = Task {
                 for await activity in Activity<DepartureActivityAttributes>.activityUpdates {
+                    LiveActivityDiagnostics.record("activity_discovered", ["activityID": activity.attributes.activityID])
                     continuation.yield(activity.attributes.activityID)
                 }
             }
@@ -54,7 +70,20 @@ enum DepartureActivityBridge {
         AsyncStream { continuation in
             let task = Task {
                 guard let activity = activity(for: activityID) else { continuation.finish(); return }
+                let contentTask = Task {
+                    guard let observed = self.activity(for: activityID) else { return }
+                    for await content in observed.contentUpdates {
+                        if Task.isCancelled { return }
+                        LiveActivityDiagnostics.record("activity_content_observed", [
+                            "activityID": activityID, "sequence": String(content.state.sequence),
+                            "updatedAt": content.state.updatedAt.ISO8601Format(),
+                            "staleAt": content.staleDate?.ISO8601Format() ?? "none"
+                        ])
+                    }
+                }
+                defer { contentTask.cancel() }
                 for await state in activity.activityStateUpdates {
+                    LiveActivityDiagnostics.record("activity_state", ["activityID": activityID, "state": String(describing: state)])
                     if state == .ended || state == .dismissed {
                         continuation.yield(true)
                         break
@@ -100,17 +129,27 @@ enum DepartureActivityBridge {
         timestamp: Date
     ) async {
         guard let activity = activity(for: activityID) else { return }
+        LiveActivityDiagnostics.record("activity_local_update", ["activityID": activityID, "updatedAt": content.state.updatedAt.ISO8601Format()])
         await activity.update(content, timestamp: timestamp)
     }
 
     static func end(activityID: String, dismissAfter: TimeInterval) async {
         guard let activity = activity(for: activityID) else { return }
+        LiveActivityDiagnostics.record("activity_local_end", ["activityID": activityID])
         var final = activity.content.state
         final.sequence += 1
         await activity.end(
             ActivityContent(state: final, staleDate: nil),
             dismissalPolicy: .after(.now.addingTimeInterval(dismissAfter))
         )
+    }
+
+    /// Re-render using shared display preferences without making old data appear fresh.
+    static func refreshDisplayPreferences() async {
+        for activity in Activity<DepartureActivityAttributes>.activities {
+            guard !Task.isCancelled else { return }
+            await activity.update(activity.content)
+        }
     }
 
     static func endAll(dismissAfter: TimeInterval) async {
@@ -125,7 +164,9 @@ enum DepartureActivityBridge {
     static func pushTokens(for activityID: String) -> AsyncStream<String> {
         AsyncStream { continuation in
             let task = Task {
+                LiveActivityDiagnostics.record("update_address_observer_started", ["activityID": activityID])
                 if let token = activity(for: activityID)?.pushToken {
+                    LiveActivityDiagnostics.record("update_address_received", ["activityID": activityID, "source": "existing"])
                     continuation.yield(token.hexString)
                 }
                 await withTaskGroup(of: Void.self) { group in
@@ -134,15 +175,18 @@ enum DepartureActivityBridge {
                             if Task.isCancelled { return }
                             try? await Task.sleep(for: .milliseconds(250))
                             if let token = activity(for: activityID)?.pushToken {
+                                LiveActivityDiagnostics.record("update_address_received", ["activityID": activityID, "source": "poll"])
                                 continuation.yield(token.hexString)
                                 return
                             }
                         }
+                        LiveActivityDiagnostics.record("update_address_not_available_after_wait", ["activityID": activityID])
                     }
                     group.addTask {
                         guard let activity = activity(for: activityID) else { return }
                         for await token in activity.pushTokenUpdates {
                             if Task.isCancelled { return }
+                            LiveActivityDiagnostics.record("update_address_received", ["activityID": activityID, "source": "stream"])
                             continuation.yield(token.hexString)
                         }
                     }

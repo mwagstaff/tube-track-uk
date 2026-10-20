@@ -1,0 +1,349 @@
+{
+  "" : {
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackCore-primary.dia",
+    "emit-module-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackCore-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackCore-primary-emit-module.dia",
+    "pch" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackCore-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackCore-primary.swiftdeps"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/DerivedSources/resource_bundle_accessor.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/resource_bundle_accessor~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Activities/ActivityKitBridge.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ActivityKitBridge~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Activities/DepartureActivityAttributes.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityAttributes~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Activities/DepartureActivityBoard.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityBoard~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Activities/DepartureActivityPolicy.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureActivityPolicy~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Activities/DepartureCountdownFormatStyle.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureCountdownFormatStyle~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/CompactStationDeparturePolicy.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/CompactStationDeparturePolicy~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/DepartureDirectionFilter.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDirectionFilter~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/DepartureDisplayPreferences.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureDisplayPreferences~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/DepartureFavourite.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureFavourite~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/DepartureTimeline.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DepartureTimeline~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/Freshness.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/Freshness~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/LineServiceCondition.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineServiceCondition~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/LineStatusProjection.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LineStatusProjection~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/LossyList.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/LossyList~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/NationalRailDepartures.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDepartures~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/NationalRailDirection.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailDirection~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/ScheduledJourney.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/ScheduledJourney~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/StationDepartureGroup.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureGroup~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/StationDepartureMetadata.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureMetadata~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/StationDepartureSelection.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationDepartureSelection~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/TfLModels.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TfLModels~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/TubeLine.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLine~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Models/WidgetRefreshPolicy.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/WidgetRefreshPolicy~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Network/SnapshotCache.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/SnapshotCache~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Network/TubeTrackAPIClient.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeTrackAPIClient~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Services/NationalRailArrivalsService.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/NationalRailArrivalsService~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Services/StationArrivalsService.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationArrivalsService~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Shared/AppGroup.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppGroup~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Shared/AppInstall.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/AppInstall~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Shared/DeepLink.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/DeepLink~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/Stations/StationIndex.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StationIndex~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/UI/StatusSymbol.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/StatusSymbol~partial.swiftmodule"
+  },
+  "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/Sources/TubeTrackCore/UI/TubeLineDot.swift" : {
+    "const-values" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.swiftconstvalues",
+    "dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.d",
+    "diagnostics" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.dia",
+    "index-unit-output-path" : "/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.o",
+    "llvm-bc" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.bc",
+    "object" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.o",
+    "swift-dependencies" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot.swiftdeps",
+    "swiftmodule" : "/Users/mwagstaff/dev/tube-track-uk/ios/TubeTrackCore/.build/out/Intermediates.noindex/TubeTrackCore.build/Debug/TubeTrackCore-t.build/Objects-normal/arm64/TubeLineDot~partial.swiftmodule"
+  }
+}

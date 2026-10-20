@@ -65,7 +65,8 @@ final class DepartureBoardStore {
         do {
             let board = try await withTaskCancellationHandler { try await flight.value } onCancel: { flight.cancel() }
             try Task.checkCancellation()
-            boards[request] = board; errors.removeValue(forKey: request); fetched[request] = .now
+            boards[request] = board.retainingLastAvailable(boards[request])
+            errors.removeValue(forKey: request); fetched[request] = .now
             if boards.count > 80 {
                 let expired = fetched.sorted { $0.value < $1.value }.prefix(boards.count - 80).map(\.key)
                 for key in expired { boards.removeValue(forKey: key); fetched.removeValue(forKey: key); errors.removeValue(forKey: key) }

@@ -17,6 +17,9 @@ struct TubeTrackUKApp: App {
     )
 
     init() {
+        LiveActivityDiagnostics.record("app_launch", ["appVersion": AppInstall.appVersion,
+            "build": Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "unknown",
+            "osVersion": ProcessInfo.processInfo.operatingSystemVersionString])
         AppTypography.prepare()
     }
 
@@ -27,6 +30,8 @@ struct TubeTrackUKApp: App {
                 .environment(scheduledJourneys)
                 .task { await scheduledJourneys.refresh() }
                 .onChange(of: scenePhase) { _, phase in
+                    LiveActivityDiagnostics.record("scene_phase", ["phase": String(describing: phase)])
+                    DepartureActivityBridge.recordDiagnosticSnapshot(reason: "scene_phase")
                     if phase == .active { Task { await scheduledJourneys.refresh() } }
                 }
                 .environment(backgroundImageStore)

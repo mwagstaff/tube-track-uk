@@ -37,7 +37,7 @@ export const DIRECTION_FILTERS = Object.freeze([
 ]);
 
 export const MAXIMUM_DEPARTURES = 4;
-const RAIL_SERVICE_STATUSES = new Set(['delayed', 'cancelled']);
+const RAIL_SERVICE_STATUSES = new Set(['delayed', 'cancelled', 'unknown']);
 
 // Mirrors the truncation in ContentState.Departure so a board built here cannot
 // encode larger than the one the app built.

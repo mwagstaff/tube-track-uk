@@ -549,6 +549,8 @@ private struct StationDepartureGroupView: View {
 }
 
 struct StationDepartureRow: View {
+    @State private var selectedTrain: SelectedRailDeparture?
+    @DepartureDisplayStorage private var displayPreferences
     @Environment(\.departureBoardYellow) private var yellowBoard
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let arrival: TfLArrivalPrediction
@@ -557,9 +559,39 @@ struct StationDepartureRow: View {
 
     var body: some View {
         Group {
+            if arrival.supportsCallingPoints {
+                Button { selectedTrain = SelectedRailDeparture(arrival: arrival) } label: {
+                    HStack(spacing: 8) {
+                        rowContent
+                        Image(systemName: "chevron.right")
+                            .font(.appCaption2(.semibold))
+                            .foregroundStyle(.secondary)
+                            .accessibilityHidden(true)
+                    }
+                    .frame(minHeight: 44)
+                    .contentShape(.rect)
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint("Shows calling points and train times")
+                .accessibilityIdentifier("departure-calling-points-\(arrival.id)")
+            } else {
+                rowContent
+            }
+        }
+        .sheet(item: $selectedTrain) { selection in
+            RailCallingPointsSheet(arrival: selection.arrival)
+        }
+    }
+
+    private var rowContent: some View {
+        Group {
             if dynamicTypeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 4) {
-                    destination
+                    HStack(alignment: .top) {
+                        destination
+                        Spacer(minLength: 10)
+                        statusIcon
+                    }
                     departureTime
                 }
             } else {
@@ -567,10 +599,17 @@ struct StationDepartureRow: View {
                     destination
                     Spacer(minLength: 10)
                     departureTime
+                    statusIcon
                 }
             }
         }
         .accessibilityElement(children: .combine)
+    }
+
+    @ViewBuilder private var statusIcon: some View {
+        if DepartureTransitType(lineID: arrival.lineId) == .nationalRail {
+            RailDepartureStatusIcon(status: arrival.serviceStatus ?? .unknown)
+        }
     }
 
     private var destination: some View {
@@ -590,7 +629,7 @@ struct StationDepartureRow: View {
                     .foregroundStyle(yellowBoard ? DepartureBoardTheme.yellow.opacity(0.8) : Color.secondary)
             }
             if let note = StationDepartureMetadata.serviceNote(for: arrival),
-               note != StationDepartureMetadata.departureTime(for: arrival, now: now) {
+               note != StationDepartureMetadata.departureTime(for: arrival, now: now, preferences: displayPreferences) {
                 Text(note)
                     .font(.appCaption2(.semibold))
                     .foregroundStyle(arrival.isCancelled ? Color.red : Color.orange)
@@ -600,7 +639,7 @@ struct StationDepartureRow: View {
     }
 
     private var departureTime: some View {
-        Text(StationDepartureMetadata.departureTime(for: arrival, now: now))
+        Text(StationDepartureMetadata.departureTime(for: arrival, now: now, preferences: displayPreferences))
             .font(.appSubheadline(.bold))
             .monospacedDigit()
             .foregroundStyle(arrival.isCancelled ? Color.red : yellowBoard ? DepartureBoardTheme.yellow : Color.departureAccent)

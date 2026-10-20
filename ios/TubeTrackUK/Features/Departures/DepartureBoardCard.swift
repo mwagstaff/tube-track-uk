@@ -162,7 +162,7 @@ struct DepartureBoardCard: View {
             Button("Cancel", role: .cancel) {}
         } message: { group in
             if !trackingRequest(group).destinationIDs.isEmpty {
-                Text("Scheduled journeys track this service and direction. Calling-at filters apply only when you start tracking now.")
+                Text("Tracks this service and direction, calling at your selected destination.")
             }
         }
         .sheet(item: $filtering) { request in
@@ -344,12 +344,10 @@ struct DepartureBoardCard: View {
     }
 
     @ViewBuilder private func rows(now: Date, expanded: Bool) -> some View {
-        if appState.isOffline {
+        if appState.isOffline, board == nil {
             Label("Live departures unavailable offline", systemImage: "wifi.slash")
         } else if let error = store.errors[request], board == nil {
             Text(error).font(.appSubheadline())
-        } else if let board, now.timeIntervalSince(board.updatedAt) > 90 {
-            Text("Waiting for fresh departures…").font(.appSubheadline())
         } else if let board {
             if directionGroups.isEmpty {
                 Text(request.destinationIDs.isEmpty ? "No imminent departures reported." : "No matching departures reported.")
@@ -359,8 +357,11 @@ struct DepartureBoardCard: View {
                 VStack(alignment: .leading, spacing: 20) {
                     ForEach(groups) { group in
                         let filteredBoard = directionBoard(board, group: group)
-                        let filteredArrivals = filteredBoard?.upcoming(at: now) ?? []
                         let filteredRequest = trackingRequest(group)
+                        let displayDate = filteredBoard?.displayReferenceDate(at: now,
+                            interrupted: appState.isOffline || store.errors[request] != nil
+                                || store.errors[filteredRequest] != nil) ?? now
+                        let filteredArrivals = filteredBoard?.upcoming(at: displayDate) ?? []
                         VStack(alignment: .leading, spacing: 10) {
                             ViewThatFits(in: .horizontal) {
                                 HStack { directionHeading(group); Spacer(); directionControls(group) }
@@ -371,18 +372,19 @@ struct DepartureBoardCard: View {
                                     .font(.appCaption()).fixedSize(horizontal: false, vertical: true)
                             }
                             VStack(spacing: expanded ? 22 : 14) {
-                                if let error = store.errors[filteredRequest] {
+                                if let filteredBoard, displayDate != now {
+                                    Text("Showing last available departures · times as of \(filteredBoard.updatedAt.formatted(date: .omitted, time: .shortened)).")
+                                        .font(.appCaption()).fixedSize(horizontal: false, vertical: true)
+                                } else if let error = store.errors[filteredRequest] {
                                     Text(error).font(.appSubheadline())
                                 } else if filteredBoard == nil {
-                                    ProgressView("Loading filtered departures…")
-                                } else if let filteredBoard, now.timeIntervalSince(filteredBoard.updatedAt) > 90 {
-                                    Text("Waiting for fresh departures…").font(.appSubheadline())
+                                    ProgressView("Loading Calling at departures…")
                                 } else if filteredArrivals.isEmpty {
-                                    Text("No matching departures. Change the filter to see more services.").font(.appSubheadline())
+                                    Text("No matching departures. Change Calling at to see more services.").font(.appSubheadline())
                                 }
-                                if let filteredBoard, now.timeIntervalSince(filteredBoard.updatedAt) <= 90 {
+                                if filteredBoard != nil {
                                     ForEach(Array((expandedDirections.contains(group.id) ? filteredArrivals : Array(filteredArrivals.prefix(5))).enumerated()), id: \.offset) { _, arrival in
-                                        StationDepartureRow(arrival: arrival, now: now, showsOperator: true)
+                                        StationDepartureRow(arrival: arrival, now: displayDate, showsOperator: true)
                                     }
                                 }
                             }
@@ -427,10 +429,15 @@ struct DepartureBoardCard: View {
     }
 
     private func directionControls(_ group: DepartureBoardDirectionGroup) -> some View {
-        HStack(spacing: 16) {
-            Button("Filter", systemImage: "line.3.horizontal.decrease") { filtering = trackingRequest(group) }
-                .accessibilityLabel("Filter \(group.title) departures")
-                .frame(minHeight: 44)
+        let isFiltered = !trackingRequest(group).destinationIDs.isEmpty
+        return HStack(spacing: 6) {
+            Button("Calling at", systemImage: isFiltered ? "checkmark.circle.fill" : "line.3.horizontal.decrease") {
+                filtering = trackingRequest(group)
+            }
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: isFiltered))
+                .accessibilityLabel("Calling at, \(group.title) departures")
+                .accessibilityValue(isFiltered ? "Filter active" : "No filter")
+                .accessibilityAddTraits(isFiltered ? .isSelected : [])
             trackButton(group)
         }.font(.appCaption(.semibold))
     }
@@ -445,11 +452,13 @@ struct DepartureBoardCard: View {
         if let activity, activity.areActivitiesEnabled, let serviceID {
             let trackedRequest = trackingRequest(group)
             let tracking = activity.isTracking(request: trackedRequest)
-            Button(tracking ? "Stop tracking" : "Track", systemImage: tracking ? "stop.circle" : "livephoto") {
+            Button(tracking ? "Stop tracking" : "Track", systemImage: tracking ? "stop.circle.fill" : "livephoto") {
                 if tracking { Task { await activity.end(reason: .userEnded) } }
                 else if suggestedSchedule(group) != nil && scheduleStore != nil { trackingChoice = group }
                 else { startTracking(group) }
-            }.font(.appCaption(.semibold)).frame(minHeight: 44)
+            }.font(.appCaption(.semibold))
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: tracking))
+                .accessibilityAddTraits(tracking ? .isSelected : [])
                 .accessibilityLabel(tracking ? "Stop tracking \(group.title)" : "Track \(services.first { $0.id == serviceID }?.name ?? serviceID) \(group.title)")
                 .disabled(!tracking && !canTrack(group) && (scheduleStore == nil || suggestedSchedule(group) == nil))
         }
@@ -462,7 +471,7 @@ struct DepartureBoardCard: View {
         let name = services.first { $0.id == serviceID }?.name ?? serviceID
         Task {
             await activity.start(request: trackedRequest, stationName: origin?.name ?? "Departures",
-                                 callingAt: "\(name) · \(group.title)", board: filteredBoard)
+                                 serviceName: name, board: filteredBoard)
         }
     }
 

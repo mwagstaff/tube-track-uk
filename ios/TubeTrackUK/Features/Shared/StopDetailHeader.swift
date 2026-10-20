@@ -89,8 +89,41 @@ struct DepartureBoardActionButton: View {
                 .frame(minHeight: 30)
                 .contentShape(.rect)
         }
-        .buttonStyle(.plain)
-        .glassEffect(.regular.interactive(), in: .capsule)
-        .foregroundStyle(isActive ? Color.departureAccent : .secondary)
+        .buttonStyle(DepartureSelectionButtonStyle(isActive: isActive))
+        .accessibilityAddTraits(isActive ? .isSelected : [])
     }
+}
+
+
+/// Filled pills make applied filters and active tracking easy to distinguish.
+struct DepartureSelectionButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+    let isActive: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 10)
+            .frame(minHeight: 44)
+            .foregroundStyle(isActive ? Color(uiColor: .systemBackground) : Color.primary)
+            .background(isActive ? Color.departureAccent : Color.clear, in: .capsule)
+            .contentShape(.capsule)
+            .opacity(isEnabled ? (configuration.isPressed ? 0.7 : 1) : 0.4)
+    }
+}
+
+#Preview("Departure controls — active states") {
+    VStack(spacing: 16) {
+        HStack {
+            Button("Calling at", systemImage: "line.3.horizontal.decrease") {}
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: false))
+            Button("Track", systemImage: "livephoto") {}
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: false))
+        }
+        HStack {
+            Button("Calling at", systemImage: "checkmark.circle.fill") {}
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: true))
+            Button("Stop tracking", systemImage: "stop.circle.fill") {}
+                .buttonStyle(DepartureSelectionButtonStyle(isActive: true))
+        }
+    }.font(.appCaption(.semibold)).padding()
 }

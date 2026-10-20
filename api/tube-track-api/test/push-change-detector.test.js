@@ -52,8 +52,7 @@ test('the lead departure moving a minute is worth telling the passenger', () => 
     const verdict = decide({ next: [row({ seconds: 300 + LEAD_DEPARTURE_THRESHOLD_SECONDS })] });
     assert.equal(verdict.shouldPush, true);
     assert.equal(verdict.reason, REASONS.leadDeparture);
-    // Later, not sooner — a plan change, not an emergency.
-    assert.equal(verdict.priority, 5);
+    assert.equal(verdict.priority, 10);
 });
 
 test('a train pulled forward into Due wakes the device', () => {
@@ -65,13 +64,13 @@ test('a train pulled forward into Due wakes the device', () => {
     assert.equal(verdict.priority, 10);
 });
 
-test('a train pulled forward but still minutes away rides at normal priority', () => {
+test('a train pulled forward materially is high priority even when minutes away', () => {
     const verdict = decide({
         previous: [row({ seconds: 600 })],
         next: [row({ seconds: 300 })]
     });
     assert.equal(verdict.reason, REASONS.leadDeparture);
-    assert.equal(verdict.priority, 5);
+    assert.equal(verdict.priority, 10);
 });
 
 test('a cancelled train — the board emptying — is urgent', () => {
@@ -103,14 +102,14 @@ test('a destination change is urgent', () => {
     assert.equal(verdict.priority, 10);
 });
 
-test('service getting worse wakes the device, recovering does not', () => {
+test('both disruption and service recovery are material changes', () => {
     const worse = decide({ previousSeverityRank: 4, nextSeverityRank: 1 });
     assert.equal(worse.reason, REASONS.severity);
     assert.equal(worse.priority, 10);
 
     const better = decide({ previousSeverityRank: 1, nextSeverityRank: 4 });
     assert.equal(better.reason, REASONS.severity);
-    assert.equal(better.priority, 5);
+    assert.equal(better.priority, 10);
 });
 
 test('an unknown severity on either side is not treated as a change', () => {
@@ -220,4 +219,35 @@ test('routine countdown transitions are coalesced within thirty seconds', () => 
 test('the stale window is wider than the heartbeat that has to land inside it', () => {
     assert.ok(staleWindowMs(true) > HEARTBEAT_MS, 'one dropped heartbeat must not dim the board');
     assert.ok(staleWindowMs(false) > RELAXED_HEARTBEAT_MS);
+});
+
+
+test('material timing changes in following rows are high priority in both directions', () => {
+    const previous = [row(), row({ id: 'v2', seconds: 600 })];
+    for (const shift of [-60, 60]) {
+        const verdict = decide({ previous, next: [row(), row({ id: 'v2', seconds: 600 + shift })] });
+        assert.equal(verdict.priority, 10);
+        assert.equal(verdict.reason, REASONS.followingDeparture);
+    }
+    const next = [row(), row({ id: 'v2', seconds: 659 })];
+    assert.equal(decide({ previous, next }).shouldPush, false);
+    assert.equal(decide({ previous, next, lastPushedAtMs: NOW_MS - HEARTBEAT_MS }).priority, 5);
+});
+
+test('cancellation, delay, recovery and withdrawn predictions are material changes', () => {
+    for (const [previousExtra, nextExtra] of [
+        [{ status: 'on-time' }, { status: 'cancelled' }],
+        [{ status: 'on-time' }, { status: 'delayed' }],
+        [{ status: 'delayed' }, { status: 'on-time' }],
+        [{ hasExpectedTime: true }, { hasExpectedTime: false }]
+    ]) {
+        const verdict = decide({ previous: [{ ...row(), ...previousExtra }], next: [{ ...row(), ...nextExtra }] });
+        assert.equal(verdict.priority, 10);
+        assert.equal(verdict.reason, REASONS.serviceStatus);
+    }
+});
+
+test('a recovery cannot downgrade a simultaneous platform change', () => {
+    assert.equal(decide({ previousSeverityRank: 1, nextSeverityRank: 4,
+        next: [row({ platform: 'Platform 5' })] }).priority, 10);
 });

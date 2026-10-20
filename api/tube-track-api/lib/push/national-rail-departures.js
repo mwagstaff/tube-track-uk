@@ -87,6 +87,7 @@ export function projectNationalRailBoard({ arrivals, lineId, direction = 'any' }
             platform: compactPlatformLabel(row)?.slice(0, 14) ?? null,
             expectedAtEpoch: Math.round(Date.parse(row.expectedArrival ?? row.scheduledDeparture) / 1000),
             hasExpectedTime: row.hasExpectedTime,
+            ...(row.direction ? { directionRaw: row.direction } : {}),
             ...(row.status ? { status: row.status } : {}) }));
 }
 

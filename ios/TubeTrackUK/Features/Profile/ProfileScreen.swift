@@ -2,6 +2,7 @@ import SwiftUI
 
 private enum ProfileDestination: Hashable {
     case about
+    case diagnostics
     case preferences
 }
 
@@ -54,6 +55,12 @@ struct ProfileScreen: View {
                         .disabled(backgroundImageStore.selectedImage == nil)
                     }
 
+                    Section {
+                        NavigationLink(value: ProfileDestination.diagnostics) {
+                            Label("Share diagnostics", systemImage: "square.and.arrow.up")
+                        }
+                    }
+
                     #if DEBUG
                     Section {
                         Button {
@@ -70,6 +77,8 @@ struct ProfileScreen: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationDestination(for: ProfileDestination.self) { destination in
                     switch destination {
+                    case .diagnostics:
+                        LiveActivityDiagnosticsScreen()
                     case .about:
                         AboutScreen()
                     case .preferences:
@@ -127,7 +136,12 @@ private enum ProfilePresentation: Identifiable {
 }
 
 struct PreferencesScreen: View {
+    @DepartureDisplayStorage private var departureDisplay
     @Environment(TubeAppState.self) private var appState
+
+    init(defaults: UserDefaults? = AppGroup.defaults) {
+        _departureDisplay = DepartureDisplayStorage(store: defaults)
+    }
 
     var body: some View {
         @Bindable var state = appState
@@ -150,6 +164,27 @@ struct PreferencesScreen: View {
                     }
                 }
             }
+            Section {
+                Toggle("Match real-world departure boards", isOn: $departureDisplay.matchesRealWorld)
+                if !departureDisplay.matchesRealWorld {
+                    ForEach(DepartureTransitType.allCases) { type in
+                        Picker(type.title, selection: $departureDisplay[type]) {
+                            ForEach(DepartureTimeFormat.allCases, id: \.self) { format in
+                                Text(format.title).tag(format)
+                            }
+                        }
+                    }
+                }
+            } header: {
+                Text("Departure times")
+            } footer: {
+                Text("National Rail uses HH:mm; other transport uses minutes. Applies to boards in the app and Live Activities. Custom choices are saved when you switch back to matching real-world boards.")
+            }
+            Section {
+                Toggle("Use HH:mm for departures over 1 hour away", isOn: $departureDisplay.usesClockOverOneHour)
+            } footer: {
+                Text("Overrides the selected format for every transport type when a departure is more than 60 minutes away.")
+            }
             Section("Appearance") {
                 Picker("Appearance", selection: $state.appearanceMode) {
                     ForEach(AppAppearanceMode.allCases) { mode in
@@ -159,6 +194,9 @@ struct PreferencesScreen: View {
                 .pickerStyle(.inline)
                 .labelsHidden()
             }
+        }
+        .task(id: departureDisplay) {
+            await DepartureActivityBridge.refreshDisplayPreferences()
         }
         .navigationTitle("Preferences")
         .navigationBarTitleDisplayMode(.inline)

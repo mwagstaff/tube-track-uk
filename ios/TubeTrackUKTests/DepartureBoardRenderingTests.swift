@@ -26,7 +26,9 @@ import XCTest
         let activity = StationBoardActivityController()
         for (name, width, scheme, size) in [("light", 390.0, ColorScheme.light, DynamicTypeSize.large),
                                            ("landscape", 780.0, .dark, .large),
-                                           ("accessibility", 390.0, .dark, .accessibility3)] {
+                                           ("accessibility", 390.0, .dark, .accessibility3),
+                                           ("offline", 390.0, .light, .large)] {
+            app.setNetworkAvailable(name != "offline")
             let view = DepartureBoardCard(initialRequest: request, favouriteID: favourite.id, isVisible: false)
                 .environment(app).environment(UserLocationProvider()).environment(activity)
                 .environment(\.colorScheme, scheme).environment(\.dynamicTypeSize, size)

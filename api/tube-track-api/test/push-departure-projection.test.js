@@ -233,3 +233,13 @@ test('destination names use catalogue casing without damaging route text', () =>
         assert.equal(destinationLabel(arrival({ destinationName: null, towards: raw })), expected);
     }
 });
+
+
+test('Thameslink pushes retain unknown status even when a forecast exists', () => {
+    const board = projectBoard({
+        arrivals: [{ ...arrival({ lineId: 'thameslink' }), status: 'unknown' }],
+        lineId: 'thameslink', direction: 'any'
+    });
+    assert.equal(board.length, 1);
+    assert.equal(board[0].status, 'unknown');
+});

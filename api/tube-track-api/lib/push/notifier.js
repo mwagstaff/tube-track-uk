@@ -78,8 +78,14 @@ export class LiveActivityNotifier {
         return this.#inFlight;
     }
 
+    diagnosticOutcomes = new Map();
+
     async #run(snapshot, staleModes) {
         const rows = this.store.all({ type: 'liveActivity' });
+        const activeIDs = new Set(rows.map((row) => row.id));
+        for (const id of this.diagnosticOutcomes.keys()) {
+            if (!activeIDs.has(id)) this.diagnosticOutcomes.delete(id);
+        }
         if (rows.length === 0) return { sent: 0, considered: 0 };
 
         const conditions = conditionsByLine(await this.#safeStatuses());
@@ -88,9 +94,15 @@ export class LiveActivityNotifier {
         let sent = 0;
 
         for (const row of rows) {
-            if (staleModes.has(MODE_BY_LINE_ID.get(row.lineId))) continue;
+
             // eslint-disable-next-line no-await-in-loop
-            const outcome = await this.#considerRow({ row, snapshot, conditions, nowMs, pass });
+            const outcome = staleModes.has(MODE_BY_LINE_ID.get(row.lineId)) ? 'source_mode_stale'
+                : await this.#considerRow({ row, snapshot, conditions, nowMs, pass });
+            if (this.diagnosticOutcomes.get(row.id) !== outcome) {
+                this.logger?.info?.('push_update_outcome', { activityId: row.activityId,
+                    installId: row.installId, scheduleId: row.scheduleId, outcome });
+                this.diagnosticOutcomes.set(row.id, outcome);
+            }
             if (outcome === 'sent') sent += 1;
         }
 
@@ -152,7 +164,9 @@ export class LiveActivityNotifier {
                     platform: compactPlatformLabel(arrival)?.slice(0, 14) ?? null,
                     expectedAtEpoch: Math.round(Date.parse(arrival.expectedArrival ?? arrival.scheduledDeparture) / 1000),
                     hasExpectedTime: arrival.expectedArrival != null,
-                    ...(['delayed', 'cancelled'].includes(arrival.status) ? { status: arrival.status } : {})
+                    lineIDRaw: arrival.lineId,
+                ...(arrival.direction ? { directionRaw: arrival.direction } : {}),
+                    ...(['delayed', 'cancelled', 'unknown'].includes(arrival.status) ? { status: arrival.status } : {})
                 }));
                 condition = { rank: result.conditionRank ?? 4, headline: result.conditionHeadline ?? null };
             } catch { return 'unavailable'; }
@@ -303,6 +317,7 @@ export class LiveActivityNotifier {
         let environment = row.apnsEnvironment ?? this.client.environment ?? 'production';
         try {
             const request = {
+                activityId: row.activityId,
                 token: row.token,
                 topic: this.topic,
                 pushType: 'liveactivity',
@@ -323,7 +338,7 @@ export class LiveActivityNotifier {
             }
         } catch (error) {
             this.metrics?.recordPushSent?.({ type: 'liveActivity', result: 'error' });
-            this.logger?.warn('push_send_failed', { id: row.id, error: error.message });
+            this.logger?.warn('push_send_failed', { id: row.id, apnsId: error.apnsId, apnsUniqueId: error.apnsUniqueId, error: error.message });
             return 'failed';
         } finally {
             this.metrics?.observePushDuration?.({
@@ -335,7 +350,7 @@ export class LiveActivityNotifier {
         if (result.dead) {
             this.metrics?.recordPushSent?.({ type: 'liveActivity', result: 'dead' });
             this.store.delete(row.id);
-            this.logger?.info('push_token_retired', { id: row.id, reason: result.reason });
+            this.logger?.info('push_token_retired', { id: row.id, apnsId: result.apnsId, apnsUniqueId: result.apnsUniqueId, reason: result.reason });
             return 'dead';
         }
 
@@ -345,13 +360,16 @@ export class LiveActivityNotifier {
                 result: result.retryable ? 'retryable' : 'rejected'
             });
             this.logger?.warn('push_rejected', {
-                id: row.id,
+                id: row.id, apnsId: result.apnsId, apnsUniqueId: result.apnsUniqueId,
                 status: result.status,
                 reason: result.reason
             });
             return 'rejected';
         }
 
+        this.logger?.info?.('push_update_accepted', { apnsId: result.apnsId, apnsUniqueId: result.apnsUniqueId, activityId: row.activityId, installId: row.installId,
+            scheduleId: row.scheduleId, sequence, environment, priority: verdict.priority,
+            reason: verdict.reason, sourceUpdatedAtMs, staleDateSeconds: payload.aps['stale-date'] });
         this.metrics?.recordPushSent?.({ type: 'liveActivity', result: 'ok' });
         this.store.touch(row.id, {
             apnsEnvironment: environment,

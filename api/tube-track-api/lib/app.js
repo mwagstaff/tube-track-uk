@@ -299,6 +299,7 @@ export function createApp({
 
     if (scheduledJourneyStore) {
         app.use('/api/v1/scheduled-journeys', createScheduledJourneyRoutes({
+            logger,
             store: scheduledJourneyStore, stationById: journeyPlanner.byId
         }));
     }

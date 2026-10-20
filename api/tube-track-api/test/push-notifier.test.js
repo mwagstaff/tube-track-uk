@@ -84,6 +84,7 @@ test('custom board background updates preserve filters and never substitute a pa
         await notifier.notify(snapshotWith([]));
         assert.equal(client.sends.length, 1);
         assert.equal(client.sends[0].payload.aps['content-state'].departures.length, 1);
+        assert.equal(client.sends[0].payload.aps['content-state'].departures[0].lineIDRaw, arrival().lineId);
         partial = true;
         await notifier.notify(snapshotWith([]));
         assert.equal(client.sends.length, 1);

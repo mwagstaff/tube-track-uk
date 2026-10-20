@@ -24,9 +24,12 @@ async function fixture(run) {
     const store = await new ScheduledJourneyStore({ dataDir: dir }).load();
     const pushStore = new PushTokenStore({ dataDir: dir });
     let now = Date.parse('2026-09-29T06:00:00Z');
+    const logs = [];
+    const logger = { info: (event, fields) => logs.push({ event, ...fields }),
+        warn: (event, fields) => logs.push({ event, ...fields }), error: (event, fields) => logs.push({ event, ...fields }) };
     const app = express();
-    app.use('/schedules', createScheduledJourneyRoutes({ store, stationById: stations, clock: () => now }));
-    app.use('/push', createPushRoutes({ store: pushStore, scheduleStore: store, isKnownStop: (id) => stations.has(id), clock: () => now }));
+    app.use('/schedules', createScheduledJourneyRoutes({ store, stationById: stations, logger, clock: () => now }));
+    app.use('/push', createPushRoutes({ store: pushStore, scheduleStore: store, logger, isKnownStop: (id) => stations.has(id), clock: () => now }));
     const server = app.listen(0, '127.0.0.1');
     await new Promise((resolve) => server.once('listening', resolve));
     const call = async (method, route, body, key = secret) => fetch(`http://127.0.0.1:${server.address().port}${route}`, {
@@ -41,7 +44,7 @@ async function fixture(run) {
         assert.equal((await call('PUT', '/schedules/device', { token, activitiesEnabled: true, frequentPushesEnabled: true, environment: 'sandbox' })).status, 204);
         assert.equal((await call('PUT', '/schedules', { journeys, revision: 0 })).status, 200);
     };
-    try { await run({ store, pushStore, scheduler, sends, apns, call, setup, cache, setTime: (date) => { now = Date.parse(date); } }); }
+    try { await run({ store, pushStore, scheduler, sends, apns, call, setup, cache, logs, setTime: (date) => { now = Date.parse(date); } }); }
     finally { await scheduler.stop(); pushStore.stop(); await pushStore.flush(); await new Promise((r) => server.close(r)); await fs.rm(dir, { recursive: true, force: true }); }
 }
 
@@ -267,7 +270,7 @@ test('calling filters survive save, start and token registration and govern subs
     const requests = [];
     const customDepartures = { board: async request => {
         requests.push(request);
-        return { arrivals: [{ id: 'matching-train', destinationName: 'Epping', platformName: 'Platform 2',
+        return { arrivals: [{ id: 'matching-train', lineId: 'central', direction: 'eastbound', destinationName: 'Epping', platformName: 'Platform 2',
             expectedArrival: '2026-09-29T07:05:00Z' }], updatedAt: '2026-09-29T07:00:00Z', stale: false, unavailableSources: 0 };
     } };
     scheduler.customDepartures = customDepartures;
@@ -277,6 +280,10 @@ test('calling filters survive save, start and token registration and govern subs
     assert.equal(sends.length, 1);
     const aps = sends[0].payload.aps;
     assert.deepEqual(aps['content-state'].departures.map(row => row.id), ['matching-train']);
+    assert.equal(aps['content-state'].departures[0].lineIDRaw, 'central');
+    assert.equal(aps['content-state'].departures[0].directionRaw, 'eastbound');
+    assert.deepEqual(aps.attributes.boardRequest, { originID: board.hubId,
+        destinationIDs: ['HUBBAN'], lineIDs: ['central'], direction: 'Eastbound' });
     assert.equal((await call('POST', '/push/live-activities', { ...board,
         activityId: aps.attributes.activityID, token })).status, 201);
     assert.deepEqual(pushStore.all()[0].boardRequest.destinationIDs, ['HUBBAN']);
@@ -286,6 +293,8 @@ test('calling filters survive save, start and token registration and govern subs
         topic: 'app.push-type.liveactivity', clock: () => Date.parse('2026-09-29T07:00:30Z') });
     await notifier.notify({ arrivals: [], updatedAtMs: Date.parse('2026-09-29T07:00:30Z') });
     assert.equal(updates.length, 1);
+    assert.equal(updates[0].payload.aps['content-state'].departures[0].lineIDRaw, 'central');
+    assert.equal(updates[0].payload.aps['content-state'].departures[0].directionRaw, 'eastbound');
     assert.equal(requests.length, 2);
     for (const request of requests) assert.deepEqual(request, {
         originID: board.hubId, destinationIDs: ['HUBBAN'], lineIDs: ['central'], direction: 'Eastbound'
@@ -301,3 +310,57 @@ test('filtered starts never fall back to unfiltered departures on empty or parti
         assert.equal(await scheduler.initialState(filtered, Date.parse('2026-09-29T07:00:00Z')), null);
     }
 });
+
+
+test('missing update registration is correlated, warned once, and late registration is persisted', async () => fixture(async ({ setup, scheduler, setTime, store, call }) => {
+    const events = [];
+    scheduler.logger = { info: (event, fields) => events.push({ event, ...fields }),
+        warn: (event, fields) => events.push({ event, ...fields }) };
+    await setup();
+    setTime('2026-09-29T07:00:00Z');
+    await scheduler.run();
+    const occurrence = Object.values(store.rows[install].occurrences)[0];
+    const start = events.find((e) => e.event === 'scheduled_start_result');
+    assert.equal(start.activityId, occurrence.activityId);
+    assert.equal(start.installId, install);
+    setTime('2026-09-29T07:01:59Z');
+    await scheduler.run();
+    assert.equal(events.filter((e) => e.event === 'scheduled_update_registration_missing').length, 0);
+    setTime('2026-09-29T07:02:00Z');
+    await scheduler.run();
+    await scheduler.run();
+    const warnings = events.filter((e) => e.event === 'scheduled_update_registration_missing');
+    assert.equal(warnings.length, 1);
+    assert.equal(warnings[0].activityId, occurrence.activityId);
+    assert.equal(warnings[0].windowExpired, false);
+    assert.equal((await call('POST', '/push/live-activities', {
+        activityId: occurrence.activityId, token, lineId: board.lineId,
+        hubId: board.hubId, stopIds: board.stopIds, direction: board.direction
+    })).status, 201);
+    const disk = await new ScheduledJourneyStore({ filePath: store.filePath }).load();
+    assert.equal(disk.occurrence(install, occurrence.activityId).updateRegisteredAtMs, Date.parse('2026-09-29T07:02:00Z'));
+    scheduler.missingRegistrationWarnings.clear(); // Simulate a restarted diagnostic monitor.
+    setTime('2026-09-29T09:00:00Z');
+    await scheduler.run();
+    await scheduler.run();
+    assert.equal(events.filter((e) => e.event === 'scheduled_update_registration_missing').length, 1);
+    assert.equal(events.find((e) => e.event === 'scheduled_end_result').activityId, occurrence.activityId);
+    assert.ok(!JSON.stringify(events).includes(token));
+    assert.ok(!JSON.stringify(events).includes(secret));
+}));
+
+
+test('rejected registration logs status and validation code without the submitted secrets', async () => fixture(async ({ call, logs }) => {
+    const response = await call('POST', '/push/live-activities', {
+        activityId: 'scheduled-invalid-test', token, lineId: 'not-a-line',
+        hubId: board.hubId, stopIds: board.stopIds, direction: 'any'
+    });
+    assert.equal(response.status, 400);
+    const body = await response.json();
+    const result = logs.find((e) => e.event === 'push_registration_request_result');
+    assert.equal(result.activityId, 'scheduled-invalid-test');
+    assert.equal(result.status, 400);
+    assert.equal(result.errorCode, body.error.code);
+    assert.ok(!JSON.stringify(logs).includes(token));
+    assert.ok(!JSON.stringify(logs).includes(secret));
+}));

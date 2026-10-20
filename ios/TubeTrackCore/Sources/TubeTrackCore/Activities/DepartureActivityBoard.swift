@@ -24,7 +24,8 @@ public enum DepartureActivityBoard {
                   seen.insert(arrival.id).inserted else { return nil }
             return .init(id: arrival.id, destination: StationDepartureMetadata.destinationLabel(for: arrival),
                 platform: StationDepartureMetadata.compactPlatformLabel(for: arrival), expectedAt: time,
-                status: arrival.serviceStatus, hasExpectedTime: arrival.expectedArrival != nil)
+                status: arrival.serviceStatus, hasExpectedTime: arrival.expectedArrival != nil,
+                direction: DepartureDirectionFilter.resolve(label: StationDepartureMetadata.directionLabel(for: arrival)))
         }
         let condition: LineServiceCondition = rows.contains(where: \.isCancelled)
             ? .minorDisruption("Cancellations")

@@ -105,30 +105,38 @@ public enum StationDepartureMetadata {
 
     public static func departureTime(
         for arrival: TfLArrivalPrediction,
-        now: Date = .now
+        now: Date = .now,
+        preferences: DepartureDisplayPreferences = .init()
     ) -> String {
         if arrival.isCancelled { return "Cancelled" }
         if arrival.isNationalRailOperator, arrival.expectedArrival == nil {
             return arrival.serviceStatus == .delayed ? "Delayed" : "—"
         }
-        let seconds: Int?
+        let seconds: TimeInterval?
         if let expectedArrival = arrival.expectedArrival {
-            seconds = max(0, Int(expectedArrival.timeIntervalSince(now)))
+            seconds = max(0, expectedArrival.timeIntervalSince(now))
         } else {
-            seconds = arrival.timeToStation
+            seconds = arrival.timeToStation.map(TimeInterval.init)
         }
         guard let seconds else { return "—" }
         return departureTimeLabel(
             expectedAt: arrival.expectedArrival ?? now.addingTimeInterval(TimeInterval(seconds)),
             seconds: TimeInterval(seconds),
-            minutes: seconds < 45 ? 0 : max(1, seconds / 60)
+            minutes: seconds < 45 ? 0 : max(1, Int(seconds / 60)),
+            transitType: DepartureTransitType(lineID: arrival.lineId), preferences: preferences
         )
     }
 
     /// Shared wording across departure surfaces, preserving each surface's rounding policy.
-    public static func departureTimeLabel(expectedAt: Date, seconds: TimeInterval, minutes: Int) -> String {
-        let countdown = minutes <= 0 ? "Due" : "\(minutes) \(minutes == 1 ? "min" : "mins")"
-        return "\(countdown) (\(expectedAt.formatted(londonClockTime)))"
+    public static func departureTimeLabel(
+        expectedAt: Date, seconds: TimeInterval, minutes: Int,
+        transitType: DepartureTransitType = .underground,
+        preferences: DepartureDisplayPreferences = .init()
+    ) -> String {
+        if preferences.format(for: transitType, seconds: seconds) == .clock {
+            return expectedAt.formatted(DepartureCountdownFormatStyle.clockTime)
+        }
+        return minutes <= 0 ? "Due" : "\(minutes) \(minutes == 1 ? "min" : "mins")"
     }
 
     // Validate API casing against known station names rather than title-casing
