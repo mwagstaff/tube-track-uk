@@ -487,6 +487,11 @@ the contract, assumptions, recorded replay and regression coverage.
 
 ### Custom departure boards
 
+Boards count a train once when TfL repeats it across boarding faces or possible
+platforms. Canary Wharf DLR retains both boarding numbers; identified Tube trains
+on alternative tracks show `Check platform`. See the
+[platform audit and matching rules](docs/departure-platform-audit.md).
+
 `GET /api/v1/departure-board?origin=nr:KTH&destinations=910GBROMLYS&lines=` returns an envelope containing `arrivals`, `updatedAt`, `unavailableSources`, `unverifiedCount` and `stale`. Origins and destinations use the shared `data/departure-stops.json` hub IDs (river boards use canonical pier IDs). Up to eight destination IDs are OR-matched; optional line/operator IDs restrict the combined board. Filtering precedes sorting and the app's five-row compact limit. Full screen can display the remaining results.
 
 National Rail intermediate calls use TrainTrack's verified `/api/v1/departures/from/:crs/to/:crs` feed. Cancelled calls at the selected destination and unverified filters are excluded. Tube/DLR/tram and river boards require the published terminus or an unambiguous downstream calling pattern; reachability in a network graph is not sufficient. Source failures produce a partial-board notice rather than implying there are no services.

@@ -6,6 +6,7 @@ import { createRailDepartureSource, correctRailBoard } from './push/rail-departu
 import { createThameslinkDataSource } from './thameslink.js';
 import { LINE_COLOURS } from './line-colours.js';
 import { isSelfReferential } from './push/departure-projection.js';
+import { coalesceDeparturePlatforms } from './departure-platforms.js';
 import { loadLineStatuses } from './line-status.js';
 import { conditionsByLine } from './push/line-condition.js';
 import { riverCondition } from './push/river-departure-projection.js';
@@ -68,7 +69,7 @@ export function callsAtSelected(row, originIDs, destinationIDs, routes) {
 
 export function orderedUniqueDepartures(rows, nowMs) {
     const seen = new Set();
-    return rows.filter(row => {
+    return coalesceDeparturePlatforms(rows.filter(row => {
         const date = Date.parse(row.expectedArrival ?? row.expectedDeparture ?? row.scheduledDeparture);
         if (!(date > nowMs - 15_000) && !(row.status === 'delayed' && !row.expectedArrival)) return false;
         if (isSelfReferential(row)) return false;
@@ -77,7 +78,7 @@ export function orderedUniqueDepartures(rows, nowMs) {
         if (seen.has(key)) return false;
         seen.add(key); return true;
     }).sort((a, b) => Date.parse(a.expectedArrival ?? a.scheduledDeparture)
-        - Date.parse(b.expectedArrival ?? b.scheduledDeparture) || a.id.localeCompare(b.id));
+        - Date.parse(b.expectedArrival ?? b.scheduledDeparture) || a.id.localeCompare(b.id)));
 }
 
 export function createCustomDepartureSource({ client, resourceCache, cache, clock = Date.now,

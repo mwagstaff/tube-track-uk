@@ -164,3 +164,19 @@ test('failed rail refresh retains a still-fresh source snapshot but expires at 9
     time = now + 91_000;
     await assert.rejects(source.departures('LEW'), /stale/);
 });
+
+// Regression: the new server-backed board bypassed the iOS face coalescer.
+test('Canary Wharf boards count trains and retain both boarding faces', async () => {
+    const rows = [60, 840, 1620].flatMap(seconds => [4, 3].map(platform => ({
+        ...prediction('shared-dlr-id', '940GZZDLSTD', seconds), vehicleId: null,
+        stopId: '940GZZDLCAN', platformName: `Platform ${platform}`, direction: 'inbound'
+    })));
+    const stop = { id: 'canary', name: 'Canary Wharf', stopIDs: ['940GZZDLCAN'],
+        lineIDs: ['dlr'], railCodes: [], mode: 'rail' };
+    const result = await fixture(rows, { stops: [stop] }).board({
+        originID: 'canary', destinationIDs: [], lineIDs: ['dlr']
+    });
+    assert.equal(result.arrivals.length, 3);
+    assert.deepEqual(result.arrivals.map(row => row.platformName), Array(3).fill('Platforms 3 & 4'));
+    assert.deepEqual(result.arrivals.map(row => row.expectedArrival), [iso(60000), iso(840000), iso(1620000)]);
+});

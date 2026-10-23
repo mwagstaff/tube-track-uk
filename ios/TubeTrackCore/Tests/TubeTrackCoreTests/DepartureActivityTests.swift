@@ -267,4 +267,18 @@ struct DepartureActivityTests {
         )
         #expect(state.departures.first?.platform == "Platform 2")
     }
+
+    @Test func trackedPlatformLabelsRetainBothFacesAndUncertainty() {
+        for (platform, expected) in [
+            ("Platforms 3 & 4", "Platforms 3&4"),
+            ("Eastbound - Check platform", "Check platform"),
+        ] {
+            let state = DepartureActivityBoard.contentState(
+                from: [arrival(id: "1", platform: platform, seconds: 120)],
+                lineID: .northern, direction: .any, condition: nil,
+                updatedAt: .now, sequence: 1
+            )
+            #expect(state.departures.first?.platform == expected)
+        }
+    }
 }

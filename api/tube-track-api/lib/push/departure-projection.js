@@ -9,6 +9,7 @@
 //
 // Projection has no clock or request-time I/O; station names are loaded once.
 import { readFileSync } from 'node:fs';
+import { coalesceDeparturePlatforms } from '../departure-platforms.js';
 
 const CARDINAL_DIRECTIONS = ['northbound', 'southbound', 'eastbound', 'westbound'];
 const STOP_NAME_SUFFIXES = [
@@ -119,6 +120,7 @@ export function platformLabel(arrival) {
 export function compactPlatformLabel(arrival) {
     const label = platformLabel(arrival);
     if (label === null) return null;
+    if (label.endsWith('Check platform')) return 'Check platform';
 
     const platformIndex = label.toLowerCase().indexOf('platform');
     if (platformIndex >= 0) {
@@ -255,13 +257,13 @@ export function projectBoard({
         if (difference !== 0) return difference;
         return String(left.id).localeCompare(String(right.id));
     });
-    return uniquePredictions(matching)
+    return coalesceDeparturePlatforms(uniquePredictions(matching))
         .filter((arrival) => matchesDirection(directionLabel(arrival), direction))
         .slice(0, limit)
         .map((arrival) => ({
             id: arrival.vehicleId ?? arrival.id,
             destination: destinationLabel(arrival).slice(0, DESTINATION_LIMIT),
-            platform: compactPlatformLabel(arrival)?.slice(0, PLATFORM_LIMIT) ?? null,
+            platform: compactPlatformLabel(arrival)?.replace(/\s+&\s+/g, '&').slice(0, PLATFORM_LIMIT) ?? null,
             expectedAtEpoch: Math.round(expectedAtMs(arrival) / 1_000),
             // National Rail boards say when a train is late or will not run;
             // Tube predictions carry no status and keep their shape.

@@ -45,7 +45,10 @@ public enum StationDepartureMetadata {
     /// way the train is going. TfL writes "Eastbound - Platform 2"; on a Lock
     /// Screen that repeats the heading and then truncates the part that matters.
     public static func compactPlatformLabel(for arrival: TfLArrivalPrediction) -> String? {
-        guard let label = platformLabel(for: arrival) else { return nil }
+        guard let rawLabel = platformLabel(for: arrival) else { return nil }
+        // Preserve both boarding faces within the Live Activity's 14-character limit.
+        let label = rawLabel.replacingOccurrences(of: " & ", with: "&")
+        if label.hasSuffix("Check platform") { return "Check platform" }
         if let platform = label.range(of: "platform", options: .caseInsensitive) {
             return String(label[platform.lowerBound...])
                 .trimmingCharacters(in: .whitespaces)
