@@ -6,6 +6,7 @@ struct DeepLinkTests {
     @Test func linksRoundTripThroughURLs() throws {
         let links: [DeepLink] = [
             .status,
+            .journey(id: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
             .line(.central),
             .line(.hammersmithCity),
             .station(id: "940GZZLUOXC", line: nil),
@@ -33,6 +34,8 @@ struct DeepLinkTests {
             "tubetrack://station",
             "tubetrack://status/extra",
             "tubetrack://unknown",
+            "tubetrack://journey/not-a-session",
+            "tubetrack://journey",
         ] {
             let url = try #require(URL(string: value))
             #expect(DeepLink(url: url) == nil, "\(value)")

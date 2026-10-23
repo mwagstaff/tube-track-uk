@@ -124,6 +124,24 @@ with `-DebugJourneyFrom <station ID>` and `-DebugJourneyTo <station ID>`.
 `-DebugJourneyDestination details` or `map` opens that screen after the search.
 These options are Debug-only. No TfL credential belongs in the app.
 
+## Tracking a complete route
+
+Journey search supports up to four ordered via stations. Select a route and choose
+Start journey or Schedule this route. A full-screen view follows the selected
+legs, surfaces the relevant onward board and shows next-stop/final arrival
+estimates. Confirm a train to retain its service details; use the progress picker
+or arrival controls to correct the leg. Alternative routes require acceptance.
+
+Follow my location is optional and runs only during the active journey. Coordinates
+stay on the phone; the server receives progress changes. A scheduled Live Activity
+can start remotely, but location following starts when enabled in the foreground.
+One-off and weekly route schedules resolve fresh services on the saved route.
+Existing station-board schedules remain available and unchanged.
+
+Deploy `/api/v2/tracked-journeys` and via-search support before shipping. See
+[complete-route tracking](../api/tube-track-api/docs/tracked-journeys.md) for API,
+freshness, privacy, operational details and required signed-device verification.
+
 ## Widgets and Live Activity
 
 The `TubeTrackWidgets` extension ships one configurable widget and the

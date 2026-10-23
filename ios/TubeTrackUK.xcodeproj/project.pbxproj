@@ -610,7 +610,7 @@
 				INFOPLIST_FILE = "Configuration/TubeTrackUK-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location shows nearby stations and, when you enable journey location, follows your active journey while the screen is locked.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -655,7 +655,7 @@
 				INFOPLIST_FILE = "Configuration/TubeTrackUK-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "TubeTrack UK";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
-				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location is used to show the three nearest stations.";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Your location shows nearby stations and, when you enable journey location, follows your active journey while the screen is locked.";
 				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_NSSupportsLiveActivitiesFrequentUpdates = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

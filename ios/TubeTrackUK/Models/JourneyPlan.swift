@@ -31,6 +31,7 @@ struct JourneyRequest: Equatable, Sendable {
     let timeMode: JourneyTimeMode
     let time: Date
     let accessibility: JourneyAccessibility
+    var via: [String] = []
 
     var queryItems: [URLQueryItem] {
         var items = [
@@ -39,6 +40,7 @@ struct JourneyRequest: Equatable, Sendable {
             URLQueryItem(name: "timeMode", value: timeMode.rawValue),
             URLQueryItem(name: "accessibility", value: accessibility.rawValue)
         ]
+        if !via.isEmpty { items.append(URLQueryItem(name: "via", value: via.joined(separator: ","))) }
         if timeMode != .now {
             items.append(URLQueryItem(name: "time", value: time.ISO8601Format()))
         }
@@ -46,7 +48,8 @@ struct JourneyRequest: Equatable, Sendable {
     }
 }
 
-struct JourneyPlan: Decodable, Sendable {
+struct JourneyPlan: Codable, Sendable {
+    var searchID: String? = nil
     let from: JourneyStation
     let to: JourneyStation
     let timeMode: String
@@ -58,12 +61,12 @@ struct JourneyPlan: Decodable, Sendable {
     let attribution: String
 }
 
-struct JourneyStation: Decodable, Sendable {
+struct JourneyStation: Codable, Sendable {
     let id: String
     let name: String
 }
 
-struct PlannedJourney: Decodable, Identifiable, Sendable {
+struct PlannedJourney: Codable, Identifiable, Sendable {
     let id: String
     let departureTime: Date
     let arrivalTime: Date
@@ -86,7 +89,7 @@ struct PlannedJourney: Decodable, Identifiable, Sendable {
     var severeWarnings: [JourneyWarning] { warnings.filter { $0.severity == "severe" } }
 }
 
-struct JourneyLeg: Decodable, Identifiable, Sendable {
+struct JourneyLeg: Codable, Identifiable, Sendable {
     let id: String
     let mode: String
     let instruction: String
@@ -101,15 +104,17 @@ struct JourneyLeg: Decodable, Identifiable, Sendable {
     let durationMinutes: Int
     let warnings: [JourneyWarning]
     let stops: [JourneyStation]
+    var serviceID: String? = nil
+    var liveUpdatedAt: Date? = nil
 }
 
-struct JourneyPoint: Decodable, Sendable {
+struct JourneyPoint: Codable, Sendable {
     let id: String
     let name: String
     let platform: String?
 }
 
-struct JourneyLine: Decodable, Sendable {
+struct JourneyLine: Codable, Sendable {
     let id: String
     let name: String
     let direction: String
@@ -117,7 +122,7 @@ struct JourneyLine: Decodable, Sendable {
     var operatorCode: String? = nil
 }
 
-struct JourneyWarning: Decodable, Identifiable, Sendable {
+struct JourneyWarning: Codable, Identifiable, Sendable {
     let id: String
     let message: String
     let kind: String

@@ -113,11 +113,13 @@ export class JourneyPlanner {
         }
     }
 
-    async plan(query, { transfer = false } = {}) {
+    async plan(query, { transfer = false, mode = null } = {}) {
         const request = this.validate(query);
+        if (mode !== null && mode !== "dlr") throw new JourneyError("INVALID_MODE", "Unsupported constrained mode.");
+        request.mode = mode;
         const key = JSON.stringify([request.from.id, request.to.id, request.timeMode,
             request.timeMode === 'now' ? Math.floor(request.requestedAt / 15_000) : request.requestedAt,
-            request.accessibility, request.nationalRail, transfer]);
+            request.accessibility, request.nationalRail, transfer, mode]);
         let entry = this.cache.get(key);
         const cached = !!entry && entry.expiresAt > this.clock();
         if (!cached) {
@@ -166,13 +168,16 @@ export class JourneyPlanner {
         // Bound the whole search, including cold station lookups and fallback,
         // to less than the mobile client's 20-second request timeout.
         const signal = AbortSignal.timeout(18_000);
-        const [from, to] = await Promise.all([this.stationId(request.from, signal), this.stationId(request.to, signal)]);
+        const [from, to] = request.mode === 'dlr'
+            ? [request.from, request.to].map(s => s.stopIds.find(id => id.startsWith('940GZZDL')))
+            : await Promise.all([this.stationId(request.from, signal), this.stationId(request.to, signal)]);
+        if (!from || !to) throw new JourneyError('INVALID_MODE', 'Choose DLR stations.');
         const queryTime = request.timeMode === 'arriveBy'
             ? Math.floor(request.requestedAt / 60_000) * 60_000
             : Math.ceil(request.requestedAt / 60_000) * 60_000;
         const query = {
             ...tflDateTime(queryTime), timeIs: request.timeMode === 'arriveBy' ? 'Arriving' : 'Departing',
-            mode: request.nationalRail ? `${MODES},${NATIONAL_RAIL_MODE}` : MODES,
+            mode: request.mode ?? (request.nationalRail ? `${MODES},${NATIONAL_RAIL_MODE}` : MODES),
             journeyPreference: 'LeastTime', includeAlternativeRoutes: 'true',
             calcOneDirection: 'true', useRealTimeLiveArrivals: 'true', applyHtmlMarkup: 'false',
             accessibilityPreference: ACCESSIBILITY[request.accessibility]
@@ -264,6 +269,7 @@ export function normalizeJourney(raw, request) {
     let anchor = departure;
     for (const [index, leg] of raw.legs.entries()) {
         const mode = leg.mode?.id;
+        if (request.mode && mode !== request.mode && mode !== "walking") return null;
         if (!RAIL_MODES.has(mode) && mode !== 'walking') return null;
         const nationalRailLine = mode === NATIONAL_RAIL_MODE
             ? (leg.routeOptions ?? []).map((r) => r.lineIdentifier?.id ?? r.id).find((id) => NATIONAL_RAIL_LINE_IDS.has(id))

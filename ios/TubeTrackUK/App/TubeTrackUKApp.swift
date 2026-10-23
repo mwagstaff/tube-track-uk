@@ -3,6 +3,7 @@ import SwiftUI
 @main
 struct TubeTrackUKApp: App {
     @Environment(\.scenePhase) private var scenePhase
+    @State private var trackedJourneys = TrackedJourneyStore()
     @State private var scheduledJourneys = ScheduledJourneyStore()
     @State private var appState = TubeAppState()
     @State private var backgroundImageStore = AppBackgroundImageStore()
@@ -28,11 +29,13 @@ struct TubeTrackUKApp: App {
             RootTabView()
                 .environment(appState)
                 .environment(scheduledJourneys)
+                .environment(trackedJourneys)
+                .task { await trackedJourneys.run() }
                 .task { await scheduledJourneys.refresh() }
                 .onChange(of: scenePhase) { _, phase in
                     LiveActivityDiagnostics.record("scene_phase", ["phase": String(describing: phase)])
                     DepartureActivityBridge.recordDiagnosticSnapshot(reason: "scene_phase")
-                    if phase == .active { Task { await scheduledJourneys.refresh() } }
+                    if phase == .active { trackedJourneys.resumeLocation(); Task { await scheduledJourneys.refresh(); await trackedJourneys.refresh() } }
                 }
                 .environment(backgroundImageStore)
                 .environment(gameHighScoreStore)

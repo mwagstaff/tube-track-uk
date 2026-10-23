@@ -4,6 +4,7 @@ import TubeTrackCore
 struct JourneysScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(ScheduledJourneyStore.self) private var scheduleStore
+    @Environment(TrackedJourneyStore.self) private var tracking: TrackedJourneyStore?
     @State private var showsResults = false
     @State private var schedulePresentation: ScheduledJourneyPresentation
 
@@ -18,6 +19,31 @@ struct JourneysScreen: View {
 
         NavigationStack {
             List {
+                if let tracking {
+                    if let active = tracking.active {
+                        Section("Active journey") {
+                            Button { tracking.showsJourney = true } label: {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(active.state?.headline ?? "Resume journey").font(.headline)
+                                    Text("To " + (active.plan.legs.last?.to.name ?? "destination")).foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    if !tracking.schedules.isEmpty {
+                        Section("Scheduled routes") {
+                            ForEach(tracking.schedules) { schedule in
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text("\(schedule.plan.legs.first?.from.name ?? "") → \(schedule.plan.legs.last?.to.name ?? "")").font(.headline)
+                                    if let date = schedule.date { Text(JourneyFormatting.date(date)) }
+                                    else { Text(schedule.days.map { ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][$0 - 1] }.joined(separator: ", ") + String(format: " · %02d:%02d London", schedule.minute / 60, schedule.minute % 60)) }
+                                    if let message = schedule.message { Text(message).font(.footnote).foregroundStyle(.orange) }
+                                }
+                                .swipeActions { Button("Delete", role: .destructive) { Task { await tracking.deleteSchedule(schedule.id) } } }
+                            }
+                        }
+                    }
+                }
                 Section {
                     scheduledJourneysLink
                 } footer: {
@@ -26,6 +52,18 @@ struct JourneysScreen: View {
 
                 Section {
                     stationButton("From", station: planner.from, field: .from)
+                    ForEach(Array(planner.via.enumerated()), id: \.element.id) { index, station in
+                        HStack {
+                            Text("Via \(index + 1)").foregroundStyle(.secondary)
+                            Text(station.name)
+                            Spacer()
+                            Button { planner.via.remove(at: index) } label: { Image(systemName: "minus.circle") }
+                                .accessibilityLabel("Remove via \(station.name)").buttonStyle(.borderless)
+                        }
+                    }
+                    if planner.via.count < 4 {
+                        Button { planner.stationField = .via } label: { Label("Add via station", systemImage: "plus.circle") }
+                    }
                     stationButton("To", station: planner.to, field: .to)
                     Button {
                         planner.swapStations()
@@ -120,7 +158,7 @@ struct JourneysScreen: View {
                 StationSearchSheet(
                     graph: graph,
                     selectedStationID: field == .from ? planner.from?.id : planner.to?.id,
-                    title: field == .from ? "Starting station" : "Destination",
+                    title: field == .from ? "Starting station" : field == .via ? "Via station" : "Destination",
                     selectionHint: field == .from ? "Sets your starting station" : "Sets your destination",
                     onClose: {
                         JourneyNavigationDiagnostics.record("picker close field=\(field.rawValue) tab=\(appState.selectedTab.rawValue)")
@@ -128,8 +166,23 @@ struct JourneysScreen: View {
                     }
                 ) { station in
                     JourneyNavigationDiagnostics.record("picker selected field=\(field.rawValue) tab=\(appState.selectedTab.rawValue)")
-                    if field == .from { planner.from = station } else { planner.to = station }
+                    if field == .from { planner.from = station }
+                    else if field == .via {
+                        if station.id != planner.from?.id, station.id != planner.to?.id, !planner.via.contains(where: { $0.id == station.id }) { planner.via.append(station) }
+                    } else { planner.to = station }
                 }
+            }
+        }
+        .fullScreenCover(isPresented: Binding(get: { tracking?.showsJourney ?? false }, set: { tracking?.showsJourney = $0 })) {
+            JourneyTrackingScreen()
+        }
+        .onChange(of: appState.linkedJourneyID, initial: true) { _, id in
+            guard let id, let tracking else { return }
+            Task {
+                await tracking.refresh()
+                if tracking.active?.id == id { tracking.showsJourney = true }
+                else { tracking.error = "This journey has ended." }
+                appState.linkedJourneyID = nil
             }
         }
         .sheet(item: $schedules.editing) { journey in
@@ -223,7 +276,7 @@ struct JourneysScreen: View {
             if arguments[index + 1] == "map" {
                 JourneyMapScreen(journey: journey)
             } else if arguments[index + 1] == "details" {
-                JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale)
+                JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale, searchID: response.data.searchID)
             } else {
                 JourneyResultsScreen()
             }
@@ -330,15 +383,11 @@ private struct JourneyResultsScreen: View {
         ForEach(response.data.journeys) { journey in
             Section {
                 NavigationLink {
-                    JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale)
+                    JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale, searchID: response.data.searchID)
                 } label: {
                     JourneySummary(journey: journey)
                 }
-                if let schedule = journey.suggestedSchedule {
-                    Button { scheduling = schedule } label: {
-                        Label("Save as scheduled journey", systemImage: "calendar.badge.plus")
-                    }
-                }
+                TrackedRouteActions(journey: journey, searchID: response.data.searchID)
             }
         }
 
@@ -467,6 +516,7 @@ struct JourneyDetailScreen: View {
     let journey: PlannedJourney
     let expiresAt: Date
     var isStale = false
+    var searchID: String? = nil
     @State private var scheduling: ScheduledJourney?
 
     var body: some View {
@@ -504,15 +554,7 @@ struct JourneyDetailScreen: View {
                     Label("Show journey map", systemImage: "map")
                 }
             }
-            if let schedule = journey.suggestedSchedule {
-                Section {
-                    Button { scheduling = schedule } label: {
-                        Label("Save as scheduled journey", systemImage: "calendar.badge.plus")
-                    }
-                } footer: {
-                    Text("Track the first departure board each way on your usual travel days. You can review the stations and times before saving.")
-                }
-            }
+            Section { TrackedRouteActions(journey: journey, searchID: searchID) }
             ForEach(Array(journey.legs.enumerated()), id: \.element.id) { index, leg in
                 Section {
                     HStack(alignment: .top, spacing: 12) {

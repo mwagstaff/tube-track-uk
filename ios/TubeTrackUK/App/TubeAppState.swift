@@ -119,6 +119,7 @@ enum AppAppearanceMode: String, CaseIterable, Identifiable, Sendable {
 @MainActor
 @Observable
 final class TubeAppState {
+    var linkedJourneyID: String?
     let journeyPlanner: JourneyPlannerModel
     let cableCar: CableCarState
     let river: RiverBusState
@@ -841,6 +842,9 @@ final class TubeAppState {
             return
         }
         switch link {
+        case let .journey(id):
+            selectedTab = .journeys
+            linkedJourneyID = id
         case let .board(request):
             selectedTab = .nearMe
             linkedDepartureBoard = request

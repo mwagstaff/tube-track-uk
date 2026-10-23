@@ -326,3 +326,23 @@ test('arrive-by route deduplication preserves latest-departure ordering', () => 
     assert.equal(choices[0].id, 'latest');
     assert.deepEqual(choices[0].labels, ['latestDeparture']);
 });
+
+
+test('DLR constrained search uses platform NaPTAN IDs and excludes other modes', async () => {
+    const calls = [];
+    const dlrStations = [
+        { id: 'HUBLEW', name: 'Lewisham', stopIds: ['940GZZDLLEW'], aliases: [], lineIds: ['dlr'] },
+        { id: 'HUBCAW', name: 'Canary Wharf', stopIds: ['910GCANWHRF', '940GZZDLCAN', '940GZZLUCYF'], aliases: [], lineIds: ['dlr', 'jubilee'] }
+    ];
+    const planner = new JourneyPlanner({ stations: dlrStations, clock: () => now,
+        disruptions: { snapshot: async () => ({}), enrich: journeys => journeys.map(j => ({ ...j, disruption: { coverage: 'complete', hasDisruption: false } })) },
+        client: { fetchJSON: async (path, options) => {
+            calls.push({ path, options });
+            return { journeys: [itinerary({ mode: 'dlr', line: 'dlr' }), itinerary({ mode: 'tube', line: 'jubilee' })], stopMessages: [] };
+        } } });
+    const result = await planner.plan({ from: 'HUBLEW', to: 'HUBCAW' }, { mode: 'dlr' });
+    assert.ok(calls.every(c => c.path === '/Journey/JourneyResults/940GZZDLLEW/to/940GZZDLCAN'));
+    assert.ok(calls.every(c => c.options.query.mode === 'dlr'));
+    assert.ok(result.data.journeys.length);
+    assert.ok(result.data.journeys.every(j => j.legs.every(l => l.mode === 'dlr')));
+});

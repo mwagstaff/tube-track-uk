@@ -66,7 +66,8 @@ struct AboutScreen: View {
                 }
 
                 Section {
-                    Label("No account or personal data required", systemImage: "hand.raised.fill")
+                    Label("No account required", systemImage: "hand.raised.fill")
+                    Text("Journey location stays on your phone. When you track or schedule a route, its itinerary, current leg and Live Activity addresses are stored by our service to provide updates. End tracking or delete a scheduled route from Journeys.").font(.footnote).foregroundStyle(.secondary)
                     Text("TubeTrack UK is independent and is not affiliated with or endorsed by TfL, although we think they're pretty great and thank them for sharing their data. ")
                         .font(.appFootnote())
                         .foregroundStyle(.secondary)

@@ -9,6 +9,7 @@ public enum DeepLink: Equatable, Sendable {
     public static let scheme = "tubetrack"
 
     case status
+    case journey(id: String)
     case line(TubeLineID)
     case station(id: String, line: TubeLineID?)
     case pier(id: String, line: String?)
@@ -22,6 +23,9 @@ public enum DeepLink: Equatable, Sendable {
         }
         let segments = components.path.split(separator: "/").map(String.init)
         switch host {
+        case "journey":
+            guard segments.count == 1, UUID(uuidString: segments[0]) != nil else { return nil }
+            self = .journey(id: segments[0])
         case "departures":
             guard segments.count == 1, segments[0].count <= 64 else { return nil }
             func values(_ name: String) -> [String] {
@@ -59,6 +63,9 @@ public enum DeepLink: Equatable, Sendable {
         var components = URLComponents()
         components.scheme = Self.scheme
         switch self {
+        case let .journey(id):
+            components.host = "journey"
+            components.path = "/\(id)"
         case let .board(request):
             components.host = "departures"
             components.path = "/\(request.originID)"

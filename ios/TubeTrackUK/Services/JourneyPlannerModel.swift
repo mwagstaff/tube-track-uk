@@ -20,7 +20,9 @@ struct JourneyService: JourneyFetching {
             while Date.now < deadline {
                 try Task.checkCancellation()
                 if let result = job.result {
-                    return TubeTrackAPIResponse(data: result.data, updatedAt: result.meta.updatedAt,
+                    var plan = result.data
+                    plan.searchID = started.id
+                    return TubeTrackAPIResponse(data: plan, updatedAt: result.meta.updatedAt,
                                                 cached: result.meta.cached, stale: result.meta.stale)
                 }
                 if let error = job.error {
@@ -67,13 +69,14 @@ private struct CombinedJourneyJob: Decodable, Sendable {
 @Observable
 final class JourneyPlannerModel {
     enum StationField: String, Identifiable {
-        case from, to
+        case from, to, via
         var id: String { rawValue }
     }
     var stationField: StationField?
 
     var from: TubeStation? { didSet { invalidate() } }
     var to: TubeStation? { didSet { invalidate() } }
+    var via: [TubeStation] = [] { didSet { invalidate() } }
     var timeMode: JourneyTimeMode = .now { didSet { invalidate() } }
     var time = Date.now.addingTimeInterval(3_600) { didSet { invalidate() } }
     var accessibility: JourneyAccessibility = .none { didSet { invalidate() } }
@@ -99,6 +102,7 @@ final class JourneyPlannerModel {
         let oldFrom = from
         from = to
         to = oldFrom
+        via.reverse()
     }
 
     func startSearch(keepingResults: Bool = false) {
@@ -118,7 +122,7 @@ final class JourneyPlannerModel {
         guard let id = searchID, let from, let to else { return }
         let request = JourneyRequest(
             from: from.id, to: to.id, timeMode: timeMode,
-            time: time, accessibility: accessibility
+            time: time, accessibility: accessibility, via: via.map(\.id)
         )
         do {
             let response = try await service.fetch(request)

@@ -1,3 +1,4 @@
+import { trackedJourneyRoutes } from './tracked-journeys.js';
 import { createScheduledJourneyRoutes } from './scheduled-journeys.js';
 import { createCustomDepartureSource, createCustomDepartureRoutes } from './custom-departure-board.js';
 import compression from 'compression';
@@ -100,6 +101,7 @@ export function createApp({
     pushTokenStore = null,
     scheduledJourneyStore = null,
     usageStore = null,
+    trackedJourneys = null,
     journeyPlanner = new JourneyPlanner({ client }),
     combinedJourneys = new CombinedJourneys({ tflPlanner: journeyPlanner })
 }) {
@@ -140,6 +142,7 @@ export function createApp({
     app.use('/api/v1/thameslink', createThameslinkRoutes({ client, resourceCache }));
     app.use('/api/v1/national-rail', createNationalRailRoutes({ client, resourceCache }));
     app.use('/api/v1/departure-board', createCustomDepartureRoutes(customDepartures));
+    if (trackedJourneys) app.use('/api/v2/tracked-journeys', trackedJourneyRoutes(trackedJourneys));
     app.use('/api/v2/journey-searches', combinedJourneyRoutes(combinedJourneys));
 
     app.get('/api/v1/line-colours', (req, res) => {

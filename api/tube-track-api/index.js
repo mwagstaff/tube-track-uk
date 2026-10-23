@@ -1,3 +1,8 @@
+import path from 'node:path';
+import { defaultDataDirectory } from './lib/push/token-store.js';
+import { JourneyPlanner } from './lib/journey-planner.js';
+import { CombinedJourneys } from './lib/combined-journeys.js';
+import { TrackedJourneys, TrackedJourneyStore } from './lib/tracked-journeys.js';
 import { ScheduledJourneyStore, JourneyScheduler } from './lib/scheduled-journeys.js';
 import { createApp } from './lib/app.js';
 import { createCustomDepartureSource } from './lib/custom-departure-board.js';
@@ -137,7 +142,17 @@ async function main() {
         requestStaggerMs: config.requestStaggerMs,
         refreshTimeoutMs: config.refreshTimeoutMs
     });
+    const journeyPlanner = new JourneyPlanner({ client });
+    const combinedJourneys = new CombinedJourneys({ tflPlanner: journeyPlanner });
+    let trackedJourneys = null;
+    try {
+        const store = await new TrackedJourneyStore({ filePath: path.join(config.push.dataDir || defaultDataDirectory(), 'tracked-journeys.json') }).load();
+        trackedJourneys = new TrackedJourneys({ store, planner: combinedJourneys,
+            boards: createCustomDepartureSource({ client, resourceCache, cache }), apns: push.apns,
+            topic: config.push.liveActivityTopic, logger });
+    } catch { logger.error('tracked_journey_store_unavailable'); }
     const app = createApp({
+        journeyPlanner, combinedJourneys, trackedJourneys,
         cache,
         poller,
         metrics,
@@ -162,6 +177,7 @@ async function main() {
         });
         poller.start();
         push.scheduler?.start();
+        trackedJourneys?.start();
     });
     server.keepAliveTimeout = 65_000;
     server.headersTimeout = 70_000;
@@ -178,6 +194,7 @@ async function main() {
         }, 10_000);
         forcedExit.unref();
 
+        await trackedJourneys?.stop();
         await push.scheduler?.stop();
         await poller.stop();
         // Tokens registered since the last debounced write would otherwise be
