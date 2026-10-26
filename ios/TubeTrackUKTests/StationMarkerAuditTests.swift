@@ -73,7 +73,7 @@ struct StationMarkerAuditTests {
             .appendingPathComponent("../Tools/NationalRailMapBuilder/reviewed-station-targets.csv")
         let rows = try String(contentsOf: fixture, encoding: .utf8)
             .components(separatedBy: .newlines).filter { !$0.isEmpty }.dropFirst()
-        #expect(rows.count == 944)
+        #expect(rows.count == 945)
         let name = "StationMarkerAudit.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
         defer { defaults.removePersistentDomain(forName: name) }

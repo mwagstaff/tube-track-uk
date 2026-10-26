@@ -6,7 +6,11 @@ struct JourneysScreen: View {
     @Environment(ScheduledJourneyStore.self) private var scheduleStore
     @Environment(TrackedJourneyStore.self) private var tracking: TrackedJourneyStore?
     @State private var showsResults = false
+    @State private var recentSearchQuery = ""
+    @State private var recentSearchPage = 0
+    @FocusState private var isRecentSearchFocused: Bool
     @State private var schedulePresentation: ScheduledJourneyPresentation
+    private static let recentSearchFieldID = "recent-search-field"
 
     init(schedulePresentation: ScheduledJourneyPresentation = ScheduledJourneyPresentation()) {
         _schedulePresentation = State(initialValue: schedulePresentation)
@@ -18,7 +22,8 @@ struct JourneysScreen: View {
         @Bindable var schedules = schedulePresentation
 
         NavigationStack {
-            List {
+            ScrollViewReader { scrollProxy in
+                List {
                 if let tracking {
                     if let active = tracking.active {
                         Section("Active journey") {
@@ -30,24 +35,12 @@ struct JourneysScreen: View {
                             }
                         }
                     }
-                    if !tracking.schedules.isEmpty {
-                        Section("Scheduled routes") {
-                            ForEach(tracking.schedules) { schedule in
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("\(schedule.plan.legs.first?.from.name ?? "") → \(schedule.plan.legs.last?.to.name ?? "")").font(.headline)
-                                    if let date = schedule.date { Text(JourneyFormatting.date(date)) }
-                                    else { Text(schedule.days.map { ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"][$0 - 1] }.joined(separator: ", ") + String(format: " · %02d:%02d London", schedule.minute / 60, schedule.minute % 60)) }
-                                    if let message = schedule.message { Text(message).font(.footnote).foregroundStyle(.orange) }
-                                }
-                                .swipeActions { Button("Delete", role: .destructive) { Task { await tracking.deleteSchedule(schedule.id) } } }
-                            }
-                        }
-                    }
+
                 }
                 Section {
                     scheduledJourneysLink
                 } footer: {
-                    Text("Your regular journeys, tracked automatically. Save a route below or add one in My scheduled journeys.")
+                    Text("Your regular and one-off journeys, together in My scheduled journeys.")
                 }
 
                 Section {
@@ -138,14 +131,31 @@ struct JourneysScreen: View {
                     }
                 }
 
-            }
-            .navigationTitle("Journeys")
-            .journeyBackground()
-            .navigationDestination(isPresented: $schedules.showsList) {
-                ScheduledJourneysScreen(presentation: schedulePresentation)
-            }
-            .navigationDestination(isPresented: $showsResults) {
-                resultsDestination
+                    recentSearchSection
+
+                }
+                .navigationTitle("Journeys")
+                .journeyBackground()
+                .onChange(of: recentSearchQuery) { _, _ in
+                    recentSearchPage = 0
+                    if isRecentSearchFocused {
+                        withAnimation(.easeOut(duration: 0.2)) {
+                            scrollProxy.scrollTo(Self.recentSearchFieldID, anchor: .top)
+                        }
+                    }
+                }
+                .onChange(of: isRecentSearchFocused) { _, focused in
+                    guard focused else { return }
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        scrollProxy.scrollTo(Self.recentSearchFieldID, anchor: .top)
+                    }
+                }
+                .navigationDestination(isPresented: $schedules.showsList) {
+                    ScheduledJourneysScreen(presentation: schedulePresentation)
+                }
+                .navigationDestination(isPresented: $showsResults) {
+                    resultsDestination
+                }
             }
 
         }
@@ -185,6 +195,25 @@ struct JourneysScreen: View {
                 appState.linkedJourneyID = nil
             }
         }
+        .environment(schedulePresentation)
+        .sheet(item: $schedules.routeEditing, onDismiss: {
+            guard schedules.routeSaved else { return }
+            if schedules.returnHomeAfterSave {
+                planner.cancelSearch()
+                showsResults = false
+                schedules.showsList = false
+            }
+            schedules.routeSaved = false
+            schedules.showsRouteSaved = true
+        }) { selection in
+            TrackedRouteScheduleEditor(journey: selection.journey, searchID: selection.searchID, existing: selection.existing) {
+                schedules.returnHomeAfterSave = selection.existing == nil
+                schedules.routeSaved = true
+            }
+        }
+        .alert("Journey saved", isPresented: $schedules.showsRouteSaved) {
+            Button("OK") {}
+        } message: { Text("You can edit or delete this journey in My scheduled journeys.") }
         .sheet(item: $schedules.editing) { journey in
             NavigationStack { ScheduledJourneyEditor(journey: journey) }
         }
@@ -222,7 +251,7 @@ struct JourneysScreen: View {
     }
 
     private var scheduledJourneysLink: some View {
-        let count = scheduleStore.journeys.count
+        let count = scheduleStore.journeys.count + (tracking?.schedules.count ?? 0)
         return Button {
             schedulePresentation.showsList = true
         } label: {
@@ -251,9 +280,109 @@ struct JourneysScreen: View {
     }
 
     @ViewBuilder
+    private var recentSearchSection: some View {
+        let planner = appState.journeyPlanner
+        if !planner.recentSearches.isEmpty {
+            let page = planner.recentSearchPage(matching: recentSearchQuery, index: recentSearchPage)
+
+            Section {
+                HStack {
+                    Image(systemName: "magnifyingglass").foregroundStyle(.secondary)
+                        .accessibilityHidden(true)
+                    TextField("Search recent journeys", text: $recentSearchQuery)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                        .focused($isRecentSearchFocused)
+                        .accessibilityLabel("Search recent journeys")
+                    if !recentSearchQuery.isEmpty {
+                        Button {
+                            recentSearchQuery = ""
+                            isRecentSearchFocused = true
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.secondary)
+                                .frame(minWidth: 44, minHeight: 44)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Clear recent search")
+                    }
+                }
+                .id(Self.recentSearchFieldID)
+
+                if page.entries.isEmpty {
+                    Text("No matching searches").foregroundStyle(.secondary)
+                } else {
+                    ForEach(page.entries) { search in
+                        Button {
+                            guard let graph = appState.graph else { return }
+                            _ = planner.rerun(search, stations: graph.stations)
+                        } label: {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text("\(search.from.name) → \(search.to.name)")
+                                    .font(.appBody(.semibold))
+                                    .foregroundStyle(.primary)
+                                if !search.via.isEmpty {
+                                    Text("Via " + search.via.map(\.name).joined(separator: " → "))
+                                        .font(.appCaption()).foregroundStyle(.secondary)
+                                }
+                                Text("Searched \(LondonRailDate.formatted(search.searchedAt, dateFormat: "d MMM yyyy, HH:mm")) · \(search.timeMode.title)")
+                                    .font(.appCaption()).foregroundStyle(.secondary)
+                                if search.timeMode != .now {
+                                    Text("For \(JourneyFormatting.date(search.time))")
+                                        .font(.appCaption()).foregroundStyle(.secondary)
+                                }
+                                if search.accessibility != .none {
+                                    Text(search.accessibility.title)
+                                        .font(.appCaption()).foregroundStyle(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .contentShape(Rectangle())
+                        }
+                        .disabled(planner.isLoading || appState.isOffline || appState.graph == nil)
+                        .accessibilityHint("Run this journey search again")
+                    }
+
+                    if page.count > 1 {
+                        recentSearchPagination(page)
+                    }
+                }
+            } header: {
+                Text("Recent searches")
+            } footer: {
+                Text("Up to 500 recent routes are kept on this device. Past departure or arrival times run as Leave now.")
+            }
+        } else {
+            Section("Recent searches") {
+                Text("Searches you run will appear here.").foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func recentSearchPagination(_ page: RecentJourneySearchPage) -> some View {
+        let previous = Button("Previous") { recentSearchPage = max(0, page.number - 1) }
+            .disabled(page.number == 0)
+        let next = Button("Next") { recentSearchPage = min(page.count - 1, page.number + 1) }
+            .disabled(page.number + 1 >= page.count)
+        let label = Text("Page \(page.number + 1) of \(page.count)")
+            .font(.appCaption()).foregroundStyle(.secondary)
+
+        if dynamicTypeSize.isAccessibilitySize {
+            VStack(spacing: 8) {
+                label
+                HStack { previous; Spacer(); next }
+            }
+        } else {
+            HStack { previous; Spacer(); label; Spacer(); next }
+        }
+    }
+
+    @ViewBuilder
     private var scheduledJourneyBadge: some View {
-        if !scheduleStore.journeys.isEmpty {
-            Text(scheduleStore.journeys.count, format: .number)
+        let count = scheduleStore.journeys.count + (tracking?.schedules.count ?? 0)
+        if count > 0 {
+            Text(count, format: .number)
                 .font(.appCaption(.semibold))
                 .monospacedDigit()
                 .foregroundStyle(.white)
@@ -276,7 +405,7 @@ struct JourneysScreen: View {
             if arguments[index + 1] == "map" {
                 JourneyMapScreen(journey: journey)
             } else if arguments[index + 1] == "details" {
-                JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale, searchID: response.data.searchID)
+                JourneyDetailScreen(journey: journey, expiresAt: JourneyPlannerModel.displayExpiry(for: response), isStale: response.stale, searchID: response.data.searchID)
             } else {
                 JourneyResultsScreen()
             }
@@ -318,7 +447,7 @@ struct JourneysScreen: View {
 private struct JourneyResultsScreen: View {
     @Environment(TubeAppState.self) private var appState
     @Environment(\.scenePhase) private var scenePhase
-    @State private var scheduling: ScheduledJourney?
+    @Environment(ScheduledJourneyPresentation.self) private var routePresentation: ScheduledJourneyPresentation?
 
     var body: some View {
         List {
@@ -338,16 +467,13 @@ private struct JourneyResultsScreen: View {
             guard !appState.isOffline else { return }
             await appState.journeyPlanner.refreshSuggestions()
         }
-        .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey) }
-        }
         .navigationTitle("Route suggestions")
         .navigationBarTitleDisplayMode(.inline)
         .journeyBackground()
         .task(id: scenePhase) {
             guard scenePhase == .active else { return }
             while !Task.isCancelled {
-                if !appState.isOffline { appState.journeyPlanner.refreshIfNeeded() }
+                if routePresentation?.routeEditing == nil && !appState.isOffline { appState.journeyPlanner.refreshIfNeeded() }
                 do { try await Task.sleep(for: .seconds(5)) }
                 catch { return }
             }
@@ -358,7 +484,8 @@ private struct JourneyResultsScreen: View {
     private func results(_ response: TubeTrackAPIResponse<JourneyPlan>) -> some View {
         Section {
             TimelineView(.periodic(from: .now, by: 15)) { context in
-                let expired = context.date >= response.data.expiresAt || response.stale || appState.isOffline
+                let expired = context.date >= JourneyPlannerModel.displayExpiry(for: response)
+                    || response.stale || appState.isOffline
                 VStack(alignment: .leading, spacing: 6) {
                     Text("\(response.data.from.name) to \(response.data.to.name)")
                         .font(.appHeadline())
@@ -383,11 +510,13 @@ private struct JourneyResultsScreen: View {
         ForEach(response.data.journeys) { journey in
             Section {
                 NavigationLink {
-                    JourneyDetailScreen(journey: journey, expiresAt: response.data.expiresAt, isStale: response.stale, searchID: response.data.searchID)
+                    JourneyDetailScreen(journey: journey, expiresAt: JourneyPlannerModel.displayExpiry(for: response), isStale: response.stale, searchID: response.data.searchID)
                 } label: {
                     JourneySummary(journey: journey)
                 }
-                TrackedRouteActions(journey: journey, searchID: response.data.searchID)
+                TrackedRouteActions(journey: journey, searchID: response.data.searchID) {
+                    routePresentation?.routeEditing = TrackedRouteSelection(journey: journey, searchID: response.data.searchID)
+                }
             }
         }
 
@@ -517,7 +646,7 @@ struct JourneyDetailScreen: View {
     let expiresAt: Date
     var isStale = false
     var searchID: String? = nil
-    @State private var scheduling: ScheduledJourney?
+    @Environment(ScheduledJourneyPresentation.self) private var routePresentation: ScheduledJourneyPresentation?
 
     var body: some View {
         List {
@@ -554,7 +683,11 @@ struct JourneyDetailScreen: View {
                     Label("Show journey map", systemImage: "map")
                 }
             }
-            Section { TrackedRouteActions(journey: journey, searchID: searchID) }
+            Section {
+                TrackedRouteActions(journey: journey, searchID: searchID) {
+                    routePresentation?.routeEditing = TrackedRouteSelection(journey: journey, searchID: searchID)
+                }
+            }
             ForEach(Array(journey.legs.enumerated()), id: \.element.id) { index, leg in
                 Section {
                     HStack(alignment: .top, spacing: 12) {
@@ -619,9 +752,6 @@ struct JourneyDetailScreen: View {
             }
         }
         .journeyBackground()
-        .sheet(item: $scheduling) { journey in
-            NavigationStack { ScheduledJourneyEditor(journey: journey) }
-        }
         .navigationTitle("Journey details")
         .navigationBarTitleDisplayMode(.inline)
     }

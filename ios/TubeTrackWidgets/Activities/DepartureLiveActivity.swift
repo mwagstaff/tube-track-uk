@@ -303,7 +303,7 @@ private struct DepartureCallingAtLabel: View {
     }
 }
 
-private enum DepartureBoardStyle {
+enum DepartureBoardStyle {
     static let yellow = Color(red: 1, green: 0.86, blue: 0)
     static let background = Color(red: 0.13, green: 0.13, blue: 0.12)
     static let timeBackground = Color(white: 0.22)

@@ -123,11 +123,13 @@ struct JourneyPlannerTests {
         model.from = station("940A")
         model.to = station("940B")
         model.startSearch()
+        let historyCount = model.recentSearches.count
         await model.load()
         model.startSearch(keepingResults: true)
         let refreshID = model.searchID
         #expect(model.result != nil)
         #expect(model.isLoading)
+        #expect(model.recentSearches.count == historyCount)
         model.startSearch()
         #expect(model.searchID == refreshID)
         #expect(model.result != nil)
@@ -193,6 +195,100 @@ struct JourneyPlannerTests {
         let searchID = model.searchID
         model.refreshIfNeeded(now: model.nextAutomaticRefresh.addingTimeInterval(60))
         #expect(model.searchID == searchID)
+    }
+
+    @Test func shortServerExpiryDoesNotMarkDisplayedResultsStaleAfterSeconds() throws {
+        let plan = try plan()
+        let checkedAt = plan.requestedAt
+        let response = TubeTrackAPIResponse(data: plan, updatedAt: checkedAt,
+                                            cached: false, stale: false)
+        #expect(JourneyPlannerModel.displayExpiry(for: response)
+            == checkedAt.addingTimeInterval(JourneyPlannerModel.minimumResultLifetime))
+    }
+
+    @Test func recentSearchesAreBoundedPaginatedSearchableAndPersisted() throws {
+        let suite = "journey-history-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let key = "recent-searches-test"
+        let entries = (0..<502).map { index in
+            RecentJourneySearch(id: UUID(), searchedAt: Date(timeIntervalSince1970: Double(index)),
+                from: JourneyStation(id: "origin-\(index)", name: index == 501 ? "Elverson Road" : "Alpha"),
+                to: JourneyStation(id: "destination-\(index)", name: index == 501 ? "Stratford" : "Beta"),
+                via: [], timeMode: .now, time: .now, accessibility: .none)
+        }
+        defaults.set(try JSONEncoder().encode(entries), forKey: key)
+        let model = JourneyPlannerModel(service: TestJourneyService(), defaults: defaults, historyKey: key)
+        #expect(model.recentSearches.count == 500)
+        #expect(model.recentSearches.first?.from.name == "Elverson Road")
+        #expect(model.recentSearches.last?.searchedAt == Date(timeIntervalSince1970: 2))
+        #expect(model.recentSearchPage(matching: "", index: 0).entries.count == 50)
+        #expect(model.recentSearchPage(matching: "", index: 9).entries.count == 50)
+        #expect(model.recentSearchPage(matching: "", index: 100).count == 10)
+        #expect(model.recentSearchPage(matching: "Elverson Strat", index: 0).entries.count == 1)
+        #expect(model.recentSearchPage(matching: "missing", index: 0).entries.isEmpty)
+
+        model.from = station("940A")
+        model.to = station("940B")
+        model.startSearch()
+        #expect(model.recentSearches.count == 500)
+        #expect(JourneyPlannerModel(service: TestJourneyService(), defaults: defaults, historyKey: key)
+            .recentSearches.first?.id == model.recentSearches.first?.id)
+    }
+
+    @Test func repeatedRoutesKeepOnlyTheirLatestSearchAcrossRestarts() throws {
+        let suite = "journey-dedup-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let key = "recent-searches-dedup"
+        let route = RecentJourneySearch(id: UUID(), searchedAt: Date(timeIntervalSince1970: 100),
+            from: JourneyStation(id: "940A", name: "Alpha"),
+            to: JourneyStation(id: "940B", name: "Beta"), via: [],
+            timeMode: .departAt, time: Date(timeIntervalSince1970: 200), accessibility: .none)
+        let newer = RecentJourneySearch(id: UUID(), searchedAt: Date(timeIntervalSince1970: 300),
+            from: route.from, to: route.to, via: [], timeMode: .arriveBy,
+            time: Date(timeIntervalSince1970: 400), accessibility: .train)
+        let reverse = RecentJourneySearch(id: UUID(), searchedAt: Date(timeIntervalSince1970: 250),
+            from: route.to, to: route.from, via: [], timeMode: .now, time: .now, accessibility: .none)
+        let via = RecentJourneySearch(id: UUID(), searchedAt: Date(timeIntervalSince1970: 275),
+            from: route.from, to: route.to, via: [JourneyStation(id: "940C", name: "Via")],
+            timeMode: .now, time: .now, accessibility: .none)
+        defaults.set(try JSONEncoder().encode([route, reverse, newer, via]), forKey: key)
+
+        let model = JourneyPlannerModel(service: TestJourneyService(), defaults: defaults, historyKey: key)
+        #expect(model.recentSearches.count == 3)
+        #expect(model.recentSearches.first?.id == newer.id)
+        #expect(model.recentSearches.first?.accessibility == .train)
+        #expect(model.recentSearchPage(matching: "Via", index: 0).entries.count == 1)
+        let savedData = try #require(defaults.data(forKey: key))
+        #expect(try JSONDecoder().decode([RecentJourneySearch].self, from: savedData).count == 3)
+
+        model.from = station("940A")
+        model.to = station("940B")
+        model.startSearch()
+        #expect(model.recentSearches.count == 3)
+        #expect(model.recentSearches.first?.routeKey == route.routeKey)
+        #expect(model.recentSearches.first?.id != newer.id)
+    }
+
+    @Test func replayRestoresRouteAndUsesLeaveNowForPastTimes() throws {
+        let suite = "journey-replay-\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let model = JourneyPlannerModel(service: TestJourneyService(), defaults: defaults, historyKey: "replay")
+        let now = Date(timeIntervalSince1970: 1_700_000_000)
+        let search = RecentJourneySearch(id: UUID(), searchedAt: now.addingTimeInterval(-86_400),
+            from: JourneyStation(id: "940A", name: "Alpha"),
+            to: JourneyStation(id: "940B", name: "Beta"),
+            via: [JourneyStation(id: "940C", name: "Via")],
+            timeMode: .arriveBy, time: now.addingTimeInterval(-3_600), accessibility: .train)
+        #expect(model.rerun(search, stations: [station("940A"), station("940B"), station("940C")], now: now))
+        #expect(model.from?.id == "940A")
+        #expect(model.to?.id == "940B")
+        #expect(model.via.map(\.id) == ["940C"])
+        #expect(model.timeMode == .now)
+        #expect(model.accessibility == .train)
+        #expect(model.recentSearches.first?.timeMode == .now)
     }
 
     @Test func mapJourneySelectionIncludesNationalRailStations() throws {

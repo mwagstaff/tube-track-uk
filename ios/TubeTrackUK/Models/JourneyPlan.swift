@@ -1,7 +1,7 @@
 import Foundation
 import TubeTrackCore
 
-enum JourneyTimeMode: String, CaseIterable, Identifiable, Sendable {
+enum JourneyTimeMode: String, CaseIterable, Identifiable, Codable, Sendable {
     case now, departAt, arriveBy
     var id: Self { self }
     var title: String {
@@ -13,7 +13,7 @@ enum JourneyTimeMode: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-enum JourneyAccessibility: String, CaseIterable, Identifiable, Sendable {
+enum JourneyAccessibility: String, CaseIterable, Identifiable, Codable, Sendable {
     case none, platform, train
     var id: Self { self }
     var title: String {

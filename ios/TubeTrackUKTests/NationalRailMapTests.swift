@@ -4,6 +4,26 @@ import Testing
 
 @MainActor
 struct NationalRailMapTests {
+    @Test func dartTerminalOpensItsOwnInformationStation() throws {
+        let graph = try TubeGraph.bundled().includingNationalRailStations()
+        let document = try BeckMapRepository().load(region: .londonRailAndTube, graph: graph)
+        #expect(document.referenceArtwork?.stationID(at: CGPoint(x: 1040, y: 45)) == "nr:LUA")
+        #expect(document.referenceArtwork?.stationID(at: CGPoint(x: 973, y: 72)) == "nr:LTN")
+        let cache = BeckMapCanvas.RenderCache(document: document)
+        let airport = try #require(graph.stationsByID[LutonDARTConnectionCard.airportID])
+        #expect(StationSearch.suggestions(in: graph, matching: "Luton Airport", selectedStationID: nil)
+            .contains { $0.id == airport.id })
+        for scale in [CGFloat(0.25), 0.5, 1, 3] {
+            let selection = BeckMapStationTapResolver.resolve(
+                screenPoint: CGPoint(x: 1037.888 * scale, y: 58.266 * scale),
+                cameraScale: scale, cameraOffset: .zero, document: document,
+                renderedSegments: cache.renderedSegments, graph: graph, exactOnly: true)
+            #expect(selection?.stationID == airport.id)
+        }
+        #expect(NationalRailStations.codes(for: [airport.id]).isEmpty)
+        #expect(NationalRailStations.codes(for: [LutonDARTConnectionCard.parkwayID]) == ["LTN"])
+    }
+
     @Test func layerStartsHiddenAndRemembersTheUsersChoice() throws {
         let name = "NationalRailMapTests.\(UUID())"
         let defaults = try #require(UserDefaults(suiteName: name))
@@ -65,7 +85,11 @@ struct NationalRailMapTests {
         let markerIDs = Set(document.stationMarkers.map(\.stationID))
         for station in map.stations {
             #expect(markerIDs.contains(station.id), "No map target for \(station.name)")
-            #expect(!NationalRailStations.codes(for: [station.id]).isEmpty)
+            if station.id == LutonDARTConnectionCard.airportID {
+                #expect(NationalRailStations.codes(for: [station.id]).isEmpty)
+            } else {
+                #expect(!NationalRailStations.codes(for: [station.id]).isEmpty)
+            }
             let marker = try #require(document.stationMarkers.first { $0.stationID == station.id })
             let hit = BeckMapStationMarkerHitTester.nearestMarker(
                 to: CGPoint(x: marker.anchor.x, y: marker.anchor.y),

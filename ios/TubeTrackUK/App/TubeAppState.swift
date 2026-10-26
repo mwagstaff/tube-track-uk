@@ -284,7 +284,7 @@ final class TubeAppState {
         self.nationalRail = NationalRailStatusState(client: sharedClient, cache: snapshotCache)
         self.favourites = FavouriteStopsStore(defaults: defaults)
         self.departureBoards = DepartureBoardStore(defaults: defaults, client: sharedClient)
-        self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient))
+        self.journeyPlanner = JourneyPlannerModel(service: JourneyService(client: sharedClient), defaults: defaults)
         self.snapshotCache = snapshotCache
         self.connectivityMonitor = monitorsConnectivity
             && !ProcessInfo.processInfo.arguments.contains("-DebugOffline")
@@ -823,7 +823,7 @@ final class TubeAppState {
         stationArrivalsError = nil
         nationalRailDeparturesError = nil
         AppGroup.recordRecentStation(id: station.hubID ?? station.id)
-        if selectedTab == .map {
+        if selectedTab == .map, station.id != LutonDARTConnectionCard.airportID {
             requestStationArrivals(for: station.id)
             startStationArrivalsPolling()
         }

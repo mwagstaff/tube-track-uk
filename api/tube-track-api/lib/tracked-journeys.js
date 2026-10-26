@@ -1,4 +1,5 @@
 import express from 'express';
+import { JourneyError } from './journey-planner.js';
 import { railClockDate } from './push/national-rail-departures.js';
 import { randomUUID, createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
@@ -19,7 +20,7 @@ export function scheduleDue(schedule, now) {
     }) ?? null;
 }
 const epoch = date => Math.floor(Date.parse(date) / 1000);
-const fail = (message, status = 400) => { throw Object.assign(new Error(message), { status }); };
+const fail = (message, status = 400) => { throw new JourneyError('TRACKED_JOURNEY_REJECTED', message, status); };
 const hash = text => createHash('sha256').update(text).digest('hex');
 const tokenOK = value => typeof value === 'string' && /^[a-f0-9]{64,200}$/i.test(value);
 const signature = plan => plan.legs.filter(transit).map(l => `${station(l.from.id)?.id}:${station(l.to.id)?.id}:${l.lines.map(l => l.operatorCode ?? l.id).sort().join(',')}`).join('|');
@@ -159,7 +160,7 @@ export class TrackedJourneys {
         const aps = { timestamp: now, event, 'content-state': session.state,
             'stale-date': session.state.staleAtEpoch };
         if (event === 'start') Object.assign(aps, { 'attributes-type': 'JourneyActivityAttributes',
-            attributes: { sessionID: session.id, destination: session.state.destination, endsAtEpoch: epoch(session.endsAt) },
+            attributes: { sessionID: session.id, destination: session.state.destination, endsAtEpoch: epoch(session.endsAt), origin: session.plan.legs[0].from.name },
             'input-push-token': 1, alert: { title: 'Your journey is ready', body: session.state.headline } });
         if (event === 'end') aps['dismissal-date'] = now;
         const result = await this.apns.send({ token, topic: this.topic, pushType: 'liveactivity', activityId: session.id,
@@ -219,7 +220,8 @@ export class TrackedJourneys {
                 const local = londonTime(now);
                 const due = scheduleDue(schedule, now);
                 if (due == null || now < due || now - due > 180000) continue;
-                const key = `${schedule.id}:${local.date}`;
+                const key = schedule.revision
+                    ? `${schedule.id}:${schedule.revision}:${local.date}` : `${schedule.id}:${local.date}`;
                 if (row.claims?.[key]) continue;
                 const claim = await this.store.transaction(rows => {
                     const current = rows[id];
@@ -251,7 +253,8 @@ export class TrackedJourneys {
             const prepared = await this.store.transaction(rows => {
                 const current = rows[id];
                 const saved = current.schedules.find(s => s.id === schedule.id && s.enabled);
-                if (current.active || current.device?.activitiesEnabled === false || !saved) return false;
+                if (current.active || current.device?.activitiesEnabled === false || !saved
+                    || (saved.revision ?? 0) !== (schedule.revision ?? 0)) return false;
                 if (this.clock() - due > 180000) throw new Error('Scheduled start expired');
                 current.active = session; current.revision++;
                 if (saved.date) { saved.enabled = false; saved.message = 'This one-off journey has started.'; }
@@ -274,7 +277,7 @@ export class TrackedJourneys {
         } catch {
             await this.store.transaction(rows => {
                 const saved = rows[id].schedules.find(s => s.id === schedule.id);
-                if (saved) {
+                if (saved && (saved.revision ?? 0) === (schedule.revision ?? 0)) {
                     if (saved.date) saved.enabled = false;
                     saved.message = 'Could not refresh this route for the scheduled start. Open Journeys to search again.';
                     rows[id].revision++;
@@ -325,7 +328,8 @@ export function trackedJourneyRoutes(service) {
     router.get('/', handle(req => service.view(service.store.rows[req.installID])));
     router.post('/start', handle(async req => {
         const plan = service.selected(req.body.searchID, req.body.journeyID);
-        if (Date.parse(plan.departureTime) < service.clock() - 60000 || Date.parse(plan.departureTime) > service.clock() + 2 * 3600000) fail('Refresh this route before starting.', 409);
+        if (Date.parse(plan.departureTime) < service.clock() - 60000) fail('This departure has passed. Refresh route suggestions before starting.', 409);
+        if (Date.parse(plan.departureTime) > service.clock() + 2 * 3600000) fail('This journey departs in more than two hours. Schedule this route, or start tracking closer to departure.', 409);
         const session = await service.snapshot(service.session(plan));
         return mutate(req, async row => {
             if (row.active) {
@@ -364,8 +368,10 @@ export function trackedJourneyRoutes(service) {
         if (!tokenOK(req.body.token) || !['sandbox', 'production'].includes(req.body.environment)) fail('Invalid update address.');
         row.active.token = req.body.token; row.active.environment = req.body.environment;
     })));
-    router.post('/schedules', handle(req => {
-        const plan = service.selected(req.body.searchID, req.body.journeyID);
+    const saveSchedule = req => {
+        const existing = req.params.id ? service.store.rows[req.installID]?.schedules.find(s => s.id === req.params.id) : null;
+        if (req.params.id && !existing) fail('This scheduled journey no longer exists.', 404);
+        const plan = existing?.plan ?? service.selected(req.body.searchID, req.body.journeyID);
         service.session(plan); // Validate all board identities before accepting a recurring route.
         if (plan.legs.filter(transit).length > 5) fail('Schedule routes with up to four changes.');
         const date = req.body.date, days = req.body.days ?? [], minute = req.body.minute;
@@ -375,11 +381,16 @@ export function trackedJourneyRoutes(service) {
                 || !Number.isInteger(minute) || minute < 0 || minute > 1439) fail('Choose a future date or valid repeat days and London time.');
         return mutate(req, row => {
             if (!service.apns || !row.device || row.device.activitiesEnabled === false) fail('Enable Live Activities before scheduling a route.');
-            if (row.schedules.length >= 3) fail('You can save up to three complete routes.');
-            row.schedules.push({ id: randomUUID(), plan, date: date ?? null, days, minute: minute ?? 0,
-                accessibility: service.planner.jobs.get(req.body.searchID)?.request.accessibility ?? 'none', enabled: true });
+            const index = existing ? row.schedules.findIndex(s => s.id === existing.id) : -1;
+            if (existing && index < 0) fail('This scheduled journey no longer exists.', 404);
+            if (!existing && row.schedules.length >= 3) fail('You can save up to three complete routes.');
+            const saved = { id: existing?.id ?? randomUUID(), revision: (existing?.revision ?? -1) + 1, plan, date: date ?? null, days, minute: minute ?? 0,
+                accessibility: existing?.accessibility ?? service.planner.jobs.get(req.body.searchID)?.request.accessibility ?? 'none', enabled: true };
+            if (existing) row.schedules[index] = saved; else row.schedules.push(saved);
         });
-    }));
+    };
+    router.post('/schedules', handle(saveSchedule));
+    router.put('/schedules/:id', handle(saveSchedule));
     router.delete('/schedules/:id', handle(req => mutate(req, async row => {
         row.schedules = row.schedules.filter(s => s.id !== req.params.id);
         if (row.active?.scheduleID === req.params.id) {

@@ -27,8 +27,8 @@ OPERATOR_NAMES = {
 
 # These two source circles belong to the separate cable-car interaction layer.
 CABLE_TERMINAL_CENTRES = [(1927.647, 1103.523), (2065.291, 1016.182)]
-# The DART airport terminal is a transfer landmark, without a rail CRS or
-# departure station in the app. Luton Airport Parkway's three rail circles are
+# The DART airport terminal is added separately by airport_connection.py as
+# an information-only target, without a live departure feed. Luton Airport Parkway's three rail circles are
 # matched normally; do not misidentify this distant airport symbol as Parkway.
 AIRPORT_TRANSFER_CENTRES = [(1037.888, 58.266)]
 

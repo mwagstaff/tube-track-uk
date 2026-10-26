@@ -1,10 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import express from 'express';
+import { createApp } from '../lib/app.js';
+import { LiveCache } from '../lib/live-cache.js';
+import { createMetrics } from '../lib/metrics.js';
+import { ResourceCache } from '../lib/resource-cache.js';
 import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { TrackedJourneys, TrackedJourneyStore, trackedJourneyRoutes, journeyProjection, routeBoard, scheduleDue } from '../lib/tracked-journeys.js';
+import { TrackedJourneys, TrackedJourneyStore, journeyProjection, routeBoard, scheduleDue } from '../lib/tracked-journeys.js';
 import { combineViaChoices, validateCombinedQuery, CombinedJourneys } from '../lib/combined-journeys.js';
 
 const now = Date.parse('2026-10-23T11:00:00Z');
@@ -86,10 +89,12 @@ async function fixture(t) {
     const service = new TrackedJourneys({ store, planner, clock: () => now,
         boards: { board: async () => board([row('train', 2)]) },
         apns: { send: async payload => { pushes.push(payload); return { ok: true }; } }, topic: 'test' });
-    const app = express(); app.use('/journeys', trackedJourneyRoutes(service));
-    app.use((e, req, res, next) => res.status(e.status ?? 500).json({ error: { message: e.message } }));
+    // Exercise production error handling; a custom test handler hid validation 500s.
+    const cache = new LiveCache();
+    const app = createApp({ cache, metrics: createMetrics({ cache, collectProcessMetrics: false }),
+        client: { fetchJSON: async () => [] }, resourceCache: new ResourceCache(), trackedJourneys: service });
     const server = app.listen(0); await new Promise(resolve => server.once('listening', resolve));
-    const url = `http://127.0.0.1:${server.address().port}/journeys`;
+    const url = `http://127.0.0.1:${server.address().port}/api/v2/tracked-journeys`;
     const request = async (route = '', method = 'GET', body, secret = 'a'.repeat(64)) => {
         const response = await fetch(url + route, { method, headers: { 'Content-Type': 'application/json',
             'X-TubeTrack-Install': 'installation-123', 'X-TubeTrack-Schedule-Key': secret }, body: body ? JSON.stringify(body) : undefined });
@@ -116,6 +121,25 @@ test('start, correction, stale revision, auth ownership, token isolation and com
     assert.equal(completed.body.data.active, null);
     const reloaded = await new TrackedJourneyStore({ filePath: store.filePath }).load();
     assert.equal(reloaded.rows['installation-123'].active, null);
+});
+
+test('overnight departures and expired selections return actionable errors through the production app', async t => {
+    const { request, service, store } = await fixture(t);
+    const missing = await request('/start', 'POST', { searchID: 'expired', journeyID: 'route' });
+    assert.equal(missing.status, 409);
+    assert.match(missing.body.error.message, /Search again/);
+    service.planner.jobs.get('search').result.data.journeys = [{ ...plan, departureTime: at(407) }];
+    const future = await request('/start', 'POST', { searchID: 'search', journeyID: 'route' });
+    assert.equal(future.status, 409);
+    assert.match(future.body.error.message, /Schedule this route/);
+    assert.equal(store.rows['installation-123'], undefined);
+    const schedule = await request('/schedules', 'POST', { searchID: 'search', journeyID: 'route', date: at(400) });
+    assert.equal(schedule.status, 400);
+    assert.match(schedule.body.error.message, /Enable Live Activities/);
+    await request('/device', 'PUT', { token: 'd'.repeat(64), environment: 'sandbox' });
+    const saved = await request('/schedules', 'POST', { searchID: 'search', journeyID: 'route', date: at(400) });
+    assert.equal(saved.status, 200);
+    assert.equal(saved.body.data.schedules.length, 1);
 });
 
 test('scheduled occurrence is claimed once, refreshes the route and survives restart', async t => {
@@ -219,4 +243,47 @@ test('via adapter checks mode-constrained DLR and propagates backward arrival ti
     assert.equal(calls[0].query.time, at(60));
     assert.equal(planner.jobs.get(job.id).index, 0);
     await planner.cancel(job.id);
+});
+
+
+test('saved routes can switch between one-off and regular schedules without a search or duplicate', async t => {
+    const { request, service, store } = await fixture(t);
+    await request('/device', 'PUT', { token: 'd'.repeat(64), environment: 'sandbox' });
+    const created = await request('/schedules', 'POST', { searchID: 'search', journeyID: 'route', date: at(10) });
+    const id = created.body.data.schedules[0].id;
+    service.planner.jobs.clear();
+    const regular = await request(`/schedules/${id}`, 'PUT', { days: [1, 3, 5], minute: 570 });
+    assert.equal(regular.status, 200);
+    assert.equal(regular.body.data.schedules.length, 1);
+    assert.equal(regular.body.data.schedules[0].id, id);
+    assert.equal(regular.body.data.schedules[0].date, null);
+    assert.deepEqual(regular.body.data.schedules[0].plan, plan);
+    const invalid = await request(`/schedules/${id}`, 'PUT', { days: [], minute: 570 });
+    assert.equal(invalid.status, 400);
+    assert.deepEqual(store.rows['installation-123'].schedules[0].days, [1, 3, 5]);
+    const once = await request(`/schedules/${id}`, 'PUT', { date: at(20) });
+    assert.equal(once.status, 200);
+    assert.equal(once.body.data.schedules[0].date, at(20));
+    assert.equal((await request(`/schedules/${id}`, 'DELETE')).body.data.schedules.length, 0);
+    assert.equal((await request(`/schedules/${id}`, 'PUT', { date: at(30) })).status, 404);
+});
+
+test('editing a schedule while its old occurrence replans prevents the old start', async t => {
+    const { request, service, pushes } = await fixture(t);
+    await request('/device', 'PUT', { token: 'd'.repeat(64), environment: 'sandbox' });
+    const created = await request('/schedules', 'POST', { searchID: 'search', journeyID: 'route', date: at(1) });
+    const id = created.body.data.schedules[0].id;
+    let release;
+    service.resolve = () => new Promise(resolve => { release = resolve; });
+    service.clock = () => now + 60000;
+    await service.tick();
+    await request(`/schedules/${id}`, 'PUT', { date: at(60) });
+    release(plan); await Promise.all([...service.pending]);
+    assert.equal((await request()).body.data.active, null);
+    assert.equal(pushes.length, 0);
+    service.resolve = async () => plan;
+    service.clock = () => now + 60 * 60000;
+    await service.tick(); await Promise.all([...service.pending]);
+    assert.equal((await request()).body.data.active.scheduleID, id);
+    assert.equal(pushes.filter(p => p.payload.aps.event === 'start').length, 1);
 });

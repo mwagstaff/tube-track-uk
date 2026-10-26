@@ -11,7 +11,14 @@ import XCTest
         let suite = "schedule-render-\(UUID())"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
         defer { defaults.removePersistentDomain(forName: suite) }
+        let recent = RecentJourneySearch(id: UUID(), searchedAt: .now,
+            from: JourneyStation(id: "940GZZLUOXC", name: "Oxford Circus"),
+            to: JourneyStation(id: "nr:KTH", name: "Kent House"), via: [],
+            timeMode: .now, time: .now, accessibility: .none)
+        defaults.set(try JSONEncoder().encode([recent]),
+            forKey: "journeySearchHistory.v1.\(AppInstall.identifier)")
         let app = TubeAppState(defaults: defaults, monitorsConnectivity: false)
+        XCTAssertEqual(app.journeyPlanner.recentSearches.count, 1)
         let hub = try XCTUnwrap(StationIndex.bundled.hub(containing: "940GZZLUOXC"))
         var filteredBoard = ScheduledBoard(hub: hub, line: .central, direction: .eastbound)
         filteredBoard.destinationIDs = ["HUBBAN", "HUBTCR"]

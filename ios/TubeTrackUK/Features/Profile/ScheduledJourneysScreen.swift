@@ -5,6 +5,10 @@ import TubeTrackCore
 @MainActor @Observable
 final class ScheduledJourneyPresentation {
     var showsList = false
+    var routeEditing: TrackedRouteSelection?
+    var routeSaved = false
+    var returnHomeAfterSave = false
+    var showsRouteSaved = false
     var editing: ScheduledJourney?
     private(set) var deleting: ScheduledJourney?
     var showsDeleteConfirmation = false
@@ -18,6 +22,8 @@ final class ScheduledJourneyPresentation {
 
 struct ScheduledJourneysScreen: View {
     @Environment(ScheduledJourneyStore.self) private var store
+    @Environment(TrackedJourneyStore.self) private var tracking: TrackedJourneyStore?
+    @State private var deletingRoute: TrackedRouteSchedule?
     @Bindable var presentation: ScheduledJourneyPresentation
 
     var body: some View {
@@ -29,8 +35,12 @@ struct ScheduledJourneysScreen: View {
                     Button("Retry") { Task { await store.refresh() } }
                 }
             }
+            if let tracking {
+                trackedRoutes(tracking.schedules.filter { $0.date == nil }, title: "Regular journeys", store: tracking)
+                trackedRoutes(tracking.schedules.filter { $0.date != nil }, title: "One-off journeys", store: tracking)
+            }
             Section {
-                if store.journeys.isEmpty {
+                if store.journeys.isEmpty && (tracking?.schedules.isEmpty ?? true) {
                     ContentUnavailableView("Your commute, ready on time", systemImage: "calendar.badge.clock",
                         description: Text("Schedule departure boards for the days and times you travel."))
                 }
@@ -68,16 +78,52 @@ struct ScheduledJourneysScreen: View {
                 }
                 .disabled(store.journeys.count >= store.maximumJourneys || store.isSaving || store.isLoading)
             } header: {
-                Text("\(store.journeys.count) of \(store.maximumJourneys) journeys")
+                Text("Regular departure boards · \(store.journeys.count) of \(store.maximumJourneys)")
             } footer: {
                 Text("All times use London time, including British Summer Time. Manually tracked boards take priority. Journeys are saved for this installation only.")
             }
         }
         .navigationTitle("My scheduled journeys")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await store.refresh() }
-        .refreshable { await store.refresh() }
+        .task { await store.refresh(); await tracking?.refresh() }
+        .refreshable { await store.refresh(); await tracking?.refresh() }
+        .confirmationDialog("Delete this scheduled journey?", isPresented: Binding(get: { deletingRoute != nil }, set: { if !$0 { deletingRoute = nil } }), titleVisibility: .visible) {
+            if let route = deletingRoute {
+                Button("Delete journey", role: .destructive) { Task { await tracking?.deleteSchedule(route.id) } }
+            }
+        }
+        .alert("Could not update journey", isPresented: Binding(get: { tracking?.error != nil }, set: { if !$0 { tracking?.error = nil } })) {
+            Button("OK") { tracking?.error = nil }
+        } message: { Text(tracking?.error ?? "") }
 
+    }
+
+    @ViewBuilder private func trackedRoutes(_ routes: [TrackedRouteSchedule], title: String, store: TrackedJourneyStore) -> some View {
+        if !routes.isEmpty {
+            Section(title) {
+                ForEach(routes) { route in
+                    Button {
+                        presentation.routeEditing = TrackedRouteSelection(journey: route.plan, searchID: nil, existing: route)
+                    } label: {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("\(route.plan.legs.first?.from.name ?? "") → \(route.plan.legs.last?.to.name ?? "")").font(.headline)
+                            if let date = route.date { Text(JourneyFormatting.date(date)) }
+                            else { Text(route.days.map { ScheduledJourney.dayNames[$0 - 1] }.joined(separator: ", ") + String(format: " · %02d:%02d London", route.minute / 60, route.minute % 60)) }
+                            if !route.enabled { Text("Finished · edit to schedule again").font(.caption) }
+                            if let message = route.message { Text(message).font(.footnote) }
+                        }.foregroundStyle(.primary)
+                    }
+                    .disabled(store.busy)
+                    .swipeActions(allowsFullSwipe: false) {
+                        Button("Delete") { deletingRoute = route }.tint(.red)
+                    }
+                    .contextMenu {
+                        Button("Edit", systemImage: "pencil") { presentation.routeEditing = TrackedRouteSelection(journey: route.plan, searchID: nil, existing: route) }
+                        Button("Delete", role: .destructive) { deletingRoute = route }
+                    }
+                }
+            }
+        }
     }
 
     private func summary(_ label: String, _ window: ScheduledJourneyWindow) -> some View {

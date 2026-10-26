@@ -25,6 +25,14 @@ Boards refresh with the existing 30-second station polling and retain up to five
 minutes of explicitly marked saved data during an outage. UK-local departure
 times are resolved against the source timestamp, including midnight and DST.
 
+Luton Airport Parkway includes a DART connection information card above its live
+departure board. The Luton Airport terminal symbol and station search result open
+a dedicated DART information sheet. Both show the approximate four-minute journey
+and link to the operator's current service information; neither fabricates live
+DART departures. The terminal is an information-only map station, excluded from
+the Darwin CRS catalogue. The map builder preserves its reviewed tap target via
+`airport_connection.py`.
+
 National Rail and Thameslink departure rows open a calling-points sheet. Details
 load on demand from TrainTrack's existing `/api/v2/service_details/{serviceID}`
 endpoint, using the selected service and boarding CRS. The sheet shows scheduled,
@@ -102,7 +110,14 @@ and retain a less-disrupted alternative where TfL supplies one. Search progress
 is shown in the button, then route choices open on a separate screen with Back
 navigation. Results and leg details use labelled line-colour dots. Route details
 include changes, walking, stops and station/line notices. All times are shown
-in London time; journey results are estimates and have a short explicit expiry.
+in London time; journey results are estimates. The app refreshes route
+suggestions in the background and waits at least five minutes before marking
+normally fresh results as needing refresh. Searches are saved on this device,
+newest first, with up to 500 unique routes searchable in pages of 50. Repeating
+a route replaces its earlier search. The recent-search field has a clear
+control and scrolls into view while editing so matches remain visible. Tapping
+a previous search runs it again; a past Depart at or Arrive by time becomes
+Leave now.
 
 Journey details can open a separate network map with the selected rail sections
 in line colours and blue rings around the start, end and change stations. This

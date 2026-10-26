@@ -28,11 +28,27 @@ installation's existing random `X-TubeTrack-Schedule-Key`. Responses are
 The secret's SHA-256 hash is stored; mutations repeat ownership checks inside the
 serial transaction. This is installation ownership, not account authentication.
 
+The iOS app lists complete-route schedules under My scheduled journeys, grouped
+as regular (weekly) or one-off. Saving a new route returns to the main Journeys
+screen. Editing keeps the saved route and changes its date or weekly days/time;
+it does not require the original search to remain cached.
+
+`PUT /schedules/:id` accepts the same `date` or `days, minute` timing fields as
+creation, preserving the schedule ID and route. It can convert between one-off
+and weekly schedules. Updates validate and persist atomically; in-flight planning
+for an older schedule revision cannot start that old occurrence. Changes apply
+to future starts, not an already active journey. No operational alert or recovery
+behaviour changes.
+
 - `GET /`: current session and saved complete-route schedules.
 - `POST /start`: `{searchID, journeyID}` selects a server-held result. Optional
   `replaceID, replaceRevision` explicitly replace the reviewed active session in
   one transaction, after validating the new selection. A failed selection keeps
   the original journey. Starts are limited to departures within two hours.
+  Later departures return 409 with guidance to schedule the route; expired
+  selections return 409 with guidance to search again. Expected validation errors
+  use `JourneyError` so the production HTTP handler preserves their message and
+  status instead of returning a generic 500.
 - `PUT /progress`: `{id, revision, legIndex, phase, boardedID?}` changes progress.
   Phase is waiting/onboard/complete. Revisions prevent late corrections overwriting
   newer progress. An optional boardedID must belong to a fresh verified board.

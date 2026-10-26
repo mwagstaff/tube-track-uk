@@ -229,6 +229,8 @@ def add_roundel_targets(document, stations, rail_routes, page, drawings, crs_ind
     targets,audit = build_roundel_targets(document,stations,boxes,colors,operator_stations)
     document['referenceArtwork']['stationRoundels'] = targets
     from station_targets import bind_reviewed_targets
+    from airport_connection import add_airport_connection
+    add_airport_connection(document, {'stations': stations})
     bind_reviewed_targets(document, stations, colors)
     return audit
 
@@ -423,7 +425,7 @@ def main():
     if errors:
         print('\n'.join(errors));return 1
     add_roundel_targets(document,all_stations,routes,page,drawings,crs_index)
-    metadata=dict(schemaVersion=1,referenceURL='https://content.tfl.gov.uk/london-rail-and-tube-services-map.pdf',referenceSHA256=hashlib.sha256(args.pdf.read_bytes()).hexdigest(),referenceRevision='April 2026',attribution='Transport for London and Rail Delivery Group; © OpenStreetMap contributors, ODbL 1.0',stations=[s for s in all_stations if s['id'] in new_ids],stationRecords=station_records,routes=routes)
+    metadata=dict(schemaVersion=1,referenceURL='https://content.tfl.gov.uk/london-rail-and-tube-services-map.pdf',referenceSHA256=hashlib.sha256(args.pdf.read_bytes()).hexdigest(),referenceRevision='April 2026',attribution='Transport for London and Rail Delivery Group; © OpenStreetMap contributors, ODbL 1.0',stations=[s for s in all_stations if s['id'] in new_ids or s['id'] == 'nr:LUA'],stationRecords=station_records,routes=routes)
     metadata['routingSHA256']=hashlib.sha256((args.train_track/ROUTING_ASSET).read_bytes()).hexdigest()
     metadata['catalogueSHA256']=hashlib.sha256((args.train_track/'api/train-track-api/resources/stations.json').read_bytes()).hexdigest()
     (ROOT/'TubeTrackUK/Resources/NationalRailMap.json').write_text(json.dumps(metadata,separators=(',',':'))+'\n')

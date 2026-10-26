@@ -141,8 +141,11 @@ final class TrackedJourneyStore {
         if enabled { location.session = active; location.start() } else { location.stop() }
     }
     func resumeLocation() { if locationEnabled, active != nil { location.start() } }
-    func schedule(_ journey: PlannedJourney, searchID: String?, date: Date?, days: [Int], minute: Int) async -> Bool {
-        guard let searchID, !busy else { error = "Refresh route suggestions before scheduling."; return false }
+    func schedule(_ journey: PlannedJourney, searchID: String?, date: Date?, days: [Int], minute: Int, editingID: String? = nil) async -> Bool {
+        guard searchID != nil || editingID != nil else { error = "Refresh route suggestions before scheduling."; return false }
+        while busy {
+            do { try await Task.sleep(for: .milliseconds(100)); try Task.checkCancellation() } catch { return false }
+        }
         busy = true; defer { busy = false }
         do {
             guard ActivityAuthorizationInfo().areActivitiesEnabled,
@@ -150,9 +153,10 @@ final class TrackedJourneyStore {
                 throw ScheduleError("Live Activity setup is not ready. Enable Live Activities and try again shortly.")
             }
             apply(try await request("/device", method: "PUT", body: ["token": token.hex, "environment": Self.environment, "activitiesEnabled": true]))
-            var body: [String: Any] = ["searchID": searchID, "journeyID": journey.id, "days": days, "minute": minute]
+            var body: [String: Any] = ["journeyID": journey.id, "days": days, "minute": minute]
+            if let searchID { body["searchID"] = searchID }
             if let date { body["date"] = date.ISO8601Format() }
-            apply(try await request("/schedules", method: "POST", body: body)); error = nil
+            apply(try await request(editingID.map { "/schedules/" + $0 } ?? "/schedules", method: editingID == nil ? "POST" : "PUT", body: body)); error = nil
             return true
         } catch { self.error = error.localizedDescription; return false }
     }
@@ -241,7 +245,7 @@ enum JourneyActivityBridge {
         guard let journey, let state = journey.state, ActivityAuthorizationInfo().areActivitiesEnabled else { return }
         guard !Activity<JourneyActivityAttributes>.activities.contains(where: { $0.attributes.sessionID == journey.id }) else { return }
         _ = try Activity.request(attributes: JourneyActivityAttributes(sessionID: journey.id,
-            destination: state.destination, endsAtEpoch: Int(journey.endsAt.timeIntervalSince1970)),
+            destination: state.destination, endsAtEpoch: Int(journey.endsAt.timeIntervalSince1970), origin: journey.plan.legs.first?.from.name),
             content: ActivityContent(state: state, staleDate: Date(timeIntervalSince1970: Double(state.staleAtEpoch))), pushType: .token)
     }
     static func update(_ id: String, state: JourneyActivityAttributes.ContentState) async {

@@ -171,6 +171,13 @@ extension JourneyLeg {
     }
 }
 
+struct TrackedRouteSelection: Identifiable {
+    let id = UUID()
+    let journey: PlannedJourney
+    let searchID: String?
+    var existing: TrackedRouteSchedule? = nil
+}
+
 struct TrackedRouteScheduleEditor: View {
     @Environment(TrackedJourneyStore.self) private var store
     @Environment(\.dismiss) private var dismiss
@@ -179,19 +186,43 @@ struct TrackedRouteScheduleEditor: View {
     @State private var repeats = false
     @State private var date = Date.now.addingTimeInterval(600)
     @State private var days: Set<Int> = [1, 2, 3, 4, 5]
+    @State private var saveError: String?
+    @State private var saving = false
+    let existing: TrackedRouteSchedule?
+    let onSaved: () -> Void
+
+    init(journey: PlannedJourney, searchID: String?, existing: TrackedRouteSchedule? = nil, onSaved: @escaping () -> Void = {}) {
+        self.journey = journey; self.searchID = searchID; self.existing = existing; self.onSaved = onSaved
+        _repeats = State(initialValue: existing.map { $0.date == nil } ?? false)
+        let calendar = LondonRailDate.calendar
+        let minute = existing?.minute ?? 0
+        let repeatDate = calendar.date(bySettingHour: minute / 60, minute: minute % 60, second: 0, of: .now) ?? .now
+        _date = State(initialValue: existing.map { $0.date.map { max($0, .now.addingTimeInterval(600)) } ?? repeatDate } ?? max(.now.addingTimeInterval(600), journey.departureTime.addingTimeInterval(-600)))
+        _days = State(initialValue: Set(existing?.days ?? [1, 2, 3, 4, 5]))
+    }
     var body: some View {
         NavigationStack {
             Form {
                 Section {
                     Text("\(journey.legs.first?.from.name ?? "") → \(journey.legs.last?.to.name ?? "")").font(.headline)
                     ForEach(journey.legs.filter { !["walking", "transfer"].contains($0.mode) }) { leg in
-                        Text("\(leg.from.name) → \(leg.to.name) · \(leg.lines.map(\.name).joined(separator: ", "))")
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("\(leg.from.name) → \(leg.to.name)")
+                            ForEach(leg.lines, id: \.id) { line in
+                                HStack { JourneyLineDot(line: line, diameter: 12); Text(line.name).font(.subheadline) }
+                            }
+                        }
                     }
                 }
                 Section {
-                    Toggle("Repeat weekly", isOn: $repeats)
-                    DatePicker("Start tracking", selection: $date, in: Date.now...Date.now.addingTimeInterval(59 * 86400), displayedComponents: repeats ? [.hourAndMinute] : [.date, .hourAndMinute])
-                        .environment(\.timeZone, LondonRailDate.calendar.timeZone)
+                    Toggle("Make this a regular journey", isOn: $repeats)
+                    if repeats {
+                        DatePicker("Start tracking", selection: $date, displayedComponents: [.hourAndMinute])
+                            .environment(\.timeZone, LondonRailDate.calendar.timeZone)
+                    } else {
+                        DatePicker("Start tracking", selection: $date, in: Date.now...Date.now.addingTimeInterval(59 * 86400), displayedComponents: [.date, .hourAndMinute])
+                            .environment(\.timeZone, LondonRailDate.calendar.timeZone)
+                    }
                     if repeats {
                         ForEach(1...7, id: \.self) { day in
                             Toggle(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"][day - 1], isOn: Binding(get: { days.contains(day) }, set: { enabled in
@@ -202,15 +233,28 @@ struct TrackedRouteScheduleEditor: View {
                 } footer: {
                     Text("Times are London time. At the start time we find fresh services on this route and start a Live Activity. Open the journey to enable location following. If the route is unavailable, check Journeys for details.")
                 }
-                if let error = store.error { Section { Text(error).foregroundStyle(.orange) } }
-                Button(store.busy ? "Saving…" : "Schedule journey") {
+                Button(saving ? "Saving…" : existing == nil ? "Schedule journey" : "Save changes") {
+                    saving = true
                     let calendar = LondonRailDate.calendar
                     let minute = calendar.component(.hour, from: date) * 60 + calendar.component(.minute, from: date)
-                    Task { if await store.schedule(journey, searchID: searchID, date: repeats ? nil : date, days: Array(days).sorted(), minute: minute) { dismiss() } }
-                }.disabled(store.busy || (repeats && days.isEmpty))
+                    Task {
+                        defer { saving = false }
+                        if await store.schedule(journey, searchID: searchID, date: repeats ? nil : date, days: Array(days).sorted(), minute: minute, editingID: existing?.id) {
+                            onSaved(); dismiss()
+                        } else {
+                            saveError = store.error ?? "The journey could not be scheduled. Please try again."
+                        }
+                    }
+                }.disabled(saving || (repeats && days.isEmpty))
+                .buttonStyle(.borderless)
             }
             .navigationTitle("Schedule route")
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() }.disabled(saving) } }
+            .interactiveDismissDisabled(saving)
+            .alert("Journey not scheduled", isPresented: Binding(get: { saveError != nil }, set: { if !$0 { saveError = nil } })) {
+                Button("OK") { saveError = nil }
+            } message: { Text(saveError ?? "") }
+
         }
     }
 }
@@ -220,19 +264,25 @@ struct TrackedRouteActions: View {
     @Environment(TubeAppState.self) private var app
     let journey: PlannedJourney
     let searchID: String?
-    @State private var scheduling = false
+    let onSchedule: () -> Void
     @State private var replacing = false
+    static func canStart(_ journey: PlannedJourney, at now: Date) -> Bool {
+        journey.departureTime <= now.addingTimeInterval(7200)
+    }
     var body: some View {
         if let store {
+            TimelineView(.periodic(from: .now, by: 30)) { context in
+                if Self.canStart(journey, at: context.date) {
             Button {
                 if store.active != nil { replacing = true } else { Task { await store.start(journey, searchID: searchID) } }
-            } label: { Label("Start journey", systemImage: "location.north.line.fill") }
+            } label: { Label("Start journey", systemImage: "play.fill") }
                 .disabled(store.busy || app.isOffline)
-            Button { scheduling = true } label: { Label("Schedule this route", systemImage: "calendar.badge.plus") }
+                }
+            }
+            Button(action: onSchedule) { Label("Schedule this route", systemImage: "calendar.badge.plus") }
                 .disabled(store.busy || app.isOffline)
             if let error = store.error { Text(error).font(.footnote).foregroundStyle(.orange) }
             Color.clear.frame(height: 0)
-                .sheet(isPresented: $scheduling) { TrackedRouteScheduleEditor(journey: journey, searchID: searchID) }
                 .confirmationDialog("Replace your active journey with this route?", isPresented: $replacing, titleVisibility: .visible) {
                     Button("Use this route") {
                         Task {

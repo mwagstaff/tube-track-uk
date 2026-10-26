@@ -228,6 +228,9 @@ struct DepartureBoardCard: View {
                 if !configuration.name.isEmpty { Text(configuration.name).font(.appCaption(.semibold)) }
                 if let origin { DepartureDistanceButton(stop: origin, distance: distances[originID]) }
             }
+            if originID == LutonDARTConnectionCard.parkwayID {
+                LutonDARTConnectionCard(atAirport: false)
+            }
             ViewThatFits(in: .horizontal) {
                 servicePills.fixedSize(horizontal: true, vertical: false)
                 ScrollView(.horizontal) { servicePills }

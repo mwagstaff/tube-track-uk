@@ -173,8 +173,12 @@ struct UnifiedMapScreen: View {
                 appState.river.clearSelection()
             }
         })) { request in
-            DepartureBoardCard(initialRequest: request, presentedAsSheet: true,
-                               preferredServiceID: appState.selectedStationDepartureOperatorID ?? appState.selectedStationDepartureLineID?.rawValue)
+            if request.originID == LutonDARTConnectionCard.airportID {
+                LutonDARTAirportSheet()
+            } else {
+                DepartureBoardCard(initialRequest: request, presentedAsSheet: true,
+                                   preferredServiceID: appState.selectedStationDepartureOperatorID ?? appState.selectedStationDepartureLineID?.rawValue)
+            }
         }
         .sheet(item: $presentedDisruption) { disruption in
             DisruptionDetailSheet(disruption: disruption)

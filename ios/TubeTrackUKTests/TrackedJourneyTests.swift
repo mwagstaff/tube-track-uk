@@ -6,6 +6,12 @@ import XCTest
 @testable import TubeTrackUK
 
 @MainActor struct TrackedJourneyTests {
+    @Test func startOptionAppearsOnlyWithinTwoHours() {
+        let journey = TrackedJourneyFixture.plan
+        #expect(!TrackedRouteActions.canStart(journey, at: journey.departureTime.addingTimeInterval(-7201)))
+        #expect(TrackedRouteActions.canStart(journey, at: journey.departureTime.addingTimeInterval(-7200)))
+        #expect(TrackedRouteActions.canStart(journey, at: journey.departureTime))
+    }
     @Test func viaRequestPreservesOrderAndAccessibility() {
         let request = JourneyRequest(from: "nr:CLK", to: "HUBSRA", timeMode: .now, time: .now,
             accessibility: .platform, via: ["HUBLEW", "HUBCAW"])
@@ -78,6 +84,27 @@ import XCTest
 }
 
 @MainActor final class TrackedJourneyRenderingTests: XCTestCase {
+    func testRouteScheduleEditorAtLightDarkAndAccessibilitySizes() async throws {
+        let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.first as? UIWindowScene)
+        let previousWindow = scene.windows.first(where: \.isKeyWindow)
+        defer { previousWindow?.makeKey() }
+        let suite = "schedule-render-\(UUID())", defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let store = try TrackedJourneyFixture.store(defaults)
+        for (name, scheme, size) in [("light", ColorScheme.light, DynamicTypeSize.large), ("dark", .dark, .large), ("accessibility", .dark, .accessibility3)] {
+            let view = TrackedRouteScheduleEditor(journey: TrackedJourneyFixture.plan, searchID: "search")
+                .environment(store).environment(\.colorScheme, scheme).environment(\.dynamicTypeSize, size)
+            let host = UIHostingController(rootView: view)
+            let window = UIWindow(windowScene: scene); window.rootViewController = host
+            window.frame = CGRect(x: 0, y: 0, width: 390, height: 844); window.makeKeyAndVisible()
+            try await Task.sleep(for: .milliseconds(300)); host.view.layoutIfNeeded()
+            let image = UIGraphicsImageRenderer(bounds: host.view.bounds).image { _ in host.view.drawHierarchy(in: host.view.bounds, afterScreenUpdates: true) }
+            let attachment = XCTAttachment(image: image); attachment.name = "route-schedule-\(name)"; attachment.lifetime = .keepAlways; add(attachment)
+            try image.pngData()?.write(to: URL(fileURLWithPath: "/tmp/route-schedule-\(name).png"))
+            window.isHidden = true; window.rootViewController = nil
+        }
+    }
+
     func testJourneyAtLightDarkAndAccessibilitySizes() async throws {
         let scene = try XCTUnwrap(UIApplication.shared.connectedScenes.first as? UIWindowScene)
         let previousWindow = scene.windows.first(where: \.isKeyWindow)

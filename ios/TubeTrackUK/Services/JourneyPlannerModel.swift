@@ -65,9 +65,46 @@ private struct CombinedJourneyJob: Decodable, Sendable {
     let error: Failure?
 }
 
+struct RecentJourneySearch: Codable, Identifiable, Sendable {
+    let id: UUID
+    let searchedAt: Date
+    let from: JourneyStation
+    let to: JourneyStation
+    let via: [JourneyStation]
+    let timeMode: JourneyTimeMode
+    let time: Date
+    let accessibility: JourneyAccessibility
+
+    var routeKey: RecentJourneyRouteKey {
+        RecentJourneyRouteKey(fromID: from.id, toID: to.id, viaIDs: via.map(\.id))
+    }
+
+    func matches(_ query: String) -> Bool {
+        let searchable = ([from.name, to.name] + via.map(\.name) + [timeMode.title, accessibility.title]).joined(separator: " ")
+        return query.split(whereSeparator: \.isWhitespace).allSatisfy {
+            searchable.localizedStandardContains(String($0))
+        }
+    }
+}
+
+struct RecentJourneyRouteKey: Hashable {
+    let fromID: String
+    let toID: String
+    let viaIDs: [String]
+}
+
+struct RecentJourneySearchPage {
+    let entries: [RecentJourneySearch]
+    let number: Int
+    let count: Int
+}
+
 @MainActor
 @Observable
 final class JourneyPlannerModel {
+    static let recentSearchPageSize = 50
+    static let maximumRecentSearches = 500
+    static let minimumResultLifetime: TimeInterval = 5 * 60
     enum StationField: String, Identifiable {
         case from, to, via
         var id: String { rawValue }
@@ -85,9 +122,43 @@ final class JourneyPlannerModel {
     private(set) var isLoading = false
     private(set) var errorMessage: String?
     private(set) var nextAutomaticRefresh = Date.distantPast
+    private(set) var recentSearches: [RecentJourneySearch] = []
     @ObservationIgnored private let service: any JourneyFetching
+    @ObservationIgnored private let defaults: UserDefaults
+    @ObservationIgnored private let historyKey: String
 
-    init(service: any JourneyFetching) { self.service = service }
+    init(service: any JourneyFetching, defaults: UserDefaults = .standard,
+         historyKey: String = "journeySearchHistory.v1.\(AppInstall.identifier)") {
+        self.service = service
+        self.defaults = defaults
+        self.historyKey = historyKey
+        if let data = defaults.data(forKey: historyKey),
+           let saved = try? JSONDecoder().decode([RecentJourneySearch].self, from: data) {
+            var seen = Set<RecentJourneyRouteKey>()
+            recentSearches = Array(saved.sorted { $0.searchedAt > $1.searchedAt }
+                .filter { seen.insert($0.routeKey).inserted }
+                .prefix(Self.maximumRecentSearches))
+            if recentSearches.count != saved.count,
+               let cleaned = try? JSONEncoder().encode(recentSearches) {
+                defaults.set(cleaned, forKey: historyKey)
+            }
+        }
+    }
+
+    /// Short live-feed expiries should not make an entire route search appear obsolete within seconds.
+    /// Refreshes can run sooner, while the visible warning waits for a five-minute-old result.
+    static func displayExpiry(for response: TubeTrackAPIResponse<JourneyPlan>) -> Date {
+        max(response.data.expiresAt, response.updatedAt.addingTimeInterval(minimumResultLifetime))
+    }
+
+    func recentSearchPage(matching query: String, index: Int) -> RecentJourneySearchPage {
+        let matching = recentSearches.filter { $0.matches(query) }
+        let count = max(1, (matching.count + Self.recentSearchPageSize - 1) / Self.recentSearchPageSize)
+        let number = min(max(0, index), count - 1)
+        return RecentJourneySearchPage(
+            entries: Array(matching.dropFirst(number * Self.recentSearchPageSize).prefix(Self.recentSearchPageSize)),
+            number: number, count: count)
+    }
 
     var canSearch: Bool {
         guard let from, let to else { return false }
@@ -107,10 +178,49 @@ final class JourneyPlannerModel {
 
     func startSearch(keepingResults: Bool = false) {
         guard canSearch, !isLoading else { return }
+        if !keepingResults { saveRecentSearch() }
         if !keepingResults { result = nil }
         errorMessage = nil
         isLoading = true
         searchID = UUID()
+    }
+
+    @discardableResult
+    func rerun(_ search: RecentJourneySearch, stations: [TubeStation], now: Date = .now) -> Bool {
+        guard !isLoading else { return false }
+        let byID = Dictionary(uniqueKeysWithValues: stations.map { ($0.id, $0) })
+        guard let origin = byID[search.from.id], let destination = byID[search.to.id],
+              search.via.allSatisfy({ byID[$0.id] != nil }) else {
+            errorMessage = "A station in this search is no longer available. Choose the stations again."
+            return false
+        }
+        from = origin
+        to = destination
+        via = search.via.compactMap { byID[$0.id] }
+        timeMode = search.timeMode
+        time = search.time
+        if timeMode != .now && time <= now {
+            timeMode = .now
+            time = now.addingTimeInterval(3_600)
+        }
+        accessibility = search.accessibility
+        startSearch()
+        return isLoading
+    }
+
+    private func saveRecentSearch() {
+        guard let from, let to else { return }
+        let entry = RecentJourneySearch(id: UUID(), searchedAt: .now,
+            from: JourneyStation(id: from.id, name: from.name),
+            to: JourneyStation(id: to.id, name: to.name),
+            via: via.map { JourneyStation(id: $0.id, name: $0.name) },
+            timeMode: timeMode, time: time, accessibility: accessibility)
+        recentSearches.removeAll { $0.routeKey == entry.routeKey }
+        recentSearches.insert(entry, at: 0)
+        if recentSearches.count > Self.maximumRecentSearches {
+            recentSearches.removeLast(recentSearches.count - Self.maximumRecentSearches)
+        }
+        if let data = try? JSONEncoder().encode(recentSearches) { defaults.set(data, forKey: historyKey) }
     }
 
     func cancelSearch() {
@@ -129,7 +239,8 @@ final class JourneyPlannerModel {
             try Task.checkCancellation()
             guard searchID == id else { return }
             result = response
-            nextAutomaticRefresh = max(Date.now.addingTimeInterval(30), response.data.expiresAt)
+            nextAutomaticRefresh = response.stale ? Date.now.addingTimeInterval(30)
+                : max(Date.now.addingTimeInterval(60), response.data.expiresAt)
             isLoading = false
         } catch {
             guard searchID == id else { return }

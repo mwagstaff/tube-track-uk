@@ -25,7 +25,7 @@ class StationTargetsTests(unittest.TestCase):
 
     def test_all_printed_station_symbols_match_independent_review(self):
         expected = reviewed_targets()
-        self.assertEqual(len(expected),944)
+        self.assertEqual(len(expected),945)
         actual = [('circle',t) for t in self.artwork['stationRoundels']]+[('tick',t) for t in self.artwork['stationTicks']]
         self.assertEqual(len(actual),len(expected))
         for kind,target in actual:
