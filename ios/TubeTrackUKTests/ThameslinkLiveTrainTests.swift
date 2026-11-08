@@ -48,6 +48,43 @@ struct ThameslinkLiveTrainTests {
         #expect(fast.secondsToNextStop(at: ISO8601DateFormatter().date(from: "2026-09-28T08:31:00Z")!) == 120)
     }
 
+    @Test(arguments: [TubeLineID.victoria, .elizabeth, .mildmay, .lioness, .liberty, .suffragette, .weaver, .windrush])
+    func bulkRailMarkersUseSourceTiming(lineID: TubeLineID) async throws {
+        let graph = try TubeGraph.bundled()
+        let route = try #require(graph.line(lineID)?.routes.first)
+        let now = Date.now
+        let formatter = ISO8601DateFormatter()
+        let arrivals: [[String: Any]] = [
+            // The older stop must not win merely because its raw countdown is shorter.
+            ["vehicleId": "timing-test", "lineId": lineID.rawValue,
+             "stopId": route[1], "destinationStopId": route.last!, "timeToStation": 30,
+             "expectedArrival": formatter.string(from: now.addingTimeInterval(-60))],
+            ["vehicleId": "timing-test", "lineId": lineID.rawValue,
+             "stopId": route[2], "destinationStopId": route.last!, "timeToStation": 180,
+             "expectedArrival": formatter.string(from: now.addingTimeInterval(60)),
+             "timestamp": formatter.string(from: now.addingTimeInterval(-120))],
+        ]
+        let body = try JSONSerialization.data(withJSONObject: ["data": arrivals,
+            "meta": ["updatedAt": formatter.string(from: now)]])
+        ThameslinkTrainsURLProtocol.prepare(nil, bulk: body)
+        let train = try #require(try await service().fetch(lineIDs: [lineID]).first)
+        #expect(train.nextStationID == route[2])
+        #expect((50 ... 60).contains(train.secondsToNextStation))
+    }
+
+    @Test func bulkRailMarkersFallBackToSnapshotAgeWithoutPredictionDates() async throws {
+        let now = Date.now
+        let graph = try TubeGraph.bundled()
+        let route = try #require(graph.line(.victoria)?.routes.first)
+        let body = try JSONSerialization.data(withJSONObject: ["data": [
+            ["vehicleId": "fallback", "lineId": "victoria", "stopId": route[2],
+             "destinationStopId": route.last!, "timeToStation": 180]
+        ], "meta": ["updatedAt": ISO8601DateFormatter().string(from: now.addingTimeInterval(-120))]])
+        ThameslinkTrainsURLProtocol.prepare(nil, bulk: body)
+        let train = try #require(try await service().fetch(lineIDs: [.victoria]).first)
+        #expect((50 ... 60).contains(train.secondsToNextStation))
+    }
+
     @Test func aThameslinkFailureNeverHidesOtherLinesTrains() async throws {
         ThameslinkTrainsURLProtocol.prepare(nil)
         let trains = try await service().fetch(lineIDs: [.thameslink, .victoria])
@@ -58,12 +95,14 @@ struct ThameslinkLiveTrainTests {
 
 private final class ThameslinkTrainsURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var thameslinkResponse: Data?
+    nonisolated(unsafe) static var bulkResponse = Data("[]".utf8)
     nonisolated(unsafe) static var requestedPaths: [String] = []
     private static let lock = NSLock()
 
-    static func prepare(_ response: Data?) {
+    static func prepare(_ response: Data?, bulk: Data = Data("[]".utf8)) {
         lock.withLock {
             thameslinkResponse = response
+            bulkResponse = bulk
             requestedPaths = []
         }
     }
@@ -77,7 +116,7 @@ private final class ThameslinkTrainsURLProtocol: URLProtocol, @unchecked Sendabl
         let body: Data? = Self.lock.withLock {
             Self.requestedPaths.append(path)
             if path == "/api/v1/thameslink/trains" { return Self.thameslinkResponse }
-            return Data("[]".utf8)
+            return Self.bulkResponse
         }
         let status = body == nil ? 503 : 200
         let response = HTTPURLResponse(url: url, statusCode: status, httpVersion: nil,

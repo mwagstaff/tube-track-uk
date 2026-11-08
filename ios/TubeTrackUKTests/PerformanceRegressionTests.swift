@@ -69,7 +69,7 @@ struct PerformanceRegressionTests {
         #expect(AppAppearanceMode.dark.actionTitle == "Enable dark mode")
     }
 
-    @Test func lightweightLivePredictionIgnoresUnusedDatePayload() throws {
+    @Test func livePredictionToleratesInvalidOptionalDatePayload() throws {
         let json = """
         [{
           "id": "prediction-id",
@@ -98,6 +98,84 @@ struct PerformanceRegressionTests {
         #expect(prediction.lineId == TubeLineID.victoria.rawValue)
         #expect(prediction.timeToStation == 75)
         #expect(prediction.platformName == "Unused platform")
+    }
+
+    @Test func tramPredictionDecodesSourceTimingAndToleratesInvalidOptionalDates() throws {
+        let json = """
+        {"vehicleId":"2530","lineId":"tram","stopId":"940GZZCRWOD",
+         "timeToStation":180,"expectedArrival":"2026-11-08T14:00:00.000Z",
+         "timestamp":"2026-11-08T13:57:00Z"}
+        """
+        let prediction = try JSONDecoder.tfl.decode(TfLLiveTrainPrediction.self, from: Data(json.utf8))
+        let arrival = try #require(prediction.expectedArrival)
+        #expect(arrival.timeIntervalSince(try #require(prediction.timestamp)) == 180)
+        #expect(prediction.remainingSeconds(at: arrival) == 0)
+        let invalid = json.replacingOccurrences(of: "2026-11-08T14:00:00.000Z", with: "invalid")
+        let fallback = try JSONDecoder.tfl.decode(TfLLiveTrainPrediction.self, from: Data(invalid.utf8))
+        #expect(fallback.expectedArrival == nil)
+        #expect(fallback.remainingSeconds(at: arrival) == 0)
+    }
+
+    @Test func woodsideTramUsesAbsoluteArrivalInsteadOfRestartingThreeMinuteCountdown() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let now = Date(timeIntervalSince1970: 10_000)
+        let predictions = [tramPrediction(
+            stationID: "940GZZCRWOD", seconds: 180,
+            destinationName: "Elmers End", destinationStationID: "940GZZCRELM",
+            expectedArrival: now, timestamp: now.addingTimeInterval(-180)
+        )]
+        let resolution = try #require(TramVehicleRouteResolver.resolve(
+            vehicleID: "2530", predictions: predictions, repository: repository,
+            previousContext: nil, now: now
+        ))
+        #expect(resolution.train.nextStationID == "940GZZCRWOD")
+        #expect(resolution.train.progress == 1)
+        #expect(resolution.train.secondsToNextStop(at: now) == 0)
+    }
+
+    @Test func repeatedTramSnapshotCountsDownAndAdvancesPastExpiredStops() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let now = Date(timeIntervalSince1970: 10_000)
+        let predictions = [
+            tramPrediction(stationID: "940GZZCRBLA", seconds: 120,
+                           destinationName: "Elmers End", destinationStationID: "940GZZCRELM",
+                           expectedArrival: now.addingTimeInterval(-30)),
+            tramPrediction(stationID: "940GZZCRWOD", seconds: 210,
+                           destinationName: "Elmers End", destinationStationID: "940GZZCRELM",
+                           expectedArrival: now.addingTimeInterval(60)),
+        ]
+        let first = try #require(TramVehicleRouteResolver.resolve(
+            vehicleID: "2530", predictions: predictions, repository: repository,
+            previousContext: nil, now: now
+        ))
+        let repeated = try #require(TramVehicleRouteResolver.resolve(
+            vehicleID: "2530", predictions: predictions, repository: repository,
+            previousContext: first.context, now: now.addingTimeInterval(30)
+        ))
+        #expect(first.train.nextStationID == "940GZZCRWOD")
+        #expect(first.train.secondsToNextStation == 60)
+        #expect(repeated.train.secondsToNextStation == 30)
+        #expect(repeated.train.progress > first.train.progress)
+        #expect(TramVehicleRouteResolver.resolve(
+            vehicleID: "2530", predictions: predictions, repository: repository,
+            previousContext: repeated.context, now: now.addingTimeInterval(71)
+        ) == nil)
+    }
+
+    @Test func tramTimingFallsBackToSourceThenSnapshotAge() {
+        let now = Date(timeIntervalSince1970: 10_000)
+        let prediction = tramPrediction(
+            stationID: "940GZZCRWOD", seconds: 180, destinationName: "Elmers End",
+            timestamp: now.addingTimeInterval(-120)
+        )
+        #expect(prediction.remainingSeconds(at: now, snapshotUpdatedAt: now.addingTimeInterval(-10)
+        ) == 60)
+        let undated = tramPrediction(stationID: "940GZZCRWOD", seconds: 180, destinationName: "Elmers End")
+        #expect(undated.remainingSeconds(at: now, snapshotUpdatedAt: now.addingTimeInterval(-90)
+        ) == 90)
+        #expect(undated.remainingSeconds(at: now) == 180)
+        #expect(prediction.remainingSeconds(at: now.addingTimeInterval(71)
+        ) == nil)
     }
 
     @Test func ambiguousTramMergeIsHiddenUntilVehicleContextDisambiguatesIt() throws {
@@ -239,6 +317,48 @@ struct PerformanceRegressionTests {
         #expect(train.previousStationID == "940GZZCRWCR")
         #expect(train.nextStationID == "940GZZCRWEL")
         #expect(resolution?.context.routeIndex == 5)
+    }
+
+    @Test func dlrCachedPredictionKeepsArrivalIdentityAndCountsDown() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let now = Date(timeIntervalSince1970: 10_000)
+        let prediction = dlrPrediction(
+            stationID: "940GZZDLSHA", seconds: 180, destinationStationID: "940GZZDLBNK",
+            expectedArrival: now.addingTimeInterval(60), timestamp: now.addingTimeInterval(-120)
+        )
+        let first = try #require(DLRPredictionResolver.resolve(
+            predictions: [prediction], repository: repository, now: now
+        ).first)
+        let repeated = try #require(DLRPredictionResolver.resolve(
+            predictions: [prediction], repository: repository, now: now.addingTimeInterval(30)
+        ).first)
+        #expect(first.secondsToNextStation == 60)
+        #expect(repeated.secondsToNextStation == 30)
+        #expect(first.id == repeated.id)
+        #expect(repeated.progress > first.progress)
+        #expect(DLRPredictionResolver.resolve(
+            predictions: [prediction], repository: repository, now: now.addingTimeInterval(71)
+        ).isEmpty)
+        let atStop = try #require(DLRPredictionResolver.resolve(
+            predictions: [prediction], repository: repository, now: now.addingTimeInterval(60)
+        ).first)
+        #expect(atStop.progress == 1)
+    }
+
+    @Test func dlrCountdownFallsBackToSourceAndSnapshotTiming() throws {
+        let repository = TubeNetworkRepository(graph: try TubeGraph.bundled())
+        let now = Date(timeIntervalSince1970: 10_000)
+        for sourceTime in [now.addingTimeInterval(-120), nil] {
+            let prediction = dlrPrediction(
+                stationID: "940GZZDLSHA", seconds: 180, destinationStationID: "940GZZDLBNK",
+                timestamp: sourceTime
+            )
+            let train = try #require(DLRPredictionResolver.resolve(
+                predictions: [prediction], repository: repository, now: now,
+                snapshotUpdatedAt: now.addingTimeInterval(-120)
+            ).first)
+            #expect(train.secondsToNextStation == 60)
+        }
     }
 
     @Test func dlrCountdownBoardPredictionsCollapseIntoIndividualMovingVehicles() throws {
@@ -698,7 +818,9 @@ private func tramPrediction(
     stationID: String,
     seconds: Int,
     destinationName: String,
-    destinationStationID: String? = nil
+    destinationStationID: String? = nil,
+    expectedArrival: Date? = nil,
+    timestamp: Date? = nil
 ) -> TfLLiveTrainPrediction {
     TfLLiveTrainPrediction(
         vehicleId: "tram-test-vehicle",
@@ -710,14 +832,18 @@ private func tramPrediction(
         towards: destinationName,
         timeToStation: seconds,
         currentLocation: nil,
-        platformName: "Westbound"
+        platformName: "Westbound",
+        expectedArrival: expectedArrival,
+        timestamp: timestamp
     )
 }
 
 private func dlrPrediction(
     stationID: String,
     seconds: Int,
-    destinationStationID: String
+    destinationStationID: String,
+    expectedArrival: Date? = nil,
+    timestamp: Date? = nil
 ) -> TfLLiveTrainPrediction {
     TfLLiveTrainPrediction(
         vehicleId: "",
@@ -729,6 +855,8 @@ private func dlrPrediction(
         towards: "",
         timeToStation: seconds,
         currentLocation: "",
-        platformName: "Platform 2"
+        platformName: "Platform 2",
+        expectedArrival: expectedArrival,
+        timestamp: timestamp
     )
 }

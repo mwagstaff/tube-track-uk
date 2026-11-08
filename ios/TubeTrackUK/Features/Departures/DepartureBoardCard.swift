@@ -236,6 +236,18 @@ struct DepartureBoardCard: View {
                 ScrollView(.horizontal) { servicePills }
                     .scrollIndicators(.hidden).fixedSize(horizontal: false, vertical: true)
             }
+            if let serviceID, let lineID = TubeLineID(rawValue: serviceID) {
+                let condition = LineServiceCondition.condition(for: appState.statuses.first { $0.id == lineID })
+                Label {
+                    Text(appState.isOffline ? "Saved status · \(condition.accessibilityDescription)" : condition.accessibilityDescription)
+                        .foregroundStyle(.secondary)
+                } icon: {
+                    Image(systemName: condition.symbolName).foregroundStyle(condition.tint)
+                }
+                .font(.appCaption())
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityLabel("\(lineID.displayName): \(appState.isOffline ? "Saved status, " : "")\(condition.accessibilityDescription)")
+            }
             ViewThatFits(in: .horizontal) {
                 HStack { controls }
                 VStack(alignment: .leading, spacing: 4) { controls }

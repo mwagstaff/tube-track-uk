@@ -357,7 +357,8 @@ public struct TfLArrivalPrediction: Codable, Sendable {
 
 /// The subset of a TfL arrival prediction needed to estimate a vehicle's
 /// position. Keeping this separate from station departures avoids decoding
-/// thousands of unused strings and ISO-8601 dates on every network-wide poll.
+/// unused station-board fields on every network-wide poll. Source timing is
+/// retained because upstream countdowns can already be minutes old.
 public struct TfLLiveTrainPrediction: Decodable, Sendable {
     public let vehicleId: String?
     public let lineId: String
@@ -370,10 +371,13 @@ public struct TfLLiveTrainPrediction: Decodable, Sendable {
     public let currentLocation: String?
     public let platformName: String?
 
+    public let expectedArrival: Date?
+    public let timestamp: Date?
+
     private enum CodingKeys: String, CodingKey {
         case vehicleId, lineId, naptanId, stopId, direction, destinationName
         case destinationNaptanId, destinationStopId, towards, timeToStation
-        case currentLocation, platformName
+        case currentLocation, platformName, expectedArrival, timestamp
     }
 
     public init(
@@ -386,7 +390,9 @@ public struct TfLLiveTrainPrediction: Decodable, Sendable {
         towards: String?,
         timeToStation: Int?,
         currentLocation: String?,
-        platformName: String?
+        platformName: String?,
+        expectedArrival: Date? = nil,
+        timestamp: Date? = nil
     ) {
         self.vehicleId = vehicleId
         self.lineId = lineId
@@ -398,6 +404,8 @@ public struct TfLLiveTrainPrediction: Decodable, Sendable {
         self.timeToStation = timeToStation
         self.currentLocation = currentLocation
         self.platformName = platformName
+        self.expectedArrival = expectedArrival
+        self.timestamp = timestamp
     }
 
     public init(from decoder: Decoder) throws {
@@ -414,6 +422,29 @@ public struct TfLLiveTrainPrediction: Decodable, Sendable {
         timeToStation = try container.decodeIfPresent(Int.self, forKey: .timeToStation)
         currentLocation = try container.decodeIfPresent(String.self, forKey: .currentLocation)
         platformName = try container.decodeIfPresent(String.self, forKey: .platformName)
+        // A malformed optional date must not discard the whole network snapshot.
+        expectedArrival = try? container.decodeIfPresent(Date.self, forKey: .expectedArrival)
+        timestamp = try? container.decodeIfPresent(Date.self, forKey: .timestamp)
+    }
+
+    /// Countdown values are relative to TfL's observation, not receipt by the
+    /// phone. Drop already-passed stops so they cannot pin a vehicle behind its
+    /// next stop, while allowing a short platform dwell around the arrival.
+    public func remainingSeconds(
+        at now: Date,
+        snapshotUpdatedAt: Date? = nil
+    ) -> Int? {
+        let remaining: TimeInterval
+        if let expectedArrival {
+            remaining = expectedArrival.timeIntervalSince(now)
+        } else if let seconds = timeToStation, seconds >= 0 {
+            let observedAt = timestamp ?? snapshotUpdatedAt ?? now
+            remaining = Double(seconds) - max(0, now.timeIntervalSince(observedAt))
+        } else {
+            return nil
+        }
+        guard remaining >= -10 else { return nil }
+        return max(0, Int(ceil(remaining)))
     }
 }
 

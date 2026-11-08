@@ -556,3 +556,9 @@ the tracking choice explains this before opening the editor.
 Save detects overlapping enabled journeys on shared days and asks before replacing
 them. Replacement removes the entire conflicting journeys, including other windows,
 in one revision-checked request; a failed save preserves the existing schedules.
+
+Station departure boards show a compact icon and status label for the selected
+TfL line, using the shared line-status palette. Missing status remains “Status
+updating”; offline status is labelled as saved. Self-referential TfL destinations
+returned by the custom board retain their official timings with “Check departure
+board for destination”, without claiming an unverified onward route.

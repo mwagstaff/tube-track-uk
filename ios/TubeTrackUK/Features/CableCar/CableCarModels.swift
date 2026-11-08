@@ -187,8 +187,14 @@ enum CableCarPolicy {
         if let issue = active.first(where: { disruptionSeverities.contains($0.statusSeverity) }) {
             return .init(kind: .disrupted, headline: issue.statusSeverityDescription, detail: issue.reason ?? "TfL reports a service change", schedule: hoursText)
         }
-        if currentInterval != nil, !active.isEmpty, active.allSatisfy({ $0.statusSeverity == 10 || $0.statusSeverity == 18 }) {
-            return .init(kind: .open, headline: "Open · good service", detail: "TfL reports good service", schedule: hoursText)
+        if !active.isEmpty, active.allSatisfy({ $0.statusSeverity == 10 || $0.statusSeverity == 18 }) {
+            if currentInterval != nil {
+                return .init(kind: .open, headline: "Open · good service", detail: "TfL reports good service", schedule: hoursText)
+            }
+            // TfL can report good service overnight. Missing/expired hours make
+            // opening uncertain, not the fresh operational status unavailable.
+            return .init(kind: .unknown, headline: "Opening unconfirmed",
+                         detail: "TfL reports good service, but opening hours could not be confirmed.", schedule: hoursText)
         }
         return .init(kind: .unknown, headline: "Status unavailable", detail: active.first?.reason ?? active.first?.statusSeverityDescription ?? "Live service status could not be confirmed", schedule: hoursText)
     }

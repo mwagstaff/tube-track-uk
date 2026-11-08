@@ -67,12 +67,18 @@ export function callsAtSelected(row, originIDs, destinationIDs, routes) {
     return matches.some(Boolean) ? null : false;
 }
 
+// Keep official timings when the destination loops back to the boarding stop.
+// Clear routing metadata before calling-at checks so no onward route is inferred.
+function withVerifiedDestination(row) {
+    return isSelfReferential(row) ? { ...row, destinationStopId: null,
+        destinationName: 'Check departure board for destination', towards: null } : row;
+}
+
 export function orderedUniqueDepartures(rows, nowMs) {
     const seen = new Set();
-    return coalesceDeparturePlatforms(rows.filter(row => {
+    return coalesceDeparturePlatforms(rows.map(withVerifiedDestination).filter(row => {
         const date = Date.parse(row.expectedArrival ?? row.expectedDeparture ?? row.scheduledDeparture);
         if (!(date > nowMs - 15_000) && !(row.status === 'delayed' && !row.expectedArrival)) return false;
-        if (isSelfReferential(row)) return false;
         const key = [row.lineId, row.vehicleId || row.id, row.destinationStopId || row.destinationName,
             row.expectedArrival ?? row.scheduledDeparture, row.platformName].join('|');
         if (seen.has(key)) return false;
@@ -220,7 +226,7 @@ export function createCustomDepartureSource({ client, resourceCache, cache, cloc
                         try { routes = await routesFor(lineId); } catch { /* Terminal matches are still verifiable. */ }
                     }
                     for (const original of arrivals) {
-                        const row = { ...original };
+                        const row = withVerifiedDestination({ ...original });
                         if (!row.destinationStopId && row.destinationName) {
                             const candidates = stops.filter(stop => stop.lineIDs.includes(lineId)
                                 && cleanName(stop.name) === cleanName(row.destinationName));

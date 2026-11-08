@@ -31,7 +31,7 @@ actor TubeTrainService: LiveTrainFetching {
             ? thameslinkTrains() : []
 
         try Task.checkCancellation()
-        let predictions: [TfLLiveTrainPrediction] = bulkLines.isEmpty ? [] : try await client.get(
+        let snapshot: TubeTrackAPIResponse<[TfLLiveTrainPrediction]>? = bulkLines.isEmpty ? nil : try await client.getSnapshot(
             "/api/v1/live",
             queryItems: [
                 URLQueryItem(
@@ -42,12 +42,12 @@ actor TubeTrainService: LiveTrainFetching {
         )
         try Task.checkCancellation()
 
-        for prediction in predictions {
+        let now = Date.now
+        for prediction in snapshot?.data ?? [] {
             guard let lineID = TubeLineID(rawValue: prediction.lineId),
                   requested.contains(lineID),
                   let nextStationID = prediction.naptanId,
-                  let seconds = prediction.timeToStation,
-                  seconds >= 0 else {
+                  let seconds = prediction.remainingSeconds(at: now, snapshotUpdatedAt: snapshot?.updatedAt) else {
                 continue
             }
 
@@ -73,7 +73,6 @@ actor TubeTrainService: LiveTrainFetching {
             )
         }
         try Task.checkCancellation()
-        let now = Date.now
 
         var trains: [LiveTubeTrain] = nearestByVehicle.values.compactMap { nearest in
             let prediction = nearest.prediction
@@ -98,7 +97,7 @@ actor TubeTrainService: LiveTrainFetching {
 
             let baselineDuration = max(75, min(180, nearest.seconds + 45))
             let atPlatform = prediction.currentLocation?.localizedCaseInsensitiveContains("at platform") == true
-            let progress = atPlatform
+            let progress = atPlatform || nearest.seconds == 0
                 ? 1.0
                 : max(0.05, min(0.95, 1 - Double(nearest.seconds) / Double(baselineDuration)))
             return LiveTubeTrain(
@@ -126,7 +125,8 @@ actor TubeTrainService: LiveTrainFetching {
                       predictions: predictions,
                       repository: repository,
                       previousContext: tramContextsByVehicleID[vehicleID],
-                      now: now
+                      now: now,
+                      snapshotUpdatedAt: snapshot?.updatedAt
                   ) else {
                 continue
             }
@@ -136,7 +136,8 @@ actor TubeTrainService: LiveTrainFetching {
         trains.append(contentsOf: DLRPredictionResolver.resolve(
             predictions: dlrPredictions,
             repository: repository,
-            now: now
+            now: now,
+            snapshotUpdatedAt: snapshot?.updatedAt
         ))
         trains.append(contentsOf: await nationalRailTrains)
 
@@ -212,15 +213,17 @@ enum TramVehicleRouteResolver {
         predictions: [TfLLiveTrainPrediction],
         repository: TubeNetworkRepository,
         previousContext: TramVehicleRouteContext?,
-        now: Date
+        now: Date,
+        snapshotUpdatedAt: Date? = nil
     ) -> TramVehicleResolution? {
         guard let line = repository.graph.line(.tram) else { return nil }
 
         let usable = predictions.compactMap { prediction -> TramObservation? in
             guard prediction.lineId == TubeLineID.tram.rawValue,
                   let stationID = prediction.naptanId,
-                  let seconds = prediction.timeToStation,
-                  seconds >= 0 else {
+                  let seconds = prediction.remainingSeconds(
+                      at: now, snapshotUpdatedAt: snapshotUpdatedAt
+                  ) else {
                 return nil
             }
             return TramObservation(prediction: prediction, stationID: stationID, seconds: seconds)
@@ -371,7 +374,7 @@ enum TramVehicleRouteResolver {
 
     private static func estimatedProgress(seconds: Int, currentLocation: String?) -> Double {
         let baselineDuration = max(75, min(180, seconds + 45))
-        if currentLocation?.localizedCaseInsensitiveContains("at platform") == true {
+        if seconds == 0 || currentLocation?.localizedCaseInsensitiveContains("at platform") == true {
             return 1
         }
         return max(0.05, min(0.95, 1 - Double(seconds) / Double(baselineDuration)))
@@ -453,7 +456,8 @@ enum DLRPredictionResolver {
     static func resolve(
         predictions: [TfLLiveTrainPrediction],
         repository: TubeNetworkRepository,
-        now: Date
+        now: Date,
+        snapshotUpdatedAt: Date? = nil
     ) -> [LiveTubeTrain] {
         guard let line = repository.graph.line(.dlr) else { return [] }
 
@@ -468,7 +472,7 @@ enum DLRPredictionResolver {
             guard prediction.lineId == TubeLineID.dlr.rawValue,
                   let stationID = prediction.naptanId,
                   let destinationStationID = prediction.destinationNaptanId,
-                  let seconds = prediction.timeToStation,
+                  let seconds = prediction.remainingSeconds(at: now, snapshotUpdatedAt: snapshotUpdatedAt),
                   (0 ... LiveTrainMarkerPolicy.maximumLightRailSecondsToNearestStation).contains(seconds) else {
                 return nil
             }
@@ -613,7 +617,7 @@ enum DLRPredictionResolver {
 
     private static func estimatedDLRProgress(seconds: Int, currentLocation: String?) -> Double {
         let baselineDuration = max(75, min(180, seconds + 45))
-        if currentLocation?.localizedCaseInsensitiveContains("at platform") == true {
+        if seconds == 0 || currentLocation?.localizedCaseInsensitiveContains("at platform") == true {
             return 1
         }
         return max(0.05, min(0.95, 1 - Double(seconds) / Double(baselineDuration)))

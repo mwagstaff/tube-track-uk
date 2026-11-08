@@ -3,6 +3,31 @@ import XCTest
 @testable import TubeTrackUK
 
 @MainActor final class DepartureBoardRenderingTests: XCTestCase {
+    func testTramUnknownDestinationsAndSelectedLineStatus() async throws {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [DepartureRenderProtocol.self]
+        let client = TubeTrackAPIClient(configuration: .init(baseURL: URL(string: "https://departure.test")!),
+                                        session: URLSession(configuration: config))
+        let app = TubeAppState(apiClient: client, monitorsConnectivity: false)
+        app.statuses = try JSONDecoder.tfl.decode([TfLLineStatus].self, from: Data("""
+        [{"id":"tram","name":"Tram","lineStatuses":[{"id":1,"statusSeverity":10,"statusSeverityDescription":"Good service"}]}]
+        """.utf8))
+        let request = DepartureBoardRequest(originID: "940GZZCRELM", lineIDs: ["tram"])
+        await app.departureBoards.refresh(request)
+        XCTAssertEqual(app.departureBoards.boards[request]?.arrivals.count, 2)
+        for (name, scheme, size) in [("tram-light", ColorScheme.light, DynamicTypeSize.large),
+                                     ("tram-accessibility", .dark, .accessibility3)] {
+            let view = DepartureBoardCard(initialRequest: request, isVisible: false, usesSavedView: false)
+                .environment(app).environment(UserLocationProvider())
+                .environment(\.colorScheme, scheme).environment(\.dynamicTypeSize, size)
+                .frame(width: 390).padding().background(Color(uiColor: .systemGroupedBackground))
+            let renderer = ImageRenderer(content: view)
+            renderer.scale = 2
+            let image = try XCTUnwrap(renderer.uiImage)
+            try image.pngData()?.write(to: URL(fileURLWithPath: "/tmp/tubetrack-departure-\(name).png"))
+        }
+    }
+
     func testBoardsAtPhoneLandscapeAndAccessibilitySizes() async throws {
         let suite = "departure-render-\(UUID())"
         let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
@@ -81,7 +106,15 @@ private final class DepartureRenderProtocol: URLProtocol, @unchecked Sendable {
              "status": index == 3 ? "cancelled" : "onTime"]
         }
         let direction = URLComponents(url: request.url!, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "direction" }?.value
-        let selectedRows = direction.map { direction in rows.filter { ($0["direction"] as? String)?.lowercased() == direction.lowercased() } } ?? rows
+        var selectedRows = direction.map { direction in rows.filter { ($0["direction"] as? String)?.lowercased() == direction.lowercased() } } ?? rows
+        if request.url?.query?.contains("940GZZCRELM") == true {
+            selectedRows = [180, 900].map { seconds in
+                ["id": "tram-\(seconds)", "lineId": "tram", "stopId": "940GZZCRELM",
+                 "stationName": "Elmers End", "destinationName": "Check departure board for destination",
+                 "platformName": "Westbound Platform", "direction": "outbound",
+                 "expectedArrival": now.addingTimeInterval(Double(seconds)).ISO8601Format()]
+            }
+        }
         let data = try! JSONSerialization.data(withJSONObject: ["data": [
             "arrivals": selectedRows, "updatedAt": now.ISO8601Format(), "unavailableSources": 0,
             "unverifiedCount": 1, "stale": false

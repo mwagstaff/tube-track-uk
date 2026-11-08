@@ -42,6 +42,25 @@ struct CableCarTests {
         #expect(CableCarPolicy.resolve(now: now, status: expired, updatedAt: now, stale: false, hours: hours, works: []).kind == .unknown)
     }
 
+    @Test func goodServiceWithUnavailableHoursExplainsOpeningUncertainty() throws {
+        let now = date("2026-11-08T10:13:00Z")
+        var unverified = try hours()
+        unverified.isVerified = false
+        for schedule in [nil, try hours(validThrough: "2026-10-24"), unverified] {
+            let result = resolve(now, hours: schedule)
+            #expect(result.kind == .unknown)
+            #expect(result.headline == "Opening unconfirmed")
+            #expect(result.detail == "TfL reports good service, but opening hours could not be confirmed.")
+            #expect(!result.isClosed && !result.isIssue)
+            #expect(resolve(now, stale: true, hours: schedule).headline == "Status unavailable")
+            #expect(resolve(now, age: 121, hours: schedule).headline == "Status unavailable")
+            #expect(resolve(now, severity: 2, hours: schedule).kind == .suspended)
+        }
+        let bundled = try #require(RiverBundle.load("CableCarHours", as: CableCarHours.self))
+        #expect(resolve(now, hours: bundled).headline == "Open · good service")
+        #expect(resolve(date("2026-11-08T21:00:00Z"), hours: bundled).kind == .scheduledClosed)
+    }
+
     @Test func londonCalendarHandlesDSTBankHolidaysExceptionsAndScheduleExpiry() throws {
         let hours = try hours(bankHolidays: ["2026-12-28"], exceptions: ["2026-12-25": .init(opens: nil, closes: nil)])
         let summer = date("2026-10-24T00:00:00Z"), winter = date("2026-10-25T00:00:00Z")

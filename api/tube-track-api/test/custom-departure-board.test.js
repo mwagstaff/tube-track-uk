@@ -180,3 +180,36 @@ test('Canary Wharf boards count trains and retain both boarding faces', async ()
     assert.deepEqual(result.arrivals.map(row => row.platformName), Array(3).fill('Platforms 3 & 4'));
     assert.deepEqual(result.arrivals.map(row => row.expectedArrival), [iso(60000), iso(840000), iso(1620000)]);
 });
+
+for (const [lineId, stopId, stationName] of [
+    ['tram', '940GZZCRELM', 'Elmers End'],
+    ['dlr', '940GZZDLBNK', 'Bank'],
+    ['northern', '940GZZLUMDN', 'Morden']
+]) {
+    test(`${stationName} keeps official same-station timings with an unknown destination`, async () => {
+        const rows = [180, 900].map((seconds, i) => ({
+            ...prediction(`vehicle-${i}`, stopId, seconds), lineId, stopId, stationName,
+            destinationName: stationName, towards: stationName, platformName: 'Westbound Platform'
+        }));
+        const stop = { id: stopId, name: stationName, stopIDs: [stopId], lineIDs: [lineId], railCodes: [], mode: 'rail' };
+        const result = await fixture(rows, { stops: [stop] }).board({
+            originID: stopId, destinationIDs: [], lineIDs: [lineId], direction: 'Westbound'
+        });
+        assert.deepEqual(result.arrivals.map(row => row.expectedArrival), [iso(180000), iso(900000)]);
+        assert.ok(result.arrivals.every(row => row.destinationName === 'Check departure board for destination'
+            && row.destinationStopId === null && row.towards === null));
+        assert.equal(rows[0].destinationStopId, stopId, 'network feed remains unchanged');
+    });
+}
+
+test('name-only same-station predictions are retained but cannot verify onward calls', async () => {
+    const row = { ...prediction('unknown', null), stopId: 'LIMEHOUSE', stationName: 'Limehouse DLR Station',
+        destinationName: 'Limehouse', towards: 'Limehouse' };
+    const source = fixture([row]);
+    const board = await source.board({ originID: 'limehouse', destinationIDs: [], lineIDs: ['dlr'] });
+    assert.equal(board.arrivals.length, 1);
+    assert.equal(board.arrivals[0].destinationName, 'Check departure board for destination');
+    const filtered = await source.board({ originID: 'limehouse', destinationIDs: ['bank'], lineIDs: ['dlr'] });
+    assert.equal(filtered.arrivals.length, 0);
+    assert.equal(filtered.unverifiedCount, 1);
+});

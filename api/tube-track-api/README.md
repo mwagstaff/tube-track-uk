@@ -522,3 +522,13 @@ Omitting or clearing the list keeps all departures for the selected service and 
 Selected stops use the custom departure source to verify intermediate calls before limiting results,
 for both scheduled starts and later Live Activity updates. Partial or unavailable sources never
 fall back to an unfiltered board. Deploy this API version before distributing the calling-stop editor.
+
+### Unknown destinations on station boards
+
+The custom departure board retains live TfL predictions whose destination ID
+or name repeats the boarding station, preserving their published times and
+platforms with “Check departure board for destination”. This applies across
+stations and lines, including tram termini such as Elmers End. Destination
+routing fields are cleared before Calling at verification, so these predictions
+cannot imply an onward stop. Dedicated railway departure correction and explicit
+terminating-boat exclusions still apply; the network vehicle feed is unchanged.

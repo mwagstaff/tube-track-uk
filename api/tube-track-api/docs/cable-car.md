@@ -56,7 +56,8 @@ structured TfL timetable and checks its first/last journeys against that policy.
 An unexpected change sets `isVerified: false`, invalidating older cached hours
 until review. A transient upstream failure may reuse unexpired reviewed hours.
 The current review is valid
-**25 September through 24 October 2026 inclusive**. Re-fetching it never extends
+**25 September through 8 December 2026 inclusive**, re-reviewed on 8 November
+against the public page and live timetable. Re-fetching it never extends
 that expiry. There are no England/Wales bank holidays in this review interval.
 
 Before extending the validity:
@@ -75,7 +76,9 @@ Before extending the validity:
    silently adopting a new timetable.
 
 After expiry, the app stops asserting scheduled open/closed state, retains
-available live notices, and says opening hours are unavailable. All calendar
+available live notices, and says opening hours are unavailable. Fresh good service
+with unverified hours says “Opening unconfirmed” and explains that TfL reports
+good service without confirming opening; it never claims “Open” from status alone. All calendar
 calculations use Europe/London, independent of the device time zone.
 
 ## App behaviour
@@ -109,7 +112,7 @@ Stale planned information is disclosed rather than presented as confirmed.
 - Deploy `/api/v1/cable-car/*` before releasing the client.
 - Verify an actual dated disruption when TfL publishes one; fixtures alone cannot
   establish how far ahead the live feed will cover maintenance.
-- Recheck the hours policy before 25 October 2026.
+- Recheck the hours policy before 9 December 2026.
 - Review both maps with River Bus on, large text, Dark Mode and VoiceOver.
 - On device, profile pan/zoom with Instruments: the cable layer uses the existing
   retained canvas. Invalidations should be limited to camera buffer refresh,
